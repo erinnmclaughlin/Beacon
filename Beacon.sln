@@ -3,20 +3,20 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.5.33627.172
 MinimumVisualStudioVersion = 10.0.40219.1
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon", "src\Beacon\Beacon.csproj", "{E0752859-4640-4533-B550-033E873BC459}"
-EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.WebApp", "src\UI\BeaconUI.WebApp\BeaconUI.WebApp.csproj", "{5614261A-48BA-4A63-AF51-0FFC41047775}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "UI", "UI", "{48B8CE62-B48D-440F-BA07-1685256CFDEA}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.DesktopApp", "src\UI\BeaconUI.DesktopApp\BeaconUI.DesktopApp.csproj", "{BDD11D7C-CC2D-4A23-B17B-8CEC925D5657}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BeaconUI.Core", "src\UI\BeaconUI.Core\BeaconUI.Core.csproj", "{2B7307FB-5C5C-476F-9F4E-644E9216A540}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.Core", "src\UI\BeaconUI.Core\BeaconUI.Core.csproj", "{2B7307FB-5C5C-476F-9F4E-644E9216A540}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0E47628-E0FF-4587-88A1-A375A7590053}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 	EndProjectSection
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.API", "src\Beacon.API\Beacon.API.csproj", "{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -24,10 +24,6 @@ Global
 		Release|Any CPU = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(ProjectConfigurationPlatforms) = postSolution
-		{E0752859-4640-4533-B550-033E873BC459}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{E0752859-4640-4533-B550-033E873BC459}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{E0752859-4640-4533-B550-033E873BC459}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{E0752859-4640-4533-B550-033E873BC459}.Release|Any CPU.Build.0 = Release|Any CPU
 		{5614261A-48BA-4A63-AF51-0FFC41047775}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{5614261A-48BA-4A63-AF51-0FFC41047775}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5614261A-48BA-4A63-AF51-0FFC41047775}.Release|Any CPU.ActiveCfg = Release|Any CPU
@@ -42,6 +38,10 @@ Global
 		{2B7307FB-5C5C-476F-9F4E-644E9216A540}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{2B7307FB-5C5C-476F-9F4E-644E9216A540}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{2B7307FB-5C5C-476F-9F4E-644E9216A540}.Release|Any CPU.Build.0 = Release|Any CPU
+		{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
