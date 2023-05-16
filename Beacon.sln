@@ -11,12 +11,14 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.DesktopApp", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.Core", "src\UI\BeaconUI.Core\BeaconUI.Core.csproj", "{2B7307FB-5C5C-476F-9F4E-644E9216A540}"
 EndProject
-Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{E0E47628-E0FF-4587-88A1-A375A7590053}"
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{E0E47628-E0FF-4587-88A1-A375A7590053}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
 	EndProjectSection
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.API", "src\Beacon.API\Beacon.API.csproj", "{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F}"
+EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{599C893F-DE0F-4AB3-B55C-7A3CFEE63AF1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -50,6 +52,7 @@ Global
 		{5614261A-48BA-4A63-AF51-0FFC41047775} = {48B8CE62-B48D-440F-BA07-1685256CFDEA}
 		{BDD11D7C-CC2D-4A23-B17B-8CEC925D5657} = {48B8CE62-B48D-440F-BA07-1685256CFDEA}
 		{2B7307FB-5C5C-476F-9F4E-644E9216A540} = {48B8CE62-B48D-440F-BA07-1685256CFDEA}
+		{30A0BB0F-3FCA-4B2A-A31F-534DF02D5B7F} = {599C893F-DE0F-4AB3-B55C-7A3CFEE63AF1}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E1D1693-99AE-4EC0-89BA-3EA69BE684A4}
