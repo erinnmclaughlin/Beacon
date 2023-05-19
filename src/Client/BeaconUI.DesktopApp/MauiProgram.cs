@@ -1,4 +1,5 @@
-﻿using Microsoft.Extensions.Logging;
+﻿using BeaconUI.Core;
+using Microsoft.Extensions.Logging;
 
 namespace BeaconUI.DesktopApp;
 
@@ -15,10 +16,7 @@ public static class MauiProgram
             });
 
         builder.Services.AddMauiBlazorWebView();
-        builder.Services.AddScoped(sp => new HttpClient
-        {
-            BaseAddress = new Uri("https://localhost:7198")
-        });
+        builder.Services.AddBeaconUI();
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

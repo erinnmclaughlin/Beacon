@@ -1,6 +1,12 @@
+using Microsoft.AspNetCore.Authentication.Cookies;
+
 var builder = WebApplication.CreateBuilder(args);
 
 builder.Services.AddControllers();
+
+builder.Services
+    .AddAuthentication()
+    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
 builder.Services.AddCors();
 
@@ -13,6 +19,7 @@ app.UseCors(o =>  o
 );
 
 app.UseHttpsRedirection();
+app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 

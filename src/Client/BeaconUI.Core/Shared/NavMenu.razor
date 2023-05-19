@@ -1,4 +1,8 @@
-﻿<div class="top-row ps-3 navbar navbar-dark">
+﻿@using System.Security.Claims
+@inject HttpClient Http
+@inject AuthenticationStateProvider AuthStateProvider
+
+<div class="top-row ps-3 navbar navbar-dark">
     <div class="container-fluid">
         <a class="navbar-brand" href="">BeaconUI.DesktopApp</a>
         <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
@@ -25,6 +29,16 @@
             </NavLink>
         </div>
     </nav>
+    <div class="ml-auto">
+        <AuthorizeView>
+            <Authorized>
+                <button type="button" class="btn btn-primary mb-3" @onclick="LogoutAsync">Logout</button>
+            </Authorized>
+            <NotAuthorized>
+                <button type="button" class="btn btn-primary mb-3" @onclick="LoginAsync">Login</button>
+            </NotAuthorized>
+        </AuthorizeView>
+    </div>
 </div>
 
 @code {
@@ -35,5 +49,34 @@
     private void ToggleNavMenu()
     {
         collapseNavMenu = !collapseNavMenu;
+    }
+
+    private async Task LoginAsync()
+    {
+        var request = new
+        {
+            Username = "test",
+            Password = "!!test"
+        };
+
+        var response = await Http.PostAsJsonAsync("api/auth/login", request);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var identity = new ClaimsIdentity("Test");
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, request.Username));
+
+            ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(identity));
+        }
+    }
+
+    private async Task LogoutAsync()
+    {
+        var response = await Http.PostAsync("api/auth/logout", null);
+
+        if (response.IsSuccessStatusCode)
+        {
+            ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(new ClaimsIdentity()));
+        }
     }
 }
