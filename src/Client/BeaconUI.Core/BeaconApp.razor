@@ -1,0 +1,19 @@
+@using System.Reflection
+
+<CascadingAuthenticationState>
+    <Router AppAssembly="@Assembly" AdditionalAssemblies="new[] { typeof(BeaconApp).Assembly }">
+        <Found Context="routeData">
+            <RouteView RouteData="@routeData" DefaultLayout="@typeof(MainLayout)" />
+            <FocusOnNavigate RouteData="@routeData" Selector="h1" />
+        </Found>
+        <NotFound>
+            <LayoutView Layout="@typeof(MainLayout)">
+                <p role="alert">Sorry, there's nothing at this address.</p>
+            </LayoutView>
+        </NotFound>
+    </Router>
+</CascadingAuthenticationState>
+
+@code {
+    [Parameter, EditorRequired] public required Assembly Assembly { get; set; }
+}
