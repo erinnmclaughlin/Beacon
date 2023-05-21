@@ -1,7 +1,12 @@
-﻿@import url('open-iconic/font/css/open-iconic-bootstrap.min.css');
+﻿@import url('fontawesome/css/all.min.css');
 
 html, body {
+    height: 100%;
     font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+}
+
+#app {
+    height: 100%;
 }
 
 h1:focus {

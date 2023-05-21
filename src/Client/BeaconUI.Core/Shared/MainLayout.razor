@@ -1,17 +1,45 @@
-﻿@inherits LayoutComponentBase
+﻿@using Microsoft.AspNetCore.Authorization
+@using System.Security.Claims;
 
-<div class="page">
-    <div class="sidebar">
-        <NavMenu />
-    </div>
+@inherits LayoutComponentBase
 
-    <main>
-        <div class="top-row px-4">
-            <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
+
+<AuthorizeView>
+    <Authorized>
+        <div class="page">
+            <div class="sidebar">
+                <NavMenu />
+            </div>
+
+            <main>
+                <div class="top-row px-4">
+                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
+                    <div class="ml-auto">
+                        <button class="btn btn-link" @onclick="LogoutAsync">Logout</button>
+                    </div>
+                </div>
+
+                <article class="content px-4">
+                    @Body
+                </article>
+            </main>
         </div>
+    </Authorized>
+    <NotAuthorized>
+        <NavigateTo Url="login" />
+    </NotAuthorized>
+    <Authorizing>
+        <p>Authorizing...</p>
+    </Authorizing>
+</AuthorizeView>
 
-        <article class="content px-4">
-            @Body
-        </article>
-    </main>
-</div>
+@code {
+    
+    private async Task LogoutAsync()
+    {
+        var response = await Http.PostAsync("api/auth/logout", null);
+        ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(new ClaimsIdentity()));
+    }
+}

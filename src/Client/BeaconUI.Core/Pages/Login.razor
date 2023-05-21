@@ -1,0 +1,91 @@
+﻿@using System.Security.Claims
+
+@page "/login"
+
+@layout EmptyLayout
+
+@inject AuthenticationStateProvider AuthStateProvider
+@inject HttpClient Http
+@inject NavigationManager NavManager
+
+<div class="login-page">
+
+    <div class="form-container text-center">
+
+        <span class="text-primary mb-1 fs-2">
+            <i class="fa-regular fa-flask-vial"></i>
+        </span>
+
+        <h3 class="fw-bold mb-4">
+            <span>Log in to your account</span>
+        </h3>
+
+        <EditForm Model="Model" OnValidSubmit="Submit">
+
+            <DataAnnotationsValidator />
+
+            <fieldset disabled="@IsSubmitting">
+
+                <div class="mb-3 text-start">
+                    <label class="form-label" for="username">Username</label>
+                    <InputText @bind-Value="Model.Username" class="form-control" id="username" placeholder="eg, jsparrow" />
+                    <ValidationMessage For="() => Model.Username" />
+                </div>
+
+                <div class="mb-3 text-start">
+                    <label class="form-label" for="password">Password</label>
+                    <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
+                    <ValidationMessage For="() => Model.Password" />
+                </div>
+
+                @if (ErrorMessage is { } error)
+                {
+                    <p class="text-danger mb-3">@error</p>
+                }
+
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+
+            </fieldset>
+        </EditForm>
+
+    </div>
+
+</div>
+
+@code {
+
+    private LoginModel Model { get; set; } = new();
+
+    private bool IsSubmitting { get; set; }
+    private string? ErrorMessage { get; set; }
+
+    private async Task Submit(EditContext editContext)
+    {
+        if (IsSubmitting) return;
+        IsSubmitting = true;
+        ErrorMessage = null;
+
+        var response = await Http.PostAsJsonAsync("api/auth/login", Model);
+
+        if (response.IsSuccessStatusCode)
+        {
+            var identity = new ClaimsIdentity("Test");
+            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, Model.Username));
+            ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(identity));
+            NavManager.NavigateTo("");
+        }
+        else
+            ErrorMessage = "Username or password was incorrect.";
+
+        IsSubmitting = false;
+    }
+
+    private class LoginModel
+    {
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Username is required.")]
+        public string Username { get; set; } = string.Empty;
+
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Password is required.")]
+        public string Password { get; set; } = string.Empty;
+    }
+}

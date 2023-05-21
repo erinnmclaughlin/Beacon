@@ -9,17 +9,19 @@ namespace Beacon.API.Controllers;
 public sealed class AuthController : ControllerBase
 {
     [HttpPost("login")]
-    public async Task Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request)
     {
         if (request.Password != $"!!{request.Username}")
-            return;
+            return BadRequest("Username or password was incorrect.");
         
         var identity = new ClaimsIdentity("Test");
         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, request.Username));
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
+
+        return NoContent();
     }
 
-    [HttpPost("logout")]
+    [HttpGet("logout")]
     public async Task Logout()
     {
         await HttpContext.SignOutAsync();

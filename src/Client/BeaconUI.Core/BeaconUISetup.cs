@@ -12,6 +12,7 @@ public static class BeaconUISetup
             BaseAddress = new Uri("https://localhost:7198")
         });
 
+        services.AddOptions();
         services.AddAuthorizationCore();
         services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
 
