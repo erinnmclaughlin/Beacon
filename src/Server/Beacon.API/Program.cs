@@ -1,4 +1,6 @@
+using Beacon.API.Persistence;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -9,6 +11,12 @@ builder.Services
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
 builder.Services.AddCors();
+
+builder.Services.AddDbContext<BeaconDbContext>(options =>
+{
+    var connectionString = builder.Configuration.GetConnectionString("SqlServerDb");
+    options.UseSqlServer(connectionString);
+});
 
 var app = builder.Build();
 
