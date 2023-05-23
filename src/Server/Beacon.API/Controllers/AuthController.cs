@@ -4,6 +4,8 @@ using Beacon.API.Security;
 using Beacon.Common.Auth;
 using Beacon.Common.Auth.Login;
 using Beacon.Common.Auth.Register;
+using FluentValidation;
+using FluentValidation.Results;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -23,8 +25,11 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("register")]
-    public async Task<IActionResult> Register(RegisterRequest request)
+    public async Task<IActionResult> Register(RegisterRequest request, [FromServices] IEnumerable<IValidator<RegisterRequest>> requestValidators)
     {
+        if (!await ValidateAsync(request, requestValidators))
+            return ValidationProblem();
+
         var email = request.EmailAddress.Trim();
 
         if (await _context.Users.AnyAsync(u => u.EmailAddress == email))
@@ -58,8 +63,11 @@ public sealed class AuthController : ControllerBase
     }
 
     [HttpPost("login")]
-    public async Task<IActionResult> Login(LoginRequest request)
+    public async Task<IActionResult> Login(LoginRequest request, [FromServices] IEnumerable<IValidator<LoginRequest>> requestValidators)
     {
+        if (!await ValidateAsync(request, requestValidators))
+            return ValidationProblem();
+
         var email = request.EmailAddress.Trim();
 
         var user = await _context.Users
@@ -93,5 +101,31 @@ public sealed class AuthController : ControllerBase
     public async Task Logout()
     {
         await HttpContext.SignOutAsync();
+    }
+
+    private async Task<bool> ValidateAsync<T>(T subject, IEnumerable<IValidator<T>> validators)
+    {
+        if (!validators.Any())
+            return true;
+
+        var failures = new List<ValidationFailure>();
+
+        foreach (var validator in validators)
+        {
+            var result = await validator.ValidateAsync(subject);
+
+            if (result.Errors.Any())
+                failures.AddRange(result.Errors);
+        }
+
+        var errors = failures
+            .GroupBy(f => f.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(f => f.ErrorMessage).Distinct().ToArray());
+
+        foreach (var error in errors)
+            foreach (var message in error.Value)
+                ModelState.AddModelError(error.Key, message);
+
+        return !errors.Any();
     }
 }

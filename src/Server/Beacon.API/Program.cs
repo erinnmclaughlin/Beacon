@@ -1,5 +1,7 @@
 using Beacon.API.Persistence;
 using Beacon.API.Security;
+using Beacon.Common.Auth.Login;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -20,6 +22,8 @@ builder.Services.AddDbContext<BeaconDbContext>(options =>
 });
 
 builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
+
+builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 var app = builder.Build();
 
