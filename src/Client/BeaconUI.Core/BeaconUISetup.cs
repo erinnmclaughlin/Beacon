@@ -8,15 +8,15 @@ public static class BeaconUISetup
 {
     public static IServiceCollection AddBeaconUI(this IServiceCollection services)
     {
-        services.AddScoped(sp => new HttpClient
+        services.AddSingleton(sp => new HttpClient
         {
-            BaseAddress = new Uri("https://localhost:7198")
+            BaseAddress = new Uri("http://localhost:5077")
         });
 
         services.AddOptions();
         services.AddAuthorizationCore();
-        services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
-        services.AddScoped<BeaconAuthClient>();
+        services.AddSingleton<AuthenticationStateProvider, BeaconAuthStateProvider>();
+        services.AddSingleton<BeaconAuthClient>();
 
         return services;
     }

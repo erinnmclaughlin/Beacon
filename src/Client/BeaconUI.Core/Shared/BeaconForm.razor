@@ -11,7 +11,7 @@
     [Parameter] public bool DisableDuringSubmit { get; set; } = true;
 
     [Parameter, EditorRequired] public required object Model { get; set; }
-    [Parameter, EditorRequired] public required Func<Task<ValidationProblemResponse?>> OnSubmit { get; set; }
+    [Parameter, EditorRequired] public required Func<Task<ValidationProblemResponse?>> OnValidSubmit { get; set; }
 
     private EditContext? _editContext;
     private EditContext EditContext => _editContext ??= new(Model);
@@ -40,12 +40,12 @@
 
     private async Task Submit()
     {
-        if (IsDisabled)
+        if (IsDisabled || !EditContext.Validate())
             return;
 
         IsSubmitting = true;
 
-        if (await OnSubmit() is { } validationProblem && validationProblem.Errors is { Count: > 0 } errors)
+        if (await OnValidSubmit() is { } validationProblem && validationProblem.Errors is { Count: > 0 } errors)
         {
             ValidationMessages.Clear();
 

@@ -21,7 +21,7 @@
             <span>Log in to your account</span>
         </h3>
 
-        <BeaconForm Model="Model" OnSubmit="Submit">
+        <BeaconForm Model="Model" OnValidSubmit="Submit">
             <div class="mb-3 text-start">
                 <label class="form-label" for="email">Email</label>
                 <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" type="email" placeholder="eg, jsparrow@blackpearl.arg" />
