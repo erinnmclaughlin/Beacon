@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace BeaconUI.Core.Auth.Register;
+namespace Beacon.Common.Auth.Register;
 
 public class RegisterRequestValidator : AbstractValidator<RegisterRequest>
 {

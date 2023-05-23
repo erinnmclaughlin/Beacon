@@ -1,5 +1,8 @@
 ﻿using Beacon.API.Entities;
 using Beacon.API.Persistence;
+using Beacon.Common.Auth;
+using Beacon.Common.Auth.Login;
+using Beacon.Common.Auth.Register;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
@@ -35,7 +38,11 @@ public sealed class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(new UserDto(user.Id, user.DisplayName));
+        return Ok(new UserDto
+        {
+            Id = user.Id,
+            DisplayName = user.DisplayName
+        });
     }
 
     [HttpPost("login")]
@@ -55,7 +62,11 @@ public sealed class AuthController : ControllerBase
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-        return Ok(new UserDto(user.Id, user.DisplayName));
+        return Ok(new UserDto
+        {
+            Id = user.Id,
+            DisplayName = user.DisplayName
+        });
     }
 
     [HttpGet("logout")]
@@ -64,7 +75,3 @@ public sealed class AuthController : ControllerBase
         await HttpContext.SignOutAsync();
     }
 }
-
-public record LoginRequest(string EmailAddress, string Password);
-public record RegisterRequest(string DisplayName, string EmailAddress, string Password);
-public record UserDto(Guid Id, string DisplayName);

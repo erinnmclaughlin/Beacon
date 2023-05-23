@@ -1,5 +1,5 @@
-﻿@using BeaconUI.Core.Auth
-@using BeaconUI.Core.Auth.Login
+﻿@using Beacon.Common.Auth.Login
+@using BeaconUI.Core.Auth
 
 @page "/login"
 
@@ -27,7 +27,7 @@
             <fieldset disabled="@IsSubmitting">
 
                 <div class="mb-3 text-start">
-                    <label class="form-label" for="username">Email</label>
+                    <label class="form-label" for="email">Email</label>
                     <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" placeholder="eg, jsparrow@blackpearl.arg" />
                     <ValidationMessage For="() => Model.EmailAddress" />
                 </div>
@@ -63,10 +63,18 @@
         if (IsSubmitting) return;
         IsSubmitting = true;
 
-        // TODO: handle errors
-        await AuthService.Login(Model);
-        NavManager.NavigateTo("");
+        var response = await AuthService.Login(Model);
+
+        response.Switch(
+            success => NavManager.NavigateTo(""),
+            validationProblem => AddServerValidationErrors(validationProblem)
+        );
 
         IsSubmitting = false;
+    }
+
+    private void AddServerValidationErrors(ValidationProblemResponse validationProblem)
+    {
+        // TODO
     }
 }

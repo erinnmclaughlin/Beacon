@@ -1,6 +1,10 @@
-﻿using BeaconUI.Core.Auth.Login;
-using BeaconUI.Core.Auth.Register;
+﻿using Beacon.Common.Auth;
+using Beacon.Common.Auth.Login;
+using Beacon.Common.Auth.Register;
+using Beacon.Common.Responses;
 using Microsoft.AspNetCore.Components.Authorization;
+using OneOf;
+using System.Net;
 using System.Net.Http.Json;
 using System.Security.Claims;
 
@@ -17,30 +21,48 @@ public sealed class BeaconAuthService
         _http = http;
     }
 
-    public async Task Register(RegisterRequest request, CancellationToken ct = default)
+    public async Task<OneOf<UserDto, ValidationProblemResponse>> Register(RegisterRequest request, CancellationToken ct = default)
     {
         var response = await _http.PostAsJsonAsync("api/auth/register", request, ct);
 
-        // TODO: deal with errors:
-        if (!response.IsSuccessStatusCode)
-            return;
+        if (response.StatusCode is HttpStatusCode.BadRequest)
+        {
+            var validationProblem = await response.Content.ReadFromJsonAsync<ValidationProblemResponse>(cancellationToken: ct);
 
-        var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct);
+            if (validationProblem is not null)
+                return validationProblem;
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct)
+            ?? throw new Exception("There was an unexpected problem deserializing the response.");
 
         ((BeaconAuthStateProvider)_authProvider).UpdateCurrentUser(user.ToClaimsPrincipal());
+
+        return user;
     }
 
-    public async Task Login(LoginRequest request, CancellationToken ct = default)
+    public async Task<OneOf<UserDto, ValidationProblemResponse>> Login(LoginRequest request, CancellationToken ct = default)
     {
         var response = await _http.PostAsJsonAsync("api/auth/login", request, ct);
 
-        // TODO: deal with errors:
-        if (!response.IsSuccessStatusCode)
-            return;
+        if (response.StatusCode is HttpStatusCode.BadRequest)
+        {
+            var validationProblem = await response.Content.ReadFromJsonAsync<ValidationProblemResponse>(cancellationToken: ct);
 
-        var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct);
+            if (validationProblem is not null)
+                return validationProblem;
+        }
+
+        response.EnsureSuccessStatusCode();
+
+        var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct)
+            ?? throw new Exception("There was an unexpected problem deserializing the response.");
 
         ((BeaconAuthStateProvider)_authProvider).UpdateCurrentUser(user.ToClaimsPrincipal());
+
+        return user;
     }
 
     public async Task Logout(CancellationToken ct = default)

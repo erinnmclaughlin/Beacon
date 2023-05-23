@@ -20,6 +20,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.DesktopApp", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.API", "src\Server\Beacon.API\Beacon.API.csproj", "{3B9C231D-F742-49AC-82DA-48CB5F2636CE}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{653ABB52-D8EB-4D7A-9FE5-247A69E3333F}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.Common", "src\Shared\Beacon.Common\Beacon.Common.csproj", "{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -44,6 +48,10 @@ Global
 		{3B9C231D-F742-49AC-82DA-48CB5F2636CE}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{3B9C231D-F742-49AC-82DA-48CB5F2636CE}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{3B9C231D-F742-49AC-82DA-48CB5F2636CE}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -53,6 +61,7 @@ Global
 		{61ECCA98-C75D-4D73-AC25-AA2D180E80F0} = {48B8CE62-B48D-440F-BA07-1685256CFDEA}
 		{9674CC28-7B22-42B1-BAD2-BB3FB361CCBD} = {48B8CE62-B48D-440F-BA07-1685256CFDEA}
 		{3B9C231D-F742-49AC-82DA-48CB5F2636CE} = {599C893F-DE0F-4AB3-B55C-7A3CFEE63AF1}
+		{CD63A9E5-83C5-4ECC-8024-1E87A96845FE} = {653ABB52-D8EB-4D7A-9FE5-247A69E3333F}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E1D1693-99AE-4EC0-89BA-3EA69BE684A4}

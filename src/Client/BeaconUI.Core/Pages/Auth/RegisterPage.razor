@@ -1,5 +1,5 @@
-﻿@using BeaconUI.Core.Auth
-@using BeaconUI.Core.Auth.Register
+﻿@using Beacon.Common.Auth.Register
+@using BeaconUI.Core.Auth
 
 @page "/register"
 
@@ -69,10 +69,18 @@
         if (IsSubmitting) return;
         IsSubmitting = true;
 
-        // TODO: Handle errors
-        await AuthService.Register(Model);
-        NavManager.NavigateTo("");
+        var response = await AuthService.Register(Model);
+
+        response.Switch(
+            success => NavManager.NavigateTo(""),
+            validationProblem => AddServerValidationErrors(validationProblem)
+        );
 
         IsSubmitting = false;
+    }
+
+    private void AddServerValidationErrors(ValidationProblemResponse validationProblem)
+    {
+        // TODO
     }
 }

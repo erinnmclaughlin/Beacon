@@ -1,4 +1,4 @@
-﻿namespace BeaconUI.Core.Auth;
+﻿namespace Beacon.Common.Auth;
 
 public record UserDto
 {

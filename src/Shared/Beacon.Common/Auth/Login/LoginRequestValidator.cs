@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace BeaconUI.Core.Auth.Login;
+namespace Beacon.Common.Auth.Login;
 
 public class LoginRequestValidator : AbstractValidator<LoginRequest>
 {

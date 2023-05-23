@@ -1,12 +1,12 @@
 ﻿using System.Security.Claims;
 
-namespace BeaconUI.Core.Auth;
+namespace Beacon.Common.Auth;
 
 public static class UserDtoClaimsPrincipalMapper
 {
     public static ClaimsPrincipal ToClaimsPrincipal(this UserDto? user)
     {
-        if (user is null) 
+        if (user is null)
             return new ClaimsPrincipal(new ClaimsIdentity());
 
         var identity = new ClaimsIdentity("Test");
