@@ -25,7 +25,10 @@ public sealed class AuthController : ControllerBase
     public async Task<IActionResult> Register(RegisterRequest request)
     {
         if (await _context.Users.AnyAsync(u => u.EmailAddress == request.EmailAddress))
-            return BadRequest("An account with the specified email address already exists.");
+        {
+            ModelState.AddModelError(nameof(RegisterRequest.EmailAddress), "An account with the specified email address already exists.");
+            return ValidationProblem();
+        }
 
         var user = new User
         {
@@ -54,7 +57,9 @@ public sealed class AuthController : ControllerBase
 
         // TODO: do real password things
         if (user is null || request.Password != "password")
-            return BadRequest("Email address or password was incorrect.");
+        {
+            return ValidationProblem("Email address or password was incorrect.");
+        }
         
         var identity = new ClaimsIdentity("Test");
         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
