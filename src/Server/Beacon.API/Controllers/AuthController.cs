@@ -27,6 +27,7 @@ public sealed class AuthController : ControllerBase
         var user = new User
         {
             Id = Guid.NewGuid(),
+            DisplayName = request.DisplayName,
             EmailAddress = request.EmailAddress,
             HashedPassword = "!!password"
         };
@@ -34,7 +35,7 @@ public sealed class AuthController : ControllerBase
         _context.Users.Add(user);
         await _context.SaveChangesAsync();
 
-        return Ok(user.Id);
+        return Ok(new UserDto(user.Id, user.DisplayName));
     }
 
     [HttpPost("login")]
@@ -54,7 +55,7 @@ public sealed class AuthController : ControllerBase
 
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-        return Ok(user.Id);
+        return Ok(new UserDto(user.Id, user.DisplayName));
     }
 
     [HttpGet("logout")]
@@ -65,4 +66,5 @@ public sealed class AuthController : ControllerBase
 }
 
 public record LoginRequest(string EmailAddress, string Password);
-public record RegisterRequest(string EmailAddress, string Password);
+public record RegisterRequest(string DisplayName, string EmailAddress, string Password);
+public record UserDto(Guid Id, string DisplayName);

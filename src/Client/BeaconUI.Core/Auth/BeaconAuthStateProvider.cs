@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
-namespace BeaconUI.Core;
+namespace BeaconUI.Core.Auth;
 
 public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 {

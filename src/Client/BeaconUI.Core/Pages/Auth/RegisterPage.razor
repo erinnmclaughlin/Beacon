@@ -1,12 +1,12 @@
-﻿@page "/register"
-@using System.Security.Claims;
+﻿@using BeaconUI.Core.Auth
+@using BeaconUI.Core.Auth.Register
+
+@page "/register"
 
 @layout EmptyLayout
 
-@inject AuthenticationStateProvider AuthStateProvider
-@inject HttpClient Http
+@inject BeaconAuthService AuthService
 @inject NavigationManager NavManager
-
 
 <div class="page-container">
 
@@ -22,13 +22,19 @@
 
         <EditForm Model="Model" OnValidSubmit="Submit">
 
-            <DataAnnotationsValidator />
+            <FluentValidationValidator />
 
             <fieldset disabled="@IsSubmitting">
 
                 <div class="mb-3 text-start">
+                    <label class="form-label" for="username">Display Name</label>
+                    <InputText @bind-Value="Model.DisplayName" class="form-control" id="username" placeholder="e.g., jsparrow" />
+                    <ValidationMessage For="() => Model.DisplayName" />
+                </div>
+
+                <div class="mb-3 text-start">
                     <label class="form-label" for="email">Email</label>
-                    <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" placeholder="eg, jsparrow@blackpearl.arg" />
+                    <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" placeholder="e.g., jsparrow@blackpearl.arg" />
                     <ValidationMessage For="() => Model.EmailAddress" />
                 </div>
 
@@ -37,11 +43,6 @@
                     <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
                     <ValidationMessage For="() => Model.Password" />
                 </div>
-
-                @if (ErrorMessage is { } error)
-                {
-                    <p class="text-danger mb-3">@error</p>
-                }
 
                 <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
 
@@ -59,37 +60,19 @@
 
 @code {
 
-    private RegisterModel Model { get; set; } = new();
+    private RegisterRequest Model { get; set; } = new();
 
     private bool IsSubmitting { get; set; }
-    private string? ErrorMessage { get; set; }
 
     private async Task Submit(EditContext editContext)
     {
         if (IsSubmitting) return;
         IsSubmitting = true;
-        ErrorMessage = null;
 
-        var response = await Http.PostAsJsonAsync("api/auth/register", Model);
-
-        if (response.IsSuccessStatusCode)
-        {
-            var identity = new ClaimsIdentity("Test");
-            identity.AddClaim(new Claim(ClaimTypes.Email, Model.EmailAddress));
-
-            ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(identity));
-            NavManager.NavigateTo("");
-        }
+        // TODO: Handle errors
+        await AuthService.Register(Model);
+        NavManager.NavigateTo("");
 
         IsSubmitting = false;
-    }
-
-    private class RegisterModel
-    {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Email address is required."), EmailAddress]
-        public string EmailAddress { get; set; } = string.Empty;
-
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Password is required.")]
-        public string Password { get; set; } = string.Empty;
     }
 }

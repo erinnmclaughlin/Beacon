@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using BeaconUI.Core.Auth;
+using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BeaconUI.Core;
@@ -15,6 +16,7 @@ public static class BeaconUISetup
         services.AddOptions();
         services.AddAuthorizationCore();
         services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
+        services.AddScoped<BeaconAuthService>();
 
         return services;
     }
