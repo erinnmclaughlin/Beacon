@@ -1,7 +1,10 @@
+using Beacon.API.Behaviors;
+using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Security;
 using Beacon.Common.Auth.Login;
 using FluentValidation;
+using MediatR;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -25,6 +28,15 @@ builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
+builder.Services.AddMediatR(config =>
+{
+    config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+});
+
+builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
+
+builder.Services.AddTransient<ExceptionHandler>();
+
 var app = builder.Build();
 
 app.UseCors(o =>  o
@@ -43,5 +55,7 @@ using (var scope = app.Services.CreateScope())
 {
     await scope.ServiceProvider.GetRequiredService<BeaconDbContext>().Database.MigrateAsync();
 }
+
+app.UseMiddleware<ExceptionHandler>();
 
 app.Run();

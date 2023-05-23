@@ -25,7 +25,7 @@ public sealed class BeaconAuthService
     {
         var response = await _http.PostAsJsonAsync("api/auth/register", request, ct);
 
-        if (response.StatusCode is HttpStatusCode.BadRequest)
+        if (response.StatusCode is HttpStatusCode.UnprocessableEntity)
         {
             var validationProblem = await response.Content.ReadFromJsonAsync<ValidationProblemResponse>(cancellationToken: ct);
 
@@ -47,7 +47,7 @@ public sealed class BeaconAuthService
     {
         var response = await _http.PostAsJsonAsync("api/auth/login", request, ct);
 
-        if (response.StatusCode is HttpStatusCode.BadRequest)
+        if (response.StatusCode is HttpStatusCode.UnprocessableEntity)
         {
             var validationProblem = await response.Content.ReadFromJsonAsync<ValidationProblemResponse>(cancellationToken: ct);
 

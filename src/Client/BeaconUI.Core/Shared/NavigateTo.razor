@@ -1,10 +1,8 @@
 ﻿@inject NavigationManager NavManager
+
 @code {
     [Parameter, EditorRequired] public required string Url { get; set; }
 
-    protected override void OnInitialized()
-    {
-        Console.WriteLine("Navigating!");
-        NavManager.NavigateTo("login");
-    }
+    protected override void OnInitialized() => NavManager.NavigateTo("login");
+
 }
