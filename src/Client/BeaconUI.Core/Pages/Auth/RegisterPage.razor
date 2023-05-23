@@ -1,6 +1,5 @@
-﻿@using System.Security.Claims
-
-@page "/login"
+﻿@page "/register"
+@using System.Security.Claims;
 
 @layout EmptyLayout
 
@@ -8,7 +7,8 @@
 @inject HttpClient Http
 @inject NavigationManager NavManager
 
-<div class="login-page">
+
+<div class="page-container">
 
     <div class="form-container text-center">
 
@@ -17,7 +17,7 @@
         </span>
 
         <h3 class="fw-bold mb-4">
-            <span>Log in to your account</span>
+            <span>Create an account</span>
         </h3>
 
         <EditForm Model="Model" OnValidSubmit="Submit">
@@ -27,9 +27,9 @@
             <fieldset disabled="@IsSubmitting">
 
                 <div class="mb-3 text-start">
-                    <label class="form-label" for="username">Username</label>
-                    <InputText @bind-Value="Model.Username" class="form-control" id="username" placeholder="eg, jsparrow" />
-                    <ValidationMessage For="() => Model.Username" />
+                    <label class="form-label" for="email">Email</label>
+                    <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" placeholder="eg, jsparrow@blackpearl.arg" />
+                    <ValidationMessage For="() => Model.EmailAddress" />
                 </div>
 
                 <div class="mb-3 text-start">
@@ -43,7 +43,12 @@
                     <p class="text-danger mb-3">@error</p>
                 }
 
-                <button type="submit" class="btn btn-primary w-100">Login</button>
+                <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
+
+                <div>
+                    <span>Already have an account?</span>
+                    <a href="login">Login</a>
+                </div>
 
             </fieldset>
         </EditForm>
@@ -54,7 +59,7 @@
 
 @code {
 
-    private LoginModel Model { get; set; } = new();
+    private RegisterModel Model { get; set; } = new();
 
     private bool IsSubmitting { get; set; }
     private string? ErrorMessage { get; set; }
@@ -65,25 +70,24 @@
         IsSubmitting = true;
         ErrorMessage = null;
 
-        var response = await Http.PostAsJsonAsync("api/auth/login", Model);
+        var response = await Http.PostAsJsonAsync("api/auth/register", Model);
 
         if (response.IsSuccessStatusCode)
         {
             var identity = new ClaimsIdentity("Test");
-            identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, Model.Username));
+            identity.AddClaim(new Claim(ClaimTypes.Email, Model.EmailAddress));
+
             ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(identity));
             NavManager.NavigateTo("");
         }
-        else
-            ErrorMessage = "Username or password was incorrect.";
 
         IsSubmitting = false;
     }
 
-    private class LoginModel
+    private class RegisterModel
     {
-        [Required(AllowEmptyStrings = false, ErrorMessage = "Username is required.")]
-        public string Username { get; set; } = string.Empty;
+        [Required(AllowEmptyStrings = false, ErrorMessage = "Email address is required."), EmailAddress]
+        public string EmailAddress { get; set; } = string.Empty;
 
         [Required(AllowEmptyStrings = false, ErrorMessage = "Password is required.")]
         public string Password { get; set; } = string.Empty;
