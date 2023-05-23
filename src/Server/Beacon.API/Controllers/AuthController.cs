@@ -33,14 +33,12 @@ public sealed class AuthController : ControllerBase
             return ValidationProblem();
         }
 
-        var hashedPassword = _passwordHasher.Hash(request.Password, out var salt);
-
         var user = new User
         {
             Id = Guid.NewGuid(),
             DisplayName = request.DisplayName.Trim(),
             EmailAddress = email,
-            HashedPassword = hashedPassword,
+            HashedPassword = _passwordHasher.Hash(request.Password, out var salt),
             HashedPasswordSalt = salt
         };
 
@@ -65,8 +63,20 @@ public sealed class AuthController : ControllerBase
         var email = request.EmailAddress.Trim();
 
         var user = await _context.Users
+            .Where(u => u.EmailAddress == email)
+            .Select(u => new
+            {
+                Response = new UserDto
+                {
+                    Id = u.Id,
+                    EmailAddress = u.EmailAddress,
+                    DisplayName = u.DisplayName,
+                },
+                u.HashedPassword,
+                u.HashedPasswordSalt
+            })
             .AsNoTracking()
-            .FirstOrDefaultAsync(u => u.EmailAddress == email);
+            .FirstOrDefaultAsync();
 
         if (user is null || !_passwordHasher.Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt))
         {
@@ -74,16 +84,9 @@ public sealed class AuthController : ControllerBase
             return ValidationProblem();
         }
 
-        var userDto = new UserDto
-        {
-            Id = user.Id,
-            DisplayName = user.DisplayName,
-            EmailAddress = user.EmailAddress
-        };
+        await HttpContext.SignInAsync(user.Response.ToClaimsPrincipal());
 
-        await HttpContext.SignInAsync(userDto.ToClaimsPrincipal());
-
-        return Ok(userDto);
+        return Ok(user.Response);
     }
 
     [HttpGet("logout")]
