@@ -6,4 +6,5 @@ public class User
     public required string DisplayName { get; set; }
     public required string EmailAddress { get; set; }
     public required string HashedPassword { get; set; }
+    public required byte[] HashedPasswordSalt { get; set; }
 }

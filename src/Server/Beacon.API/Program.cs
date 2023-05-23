@@ -1,4 +1,5 @@
 using Beacon.API.Persistence;
+using Beacon.API.Security;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
@@ -17,6 +18,8 @@ builder.Services.AddDbContext<BeaconDbContext>(options =>
     var connectionString = builder.Configuration.GetConnectionString("SqlServerDb");
     options.UseSqlServer(connectionString);
 });
+
+builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
 
 var app = builder.Build();
 

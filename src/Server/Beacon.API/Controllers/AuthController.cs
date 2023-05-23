@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Entities;
 using Beacon.API.Persistence;
+using Beacon.API.Security;
 using Beacon.Common.Auth;
 using Beacon.Common.Auth.Login;
 using Beacon.Common.Auth.Register;
@@ -15,10 +16,12 @@ namespace Beacon.API.Controllers;
 public sealed class AuthController : ControllerBase
 {
     private readonly BeaconDbContext _context;
+    private readonly IPasswordHasher _passwordHasher;
 
-    public AuthController(BeaconDbContext context)
+    public AuthController(BeaconDbContext context, IPasswordHasher passwordHasher)
     {
         _context = context;
+        _passwordHasher = passwordHasher;
     }
 
     [HttpPost("register")]
@@ -30,12 +33,15 @@ public sealed class AuthController : ControllerBase
             return ValidationProblem();
         }
 
+        var hashedPassword = _passwordHasher.Hash(request.Password, out var salt);
+
         var user = new User
         {
             Id = Guid.NewGuid(),
             DisplayName = request.DisplayName,
             EmailAddress = request.EmailAddress,
-            HashedPassword = "!!password"
+            HashedPassword = hashedPassword,
+            HashedPasswordSalt = salt
         };
 
         _context.Users.Add(user);
@@ -55,12 +61,11 @@ public sealed class AuthController : ControllerBase
             .AsNoTracking()
             .FirstOrDefaultAsync(u => u.EmailAddress == request.EmailAddress);
 
-        // TODO: do real password things
-        if (user is null || request.Password != "password")
+        if (user is null || !_passwordHasher.Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt))
         {
             return ValidationProblem("Email address or password was incorrect.");
         }
-        
+
         var identity = new ClaimsIdentity("Test");
         identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
         identity.AddClaim(new Claim(ClaimTypes.Email, user.EmailAddress));
