@@ -63,7 +63,8 @@ public sealed class AuthController : ControllerBase
 
         if (user is null || !_passwordHasher.Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt))
         {
-            return ValidationProblem("Email address or password was incorrect.");
+            ModelState.AddModelError(nameof(LoginRequest.EmailAddress), "Email address or password was incorrect.");
+            return ValidationProblem();
         }
 
         var identity = new ClaimsIdentity("Test");

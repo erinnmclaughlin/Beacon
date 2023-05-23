@@ -1,4 +1,5 @@
 ﻿@using Beacon.Common.Auth.Register
+@using Beacon.Common.Auth;
 @using BeaconUI.Core.Auth
 
 @page "/register"
@@ -20,39 +21,32 @@
             <span>Create an account</span>
         </h3>
 
-        <EditForm Model="Model" OnValidSubmit="Submit">
+        <BeaconForm Model="Model" OnSubmit="Submit">
+            <div class="mb-3 text-start">
+                <label class="form-label" for="username">Display Name</label>
+                <InputText @bind-Value="Model.DisplayName" class="form-control" id="username" placeholder="e.g., jsparrow" />
+                <ValidationMessage For="() => Model.DisplayName" />
+            </div>
 
-            <FluentValidationValidator />
+            <div class="mb-3 text-start">
+                <label class="form-label" for="email">Email</label>
+                <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" type="email" placeholder="e.g., jsparrow@blackpearl.arg" />
+                <ValidationMessage For="() => Model.EmailAddress" />
+            </div>
 
-            <fieldset disabled="@IsSubmitting">
+            <div class="mb-3 text-start">
+                <label class="form-label" for="password">Password</label>
+                <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
+                <ValidationMessage For="() => Model.Password" />
+            </div>
 
-                <div class="mb-3 text-start">
-                    <label class="form-label" for="username">Display Name</label>
-                    <InputText @bind-Value="Model.DisplayName" class="form-control" id="username" placeholder="e.g., jsparrow" />
-                    <ValidationMessage For="() => Model.DisplayName" />
-                </div>
+            <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
 
-                <div class="mb-3 text-start">
-                    <label class="form-label" for="email">Email</label>
-                    <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" placeholder="e.g., jsparrow@blackpearl.arg" />
-                    <ValidationMessage For="() => Model.EmailAddress" />
-                </div>
-
-                <div class="mb-3 text-start">
-                    <label class="form-label" for="password">Password</label>
-                    <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
-                    <ValidationMessage For="() => Model.Password" />
-                </div>
-
-                <button type="submit" class="btn btn-primary w-100 mb-3">Create Account</button>
-
-                <div>
-                    <span>Already have an account?</span>
-                    <a href="login">Login</a>
-                </div>
-
-            </fieldset>
-        </EditForm>
+            <div>
+                <span>Already have an account?</span>
+                <a href="login">Login</a>
+            </div>
+        </BeaconForm>
 
     </div>
 
@@ -62,25 +56,16 @@
 
     private RegisterRequest Model { get; set; } = new();
 
-    private bool IsSubmitting { get; set; }
-
-    private async Task Submit(EditContext editContext)
+    private async Task<ValidationProblemResponse?> Submit()
     {
-        if (IsSubmitting) return;
-        IsSubmitting = true;
-
         var response = await AuthService.Register(Model);
 
-        response.Switch(
-            success => NavManager.NavigateTo(""),
-            validationProblem => AddServerValidationErrors(validationProblem)
-        );
+        if (response.Value is UserDto)
+        {
+            NavManager.NavigateTo("");
+            return null;
+        }
 
-        IsSubmitting = false;
-    }
-
-    private void AddServerValidationErrors(ValidationProblemResponse validationProblem)
-    {
-        // TODO
+        return response.Value as ValidationProblemResponse;
     }
 }

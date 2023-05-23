@@ -1,0 +1,63 @@
+﻿<EditForm EditContext="EditContext" OnSubmit="Submit">
+    <FluentValidationValidator />
+    <fieldset disabled="@IsDisabled">
+        @ChildContent
+    </fieldset>
+</EditForm>
+
+@code {
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool DisableDuringSubmit { get; set; } = true;
+
+    [Parameter, EditorRequired] public required object Model { get; set; }
+    [Parameter, EditorRequired] public required Func<Task<ValidationProblemResponse?>> OnSubmit { get; set; }
+
+    private EditContext? _editContext;
+    private EditContext EditContext => _editContext ??= new(Model);
+
+    private ValidationMessageStore? _validationMessages;
+    private ValidationMessageStore ValidationMessages => _validationMessages ??= new(EditContext);
+
+    private bool IsSubmitting { get; set; }
+    private bool IsDisabled => DisableDuringSubmit && IsSubmitting;
+
+    public void Dispose()
+    {
+        EditContext.OnFieldChanged -= HandleFieldChanged;
+    }
+
+    protected override void OnInitialized()
+    {
+        EditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? o, FieldChangedEventArgs e)
+    {
+        ValidationMessages.Clear(e.FieldIdentifier);
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    private async Task Submit()
+    {
+        if (IsDisabled)
+            return;
+
+        IsSubmitting = true;
+
+        if (await OnSubmit() is { } validationProblem && validationProblem.Errors is { Count: > 0 } errors)
+        {
+            ValidationMessages.Clear();
+
+            foreach (var error in errors)
+            {
+                var fieldIdentifier = new FieldIdentifier(EditContext.Model, error.Key);
+                ValidationMessages.Add(fieldIdentifier, error.Value);
+            }
+
+            EditContext.NotifyValidationStateChanged();
+        }
+
+        IsSubmitting = false;
+    }
+}
