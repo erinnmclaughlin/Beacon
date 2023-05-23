@@ -16,7 +16,7 @@ public static class BeaconUISetup
         services.AddOptions();
         services.AddAuthorizationCore();
         services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
-        services.AddScoped<BeaconAuthService>();
+        services.AddScoped<BeaconAuthClient>();
 
         return services;
     }

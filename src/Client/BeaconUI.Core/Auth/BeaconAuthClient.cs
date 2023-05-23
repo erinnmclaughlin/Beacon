@@ -2,23 +2,32 @@
 using Beacon.Common.Auth.Login;
 using Beacon.Common.Auth.Register;
 using Beacon.Common.Responses;
-using Microsoft.AspNetCore.Components.Authorization;
 using OneOf;
 using System.Net;
 using System.Net.Http.Json;
-using System.Security.Claims;
 
 namespace BeaconUI.Core.Auth;
 
-public sealed class BeaconAuthService
+public sealed class BeaconAuthClient
 {
-    private readonly AuthenticationStateProvider _authProvider;
     private readonly HttpClient _http;
 
-    public BeaconAuthService(AuthenticationStateProvider authProvider, HttpClient http)
+    public Action<UserDto>? OnLogin;
+    public Action? OnLogout;
+
+    public BeaconAuthClient(HttpClient http)
     {
-        _authProvider = authProvider;
         _http = http;
+    }
+
+    public async Task<UserDto?> GetCurrentUser(CancellationToken ct = default)
+    {
+        var response = await _http.GetAsync("api/users/current", ct);
+
+        if (response.StatusCode is HttpStatusCode.NotFound)
+            return null;
+
+        return await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct);
     }
 
     public async Task<OneOf<UserDto, ValidationProblemResponse>> Register(RegisterRequest request, CancellationToken ct = default)
@@ -38,7 +47,7 @@ public sealed class BeaconAuthService
         var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct)
             ?? throw new Exception("There was an unexpected problem deserializing the response.");
 
-        ((BeaconAuthStateProvider)_authProvider).UpdateCurrentUser(user.ToClaimsPrincipal());
+        OnLogin?.Invoke(user);
 
         return user;
     }
@@ -60,7 +69,7 @@ public sealed class BeaconAuthService
         var user = await response.Content.ReadFromJsonAsync<UserDto>(cancellationToken: ct)
             ?? throw new Exception("There was an unexpected problem deserializing the response.");
 
-        ((BeaconAuthStateProvider)_authProvider).UpdateCurrentUser(user.ToClaimsPrincipal());
+        OnLogin?.Invoke(user);
 
         return user;
     }
@@ -68,8 +77,6 @@ public sealed class BeaconAuthService
     public async Task Logout(CancellationToken ct = default)
     {
         await _http.PostAsync("api/auth/logout", null, ct);
-
-        var anonymousUser = new ClaimsPrincipal(new ClaimsIdentity());
-        ((BeaconAuthStateProvider)_authProvider).UpdateCurrentUser(anonymousUser);
+        OnLogout?.Invoke();
     }
 }

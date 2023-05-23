@@ -1,20 +1,48 @@
-﻿using Microsoft.AspNetCore.Components.Authorization;
+﻿using Beacon.Common.Auth;
+using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace BeaconUI.Core.Auth;
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
+public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IDisposable
 {
-    public ClaimsPrincipal CurrentUser { get; private set; } = new ClaimsPrincipal(new ClaimsIdentity());
+    private readonly BeaconAuthClient _authClient;
+    private ClaimsPrincipal? _currentUser;
 
-    public override Task<AuthenticationState> GetAuthenticationStateAsync()
+    public BeaconAuthStateProvider(BeaconAuthClient authClient)
     {
-        return Task.FromResult(new AuthenticationState(CurrentUser));
+        _authClient = authClient;
+
+        _authClient.OnLogin += HandleLogin;
+        _authClient.OnLogout += HandleLogout;
     }
 
-    public void UpdateCurrentUser(ClaimsPrincipal currentUser)
+    public void Dispose()
     {
-        CurrentUser = currentUser;
+        _authClient.OnLogin -= HandleLogin;
+        _authClient.OnLogout -= HandleLogout;
+    }
+
+    public override async Task<AuthenticationState> GetAuthenticationStateAsync()
+    {
+        if (_currentUser == null)
+        {
+            var user = await _authClient.GetCurrentUser();
+            _currentUser = user.ToClaimsPrincipal();
+        }
+
+        return new AuthenticationState(_currentUser);
+    }
+
+    private void HandleLogin(UserDto user)
+    {
+        _currentUser = user.ToClaimsPrincipal();
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+    }
+
+    private void HandleLogout()
+    {
+        _currentUser = new ClaimsPrincipal(new ClaimsIdentity());
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }
