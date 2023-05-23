@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;
 
-internal class BeaconDbContext : DbContext
+public class BeaconDbContext : DbContext
 {
     public DbSet<User> Users => Set<User>();
 

@@ -1,6 +1,9 @@
-﻿using Microsoft.AspNetCore.Authentication;
+﻿using Beacon.API.Entities;
+using Beacon.API.Persistence;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace Beacon.API.Controllers;
@@ -8,17 +11,50 @@ namespace Beacon.API.Controllers;
 [ApiController, Route("api/[controller]")]
 public sealed class AuthController : ControllerBase
 {
+    private readonly BeaconDbContext _context;
+
+    public AuthController(BeaconDbContext context)
+    {
+        _context = context;
+    }
+
+    [HttpPost("register")]
+    public async Task<IActionResult> Register(RegisterRequest request)
+    {
+        if (await _context.Users.AnyAsync(u => u.EmailAddress == request.EmailAddress))
+            return BadRequest("An account with the specified email address already exists.");
+
+        var user = new User
+        {
+            Id = Guid.NewGuid(),
+            EmailAddress = request.EmailAddress,
+            HashedPassword = "!!password"
+        };
+
+        _context.Users.Add(user);
+        await _context.SaveChangesAsync();
+
+        return Ok(user.Id);
+    }
+
     [HttpPost("login")]
     public async Task<IActionResult> Login(LoginRequest request)
     {
-        if (request.Password != $"!!{request.Username}")
-            return BadRequest("Username or password was incorrect.");
+        var user = await _context.Users
+            .AsNoTracking()
+            .FirstOrDefaultAsync(u => u.EmailAddress == request.EmailAddress);
+
+        // TODO: do real password things
+        if (user is null || request.Password != "password")
+            return BadRequest("Email address or password was incorrect.");
         
         var identity = new ClaimsIdentity("Test");
-        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, request.Username));
+        identity.AddClaim(new Claim(ClaimTypes.NameIdentifier, user.Id.ToString()));
+        identity.AddClaim(new Claim(ClaimTypes.Email, user.EmailAddress));
+
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, new ClaimsPrincipal(identity));
 
-        return NoContent();
+        return Ok(user.Id);
     }
 
     [HttpGet("logout")]
@@ -28,4 +64,5 @@ public sealed class AuthController : ControllerBase
     }
 }
 
-public record LoginRequest(string Username, string Password);
+public record LoginRequest(string EmailAddress, string Password);
+public record RegisterRequest(string EmailAddress, string Password);
