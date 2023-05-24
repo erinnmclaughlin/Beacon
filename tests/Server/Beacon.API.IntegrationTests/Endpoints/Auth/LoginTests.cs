@@ -49,13 +49,24 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     {
         await _factory.AddUser("test@test.com", "test", "pwd12345");
 
+        // getting current user should fail if we're not logged in:
+        var currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser.IsSuccessStatusCode.Should().BeFalse();
+
+        // log in:
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = "test@test.com",
             Password = "pwd12345"
         });
 
+        // make sure login was successful:
         response.IsSuccessStatusCode.Should().BeTrue();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.Headers.Contains("Set-Cookie");
+
+        // try getting current user again; this time response should be successful:
+        currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser.IsSuccessStatusCode.Should().BeTrue();
     }
 }
