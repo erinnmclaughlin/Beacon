@@ -1,10 +1,8 @@
-﻿@using Microsoft.AspNetCore.Authorization
-@using System.Security.Claims;
+﻿@using BeaconUI.Core.Auth
 
 @inherits LayoutComponentBase
 
-@inject AuthenticationStateProvider AuthStateProvider
-@inject HttpClient Http
+@inject BeaconAuthClient AuthService
 
 <AuthorizeView>
     <Authorized>
@@ -15,9 +13,9 @@
 
             <main>
                 <div class="top-row px-4">
-                    <a href="https://docs.microsoft.com/aspnet/" target="_blank">About</a>
                     <div class="ml-auto">
-                        <button class="btn btn-link" @onclick="LogoutAsync">Logout</button>
+                        <span>Hello, @context.User.Identity!.Name!</span>
+                        <button class="btn btn-link ms-1" @onclick="() => AuthService.Logout()">Logout</button>
                     </div>
                 </div>
 
@@ -34,12 +32,3 @@
         <p>Authorizing...</p>
     </Authorizing>
 </AuthorizeView>
-
-@code {
-    
-    private async Task LogoutAsync()
-    {
-        var response = await Http.PostAsync("api/auth/logout", null);
-        ((BeaconAuthStateProvider)AuthStateProvider).UpdateCurrentUser(new ClaimsPrincipal(new ClaimsIdentity()));
-    }
-}

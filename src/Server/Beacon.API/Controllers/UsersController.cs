@@ -1,15 +1,16 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using Beacon.Common.Auth;
 using Microsoft.AspNetCore.Mvc;
-using System.Security.Claims;
 
 namespace Beacon.API.Controllers;
 
-[ApiController, Route("api/[controller]")]
-public class UsersController : ControllerBase
+[Route("api/[controller]")]
+public class UsersController : ApiControllerBase
 {
     [HttpGet("current")]
-    public Task<string?> GetCurrentUser()
+    public IActionResult GetCurrentUser()
     {
-        return Task.FromResult(HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+        var user = HttpContext.User.ToUserDto();
+
+        return user is null ? NotFound() : Ok(user);
     }
 }
