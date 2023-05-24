@@ -16,7 +16,17 @@ builder.Services
     .AddAuthentication()
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
 
-builder.Services.AddCors();
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("CorsSpecs", builder =>
+    {
+        builder
+            .AllowAnyHeader()
+            .AllowAnyMethod()
+            .SetIsOriginAllowed(options => true)
+            .AllowCredentials();
+    });
+});
 
 builder.Services.AddDbContext<BeaconDbContext>(options =>
 {
@@ -39,13 +49,10 @@ builder.Services.AddTransient<ExceptionHandler>();
 
 var app = builder.Build();
 
-app.UseCors(o =>  o
-    .AllowAnyHeader()
-    .AllowAnyOrigin()
-    .AllowAnyMethod()
-);
-
 app.UseHttpsRedirection();
+
+app.UseCors("CorsSpecs");
+
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
