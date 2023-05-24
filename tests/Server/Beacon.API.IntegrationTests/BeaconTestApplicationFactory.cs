@@ -39,25 +39,21 @@ public class BeaconTestApplicationFactory : WebApplicationFactory<BeaconAPI>
         builder.UseEnvironment("Development");
     }
 
-    public async Task<User> AddUser(string email, string displayName, string password)
+    public async Task SeedDbWithUserData(string email, string displayName, string password)
     {
         using var scope = Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         var passwordHasher = scope.ServiceProvider.GetRequiredService<IPasswordHasher>();
-        var hashedPassword = passwordHasher.Hash(password, out var salt);
 
-        var user = new User
+        db.Users.Add(new User
         {
             Id = Guid.NewGuid(),
             EmailAddress = email,
             DisplayName = displayName,
-            HashedPassword = hashedPassword,
+            HashedPassword = passwordHasher.Hash(password, out var salt),
             HashedPasswordSalt = salt
-        };
+        });
 
-        db.Users.Add(user);
         await db.SaveChangesAsync();
-
-        return user;
     }
 }

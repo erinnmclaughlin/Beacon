@@ -32,7 +32,7 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldFail_WhenPasswordIsInvalid()
     {
-        await _factory.AddUser("test@test.com", "test", "pwd12345");
+        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
 
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
@@ -47,7 +47,7 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldSucceed_WhenCredentialsAreValid()
     {
-        await _factory.AddUser("test@test.com", "test", "pwd12345");
+        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
 
         // getting current user should fail if we're not logged in:
         var currentUser = await _httpClient.GetAsync("api/users/current");
