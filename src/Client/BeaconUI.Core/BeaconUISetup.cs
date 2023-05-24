@@ -12,6 +12,7 @@ public static class BeaconUISetup
 
         services.AddHttpClient("BeaconAPI", options =>
         {
+            // TODO: pull api URL from config:
             options.BaseAddress = new Uri("https://localhost:7198/");
         })
             .AddHttpMessageHandler<CookieHandler>();
