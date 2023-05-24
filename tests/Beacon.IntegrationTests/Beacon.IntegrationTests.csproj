@@ -25,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Server\Beacon.API\Beacon.API.csproj" />
+    <ProjectReference Include="..\..\src\Server\Beacon.API\Beacon.API.csproj" />
   </ItemGroup>
 
 </Project>

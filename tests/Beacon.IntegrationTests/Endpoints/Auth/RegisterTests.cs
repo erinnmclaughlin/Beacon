@@ -1,9 +1,8 @@
 ﻿using Beacon.Common.Auth.Register;
-using FluentAssertions;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace Beacon.API.IntegrationTests.Endpoints.Auth;
+namespace Beacon.IntegrationTests.Endpoints.Auth;
 
 public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
 {

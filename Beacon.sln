@@ -24,7 +24,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Shared", "Shared", "{653ABB
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.Common", "src\Shared\Beacon.Common\Beacon.Common.csproj", "{CD63A9E5-83C5-4ECC-8024-1E87A96845FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.API.IntegrationTests", "tests\Server\Beacon.API.IntegrationTests\Beacon.API.IntegrationTests.csproj", "{95BD2E6E-9F2D-4FBB-865D-530F61A15A33}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.IntegrationTests", "tests\Server\Beacon.API.IntegrationTests\Beacon.IntegrationTests.csproj", "{95BD2E6E-9F2D-4FBB-865D-530F61A15A33}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

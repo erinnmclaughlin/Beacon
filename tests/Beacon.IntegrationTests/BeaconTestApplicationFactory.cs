@@ -1,4 +1,5 @@
-﻿using Beacon.API.Entities;
+﻿using Beacon.API;
+using Beacon.API.Entities;
 using Beacon.API.Persistence;
 using Beacon.API.Security;
 using Microsoft.AspNetCore.Hosting;
@@ -8,7 +9,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Data.Common;
 
-namespace Beacon.API.IntegrationTests;
+namespace Beacon.IntegrationTests;
 
 public class BeaconTestApplicationFactory : WebApplicationFactory<BeaconAPI>
 {
