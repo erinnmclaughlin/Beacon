@@ -57,12 +57,6 @@ app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
 
-// TODO: this is useful for early development but should be a part of CI/CD later
-using (var scope = app.Services.CreateScope())
-{
-    await scope.ServiceProvider.GetRequiredService<BeaconDbContext>().Database.MigrateAsync();
-}
-
 app.UseMiddleware<ApiExceptionHandler>();
 
 app.Run();
