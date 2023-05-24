@@ -45,7 +45,7 @@ builder.Services.AddMediatR(config =>
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
 
-builder.Services.AddTransient<ExceptionHandler>();
+builder.Services.AddTransient<ApiExceptionHandler>();
 
 var app = builder.Build();
 
@@ -63,6 +63,6 @@ using (var scope = app.Services.CreateScope())
     await scope.ServiceProvider.GetRequiredService<BeaconDbContext>().Database.MigrateAsync();
 }
 
-app.UseMiddleware<ExceptionHandler>();
+app.UseMiddleware<ApiExceptionHandler>();
 
 app.Run();

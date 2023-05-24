@@ -3,7 +3,7 @@ using FluentValidation;
 
 namespace Beacon.API.Middleware;
 
-public class ExceptionHandler : IMiddleware
+public class ApiExceptionHandler : IMiddleware
 {
     public async Task InvokeAsync(HttpContext context, RequestDelegate next)
     {
@@ -23,7 +23,7 @@ public class ExceptionHandler : IMiddleware
             };
 
             context.Response.ContentType = "application/json";
-            context.Response.StatusCode = 422;
+            context.Response.StatusCode = 422; // Unprocessable Content
 
             await context.Response.WriteAsJsonAsync(response);
         }
