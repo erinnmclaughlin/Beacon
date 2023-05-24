@@ -41,8 +41,20 @@ a, .btn-link {
     outline: 1px solid red;
 }
 
+.field {
+    margin-bottom: 0.875rem;
+}
+
+.form-label {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
+}
+
 .validation-message {
     color: red;
+    font-size: 0.875rem;
+    margin-top: 0.1rem;
+    display: block;
 }
 
 #blazor-error-ui {

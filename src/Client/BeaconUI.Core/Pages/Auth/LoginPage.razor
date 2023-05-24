@@ -11,32 +11,36 @@
 
 <div class="page-container">
 
-    <div class="form-container text-center">
+    <div class="form-container">
 
-        <span class="text-primary mb-1 fs-2">
-            <i class="fa-regular fa-flask-vial"></i>
-        </span>
+        <header class="text-center mb-3">
+            <span class="text-primary mb-1 fs-2">
+                <i class="fa-regular fa-flask-vial"></i>
+            </span>
 
-        <h3 class="fw-bold mb-4">
-            <span>Log in to your account</span>
-        </h3>
+            <h3 class="fw-bold">
+                <span>Log in to your account</span>
+            </h3>
+        </header>
 
         <BeaconForm Model="Model" OnValidSubmit="Submit">
-            <div class="mb-3 text-start">
+            <div class="field">
                 <label class="form-label" for="email">Email</label>
                 <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" type="email" placeholder="eg, jsparrow@blackpearl.arg" />
                 <ValidationMessage For="() => Model.EmailAddress" />
             </div>
 
-            <div class="mb-3 text-start">
+            <div class="field">
                 <label class="form-label" for="password">Password</label>
                 <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
                 <ValidationMessage For="() => Model.Password" />
             </div>
 
-            <button type="submit" class="btn btn-primary w-100 mb-3">Login</button>
+            <div class="field">
+                <button type="submit" class="btn btn-primary w-100">Login</button>
+            </div>
 
-            <div>
+            <div class="field text-center">
                 <span>Don't have an account?</span>
                 <a href="register">Register</a>
             </div>
