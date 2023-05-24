@@ -8,18 +8,18 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
 {
     private readonly BeaconTestApplicationFactory _factory;
+    private readonly HttpClient _httpClient;
 
     public LoginTests(BeaconTestApplicationFactory factory)
     {
         _factory = factory;
+        _httpClient = _factory.CreateClient();
     }
 
     [Fact]
     public async Task Login_ShouldFail_WhenUserDoesNotExist()
     {
-        using var client = _factory.CreateClient();
-
-        var response = await client.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = "nobody@invalid.net",
             Password = "pwd12345"
@@ -32,11 +32,9 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldFail_WhenPasswordIsInvalid()
     {
-        await _factory.ResetTestDb();
         await _factory.AddUser("test@test.com", "test", "pwd12345");
-        using var client = _factory.CreateClient();
 
-        var response = await client.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = "test@test.com",
             Password = "pwd123456"
@@ -49,11 +47,9 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldSucceed_WhenCredentialsAreValid()
     {
-        await _factory.ResetTestDb();
         await _factory.AddUser("test@test.com", "test", "pwd12345");
-        using var client = _factory.CreateClient();
 
-        var response = await client.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = "test@test.com",
             Password = "pwd12345"
