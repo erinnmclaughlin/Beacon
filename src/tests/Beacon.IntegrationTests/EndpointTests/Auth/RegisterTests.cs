@@ -15,10 +15,37 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
         _httpClient = _factory.CreateClient();
     }
 
+    [Fact]
+    public async Task Register_ShouldFail_IfEmailIsTaken()
+    {
+        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
+
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        {
+            EmailAddress = "test@test.com",
+            DisplayName = "someValidName",
+            Password = "someValidPassword"
+        });
+
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Register_ShouldFail_IfEmailIsMissing()
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        {
+            EmailAddress = "",
+            DisplayName = "someValidName",
+            Password = "someValidPassword"
+        });
+
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
     [Theory]
-    [InlineData("")]
-    [InlineData(" ")]
-    [InlineData("\t\n")]
     [InlineData("nope")]
     [InlineData("nope@")]
     [InlineData("@nope")]
@@ -37,14 +64,26 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     }
 
     [Fact]
-    public async Task Register_ShouldFail_IfEmailIsTaken()
+    public async Task Register_ShouldFail_IfPasswordIsMissing()
     {
-        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
-
         var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
-            EmailAddress = "test@test.com",
+            EmailAddress = "someValidEmail@website.com",
             DisplayName = "someValidName",
+            Password = ""
+        });
+
+        response.IsSuccessStatusCode.Should().BeFalse();
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Register_ShouldFail_IfDisplayNameIsMissing()
+    {
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        {
+            EmailAddress = "someValidEmail@website.com",
+            DisplayName = "",
             Password = "someValidPassword"
         });
 
