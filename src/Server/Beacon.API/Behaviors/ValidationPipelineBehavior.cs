@@ -31,7 +31,7 @@ public sealed class ValidationPipelineBehavior<TRequest, TResponse> : IPipelineB
             var result = await validator.ValidateAsync(request, ct);
 
             if (result.Errors.Any())
-                failures.AddRange(failures);
+                failures.AddRange(result.Errors);
         }
 
         if (failures.Any())
