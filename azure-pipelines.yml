@@ -40,5 +40,5 @@ steps:
   inputs:
     command: 'publish'
     publishWebProjects: false
-    projects: '**/Beacon.API.csproj'
+    projects: '**/Beacon.WebHost.csproj'
     arguments: '--configuration Release'
