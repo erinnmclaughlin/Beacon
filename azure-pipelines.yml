@@ -5,24 +5,39 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
-  solution: '**/*.sln'
   buildConfiguration: 'Release'
 
 steps:
-- task: DotNetCoreCLI@2
-  displayName: 'dotnet restore'
+- task: UseDotNet@2
+  displayName: 'Use .NET Core sdk'
   inputs:
-    command: 'restore' 
+    packageType: sdk
+    version: '7.0.x'
+    installationPath: $(Agent.ToolsDirectory)/dotnet
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet build'
+  displayName: 'Restore dependencies'
   inputs:
-    command: 'build'
+    command: restore
+    projects: '**/*.csproj'
+    feedsToUse: 'select'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Build'
+  inputs:
+    command: build
+    projects: '**/*.csproj'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
-  displayName: 'dotnet test'
+  displayName: 'Run tests'
   inputs:
-    command: 'test'
-    projects: '**/tests/**/*.csproj'
-    arguments: '--configuration $(buildConfiguration) --collect "Code coverage"'
+    command: test
+    projects: '**/*[Tt]ests/*.csproj'
+    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
+
+- task: PublishCodeCoverageResults@1
+  displayName: 'Publish code coverage'
+  inputs:
+    codeCoverageTool: 'cobertura'
+    summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.cobertura.xml'
