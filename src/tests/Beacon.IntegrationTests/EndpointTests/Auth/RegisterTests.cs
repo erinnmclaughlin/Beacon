@@ -1,6 +1,4 @@
 ﻿using Beacon.Common.Auth.Register;
-using System.Net;
-using System.Net.Http.Json;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
@@ -89,5 +87,32 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
 
         response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
+    public async Task Register_ShouldSucceed_WhenRequestIsValid()
+    {
+        // getting current user should fail if we're not logged in:
+        var currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser.IsSuccessStatusCode.Should().BeFalse();
+
+        // register:
+        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        {
+            EmailAddress = "someValidEmail@website.com",
+            DisplayName = "someValidName",
+            Password = "someValidPassword"
+        });
+
+        // check that register was successful:
+        response.IsSuccessStatusCode.Should().BeTrue();
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // check that auth cookie was included in the response:
+        response.Headers.Contains("Set-Cookie");
+
+        // try getting current user again; this time response should be successful:
+        currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser.IsSuccessStatusCode.Should().BeTrue();
     }
 }
