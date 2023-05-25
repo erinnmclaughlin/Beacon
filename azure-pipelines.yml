@@ -34,3 +34,18 @@ steps:
   inputs:
     codeCoverageTool: 'cobertura'
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.cobertura.xml'
+
+- task: DotNetCoreCLI@2
+  displayName: 'Publish web app'
+  inputs:
+    command: 'publish'
+    publishWebProjects: false
+    projects: '**/Beacon.WebHost.csproj'
+    arguments: '--configuration $(buildConfiguration)'
+
+- task: PublishBuildArtifacts@1
+  displayName: 'Publish artifacts'
+  inputs:
+    PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+    ArtifactName: 'drop'
+    publishLocation: 'Container'
