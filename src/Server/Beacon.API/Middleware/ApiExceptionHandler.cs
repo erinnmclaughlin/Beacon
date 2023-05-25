@@ -1,5 +1,6 @@
 ﻿using Beacon.Common.Responses;
 using FluentValidation;
+using Microsoft.AspNetCore.Http;
 
 namespace Beacon.API.Middleware;
 
