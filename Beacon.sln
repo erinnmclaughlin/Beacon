@@ -8,6 +8,7 @@ EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{E0E47628-E0FF-4587-88A1-A375A7590053}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		azure-pipelines.yml = azure-pipelines.yml
 	EndProjectSection
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Server", "Server", "{599C893F-DE0F-4AB3-B55C-7A3CFEE63AF1}"
@@ -28,7 +29,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "tests", "tests", "{20898C50
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{BF0AEB2E-E9C2-4F7F-B79F-19673D590A71}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.IntegrationTests", "src\tests\Beacon.IntegrationTests\Beacon.IntegrationTests.csproj", "{34E4C66B-68C8-4583-8015-22DAE2DA9F92}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.IntegrationTests", "src\tests\Beacon.IntegrationTests\Beacon.IntegrationTests.csproj", "{34E4C66B-68C8-4583-8015-22DAE2DA9F92}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

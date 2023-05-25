@@ -1,6 +1,4 @@
 ﻿using Beacon.Common.Auth.Login;
-using System.Net;
-using System.Net.Http.Json;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
@@ -59,9 +57,11 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
             Password = "pwd12345"
         });
 
-        // make sure login was successful:
+        // check that login was successful:
         response.IsSuccessStatusCode.Should().BeTrue();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
+
+        // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
