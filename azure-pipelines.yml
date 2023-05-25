@@ -17,14 +17,16 @@ steps:
 - task: DotNetCoreCLI@2
   inputs:
     command: 'restore'
+  displayName: 'dotnet restore'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'build'
     arguments: '--configuration $(buildConfiguration)'
-  displayName: 'dotnet build $(buildConfiguration)'
+  displayName: 'dotnet build'
 
 - task: DotNetCoreCLI@2
   inputs:
     command: 'test'
-    projects: '**/tests/*.csproj'
+    projects: '**/tests/**/*.csproj'
+  displayName: 'dotnet test'
