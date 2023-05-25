@@ -13,20 +13,20 @@ steps:
   displayName: 'Restore dependencies'
   inputs:
     command: 'restore'
-    projects: '**/*.csproj'
+    projects: '$(solution)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Build'
   inputs:
     command: build
-    projects: '**/*.csproj'
+    projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration)'
 
 - task: DotNetCoreCLI@2
   displayName: 'Run tests'
   inputs:
     command: test
-    projects: '**/*[Tt]ests/*.csproj'
+    projects: '$(solution)'
     arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura'
 
 - task: PublishCodeCoverageResults@1
