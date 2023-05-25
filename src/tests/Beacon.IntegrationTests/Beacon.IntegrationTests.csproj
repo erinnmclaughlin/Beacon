@@ -30,7 +30,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\Server\Beacon.API\Beacon.API.csproj" />
+    <ProjectReference Include="..\..\Server\Beacon.WebHost\Beacon.WebHost.csproj" />
   </ItemGroup>
 
 </Project>
