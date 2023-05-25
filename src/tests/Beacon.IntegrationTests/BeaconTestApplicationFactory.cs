@@ -1,7 +1,7 @@
-﻿using Beacon.API;
-using Beacon.API.Entities;
+﻿using Beacon.API.Entities;
 using Beacon.API.Persistence;
 using Beacon.API.Security;
+using Beacon.WebHost;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -11,7 +11,7 @@ using System.Data.Common;
 
 namespace Beacon.IntegrationTests;
 
-public class BeaconTestApplicationFactory : WebApplicationFactory<BeaconAPI>
+public class BeaconTestApplicationFactory : WebApplicationFactory<BeaconWebHost>
 {
     public BeaconTestApplicationFactory()
     {

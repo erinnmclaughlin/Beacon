@@ -1,3 +1,4 @@
+using Beacon.API;
 using Beacon.API.Behaviors;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
@@ -10,23 +11,13 @@ using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
+builder.Services.AddControllers().AddApplicationPart(typeof(BeaconAPI).Assembly);
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 builder.Services
     .AddAuthentication()
     .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
-
-builder.Services.AddCors(options =>
-{
-    options.AddPolicy("CorsSpecs", builder =>
-    {
-        builder
-            .AllowAnyHeader()
-            .AllowAnyMethod()
-            .SetIsOriginAllowed(options => true)
-            .AllowCredentials();
-    });
-});
 
 builder.Services.AddDbContext<BeaconDbContext>(options =>
 {
@@ -40,7 +31,7 @@ builder.Services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
 
 builder.Services.AddMediatR(config =>
 {
-    config.RegisterServicesFromAssembly(typeof(Program).Assembly);
+    config.RegisterServicesFromAssembly(typeof(BeaconAPI).Assembly);
 });
 
 builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationPipelineBehavior<,>));
@@ -49,14 +40,19 @@ builder.Services.AddTransient<ApiExceptionHandler>();
 
 var app = builder.Build();
 
+if (app.Environment.IsDevelopment())
+{
+    app.UseWebAssemblyDebugging();
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseHttpsRedirection();
-
-app.UseCors("CorsSpecs");
-
+app.UseBlazorFrameworkFiles();
+app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
 app.MapControllers();
-
 app.UseMiddleware<ApiExceptionHandler>();
-
+app.MapFallbackToFile("index.html");
 app.Run();
