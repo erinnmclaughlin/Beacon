@@ -5,20 +5,14 @@ pool:
   vmImage: 'windows-latest'
 
 variables:
+  solution: '**/*.sln'
   buildConfiguration: 'Release'
 
 steps:
-- task: UseDotNet@2
-  displayName: 'Use .NET Core sdk'
-  inputs:
-    packageType: sdk
-    version: '7.0.x'
-    installationPath: $(Agent.ToolsDirectory)/dotnet
-
 - task: DotNetCoreCLI@2
   displayName: 'Restore dependencies'
   inputs:
-    command: restore
+    command: 'restore'
     projects: '**/*.csproj'
 
 - task: DotNetCoreCLI@2
