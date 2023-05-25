@@ -36,7 +36,9 @@ steps:
     summaryFileLocation: '$(System.DefaultWorkingDirectory)/**/coverage.cobertura.xml'
 
 - task: DotNetCoreCLI@2
-  displayName: 'Publish'
+  displayName: 'Publish API'
   inputs:
-    command: publish
+    command: 'publish'
+    publishWebProjects: false
     projects: '**/Beacon.API.csproj'
+    arguments: '--configuration Release'
