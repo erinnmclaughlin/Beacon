@@ -41,7 +41,7 @@ steps:
     command: 'publish'
     publishWebProjects: false
     projects: '**/Beacon.WebHost.csproj'
-    arguments: '--configuration $(buildConfiguration)'
+    arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
 - task: PublishBuildArtifacts@1
   displayName: 'Publish artifacts'
