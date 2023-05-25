@@ -27,7 +27,7 @@ steps:
   inputs:
     command: test
     projects: '$(solution)'
-    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:Exclude="[*.Tests]*%2c[Beacon.API.Persistence.Migrations.*]*""'
+    arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
 
 - task: PublishCodeCoverageResults@1
   displayName: 'Publish code coverage'
