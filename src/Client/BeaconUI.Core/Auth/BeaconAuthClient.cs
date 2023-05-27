@@ -2,6 +2,7 @@
 using Beacon.Common.Auth.Login;
 using Beacon.Common.Auth.Register;
 using Beacon.Common.Responses;
+using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using OneOf;
 using System.Net;
 using System.Net.Http.Json;
@@ -13,7 +14,6 @@ public sealed class BeaconAuthClient
     private readonly HttpClient _http;
 
     public Action<UserDto>? OnLogin;
-    public Action? OnLogout;
 
     public BeaconAuthClient(HttpClient http)
     {
@@ -76,7 +76,6 @@ public sealed class BeaconAuthClient
 
     public async Task Logout(CancellationToken ct = default)
     {
-        await _http.PostAsync("api/auth/logout", null, ct);
-        OnLogout?.Invoke();
+        await _http.GetAsync("/api/auth/logout", ct);
     }
 }

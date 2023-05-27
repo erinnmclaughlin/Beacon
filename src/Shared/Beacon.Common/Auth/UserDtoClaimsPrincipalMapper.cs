@@ -23,20 +23,11 @@ public static class UserDtoClaimsPrincipalMapper
         if (claimsPrincipal.Identity is not { IsAuthenticated: true })
             return null;
 
-        if (!Guid.TryParse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value, out var id))
-            return null;
-
-        if (claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value is not { Length: > 0 } displayName)
-            return null;
-
-        if (claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value is not { Length: > 0 } email)
-            return null;
-
         return new UserDto
         {
-            Id = id,
-            EmailAddress = email,
-            DisplayName = displayName
+            Id = Guid.Parse(claimsPrincipal.FindFirst(ClaimTypes.NameIdentifier)?.Value ?? ""),
+            EmailAddress = claimsPrincipal.FindFirst(ClaimTypes.Email)?.Value ?? "",
+            DisplayName = claimsPrincipal.FindFirst(ClaimTypes.Name)?.Value ?? ""
         };
     }
 }

@@ -1,34 +1,20 @@
-﻿@using BeaconUI.Core.Auth
+﻿@inherits LayoutComponentBase
 
-@inherits LayoutComponentBase
-
-@inject BeaconAuthClient AuthService
-
-<AuthorizeView>
-    <Authorized>
-        <div class="page">
-            <div class="sidebar">
-                <NavMenu />
-            </div>
-
-            <main>
+<div class="page">
+    <main>
+        <AuthorizeView>
+            @if (context.User.Identity is {IsAuthenticated: true} user)
+            {
                 <div class="top-row px-4">
                     <div class="ml-auto">
-                        <span>Hello, @context.User.Identity!.Name!</span>
-                        <button class="btn btn-link ms-1" @onclick="() => AuthService.Logout()">Logout</button>
+                        <span>Hello, @(context.User.Identity?.Name)!</span>
+                        <LogoutButton class="btn btn-link ms-1">Logout</LogoutButton>
                     </div>
                 </div>
-
-                <article class="content px-4">
-                    @Body
-                </article>
-            </main>
-        </div>
-    </Authorized>
-    <NotAuthorized>
-        <NavigateTo Url="login" />
-    </NotAuthorized>
-    <Authorizing>
-        <p>Authorizing...</p>
-    </Authorizing>
-</AuthorizeView>
+            }
+        </AuthorizeView>
+        <article class="content px-4">
+            @Body
+        </article>
+    </main>
+</div>
