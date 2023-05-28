@@ -2,7 +2,6 @@
 using Beacon.Common.Auth.Login;
 using Beacon.Common.Auth.Register;
 using Beacon.Common.Responses;
-using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 using OneOf;
 using System.Net;
 using System.Net.Http.Json;

@@ -1,4 +1,4 @@
-using Beacon.Common.Auth.Login;
+﻿using Beacon.Common.Auth.Register;
 using BeaconUI.Core.Auth;
 using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;
@@ -7,18 +7,18 @@ using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests.Pages.Auth;
 
-public class LoginPageTests : TestContext
+public class RegisterPageTests : TestContext
 {
     [Fact]
-    public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
+    public async Task WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
     {
         // Arrange:
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultUser);
+        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultUser);
 
         Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
-        var cut = RenderComponent<LoginPage>();
+        var cut = RenderComponent<RegisterPage>();
 
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
@@ -30,18 +30,18 @@ public class LoginPageTests : TestContext
     }
 
     [Fact]
-    public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
+    public async Task WhenRegistrationIsUnsuccessful_ShowError()
     {
         // Arrange:
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondValidationProblem(new()
+        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondValidationProblem(new()
         {
-            { nameof(LoginRequest.EmailAddress), new[] { "Some error message" } }
+            { nameof(RegisterRequest.EmailAddress), new[] { "Some error message" } } 
         });
 
         Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
-        var cut = RenderComponent<LoginPage>();
+        var cut = RenderComponent<RegisterPage>();
 
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
@@ -49,7 +49,6 @@ public class LoginPageTests : TestContext
         await cut.Find("form").SubmitAsync();
 
         // Assert:
-        navManager.History.Should().BeEmpty();
         cut.WaitForAssertion(() => cut.Find(".validation-message").TextContent.Should().Be("Some error message"));
     }
 }

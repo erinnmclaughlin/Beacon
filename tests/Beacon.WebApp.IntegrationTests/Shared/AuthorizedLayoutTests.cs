@@ -17,11 +17,11 @@ public class AuthorizedLayoutTests : TestContext
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
 
         // Act
-        RenderComponent<BeaconUI.WebApp.App>();
+        var cut = RenderComponent<BeaconUI.WebApp.App>();
         navManager.NavigateTo("");
 
         // Assert
-        navManager.History.Last().Uri.Should().Be("login");
+        cut.WaitForAssertion(() => navManager.Uri.Should().Be($"{navManager.BaseUri}login"));
     }
 
     [Fact]
