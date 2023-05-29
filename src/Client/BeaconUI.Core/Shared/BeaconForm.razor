@@ -40,6 +40,8 @@
 
     private async Task Submit()
     {
+        ValidationMessages.Clear();
+
         if (IsDisabled || !EditContext.Validate())
             return;
 
