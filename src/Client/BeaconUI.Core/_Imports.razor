@@ -7,13 +7,17 @@
 @using System.ComponentModel.DataAnnotations
 @using System.Net.Http.Json
 
+@* Core / Infrastructure *@
 @using Beacon.Common
-@using Beacon.Common.Auth
 @using BeaconUI.Core
-@using BeaconUI.Core.Auth
 @using BeaconUI.Core.Shared
+@using ErrorOr
+@using MediatR
 
+@* Auth *@
+@using Beacon.Common.Auth
+@using Beacon.Common.Auth.Requests
+@using BeaconUI.Core.Auth.Components
+
+@* Validation *@
 @using Blazored.FluentValidation
-
-@using ErrorOr;
-@using MediatR;

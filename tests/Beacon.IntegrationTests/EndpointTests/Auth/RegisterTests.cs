@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth.Register;
+﻿using Beacon.Common.Auth.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
@@ -93,7 +93,7 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     public async Task Register_ShouldSucceed_WhenRequestIsValid()
     {
         // getting current user should fail if we're not logged in:
-        var currentUser = await _httpClient.GetAsync("api/users/current");
+        var currentUser = await _httpClient.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // register:
@@ -112,7 +112,7 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser = await _httpClient.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeTrue();
     }
 }

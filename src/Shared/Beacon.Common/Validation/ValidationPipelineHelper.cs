@@ -1,8 +1,8 @@
-﻿using Beacon.Common.Auth.Login;
-using ErrorOr;
+﻿using ErrorOr;
 using FluentValidation;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 
 namespace Beacon.Common.Validation;
 
@@ -10,7 +10,7 @@ public static class ValidationPipelineHelper
 {
     public static void AddValidationPipeline(this IServiceCollection services)
     {
-        services.AddValidatorsFromAssemblyContaining<LoginRequestValidator>();
+        services.AddValidatorsFromAssembly(Assembly.GetExecutingAssembly());
 
         var requestTypes = typeof(ValidationPipelineBehavior<,>).Assembly.GetTypes()
             .Where(t => t.GetInterfaces().Any(i => i.IsGenericType && i.GetGenericTypeDefinition() == typeof(IApiRequest<>)));

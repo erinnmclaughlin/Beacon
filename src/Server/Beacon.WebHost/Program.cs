@@ -1,35 +1,16 @@
 using Beacon.API;
-using Beacon.API.Persistence;
-using Beacon.API.Security;
-using Beacon.Common.Validation;
-using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers().AddApplicationPart(typeof(BeaconAPI).Assembly);
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
-builder.Services.AddHttpContextAccessor();
-
-builder.Services
-    .AddAuthentication()
-    .AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
-
-builder.Services.AddDbContext<BeaconDbContext>(options =>
+builder.Services.AddBeaconCore(options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("SqlServerDb");
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddSingleton<IPasswordHasher, PasswordHasher>();
-
-builder.Services.AddMediatR(config =>
-{
-    config.RegisterServicesFromAssembly(typeof(BeaconAPI).Assembly);
-});
-
-builder.Services.AddValidationPipeline();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
 

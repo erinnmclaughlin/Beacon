@@ -1,4 +1,4 @@
-﻿using BeaconUI.Core;
+﻿using BeaconUI.Core.Helpers;
 using Microsoft.Extensions.Logging;
 
 namespace BeaconUI.DesktopApp;

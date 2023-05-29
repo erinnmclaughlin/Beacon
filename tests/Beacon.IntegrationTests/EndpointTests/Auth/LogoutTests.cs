@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth.Login;
+﻿using Beacon.Common.Auth.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
@@ -26,7 +26,7 @@ public class LogoutTests : IClassFixture<BeaconTestApplicationFactory>
         });
 
         // current user should be available after logging in:
-        var currentUser = await _httpClient.GetAsync("api/users/current");
+        var currentUser = await _httpClient.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeTrue();
 
         // log out:
@@ -35,7 +35,7 @@ public class LogoutTests : IClassFixture<BeaconTestApplicationFactory>
         response.IsSuccessStatusCode.Should().BeTrue();
 
         // current user should no longer be available after logging out:
-        currentUser = await _httpClient.GetAsync("api/users/current");
+        currentUser = await _httpClient.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
     }
 }
