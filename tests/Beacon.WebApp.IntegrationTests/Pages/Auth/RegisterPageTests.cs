@@ -1,5 +1,5 @@
 ﻿using Beacon.Common.Auth.Register;
-using BeaconUI.Core.Auth;
+using BeaconUI.Core;
 using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +13,11 @@ public class RegisterPageTests : TestContext
     public async Task WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
     {
         // Arrange:
+        Services.AddBeaconUI();
+
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultUser);
 
-        Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<RegisterPage>();
 
@@ -33,13 +34,14 @@ public class RegisterPageTests : TestContext
     public async Task WhenRegistrationIsUnsuccessful_ShowError()
     {
         // Arrange:
+        Services.AddBeaconUI();
+
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondValidationProblem(new()
         {
             { nameof(RegisterRequest.EmailAddress), new[] { "Some error message" } } 
         });
 
-        Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<RegisterPage>();
 

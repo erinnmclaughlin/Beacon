@@ -1,5 +1,5 @@
 using Beacon.Common.Auth.Login;
-using BeaconUI.Core.Auth;
+using BeaconUI.Core;
 using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,10 +13,11 @@ public class LoginPageTests : TestContext
     public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
     {
         // Arrange:
+        Services.AddBeaconUI();
+
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultUser);
 
-        Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<LoginPage>();
 
@@ -33,13 +34,14 @@ public class LoginPageTests : TestContext
     public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
     {
         // Arrange:
+        Services.AddBeaconUI();
+
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondValidationProblem(new()
         {
             { nameof(LoginRequest.EmailAddress), new[] { "Some error message" } }
         });
 
-        Services.AddScoped<BeaconAuthClient>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<LoginPage>();
 

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Responses;
+﻿using Beacon.Common.Validation;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 using System.Net;
@@ -25,7 +25,7 @@ public static class MockHttpHelper
         return request.Respond(_ => CreateResponse(HttpStatusCode.OK, content));
     }
 
-    public static MockedRequest ThenReturnNoContent(this MockedRequest request)
+    public static MockedRequest ThenRespondNoContent(this MockedRequest request)
     {
         var response = new HttpResponseMessage(HttpStatusCode.NoContent);
         response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
@@ -33,9 +33,17 @@ public static class MockHttpHelper
         return request.Respond(_ => response);
     }
 
+    public static MockedRequest ThenRespondNotFound(this MockedRequest request)
+    {
+        var response = new HttpResponseMessage(HttpStatusCode.NotFound);
+        response.Content.Headers.ContentType = new MediaTypeHeaderValue("application/json");
+
+        return request.Respond(_ => response);
+    }
+
     public static MockedRequest ThenRespondValidationProblem(this MockedRequest request, Dictionary<string, string[]> errors)
     {
-        return request.Respond(_ => CreateResponse(HttpStatusCode.UnprocessableEntity, new ValidationProblemResponse { Errors = errors }));
+        return request.Respond(_ => CreateResponse(HttpStatusCode.UnprocessableEntity, new BeaconValidationProblem { Errors = errors }));
     }
 
     private static HttpResponseMessage CreateResponse<T>(HttpStatusCode statusCode, T content)

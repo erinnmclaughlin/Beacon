@@ -1,16 +1,15 @@
 ﻿using Beacon.API.Entities;
 using Beacon.API.Persistence;
 using Beacon.API.Security;
+using Beacon.Common;
 using Beacon.Common.Auth;
 using Beacon.Common.Auth.Register;
-using FluentValidation;
-using FluentValidation.Results;
-using MediatR;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.API.Features.Auth.Register;
+namespace Beacon.API.Features.Auth;
 
-public class RegisterRequestHandler : IRequestHandler<RegisterRequest, UserDto>
+public class RegisterRequestHandler : IApiRequestHandler<RegisterRequest, UserDto>
 {
     private readonly BeaconDbContext _context;
     private readonly IPasswordHasher _passwordHasher;
@@ -21,10 +20,11 @@ public class RegisterRequestHandler : IRequestHandler<RegisterRequest, UserDto>
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<UserDto> Handle(RegisterRequest request, CancellationToken ct)
+    public async Task<ErrorOr<UserDto>> Handle(RegisterRequest request, CancellationToken ct)
     {
-        await EnsureEmailAddressIsUnique(request.EmailAddress, ct); 
-        
+        if (await _context.Users.AnyAsync(u => u.EmailAddress == request.EmailAddress, ct))
+            return Error.Validation(nameof(RegisterRequest.EmailAddress), "An account with the specified email address already exists.");
+
         var user = new User
         {
             Id = Guid.NewGuid(),
@@ -43,18 +43,5 @@ public class RegisterRequestHandler : IRequestHandler<RegisterRequest, UserDto>
             DisplayName = user.DisplayName,
             EmailAddress = user.EmailAddress
         };
-    }
-
-    private async Task EnsureEmailAddressIsUnique(string email, CancellationToken ct)
-    {
-        if (await _context.Users.AnyAsync(u => u.EmailAddress == email, ct) == false)
-            return;
-
-        var failure = new ValidationFailure(
-            nameof(RegisterRequest.EmailAddress),
-            "An account with the specified email address already exists.",
-            email);
-
-        throw new ValidationException(new List<ValidationFailure> { failure });
     }
 }

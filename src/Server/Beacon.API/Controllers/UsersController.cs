@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth;
+﻿using Beacon.Common.Auth.GetCurrentUser;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Beacon.API.Controllers;
@@ -7,10 +7,9 @@ namespace Beacon.API.Controllers;
 public class UsersController : ApiControllerBase
 {
     [HttpGet("current")]
-    public IActionResult GetCurrentUser()
+    public async Task<IActionResult> GetCurrentUser()
     {
-        var user = HttpContext.User.ToUserDto();
-
-        return user is null ? NotFound() : Ok(user);
+        var result = await Mediator.Send(new GetCurrentUserRequest());
+        return result.IsError ? NotFound() : Ok(result.Value);
     }
 }

@@ -1,32 +1,28 @@
 ﻿using Beacon.Common.Auth;
+using Beacon.Common.Auth.GetCurrentUser;
+using MediatR;
 using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BeaconUI.Core.Auth;
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IDisposable
+public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 {
-    private readonly BeaconAuthClient _authClient;
+    private readonly ISender _sender;
 
-    public BeaconAuthStateProvider(BeaconAuthClient authClient)
+    public BeaconAuthStateProvider(ISender sender)
     {
-        _authClient = authClient;
-        _authClient.OnLogin += HandleLogin;
-    }
-
-    public void Dispose()
-    {
-        _authClient.OnLogin -= HandleLogin;
+        _sender = sender;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var user = await _authClient.GetCurrentUser();
+        var result = await _sender.Send(new GetCurrentUserRequest());
+        var user = result.IsError ? null : result.Value;
         return new AuthenticationState(user.ToClaimsPrincipal());
     }
 
-    private void HandleLogin(UserDto user)
+    public void RefreshState()
     {
-        var authState = new AuthenticationState(user.ToClaimsPrincipal());
-        NotifyAuthenticationStateChanged(Task.FromResult(authState));
+        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }

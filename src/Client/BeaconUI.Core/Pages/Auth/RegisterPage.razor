@@ -1,11 +1,5 @@
-﻿@using Beacon.Common.Auth.Register
-
-@page "/register"
-
+﻿@page "/register"
 @layout EmptyLayout
-
-@inject BeaconAuthClient AuthService
-@inject NavigationManager NavManager
 
 <div class="page-container">
 
@@ -54,26 +48,3 @@
 
 </div>
 
-@code {
-
-    private RegisterRequest Model { get; set; } = new();
-
-    private async Task<ValidationProblemResponse?> Submit()
-    {
-        var response = await AuthService.Register(Model);
-
-        if (response.Value is UserDto)
-        {
-            NavManager.NavigateTo("");
-            return null;
-        }
-
-        return response.Value as ValidationProblemResponse;
-    }
-
-    private void DoAfterUpdateEmail()
-    {
-        if (string.IsNullOrWhiteSpace(Model.DisplayName))
-            Model.DisplayName = Model.EmailAddress.Substring(0, Model.EmailAddress.IndexOf('@'));
-    }
-}

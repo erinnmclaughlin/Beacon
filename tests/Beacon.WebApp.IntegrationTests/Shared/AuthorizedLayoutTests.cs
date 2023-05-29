@@ -1,5 +1,4 @@
-﻿using Beacon.Common.Auth;
-using BeaconUI.Core.Auth;
+﻿using BeaconUI.Core;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
@@ -12,8 +11,12 @@ public class AuthorizedLayoutTests : TestContext
     public void AuthorizedLayout_RedirectsToLogin_WhenUserIsNotAuthorized()
     {
         // Arrange
-        var authContext = this.AddTestAuthorization().SetNotAuthorized();
-        Services.AddScoped<BeaconAuthClient>();
+        this.AddTestAuthorization().SetNotAuthorized();
+        Services.AddBeaconUI();
+
+        var mockHttp = Services.AddMockHttpClient();
+        mockHttp.When(HttpMethod.Get, "/api/users/current").ThenRespondNotFound();
+
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
 
         // Act
@@ -28,11 +31,12 @@ public class AuthorizedLayoutTests : TestContext
     public void AuthorizedLayout_RedirectsToLogin_WhenLoggedInUserClicksLogout()
     {
         // Arrange
-        var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Get, "/api/auth/logout").ThenReturnNoContent();
+        this.AddTestAuthorization().SetAuthorized("Test");
+        Services.AddBeaconUI();
 
-        var authContext = this.AddTestAuthorization().SetAuthorized("Test");
-        Services.AddScoped<BeaconAuthClient>();
+        var mockHttp = Services.AddMockHttpClient();
+        mockHttp.When(HttpMethod.Get, "/api/users/current").ThenRespondOK(AuthHelper.DefaultUser);
+        mockHttp.When(HttpMethod.Get, "/api/auth/logout").ThenRespondNoContent();
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
 

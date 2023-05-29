@@ -1,10 +1,5 @@
-﻿@using Beacon.Common.Auth.Login
-@page "/login"
-
+﻿@page "/login"
 @layout EmptyLayout
-
-@inject BeaconAuthClient AuthService
-@inject NavigationManager NavManager
 
 <div class="page-container">
 
@@ -46,21 +41,3 @@
     </div>
 
 </div>
-
-@code {
-
-    private LoginRequest Model { get; set; } = new();
-
-    private async Task<ValidationProblemResponse?> Submit()
-    {
-        var response = await AuthService.Login(Model);
-
-        if (response.Value is UserDto)
-        {
-            NavManager.NavigateTo("");
-            return null;
-        }
-
-        return response.Value as ValidationProblemResponse;
-    }
-}
