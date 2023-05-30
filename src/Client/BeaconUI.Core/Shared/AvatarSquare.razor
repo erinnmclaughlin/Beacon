@@ -1,0 +1,10 @@
+﻿<div class="avatar" style="height: @Size; width: @Size;">
+    <div style="font-size: @FontSize;">@Value</div>
+</div>
+
+@code {
+
+    [Parameter, EditorRequired] public required char Value { get; set; }
+    [Parameter] public string Size { get; set; } = "2rem";
+    [Parameter] public string FontSize { get; set; } = "1.5rem";
+}

@@ -1,0 +1,18 @@
+﻿<div class="nav-scrollable">
+    <nav class="d-flex flex-column">
+        <CurrentUserMemberships Context="Memberships">
+            @foreach (var membership in Memberships)
+            {
+                <div class="nav-item px-3">
+                    <NavLink class="nav-link" href="@NavigationHelper.GetLabDetailsHref(membership.LaboratoryId)" Match="NavLinkMatch.All">
+                        <AvatarSquare Value="@membership.LaboratoryName[0]" FontSize="1rem" Size="1.5rem" />
+                        <span class="ms-2">@membership.LaboratoryName</span>
+                    </NavLink>
+                </div>
+            }
+        </CurrentUserMemberships>
+        <div class="nav-item px-3">
+            <a href="new-lab">New laboratory</a>
+        </div>
+    </nav>
+</div>

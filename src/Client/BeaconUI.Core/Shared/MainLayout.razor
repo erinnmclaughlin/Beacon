@@ -1,20 +1,22 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page">
-    <main>
+<div class="page d-flex flex-column h-100">
+    <AuthorizeView>
+        <header class="d-flex flex-row flex-shrink-0 shadow-sm w-100">
+            <div class="ms-auto">
+                <span>Hello, @(context.User.ToUserDto()?.DisplayName)!</span>
+                <LogoutButton class="btn btn-link ms-1">Logout</LogoutButton>
+            </div>
+        </header>
+    </AuthorizeView>
+    <main class="d-flex flex-row flex-grow-1">
         <AuthorizeView>
-            @if (context.User.Identity is {IsAuthenticated: true} user)
-            {
-                <div class="top-row px-4">
-                    <div class="ml-auto">
-                        <span>Hello, @(context.User.Identity?.Name)!</span>
-                        <LogoutButton class="btn btn-link ms-1">Logout</LogoutButton>
-                    </div>
-                </div>
-            }
+            <div class="sidebar">
+                <SideNav />
+            </div>
         </AuthorizeView>
-        <article class="content px-4">
+        <div class="content px-4 flex-grow-1">
             @Body
-        </article>
+        </div>
     </main>
 </div>

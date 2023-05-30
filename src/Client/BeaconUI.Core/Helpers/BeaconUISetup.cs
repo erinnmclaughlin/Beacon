@@ -1,5 +1,6 @@
 ﻿using Beacon.Common.Validation;
 using BeaconUI.Core.Auth.Services;
+using BeaconUI.Core.Laboratories.Services;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using System.Reflection;
@@ -13,6 +14,7 @@ public static class BeaconUISetup
         services.AddOptions();
         services.AddAuthorizationCore();
         services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
+        services.AddScoped<CurrentUserMembershipProvider>();
 
         services.AddMediatR(config =>
         {

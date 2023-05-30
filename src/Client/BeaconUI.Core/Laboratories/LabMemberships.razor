@@ -1,0 +1,31 @@
+﻿@using Beacon.Common.Laboratories
+@using Beacon.Common.Laboratories.Requests
+@inject ISender Sender
+
+@if (Memberships == null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <ul>
+        @foreach (var membership in Memberships)
+        {
+            <li>@membership.MemberDisplayName (@membership.MembershipType)</li>
+        }
+    </ul>
+}
+
+@code {
+
+    [Parameter, EditorRequired] public required Guid LaboratoryId { get; set; }
+
+    private List<LaboratoryMembershipDto>? Memberships { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var request = new GetLaboratoryMembershipsByLabIdRequest { LaboratoryId = LaboratoryId };
+        var response = await Sender.Send(request);
+        Memberships = response.IsError ? new() : response.Value;
+    }
+}

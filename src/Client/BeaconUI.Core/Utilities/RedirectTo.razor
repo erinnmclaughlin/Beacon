@@ -1,0 +1,11 @@
+﻿@inject NavigationManager NavManager
+
+@code {
+
+    [Parameter, EditorRequired] public required string Uri { get; set; }
+
+    protected override void OnInitialized()
+    {
+        NavManager.NavigateTo(Uri);
+    }
+}

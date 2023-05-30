@@ -3,21 +3,24 @@
 @using Microsoft.AspNetCore.Components.Forms
 @using Microsoft.AspNetCore.Components.Routing
 @using Microsoft.AspNetCore.Components.Web
-
-@using System.ComponentModel.DataAnnotations
 @using System.Net.Http.Json
 
 @* Core / Infrastructure *@
 @using Beacon.Common
 @using BeaconUI.Core
+@using BeaconUI.Core.Helpers
 @using BeaconUI.Core.Shared
+@using BeaconUI.Core.Utilities
 @using ErrorOr
 @using MediatR
 
 @* Auth *@
+@using BeaconUI.Core.Auth
 @using Beacon.Common.Auth
 @using Beacon.Common.Auth.Requests
-@using BeaconUI.Core.Auth.Components
+
+@* Labs *@
+@using BeaconUI.Core.Laboratories
 
 @* Validation *@
 @using Blazored.FluentValidation

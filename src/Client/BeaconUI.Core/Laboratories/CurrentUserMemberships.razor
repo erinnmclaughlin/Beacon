@@ -1,0 +1,36 @@
+﻿@using Beacon.Common.Laboratories
+@using Beacon.Common.Laboratories.Requests
+@using BeaconUI.Core.Laboratories.Services
+
+@inject CurrentUserMembershipProvider MembershipProvider
+
+@implements IDisposable
+
+@if (ChildContent is not null && Memberships is not null)
+{
+    @ChildContent.Invoke(Memberships)
+}
+
+@code {
+
+    [Parameter] public RenderFragment<List<LaboratoryMembershipDto>>? ChildContent { get; set; }
+
+    private List<LaboratoryMembershipDto>? Memberships { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        MembershipProvider.MembershipsChanged += HandleMembershipsChanged;
+        Memberships = await MembershipProvider.GetMembershipsAsync();
+    }
+
+    public void Dispose()
+    {
+        MembershipProvider.MembershipsChanged -= HandleMembershipsChanged;
+    }
+
+    private void HandleMembershipsChanged(List<LaboratoryMembershipDto> memberships)
+    {
+        Memberships = memberships;
+        StateHasChanged();
+    }
+}

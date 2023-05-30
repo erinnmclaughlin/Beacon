@@ -2,7 +2,6 @@
 using Beacon.API.Persistence;
 using Beacon.Common.Validation;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 

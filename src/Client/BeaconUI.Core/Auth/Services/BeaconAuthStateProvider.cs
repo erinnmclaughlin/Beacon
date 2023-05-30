@@ -9,6 +9,8 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 {
     private readonly ISender _sender;
 
+    public UserDto? CurrentUser { get; private set; }
+
     public BeaconAuthStateProvider(ISender sender)
     {
         _sender = sender;
@@ -16,13 +18,18 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        var result = await _sender.Send(new GetCurrentUserRequest());
-        var user = result.IsError ? null : result.Value;
-        return new AuthenticationState(user.ToClaimsPrincipal());
+        if (CurrentUser == null)
+        {
+            var result = await _sender.Send(new GetCurrentUserRequest());
+            CurrentUser = result.IsError ? null : result.Value;
+        }
+
+        return new AuthenticationState(CurrentUser.ToClaimsPrincipal());
     }
 
     public void RefreshState()
     {
+        CurrentUser = null;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 }

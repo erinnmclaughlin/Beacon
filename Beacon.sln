@@ -31,7 +31,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.Common.UnitTests", "
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.IntegrationTests", "tests\Beacon.IntegrationTests\Beacon.IntegrationTests.csproj", "{ECCC0A02-0024-449F-8D74-4226C443D6A4}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.WebApp.IntegrationTests", "tests\Beacon.WebApp.IntegrationTests\Beacon.WebApp.IntegrationTests.csproj", "{D71DAC0F-5D85-4D42-9C8E-09AB3C499608}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.WebApp.IntegrationTests", "tests\Beacon.WebApp.IntegrationTests\Beacon.WebApp.IntegrationTests.csproj", "{D71DAC0F-5D85-4D42-9C8E-09AB3C499608}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{532CBA62-82CF-4D77-96B9-B21A39D3F993}"
 EndProject
