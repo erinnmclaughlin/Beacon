@@ -1,11 +1,10 @@
-﻿namespace Beacon.Common.Laboratories;
+﻿using Beacon.Common.Laboratories.Enums;
+
+namespace Beacon.Common.Laboratories;
 
 public record LaboratoryMembershipDto
 {
-    public required Guid MemberId { get; init; }
-    public required string MemberDisplayName { get; init; }
-    public required string MembershipType { get; init; }
-
-    public required Guid LaboratoryId { get; init; }
-    public required string LaboratoryName { get; init; }
+    public required UserDto Member { get; init; }
+    public required LaboratoryDto Laboratory { get; init; }
+    public required LaboratoryMembershipType MembershipType { get; init; }
 }

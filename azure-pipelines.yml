@@ -5,78 +5,72 @@ variables:
   solution: '**/*.sln'
   buildConfiguration: 'Release'
 
-jobs:
-- job: Build
-  pool: 
-    vmImage: 'windows-latest'
-  steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Restore dependencies'
-      inputs:
-        command: 'restore'
-        projects: '$(solution)'
+pool: 
+  vmImage: 'windows-latest'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Build'
-      inputs:
-        command: build
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration)'
+steps:
+  - task: UseDotNet@2
+    inputs:
+      packageType: 'sdk'
+      useGlobalJson: true
 
-- job: Test
-  dependsOn: Build
-  pool:
-    vmImage: 'windows-latest'
-  steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Run tests'
-      inputs:
-        command: test
-        projects: '$(solution)'
-        arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
-        publishTestResults: true
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore dependencies'
+    inputs:
+      command: 'restore'
+      projects: '$(solution)'
 
-    - script: |
-        dotnet tool install -g dotnet-reportgenerator-globaltool
-        reportgenerator -reports:$(Agent.WorkFolder)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)\CodeCoverage -reporttypes:Cobertura
-      displayName: 'Create code coverage report'
+  - task: DotNetCoreCLI@2
+    displayName: 'Build'
+    inputs:
+      command: build
+      projects: '$(solution)'
+      arguments: '--configuration $(buildConfiguration)'
 
-    - task: PublishCodeCoverageResults@1
-      displayName: 'Publish code coverage'
-      inputs:
-        codeCoverageTool: 'Cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
+  - task: DotNetCoreCLI@2
+    displayName: 'Run tests'
+    inputs:
+      command: test
+      projects: '$(solution)'
+      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
+      publishTestResults: true
 
-- job: Publish
-  dependsOn: Test
-  pool:
-    vmImage: 'windows-latest'
-  steps:
-    - task: DotNetCoreCLI@2
-      displayName: 'Install EF Core Tools'
-      inputs:
-        command: custom
-        custom: tool
-        arguments: install --global dotnet-ef
+  - script: |
+      dotnet tool install -g dotnet-reportgenerator-globaltool
+      reportgenerator -reports:$(Agent.WorkFolder)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)\CodeCoverage -reporttypes:Cobertura
+    displayName: 'Create code coverage report'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Generate Db Migrations Script'
-      inputs:
-        command: 'custom'
-        custom: 'ef'
-        arguments: migrations script --idempotent --output $(Build.ArtifactStagingDirectory)/Migrations.sql --project ./src/Server/Beacon.API/Beacon.API.csproj --startup-project ./src/Server/Beacon.WebHost/Beacon.WebHost.csproj
+  - task: PublishCodeCoverageResults@1
+    displayName: 'Publish code coverage'
+    inputs:
+      codeCoverageTool: 'Cobertura'
+      summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
 
-    - task: DotNetCoreCLI@2
-      displayName: 'Publish web app'
-      inputs:
-        command: 'publish'
-        publishWebProjects: false
-        projects: '**/Beacon.WebHost.csproj'
-        arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+  - task: DotNetCoreCLI@2
+    displayName: 'Install EF Core Tools'
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --global dotnet-ef
 
-    - task: PublishBuildArtifacts@1
-      displayName: 'Publish artifacts'
-      inputs:
-        PathtoPublish: '$(Build.ArtifactStagingDirectory)'
-        ArtifactName: 'drop'
-        publishLocation: 'Container'
+  - task: DotNetCoreCLI@2
+    displayName: 'Generate Db Migrations Script'
+    inputs:
+      command: 'custom'
+      custom: 'ef'
+      arguments: migrations script --idempotent --output $(Build.ArtifactStagingDirectory)/Migrations.sql --project ./src/Server/Beacon.API/Beacon.API.csproj --startup-project ./src/Server/Beacon.WebHost/Beacon.WebHost.csproj
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish web app'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: '**/Beacon.WebHost.csproj'
+      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+  - task: PublishBuildArtifacts@1
+    displayName: 'Publish artifacts'
+    inputs:
+      PathtoPublish: '$(Build.ArtifactStagingDirectory)'
+      ArtifactName: 'drop'
+      publishLocation: 'Container'

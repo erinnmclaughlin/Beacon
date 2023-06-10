@@ -22,7 +22,7 @@ namespace Beacon.API.Persistence.Migrations
 
             SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
 
-            modelBuilder.Entity("Beacon.API.Entities.Laboratory", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.Laboratory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -38,7 +38,74 @@ namespace Beacon.API.Persistence.Migrations
                     b.ToTable("Laboratories");
                 });
 
-            modelBuilder.Entity("Beacon.API.Entities.LaboratoryMembership", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryInvitation", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid?>("AcceptedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("CreatedOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<double>("ExpireAfterDays")
+                        .HasColumnType("float");
+
+                    b.Property<Guid>("LaboratoryId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("MembershipType")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("NewMemberEmailAddress")
+                        .IsRequired()
+                        .HasMaxLength(255)
+                        .HasColumnType("nvarchar(255)");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("AcceptedById");
+
+                    b.HasIndex("CreatedById");
+
+                    b.HasIndex("LaboratoryId");
+
+                    b.ToTable("LaboratoryInvitations");
+                });
+
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryInvitationEmail", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<DateTimeOffset>("ExpiresOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.Property<Guid>("LaboratoryInvitationId")
+                        .HasColumnType("uniqueidentifier");
+
+                    b.Property<string>("OperationId")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTimeOffset>("SentOn")
+                        .HasColumnType("datetimeoffset");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("LaboratoryInvitationId");
+
+                    b.ToTable("LaboratoryInvitationEmails");
+                });
+
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryMembership", b =>
                 {
                     b.Property<Guid>("LaboratoryId")
                         .HasColumnType("uniqueidentifier");
@@ -58,7 +125,7 @@ namespace Beacon.API.Persistence.Migrations
                     b.ToTable("LaboratoryMemberships");
                 });
 
-            modelBuilder.Entity("Beacon.API.Entities.User", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
@@ -89,15 +156,51 @@ namespace Beacon.API.Persistence.Migrations
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("Beacon.API.Entities.LaboratoryMembership", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryInvitation", b =>
                 {
-                    b.HasOne("Beacon.API.Entities.Laboratory", "Laboratory")
+                    b.HasOne("Beacon.API.Domain.Entities.User", "AcceptedBy")
+                        .WithMany()
+                        .HasForeignKey("AcceptedById");
+
+                    b.HasOne("Beacon.API.Domain.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
+
+                    b.HasOne("Beacon.API.Domain.Entities.Laboratory", "Laboratory")
+                        .WithMany()
+                        .HasForeignKey("LaboratoryId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("AcceptedBy");
+
+                    b.Navigation("CreatedBy");
+
+                    b.Navigation("Laboratory");
+                });
+
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryInvitationEmail", b =>
+                {
+                    b.HasOne("Beacon.API.Domain.Entities.LaboratoryInvitation", "LaboratoryInvitation")
+                        .WithMany("EmailInvitations")
+                        .HasForeignKey("LaboratoryInvitationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("LaboratoryInvitation");
+                });
+
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryMembership", b =>
+                {
+                    b.HasOne("Beacon.API.Domain.Entities.Laboratory", "Laboratory")
                         .WithMany("Memberships")
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
-                    b.HasOne("Beacon.API.Entities.User", "Member")
+                    b.HasOne("Beacon.API.Domain.Entities.User", "Member")
                         .WithMany("Memberships")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
@@ -108,12 +211,17 @@ namespace Beacon.API.Persistence.Migrations
                     b.Navigation("Member");
                 });
 
-            modelBuilder.Entity("Beacon.API.Entities.Laboratory", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.Laboratory", b =>
                 {
                     b.Navigation("Memberships");
                 });
 
-            modelBuilder.Entity("Beacon.API.Entities.User", b =>
+            modelBuilder.Entity("Beacon.API.Domain.Entities.LaboratoryInvitation", b =>
+                {
+                    b.Navigation("EmailInvitations");
+                });
+
+            modelBuilder.Entity("Beacon.API.Domain.Entities.User", b =>
                 {
                     b.Navigation("Memberships");
                 });

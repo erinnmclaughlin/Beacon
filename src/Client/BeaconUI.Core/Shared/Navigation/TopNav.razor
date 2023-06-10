@@ -1,0 +1,34 @@
+﻿<AuthorizeView>
+    <nav class="navbar navbar-expand-lg bg-white fixed-top border-bottom" id="topnav">
+        <div class="container-fluid">
+            @NavbarBrand
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="icon">
+                    <i class="fa-solid fa-bars"></i>
+                </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                    @NavbarItems
+                </ul>
+                <div class="dropdown text-end-lg">
+                    <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle" data-test-id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => { }">
+                        <span>@context.User?.ToAuthUserDto()?.DisplayName</span>
+                    </a>
+                    <ul class="dropdown-menu dropdown-menu-end text-small">
+                        <li><LogoutButton class="dropdown-item">Sign out</LogoutButton></li>
+                    </ul>
+                </div>              
+            </div>
+        </div>
+    </nav>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? NavbarBrand { get; set; }
+
+    [Parameter]
+    public RenderFragment? NavbarItems { get; set; }
+}

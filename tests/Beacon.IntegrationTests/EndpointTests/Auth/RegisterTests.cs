@@ -1,4 +1,7 @@
-﻿using Beacon.Common.Auth.Requests;
+﻿using Beacon.API.Persistence;
+using Beacon.Common.Auth.Requests;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
@@ -106,7 +109,7 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
 
         // check that register was successful:
         response.IsSuccessStatusCode.Should().BeTrue();
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");

@@ -1,0 +1,43 @@
+﻿@page "/laboratories/{LabId:guid}/invitations/{InviteId:guid}/accept"
+@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@layout EmptyLayout
+
+@code {
+
+    [Inject]
+    private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+
+    [Inject]
+    private IHttpClientFactory HttpClientFactory { get; set; } = null!;
+
+    [Inject]
+    private NavigationManager NavManager { get; set; } = null!;
+
+    [Parameter]
+    public Guid LabId { get; set; }
+
+    [Parameter] 
+    public Guid InviteId { get; set; }
+
+    [Parameter, SupplyParameterFromQuery(Name = "emailId")]
+    public Guid EmailId { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var authState = await AuthStateProvider.GetAuthenticationStateAsync();
+
+        if (authState.User.Identity is not { IsAuthenticated: true })
+        {
+            var redirectUri = $"laboratories/{LabId}/invitations/{InviteId}/accept?emailId={EmailId}";
+            NavManager.NavigateToLogin($"login?redirectUri={redirectUri}");
+            return;
+        }
+
+        using var httpClient = HttpClientFactory.CreateBeaconClient();
+
+        var response = await httpClient.GetAsync($"api/invitations/{InviteId}/accept?emailId={EmailId}");
+
+        if (response.IsSuccessStatusCode)
+            NavManager.NavigateTo(NavigationHelper.GetLabDetailsHref(LabId));
+    }
+}

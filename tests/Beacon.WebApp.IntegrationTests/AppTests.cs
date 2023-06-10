@@ -1,22 +1,25 @@
 ﻿using Beacon.WebApp.IntegrationTests.Auth;
-using BeaconUI.Core.Helpers;
+using Beacon.WebApp.IntegrationTests.Http;
+using BeaconUI.Core.Services;
 using Bunit.TestDoubles;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests;
 
-public class AppTests : TestContext
+public class AppTests : BeaconTestContext
 {
     [Fact]
-    public void AuthorizedLayout_RedirectsToLogin_WhenUserIsNotAuthorized()
+    public void WebApp_RedirectsToLogin_WhenUserIsNotAuthorized()
     {
         // Arrange
         this.AddTestAuthorization().SetNotAuthorized();
-        Services.AddBeaconUI();
+        SetupCoreServices();
 
-        var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Get, "/api/auth/me").ThenRespondNotFound();
+        Services.AddMockHttpClient()
+            .When(HttpMethod.Get, "/api/auth/me")
+            .ThenRespondNotFound();
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
 
@@ -29,23 +32,25 @@ public class AppTests : TestContext
     }
 
     [Fact]
-    public void AuthorizedLayout_RedirectsToLogin_WhenLoggedInUserClicksLogout()
+    public void WebApp_RedirectsToLogin_WhenLoggedInUserClicksLogout()
     {
         // Arrange
-        this.AddTestAuthorization().SetAuthorized("Test");
-        Services.AddBeaconUI();
+        SetupCoreServices();
+        Services.AddScoped<IAuthorizationService, FakeAuthorizationService>();
 
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Get, "/api/auth/me").ThenRespondOK(AuthHelper.DefaultUser);
         mockHttp.When(HttpMethod.Get, "/api/auth/logout").ThenRespondNoContent();
 
+        var authProvider = Services.GetRequiredService<BeaconAuthStateProvider>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
 
         // Act
         var cut = RenderComponent<BeaconUI.WebApp.App>();
         navManager.NavigateTo("");
 
-        cut.WaitForElement("button#logout").Click();
+        cut.WaitForElement("[data-test-id=\"profileDropdown\"]").Click();
+        cut.WaitForElement("[data-test-id=\"logoutButton\"]").Click();
 
         // Assert
         cut.WaitForAssertion(() => navManager.Uri.Should().Be($"{navManager.BaseUri}login"));

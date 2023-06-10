@@ -1,20 +1,12 @@
 ﻿@inherits LayoutComponentBase
 
 <div class="page d-flex flex-column h-100">
-    <AuthorizeView>
-        <header class="d-flex flex-row flex-shrink-0 shadow-sm w-100">
-            <div class="ms-auto">
-                <span>Hello, @(context.User.ToUserDto()?.DisplayName)!</span>
-                <LogoutButton class="btn btn-link ms-1">Logout</LogoutButton>
-            </div>
-        </header>
-    </AuthorizeView>
+    <TopNav>
+        <NavbarBrand>
+            <a class="navbar-brand" href="">Beacon LMS</a>
+        </NavbarBrand>
+    </TopNav>
     <main class="d-flex flex-row flex-grow-1">
-        <AuthorizeView>
-            <div class="sidebar">
-                <SideNav />
-            </div>
-        </AuthorizeView>
         <div class="content px-4 flex-grow-1">
             @Body
         </div>

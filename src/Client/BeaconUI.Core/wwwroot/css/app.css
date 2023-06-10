@@ -1,4 +1,6 @@
 ﻿@import url('fontawesome/css/all.min.css');
+
+@import url('variables.css');
 @import url('utils.css');
 
 html, body {
@@ -9,6 +11,14 @@ html, body {
 #app {
     height: 100%;
 }
+
+#topnav {
+    height: var(--topnav-height);
+}
+
+    #topnav + * {
+        margin-top: var(--topnav-height);
+    }
 
 h1:focus {
     outline: none;
@@ -35,7 +45,7 @@ a, .btn-link {
 }
 
 .icon:not(:last-child) {
-    margin-right: 0.5rem;
+    margin-right: 0.25rem;
 }
 
 .valid.modified:not([type=checkbox]) {

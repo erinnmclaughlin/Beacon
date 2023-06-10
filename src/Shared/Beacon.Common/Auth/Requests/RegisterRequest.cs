@@ -2,7 +2,7 @@
 
 namespace Beacon.Common.Auth.Requests;
 
-public class RegisterRequest : IApiRequest<UserDto>
+public class RegisterRequest
 {
     public string DisplayName { get; set; } = string.Empty;
     public string EmailAddress { get; set; } = string.Empty;

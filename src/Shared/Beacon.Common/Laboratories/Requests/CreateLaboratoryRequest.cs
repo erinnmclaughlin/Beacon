@@ -1,18 +1,17 @@
-﻿using FluentValidation;
+﻿using Beacon.Common.Validation.Rules;
+using FluentValidation;
 
 namespace Beacon.Common.Laboratories.Requests;
 
-public class CreateLaboratoryRequest : IApiRequest<LaboratoryDto>
+public class CreateLaboratoryRequest
 {
-    public string Name { get; set; } = string.Empty;
+    public string LaboratoryName { get; set; } = string.Empty;
 
     public class Validator : AbstractValidator<CreateLaboratoryRequest>
     {
         public Validator()
         {
-            RuleFor(x => x.Name)
-                .NotEmpty().WithMessage("Name is required.")
-                .MaximumLength(50).WithMessage("Name cannot exceed 50 characters.");
+            RuleFor(x => x.LaboratoryName).IsValidLaboratoryName();
         }
     }
 }

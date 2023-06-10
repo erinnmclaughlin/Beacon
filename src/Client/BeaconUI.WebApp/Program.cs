@@ -1,4 +1,4 @@
-using BeaconUI.Core.Helpers;
+using BeaconUI.Core;
 using BeaconUI.WebApp;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
@@ -7,9 +7,9 @@ var builder = WebAssemblyHostBuilder.CreateDefault(args);
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient
+builder.Services.AddHttpClient("BeaconApi", options =>
 {
-    BaseAddress = new Uri(builder.HostEnvironment.BaseAddress)
+    options.BaseAddress = new Uri(builder.HostEnvironment.BaseAddress);
 });
 
 builder.Services.AddBeaconUI();

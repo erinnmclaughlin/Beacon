@@ -5,22 +5,22 @@
 @using Microsoft.AspNetCore.Components.Web
 @using System.Net.Http.Json
 
-@* Core / Infrastructure *@
+@using Blazored.FluentValidation
+@using Blazored.Modal
+@using Blazored.Modal.Services
+@using ErrorOr
+
 @using Beacon.Common
+@using Beacon.Common.Auth
+@using Beacon.Common.Laboratories
+@using Beacon.Common.Laboratories.Enums
+
 @using BeaconUI.Core
+@using BeaconUI.Core.Clients
 @using BeaconUI.Core.Helpers
 @using BeaconUI.Core.Shared
-@using BeaconUI.Core.Utilities
-@using ErrorOr
-@using MediatR
-
-@* Auth *@
-@using BeaconUI.Core.Auth
-@using Beacon.Common.Auth
-@using Beacon.Common.Auth.Requests
-
-@* Labs *@
-@using BeaconUI.Core.Laboratories
-
-@* Validation *@
-@using Blazored.FluentValidation
+@using BeaconUI.Core.Shared.Auth
+@using BeaconUI.Core.Shared.Forms
+@using BeaconUI.Core.Shared.Laboratories
+@using BeaconUI.Core.Shared.Navigation
+@using BeaconUI.Core.Shared.Users

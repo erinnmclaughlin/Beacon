@@ -1,19 +1,20 @@
 using Beacon.Common.Auth.Requests;
-using BeaconUI.Core.Auth.Pages;
-using BeaconUI.Core.Helpers;
+using Beacon.WebApp.IntegrationTests.Http;
+using BeaconUI.Core;
+using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests.Auth.Pages;
 
-public class LoginPageTests : TestContext
+public class LoginPageTests : BeaconTestContext
 {
     [Fact]
     public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
     {
         // Arrange:
-        Services.AddBeaconUI();
+        SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultUser);
@@ -34,7 +35,7 @@ public class LoginPageTests : TestContext
     public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
     {
         // Arrange:
-        Services.AddBeaconUI();
+        SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondValidationProblem(new()

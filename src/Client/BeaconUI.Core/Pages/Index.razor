@@ -1,0 +1,12 @@
+﻿@page "/"
+@page "/laboratories"
+@attribute [Authorize]
+
+<div class="flex">
+    <h3 class="flex-grow-1">My Laboratories</h3>
+    <a href="new-lab" class="btn btn-link">New lab</a>
+</div>
+
+<MyLaboratories Context="memberships">
+    <LaboratoriesTable Memberships="memberships" />
+</MyLaboratories>

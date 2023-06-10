@@ -1,0 +1,15 @@
+﻿<header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
+    <h3 class="mb-0 flex-grow-1">
+        <span>@ActiveLaboratory.Name</span>
+    </h3>
+    <div>
+        @ButtonsContent
+    </div>
+</header>
+
+@code {
+
+    [CascadingParameter] public required LaboratoryDetailDto ActiveLaboratory { get; set; }
+
+    [Parameter] public RenderFragment? ButtonsContent { get; set; }
+}

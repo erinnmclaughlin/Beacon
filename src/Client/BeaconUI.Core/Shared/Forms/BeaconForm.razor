@@ -1,0 +1,69 @@
+﻿<CascadingValue Value="this">
+    <EditForm EditContext="EditContext" OnSubmit="Submit">
+        <FluentValidationValidator />
+        <fieldset disabled="@IsDisabled">
+            @ChildContent
+        </fieldset>
+    </EditForm>
+</CascadingValue>
+
+@code {
+
+    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] public bool DisableDuringSubmit { get; set; } = true;
+
+    [Parameter, EditorRequired] public required object Model { get; set; }
+    [Parameter, EditorRequired] public required EventCallback<BeaconForm> OnValidSubmit { get; set; }
+
+    private EditContext? _editContext;
+    private EditContext EditContext => _editContext ??= new(Model);
+
+    private ValidationMessageStore? _validationMessages;
+    private ValidationMessageStore ValidationMessages => _validationMessages ??= new(EditContext);
+
+    public bool IsSubmitting { get; private set; }
+    public bool IsDisabled => DisableDuringSubmit && IsSubmitting;
+
+    public void Dispose()
+    {
+        EditContext.OnFieldChanged -= HandleFieldChanged;
+    }
+
+    public void AddErrors(List<Error> errors)
+    {
+        ValidationMessages.Clear();
+
+        foreach (var error in errors.Where(e => e.Type == ErrorType.Validation))
+        {
+            var fieldIdentifier = new FieldIdentifier(EditContext.Model, error.Code);
+            ValidationMessages.Add(fieldIdentifier, error.Description);
+        }
+
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    protected override void OnInitialized()
+    {
+        EditContext.OnFieldChanged += HandleFieldChanged;
+    }
+
+    private void HandleFieldChanged(object? o, FieldChangedEventArgs e)
+    {
+        ValidationMessages.Clear(e.FieldIdentifier);
+        EditContext.NotifyValidationStateChanged();
+    }
+
+    public async Task Submit()
+    {
+        ValidationMessages.Clear();
+
+        if (IsDisabled || !EditContext.Validate())
+            return;
+
+        IsSubmitting = true;
+
+        await OnValidSubmit.InvokeAsync(this);
+
+        IsSubmitting = false;
+    }
+}

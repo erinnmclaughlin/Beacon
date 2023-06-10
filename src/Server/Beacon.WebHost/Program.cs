@@ -1,15 +1,15 @@
 using Beacon.API;
+using Beacon.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBeaconCore(options =>
+builder.Services.AddBeaconCore(builder.Configuration, options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("SqlServerDb");
     options.UseSqlServer(connectionString);
 });
 
-builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
 var app = builder.Build();
@@ -26,6 +26,10 @@ app.UseBlazorFrameworkFiles();
 app.UseStaticFiles();
 app.UseAuthentication();
 app.UseAuthorization();
-app.MapControllers();
+
+app.MapBeaconEndpoints();
+app.MapGet("api/ping", () => Results.Ok("pong"));
+
 app.MapFallbackToFile("index.html");
+
 app.Run();

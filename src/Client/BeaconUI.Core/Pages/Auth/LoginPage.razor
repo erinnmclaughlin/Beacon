@@ -1,0 +1,43 @@
+﻿@page "/login"
+@layout EmptyLayout
+
+<div class="page-container">
+
+    <div class="form-container">
+
+        <header class="text-center mb-3">
+            <span class="text-primary mb-1 fs-2">
+                <i class="fa-regular fa-flask-vial"></i>
+            </span>
+
+            <h3 class="fw-bold">
+                <span>Log in to your account</span>
+            </h3>
+        </header>
+
+        <BeaconForm Model="Model" OnValidSubmit="Submit">
+            <div class="field">
+                <label class="form-label" for="email">Email</label>
+                <InputText @bind-Value="Model.EmailAddress" class="form-control" id="email" type="email" placeholder="eg, jsparrow@blackpearl.arg" />
+                <ValidationMessage For="() => Model.EmailAddress" />
+            </div>
+
+            <div class="field">
+                <label class="form-label" for="password">Password</label>
+                <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" />
+                <ValidationMessage For="() => Model.Password" />
+            </div>
+
+            <div class="field">
+                <SubmitButton id="login" class="btn btn-primary w-100">Login</SubmitButton>
+            </div>
+
+            <div class="field text-center">
+                <span>Don't have an account?</span>
+                <a href="@GetRegisterPageHref()">Register</a>
+            </div>
+        </BeaconForm>
+
+    </div>
+
+</div>

@@ -8,21 +8,21 @@ public sealed class UserDtoClaimsPrincipalMapperTests
     [Fact]
     public void Mapper_ReturnsAnonymousClaimsPrincipal_WhenUserIsNull()
     {
-        var cp = UserDtoClaimsPrincipalMapper.ToClaimsPrincipal(null);
+        var cp = AuthUserDtoClaimsPrincipalMapper.ToClaimsPrincipal(null);
         cp.Identities.Should().ContainSingle().Which.IsAuthenticated.Should().BeFalse();
     }
 
     [Fact]
     public void Mapper_ReturnsExpectedClaimsPrincipal_WhenUserIsNotNull()
     {
-        var someUser = new UserDto
+        var someUser = new AuthUserDto
         {
             Id = Guid.NewGuid(),
             EmailAddress = "someone@test.com",
             DisplayName = "Test User"
         };
 
-        var cp = UserDtoClaimsPrincipalMapper.ToClaimsPrincipal(someUser);
+        var cp = AuthUserDtoClaimsPrincipalMapper.ToClaimsPrincipal(someUser);
 
         cp.Identities.Should().ContainSingle().Which.IsAuthenticated.Should().BeTrue();
         cp.FindAll(ClaimTypes.NameIdentifier).Should().ContainSingle().Which.Value.Should().Be(someUser.Id.ToString());
@@ -35,7 +35,7 @@ public sealed class UserDtoClaimsPrincipalMapperTests
     {
         var anonymousClaimsPrincipal = new ClaimsPrincipal(new ClaimsIdentity());
 
-        var user = UserDtoClaimsPrincipalMapper.ToUserDto(anonymousClaimsPrincipal);
+        var user = AuthUserDtoClaimsPrincipalMapper.ToAuthUserDto(anonymousClaimsPrincipal);
 
         user.Should().BeNull();
     }
@@ -55,9 +55,9 @@ public sealed class UserDtoClaimsPrincipalMapperTests
             new(ClaimTypes.Email, email)
         });
 
-        var user = UserDtoClaimsPrincipalMapper.ToUserDto(new(identity));
+        var user = AuthUserDtoClaimsPrincipalMapper.ToAuthUserDto(new(identity));
 
-        user.Should().NotBeNull().As<UserDto>();
+        user.Should().NotBeNull().As<AuthUserDto>();
         user!.Id.Should().Be(id);
         user.DisplayName.Should().Be(name);
         user.EmailAddress.Should().Be(email);

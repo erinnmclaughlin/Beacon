@@ -1,19 +1,20 @@
 ﻿using Beacon.Common.Auth.Requests;
-using BeaconUI.Core.Auth.Pages;
-using BeaconUI.Core.Helpers;
+using Beacon.WebApp.IntegrationTests.Http;
+using BeaconUI.Core;
+using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests.Auth.Pages;
 
-public class RegisterPageTests : TestContext
+public class RegisterPageTests : BeaconTestContext
 {
     [Fact]
     public async Task WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
     {
         // Arrange:
-        Services.AddBeaconUI();
+        SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultUser);
@@ -34,7 +35,7 @@ public class RegisterPageTests : TestContext
     public async Task WhenRegistrationIsUnsuccessful_ShowError()
     {
         // Arrange:
-        Services.AddBeaconUI();
+        SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
         mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondValidationProblem(new()

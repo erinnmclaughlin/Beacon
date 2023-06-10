@@ -1,0 +1,16 @@
+﻿@page "/new-lab"
+@attribute [Authorize]
+
+<h3>Create lab page</h3>
+
+<BeaconForm Model="Model" OnValidSubmit="Submit">
+    <div class="field">
+        <label class="form-label" for="lab-name">Laboratory Name</label>
+        <InputText @bind-Value="Model.LaboratoryName" class="form-control" id="lab-name" placeholder="e.g., Beacon Labs" />
+        <ValidationMessage For="() => Model.LaboratoryName" />
+    </div>
+
+    <div class="field">
+        <button type="submit" class="btn btn-primary w-100">Create Lab</button>
+    </div>
+</BeaconForm>
