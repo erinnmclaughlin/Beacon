@@ -32,22 +32,22 @@ public static class GetCurrentUser
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            var currentUser = await _currentUser
-                .GetCurrentUserAsync(cancellationToken);
+            var currentUserId = _currentUser.UserId;
 
-            var labs = await _queryService
-                .QueryFor<LaboratoryMembership>()
-                .Where(m => m.MemberId == currentUser.Id)
-                .Select(m => new Laboratory(m.Laboratory.Id, m.Laboratory.Name))
-                .ToArrayAsync(cancellationToken);
-
-            return new Response
-            {
-                Id = currentUser.Id,
-                DisplayName = currentUser.DisplayName,
-                EmailAddress = currentUser.EmailAddress,
-                Laboratories = labs
-            };
+            return await _queryService
+                .QueryFor<User>()
+                .Where(u => u.Id == currentUserId)
+                .Select(u => new Response
+                {
+                    Id = u.Id,
+                    DisplayName = u.DisplayName,
+                    EmailAddress = u.EmailAddress,
+                    Laboratories = u.Memberships
+                        .Select(m => new Laboratory(m.Laboratory.Id, m.Laboratory.Name))
+                        .ToArray()
+                })
+                .AsSplitQuery()
+                .FirstAsync(cancellationToken);
         }
     }
 }

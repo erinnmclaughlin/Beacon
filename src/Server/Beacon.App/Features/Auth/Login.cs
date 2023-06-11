@@ -1,5 +1,4 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.Helpers;
 using Beacon.App.Services;
 using FluentValidation;
 using FluentValidation.Results;
@@ -37,8 +36,7 @@ public static class Login
                 throw new ValidationException(new[] { failure });
             }
 
-            var claimsPrincipal = ClaimsPrincipalHelper.CreateClaimsPrincipal(user.Id);
-            await _signInManager.SignInAsync(claimsPrincipal);
+            await _signInManager.SignInAsync(user.Id);
         }
     }
 }

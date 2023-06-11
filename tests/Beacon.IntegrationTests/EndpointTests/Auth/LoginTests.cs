@@ -14,7 +14,7 @@ public class LoginTests : EndpointTestBase
     [Fact]
     public async Task Login_ShouldFail_WhenUserDoesNotExist()
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("portal/login", new LoginRequest
         {
             EmailAddress = "nobody@invalid.net",
             Password = "pwd12345"
@@ -26,7 +26,7 @@ public class LoginTests : EndpointTestBase
     [Fact]
     public async Task Login_ShouldFail_WhenPasswordIsInvalid()
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("portal/login", new LoginRequest
         {
             EmailAddress = TestData.DefaultUser.EmailAddress,
             Password = "not" + TestData.DefaultPassword // an invalid password
@@ -39,11 +39,11 @@ public class LoginTests : EndpointTestBase
     public async Task Login_ShouldSucceed_WhenCredentialsAreValid()
     {
         // getting current user should fail if we're not logged in:
-        var currentUser = await _httpClient.GetAsync("api/auth/me");
+        var currentUser = await _httpClient.GetAsync("portal/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // log in:
-        var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
+        var response = await _httpClient.PostAsJsonAsync("portal/login", new LoginRequest
         {
             EmailAddress = TestData.DefaultUser.EmailAddress,
             Password = TestData.DefaultPassword
@@ -56,7 +56,7 @@ public class LoginTests : EndpointTestBase
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await _httpClient.GetAsync("api/auth/me");
+        currentUser = await _httpClient.GetAsync("portal/me");
         currentUser.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

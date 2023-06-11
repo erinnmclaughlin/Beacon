@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common.Laboratories.Enums;
 using Beacon.WebHost;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,7 +13,9 @@ namespace Beacon.IntegrationTests.EndpointTests;
 public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFactory>
 {
     private readonly BeaconTestApplicationFactory _factory;
-    private bool _addTestAuthorization;
+
+    private bool IsAuthenticated { get; set; }
+    private LaboratoryMembershipType? MembershipType { get; set; }
 
     protected static JsonSerializerOptions JsonSerializerOptions
     {
@@ -35,14 +37,10 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
         _factory = factory;
     }
 
-    protected void AddTestAuthorization(bool addAuthorization = true)
+    protected void AddTestAuthorization(LaboratoryMembershipType? membershipType = null)
     {
-        _addTestAuthorization = addAuthorization;
-    }
-
-    protected IServiceScope CreateScope()
-    {
-        return _factory.Services.CreateScope();
+        IsAuthenticated = true;
+        MembershipType = membershipType;
     }
 
     protected HttpClient CreateClient(Action<BeaconDbContext>? dbAction = null)
@@ -58,7 +56,7 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
 
         var client = factory.CreateClient();
 
-        if (_addTestAuthorization)
+        if (IsAuthenticated)
             client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue(scheme: "TestScheme");
 
         return client;
@@ -66,7 +64,7 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
 
     private WebApplicationFactory<BeaconWebHost> GetWebApplicationFactory()
     {
-        if (!_addTestAuthorization)
+        if (!IsAuthenticated)
         {
             return _factory;
         }
@@ -75,8 +73,10 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
         {
             builder.ConfigureTestServices(services =>
             {
-                services.AddAuthentication(defaultScheme: "TestScheme")
-                    .AddScheme<AuthenticationSchemeOptions, TestAuthHandler>("TestScheme", options => { });
+                services
+                    .Configure<TestAuthSchemeOptions>(options => options.MembershipType = MembershipType)
+                    .AddAuthentication(defaultScheme: "TestScheme")
+                    .AddScheme<TestAuthSchemeOptions, TestAuthHandler>("TestScheme", options => { });
             });
         });
     }

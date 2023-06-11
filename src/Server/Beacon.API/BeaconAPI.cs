@@ -6,6 +6,7 @@ using Beacon.API.Services;
 using Beacon.App;
 using Beacon.App.Services;
 using Beacon.App.Settings;
+using Beacon.Common.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -42,16 +43,18 @@ public static class BeaconAPI
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("LabMember", config =>
+            options.AddPolicy("ApiAuth", config =>
             {
-                config.RequireClaim("LaboratoryId");
+                config.RequireClaim(BeaconClaimTypes.LabId);
             });
         });
 
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<ICurrentUser, SessionManager>();
+        services.AddScoped<ICurrentLab, SessionManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ISignInManager, SignInManager>();
+        services.AddScoped<ISignInManager, SessionManager>();
+        services.AddScoped<ISessionManager, SessionManager>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
@@ -73,11 +76,8 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        var endpointRoot = app.MapGroup("api").RequireAuthorization();
-
-        // TODO: register via reflection
-        AuthEndpoints.Map(endpointRoot);
-        LabEndpoints.Map(endpointRoot);
+        PortalEndpoints.Map(app);
+        ApiEndpoints.Map(app);
 
         return app;
     }
