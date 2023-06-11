@@ -41,13 +41,11 @@
     public void Dispose()
     {
         NavManager.LocationChanged -= HandleLocationChanged;
-        LabClient.OnMembershipChanged -= HandleMembershipChanged;
     }
 
     protected override void OnInitialized()
     {
         NavManager.LocationChanged += HandleLocationChanged;
-        LabClient.OnMembershipChanged += HandleMembershipChanged;
         TrySetLabId();
     }
 
@@ -86,7 +84,7 @@
         }
         else
         {
-            ActiveLaboratory = await LabClient.GetLaboratoryDetailsAsync(labId);
+            ActiveLaboratory = await LabClient.GetLaboratoryDetails();
         }
 
         StateHasChanged();

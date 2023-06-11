@@ -1,13 +1,13 @@
 ﻿using Beacon.Common.Auth;
 using Beacon.Common.Auth.Requests;
+using Beacon.Common.Laboratories.Requests;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
 
 public sealed class AuthClient : ApiClientBase
 {
-    public Action? OnLogin;
-    public Action? OnLogout;
+    public Action? OnChange;
 
     public AuthClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
@@ -15,35 +15,45 @@ public sealed class AuthClient : ApiClientBase
 
     public Task<ErrorOr<AuthUserDto>> GetCurrentUserAsync(CancellationToken ct = default)
     {
-        return GetAsync<AuthUserDto>("api/auth/me", ct);
+        return GetAsync<AuthUserDto>("portal/me", ct);
     }
 
     public async Task<ErrorOr<Success>> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
-        var result = await PostAsync("api/auth/login", request, ct);
+        var result = await PostAsync("portal/login", request, ct);
 
         if (!result.IsError)
-            OnLogin?.Invoke();
+            OnChange?.Invoke();
 
         return result;
     }
 
     public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
     {
-        var result = await PostAsync("api/auth/register", request, ct);
+        var result = await PostAsync("portal/register", request, ct);
 
         if (!result.IsError)
-            OnLogin?.Invoke();
+            OnChange?.Invoke();
 
         return result;
     }
 
     public async Task<ErrorOr<Success>> LogoutAsync(CancellationToken ct = default)
     {
-        var result = await GetAsync("api/auth/logout", ct);
+        var result = await GetAsync("portal/logout", ct);
 
         if (!result.IsError)
-            OnLogout?.Invoke();
+            OnChange?.Invoke();
+
+        return result;
+    }
+
+    public async Task<ErrorOr<Success>> CreateLaboratoryAsync(CreateLaboratoryRequest request, CancellationToken ct = default)
+    {
+        var result = await PostAsync("portal/laboratories", request, ct);
+
+        if (!result.IsError)
+            OnChange?.Invoke();
 
         return result;
     }

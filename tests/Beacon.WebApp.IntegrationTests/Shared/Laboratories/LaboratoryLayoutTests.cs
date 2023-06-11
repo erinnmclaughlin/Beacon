@@ -1,5 +1,6 @@
 ﻿using AngleSharp.Dom;
 using Beacon.Common.Laboratories;
+using Beacon.Common.Laboratories.Enums;
 using Beacon.WebApp.IntegrationTests.Http;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Authorization;
@@ -38,6 +39,7 @@ public class LaboratoryLayoutTests : BeaconTestContext
         {
             Id = Guid.NewGuid(),
             Name = "Some Lab",
+            CurrentUserMembershipType = LaboratoryMembershipType.Admin,
             Members = new List<LaboratoryMemberDto>()
         };
 

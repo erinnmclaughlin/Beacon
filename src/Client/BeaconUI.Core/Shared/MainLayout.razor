@@ -1,14 +1,33 @@
 ﻿@inherits LayoutComponentBase
 
-<div class="page d-flex flex-column h-100">
+<div class="page d-flex flex-column h-100" style="overflow-x: hidden;">
     <TopNav>
         <NavbarBrand>
             <a class="navbar-brand" href="">Beacon LMS</a>
         </NavbarBrand>
     </TopNav>
     <main class="d-flex flex-row flex-grow-1">
-        <div class="content px-4 flex-grow-1">
-            @Body
-        </div>
+        <CascadingValue Value="@ActiveLaboratory">
+            @if (ActiveLaboratory is not null)
+            {
+                <LaboratorySideNav />
+            }
+            <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+                @Body
+            </div>
+        </CascadingValue>
     </main>
 </div>
+
+@code {
+    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+    [Inject] private LabClient LabClient { get; set; } = null!;
+
+    private LaboratoryDetailDto? ActiveLaboratory { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await LabClient.GetLaboratoryDetails();
+        ActiveLaboratory = result.IsError ? null : result.Value;
+    }
+}

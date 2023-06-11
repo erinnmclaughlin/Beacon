@@ -3,34 +3,27 @@
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
-            <MyLaboratories Context="myLabs">
-                @{
-                    var myMembership = myLabs.FirstOrDefault(m => m.Laboratory.Id == MemberToUpdate.Laboratory.Id);
-                }
-
-                @if (myMembership?.MembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
-                {
-                    <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
-                }
-                else
-                {
-                    <div class="field">
-                        <label class="form-label" for="member">Member</label>
-                        <input class="form-control" id="member" readonly value="@MemberToUpdate.Member.DisplayName" />
-                    </div>
-                    <div class="field">
-                        <label class="form-label" for="type">Membership Type</label>
-                        <InputSelect class="form-select" @bind-Value="Model.MembershipType">
-                            @foreach (var option in Enum.GetValues<LaboratoryMembershipType>())
-                            {
-                                <option value="@option" disabled="@IsDisabled(myMembership, option)">@option</option>
-                            }
-                        </InputSelect>
-                        <ValidationMessage For="() => Model.MembershipType" />
-                    </div>
-                }
-                
-            </MyLaboratories>
+            @if (Detail?.CurrentUserMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
+            {
+                <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
+            }
+            else
+            {
+                <div class="field">
+                    <label class="form-label" for="member">Member</label>
+                    <input class="form-control" id="member" readonly value="@MemberToUpdate.Member.DisplayName" />
+                </div>
+                <div class="field">
+                    <label class="form-label" for="type">Membership Type</label>
+                    <InputSelect class="form-select" @bind-Value="Model.MembershipType">
+                        @foreach (var option in Enum.GetValues<LaboratoryMembershipType>())
+                        {
+                            <option value="@option" disabled="@IsDisabled(option)">@option</option>
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Model.MembershipType" />
+                </div>
+            }
         </div>
         <footer class="modal-footer">
             <SubmitButton class="btn btn-primary">Update Membership</SubmitButton>

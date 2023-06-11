@@ -15,7 +15,10 @@ public partial class UpdateMembershipTypeForm
     private LabClient LabClient { get; set; } = null !;
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null !;
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    [CascadingParameter]
+    private LaboratoryDetailDto Detail { get; set; } = null!;
 
     [Parameter]
     public required LaboratoryMembershipDto MemberToUpdate { get; set; }
@@ -28,7 +31,8 @@ public partial class UpdateMembershipTypeForm
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await LabClient.UpdateMembershipType(MemberToUpdate.Laboratory, MemberToUpdate.Member, Model);
+        var result = await LabClient.UpdateMembershipType(MemberToUpdate.Member, Model);
+
         if (result.IsError)
         {
             form.AddErrors(result.Errors);
@@ -38,14 +42,16 @@ public partial class UpdateMembershipTypeForm
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private bool IsDisabled(LaboratoryMembershipDto? myMembership, LaboratoryMembershipType targetType)
+    private bool IsDisabled(LaboratoryMembershipType targetType)
     {
-        if (myMembership is null || myMembership.Member.Id == MemberToUpdate.Member.Id)
-            return true;
-        if (myMembership?.MembershipType is LaboratoryMembershipType.Admin)
+        var myMembership = Detail.CurrentUserMembershipType;
+
+        if (myMembership is LaboratoryMembershipType.Admin)
             return false;
-        if (myMembership?.MembershipType is not LaboratoryMembershipType.Manager)
+
+        if (myMembership is not LaboratoryMembershipType.Manager)
             return true;
+
         return MemberToUpdate.MembershipType is LaboratoryMembershipType.Admin || targetType is LaboratoryMembershipType.Admin;
     }
 }

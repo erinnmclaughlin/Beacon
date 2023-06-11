@@ -1,6 +1,5 @@
-﻿@page "/laboratories/{Id:guid}/members"
+﻿@page "/members"
 @attribute [Authorize]
-@layout LaboratoryLayout
 
 <LaboratoryPageHeader>
     <ButtonsContent>
@@ -13,80 +12,82 @@
     </ButtonsContent>
 </LaboratoryPageHeader>
 <LaboratoryPageContent>
-    <MyLaboratories Context="myLabs">
-        @{
-            var myMembership = myLabs.FirstOrDefault(m => m.Laboratory.Id == Id);
-        }
-        <div class="table-responsive h-100">
-            <table class="table align-middle">
-                <thead>
+    <div class="table-responsive h-100">
+        <table class="table align-middle">
+            <thead>
+                <tr>
+                    <th>Display Name</th>
+                    <th>Email Address</th>
+                    <th>Role</th>
+                    <th style="width: 0%;"></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var member in Details.Members)
+                {
                     <tr>
-                        <th>Display Name</th>
-                        <th>Email Address</th>
-                        <th>Role</th>
-                        <th style="width: 0%;"></th>
+                        <td>@member.DisplayName</td>
+                        <td>
+                            <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
+                        </td>
+                        <td>@member.MembershipType</td>
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        @if (CanManagePermissions(member))
+                                        {
+                                            <button class="dropdown-item" type="button" @onclick="() => ShowManagePermissionsModal(member)">
+                                                <span class="icon">
+                                                    <i class="fa-regular fa-pencil"></i>
+                                                </span>
+                                                <span>Manage Permissions</span>
+                                            </button>
+                                        }
+                                        else
+                                        {
+                                            <div class="dropdown-item disabled">
+                                                <span class="icon">
+                                                    <i class="fa-regular fa-pencil"></i>
+                                                </span>
+                                                <span>Manage Permissions</span>
+                                            </div>
+                                        }
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
                     </tr>
-                </thead>
-                <tbody>
-                    @foreach (var member in Details.Members)
-                    {
-                        <tr>
-                            <td>@member.DisplayName</td>
-                            <td>
-                                <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
-                            </td>
-                            <td>@member.MembershipType</td>
-                            <td>
-                                <div class="dropdown">
-                                    <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                        <span class="icon">
-                                            <i class="fa-solid fa-ellipsis-vertical"></i>
-                                        </span>
-                                    </button>
-                                    <ul class="dropdown-menu">
-                                        <li>
-                                            @if (CanManagePermissions(myMembership, member))
-                                            {
-                                                <button class="dropdown-item" type="button" @onclick="() => ShowManagePermissionsModal(member)">
-                                                    <span class="icon">
-                                                        <i class="fa-regular fa-pencil"></i>
-                                                    </span>
-                                                    <span>Manage Permissions</span>
-                                                </button>
-                                            }
-                                            else
-                                            {
-                                                <div class="dropdown-item disabled">
-                                                    <span class="icon">
-                                                        <i class="fa-regular fa-pencil"></i>
-                                                    </span>
-                                                    <span>Manage Permissions</span>
-                                                </div>
-                                            }
-                                        </li>
-                                    </ul>
-                                </div>
-                            </td>
-                        </tr>
-                    }
-                </tbody>
-            </table>
-        </div>
-    </MyLaboratories>
+                }
+            </tbody>
+        </table>
+    </div>
 </LaboratoryPageContent>
 
 @code {
 
-    [Parameter] public Guid Id { get; set; }
+    [CascadingParameter] public required Task<AuthenticationState> AuthStateTask { get; set; }
     [CascadingParameter] public required LaboratoryDetailDto Details { get; set; }
     [CascadingParameter] private IModalService ModalService { get; set; } = null!;
 
-    private bool CanManagePermissions(LaboratoryMembershipDto? myMembership, LaboratoryMemberDto memberToUpdate)
+    private AuthenticationState AuthState { get; set; } = null!;
+
+    protected async override Task OnParametersSetAsync()
     {
-        if (myMembership is null || myMembership.Member.Id == memberToUpdate.Id)
+        AuthState = await AuthStateTask;
+    }
+
+    private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
+    {
+        if (AuthState.User.FindFirst(BeaconClaimTypes.UserId)?.Value == memberToUpdate.Id.ToString())
             return false;
 
-        if (myMembership.MembershipType is LaboratoryMembershipType.Admin)
+        if (Details.CurrentUserMembershipType is LaboratoryMembershipType.Admin)
             return true;
 
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;
@@ -94,10 +95,7 @@
 
     private async Task ShowInviteMemberModal()
     {
-        var modalParameters = new ModalParameters()
-            .Add(nameof(InviteMemberForm.LaboratoryId), Id);
-
-        await ModalService.Show<InviteMemberForm>("Invite Lab Member", modalParameters).Result;
+        await ModalService.Show<InviteMemberForm>("Invite Lab Member").Result;
     }
 
     private async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)

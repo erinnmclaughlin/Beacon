@@ -22,13 +22,11 @@
 
     [CascadingParameter] private BlazoredModalInstance Modal { get; set; } = null!;
 
-    [Parameter] public Guid LaboratoryId { get; set; }
-
     private InviteLabMemberRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await LabClient.InviteMemberAsync(LaboratoryId, Model);
+        var result = await LabClient.SendInvite(Model);
 
         if (result.IsError)
         {

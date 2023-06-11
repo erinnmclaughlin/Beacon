@@ -1,12 +1,28 @@
 ﻿@page "/"
-@page "/laboratories"
 @attribute [Authorize]
 
-<div class="flex">
-    <h3 class="flex-grow-1">My Laboratories</h3>
-    <a href="new-lab" class="btn btn-link">New lab</a>
-</div>
+@if (ActiveLab is null)
+{
+    <div class="flex">
+        <h3 class="flex-grow-1">My Laboratories</h3>
+        <a href="new-lab" class="btn btn-link">New lab</a>
+    </div>
 
-<MyLaboratories Context="memberships">
-    <LaboratoriesTable Memberships="memberships" />
-</MyLaboratories>
+    <MyLaboratories Context="memberships">
+        <LaboratoriesTable Memberships="memberships" />
+    </MyLaboratories>
+}
+else
+{
+    <LaboratoryPageHeader />
+    <LaboratoryPageContent>
+        <p>This is the laboratory details page.</p>
+    </LaboratoryPageContent>
+
+}
+
+@code {
+    
+    [CascadingParameter] 
+    private LaboratoryDetailDto? ActiveLab { get; set; }
+}

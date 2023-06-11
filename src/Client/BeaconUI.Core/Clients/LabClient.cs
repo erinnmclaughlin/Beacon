@@ -7,50 +7,22 @@ namespace BeaconUI.Core.Clients;
 
 public sealed class LabClient : ApiClientBase
 {
-    public Action? OnCurrentUserMembershipsChanged;
-    public Action<LaboratoryMembershipDto>? OnMembershipChanged;
-
     public LabClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
     }
 
-    public async Task<ErrorOr<LaboratoryDto>> CreateLaboratoryAsync(CreateLaboratoryRequest request, CancellationToken ct = default)
+    public async Task<ErrorOr<LaboratoryDetailDto>> GetLaboratoryDetails(CancellationToken ct = default)
     {
-        var result = await PostAsync<LaboratoryDto>("api/laboratories", request, ct);
-
-        if (!result.IsError)
-            OnCurrentUserMembershipsChanged?.Invoke();
-
-        return result;
+        return await GetAsync<LaboratoryDetailDto>($"api/lab", ct);
     }
 
-    public Task<ErrorOr<List<LaboratoryMembershipDto>>> GetCurrentUserMembershipsAsync(CancellationToken ct = default)
+    public Task<ErrorOr<Success>> SendInvite(InviteLabMemberRequest request, CancellationToken ct = default)
     {
-        return GetAsync<List<LaboratoryMembershipDto>>("api/users/me/memberships", ct);
+        return PostAsync($"api/invitations", request, ct);
     }
 
-    public async Task<ErrorOr<LaboratoryDetailDto>> GetLaboratoryDetailsAsync(Guid id, CancellationToken ct = default)
+    public async Task<ErrorOr<Success>> UpdateMembershipType(UserDto member, UpdateMembershipTypeRequest request, CancellationToken ct = default)
     {
-        return await GetAsync<LaboratoryDetailDto>($"api/laboratories/{id}", ct);
-    }
-
-    public Task<ErrorOr<Success>> InviteMemberAsync(Guid labId, InviteLabMemberRequest request, CancellationToken ct = default)
-    {
-        return PostAsync($"api/laboratories/{labId}/invitations", request, ct);
-    }
-
-    public async Task<ErrorOr<Success>> UpdateMembershipType(LaboratoryDto lab, UserDto member, UpdateMembershipTypeRequest request, CancellationToken ct = default)
-    {
-        var result = await PutAsync($"api/laboratories/{lab.Id}/memberships/{member.Id}/membershipType", request, ct);
-
-        if (!result.IsError)
-            OnMembershipChanged?.Invoke(new LaboratoryMembershipDto
-            {
-                Laboratory = lab,
-                Member = member,
-                MembershipType = request.MembershipType
-            });
-
-        return result;
+        return await PutAsync($"api/memberships/{member.Id}/membershipType", request, ct);
     }
 }
