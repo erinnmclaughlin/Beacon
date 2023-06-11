@@ -6,7 +6,7 @@ namespace BeaconUI.Core.Clients;
 
 public sealed class AuthClient : ApiClientBase
 {
-    public Action<AuthUserDto>? OnLogin;
+    public Action? OnLogin;
     public Action? OnLogout;
 
     public AuthClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
@@ -18,22 +18,22 @@ public sealed class AuthClient : ApiClientBase
         return GetAsync<AuthUserDto>("api/auth/me", ct);
     }
 
-    public async Task<ErrorOr<AuthUserDto>> LoginAsync(LoginRequest request, CancellationToken ct = default)
+    public async Task<ErrorOr<Success>> LoginAsync(LoginRequest request, CancellationToken ct = default)
     {
-        var result = await PostAsync<AuthUserDto>("api/auth/login", request, ct);
+        var result = await PostAsync("api/auth/login", request, ct);
 
         if (!result.IsError)
-            OnLogin?.Invoke(result.Value);
+            OnLogin?.Invoke();
 
         return result;
     }
 
-    public async Task<ErrorOr<AuthUserDto>> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
+    public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request, CancellationToken ct = default)
     {
-        var result = await PostAsync<AuthUserDto>("api/auth/register", request, ct);
+        var result = await PostAsync("api/auth/register", request, ct);
 
         if (!result.IsError)
-            OnLogin?.Invoke(result.Value);
+            OnLogin?.Invoke();
 
         return result;
     }

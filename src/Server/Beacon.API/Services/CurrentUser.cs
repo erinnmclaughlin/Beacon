@@ -9,12 +9,12 @@ namespace Beacon.API.Services;
 internal sealed class CurrentUser : ICurrentUser
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
-    private readonly IUnitOfWork _unitOfWork;
+    private readonly IQueryService _queryService;
 
-    public CurrentUser(IHttpContextAccessor httpContextAccessor, IUnitOfWork unitOfWork)
+    public CurrentUser(IHttpContextAccessor httpContextAccessor, IQueryService queryService)
     {
         _httpContextAccessor = httpContextAccessor;
-        _unitOfWork = unitOfWork;
+        _queryService = queryService;
     }
 
     public Guid UserId
@@ -30,7 +30,7 @@ internal sealed class CurrentUser : ICurrentUser
     {
         var userId = UserId;
 
-        return await _unitOfWork
+        return await _queryService
             .QueryFor<User>()
             .FirstAsync(u => u.Id == userId, ct);
     }

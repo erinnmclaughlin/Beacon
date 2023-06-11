@@ -1,5 +1,5 @@
-﻿using Beacon.API.Helpers;
-using Beacon.App.Features.Laboratories;
+﻿using Beacon.App.Features.Laboratories;
+using Beacon.App.Helpers;
 using Beacon.Common;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
@@ -33,7 +33,7 @@ internal sealed class LabEndpoints : IApiEndpointMapper
 
         await sender.Send(command, ct);
 
-        return Results.Created($"laboratories/{command.LaboratoryId}", new LaboratorySummaryDto
+        return Results.Created($"laboratories/{command.LaboratoryId}", new LaboratoryDto
         {
             Id = command.LaboratoryId,
             Name = request.LaboratoryName

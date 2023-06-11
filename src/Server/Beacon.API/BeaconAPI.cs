@@ -31,11 +31,19 @@ public static class BeaconAPI
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
 
         // Auth
-        services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme);
+        services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
+        {
+            options.Events.OnRedirectToLogin = context =>
+            {
+                context.Response.StatusCode = 401;
+                return Task.CompletedTask;
+            };
+        });
         services.AddAuthorization();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ISignInManager, SignInManager>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
@@ -57,7 +65,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        var endpointRoot = app.MapGroup("api");
+        var endpointRoot = app.MapGroup("api").RequireAuthorization();
 
         // TODO: register via reflection
         AuthEndpoints.Map(endpointRoot);

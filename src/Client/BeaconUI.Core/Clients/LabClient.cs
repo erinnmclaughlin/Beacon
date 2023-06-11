@@ -14,9 +14,9 @@ public sealed class LabClient : ApiClientBase
     {
     }
 
-    public async Task<ErrorOr<LaboratorySummaryDto>> CreateLaboratoryAsync(CreateLaboratoryRequest request, CancellationToken ct = default)
+    public async Task<ErrorOr<LaboratoryDto>> CreateLaboratoryAsync(CreateLaboratoryRequest request, CancellationToken ct = default)
     {
-        var result = await PostAsync<LaboratorySummaryDto>("api/laboratories", request, ct);
+        var result = await PostAsync<LaboratoryDto>("api/laboratories", request, ct);
 
         if (!result.IsError)
             OnCurrentUserMembershipsChanged?.Invoke();

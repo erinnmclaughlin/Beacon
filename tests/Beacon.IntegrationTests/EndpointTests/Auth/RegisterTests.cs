@@ -105,7 +105,7 @@ public class RegisterTests : EndpointTestBase
         });
 
         // check that register was successful:
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.EnsureSuccessStatusCode();
 
         // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");

@@ -4,7 +4,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Users;
+namespace Beacon.App.Features.Auth;
 
 public static class Register
 {
@@ -64,7 +64,7 @@ public static class Register
                 HashedPasswordSalt = salt
             });
 
-            await _unitOfWork.SaveChangesAsync(cancellationToken);            
+            await _unitOfWork.SaveChangesAsync(cancellationToken);
         }
     }
 }

@@ -18,7 +18,14 @@ public partial class RegisterPage
     private async Task Submit(BeaconForm formContext)
     {
         var result = await AuthClient.RegisterAsync(Model);
-        result.Switch(_ => NavManager.NavigateTo(RedirectUri ?? ""), formContext.AddErrors);
+
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        NavManager.NavigateTo(RedirectUri ?? "");
     }
 
     private void DoAfterUpdateEmail()

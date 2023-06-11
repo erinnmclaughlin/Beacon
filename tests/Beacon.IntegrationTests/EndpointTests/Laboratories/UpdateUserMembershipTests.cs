@@ -14,6 +14,48 @@ public class UpdateUserMembershipTests : EndpointTestBase
     }
 
     [Fact]
+    public async Task UpdateMembershipType_FailsWhenLabIsInvalid()
+    {
+        var memberId = Guid.NewGuid();
+
+        var client = CreateClient(db =>
+        {
+            var member = new User
+            {
+                Id = memberId,
+                DisplayName = "Member",
+                EmailAddress = "member@membership.com",
+                HashedPassword = new PasswordHasher().Hash("testing", out var salt),
+                HashedPasswordSalt = salt
+            };
+
+            db.Users.Add(member);
+
+            db.SaveChanges();
+        });
+
+        var uri = $"api/laboratories/{Guid.NewGuid()}/memberships/{memberId}/membershipType";
+        var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
+        {
+            MembershipType = LaboratoryMembershipType.Manager
+        }, JsonSerializerOptions);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    public async Task UpdateMembershipType_FailsWhenMemberIsInvalid()
+    {
+        var uri = $"api/laboratories/{TestData.DefaultLaboratory.Id}/memberships/{Guid.NewGuid()}/membershipType";
+        var response = await CreateClient().PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
+        {
+            MembershipType = LaboratoryMembershipType.Manager
+        }, JsonSerializerOptions);
+
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
     public async Task UpdateMembershipType_SucceedsWhenRequestIsValid()
     {
         var memberId = Guid.NewGuid();

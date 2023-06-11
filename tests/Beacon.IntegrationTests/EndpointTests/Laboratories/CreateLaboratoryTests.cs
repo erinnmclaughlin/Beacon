@@ -35,7 +35,7 @@ public class CreateLaboratoryTests : EndpointTestBase
 
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
-        var labSummary = await response.Content.ReadFromJsonAsync<LaboratorySummaryDto>();
+        var labSummary = await response.Content.ReadFromJsonAsync<LaboratoryDto>();
         var labDetails = await _httpClient.GetFromJsonAsync<LaboratoryDetailDto>($"api/laboratories/{labSummary?.Id}", JsonSerializerOptions);
 
         (labDetails?.Members).Should().ContainSingle().Which.Id.Should().Be(TestData.DefaultUser.Id);

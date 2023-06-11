@@ -18,7 +18,14 @@ public partial class LoginPage
     private async Task Submit(BeaconForm formContext)
     {
         var result = await AuthClient.LoginAsync(Model);
-        result.Switch(_ => NavManager.NavigateTo(RedirectUri ?? ""), formContext.AddErrors);
+
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        NavManager.NavigateTo(RedirectUri ?? "");
     }
 
     private string GetRegisterPageHref()

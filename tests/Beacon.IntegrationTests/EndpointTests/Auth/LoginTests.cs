@@ -20,7 +20,6 @@ public class LoginTests : EndpointTestBase
             Password = "pwd12345"
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -33,7 +32,6 @@ public class LoginTests : EndpointTestBase
             Password = "not" + TestData.DefaultPassword // an invalid password
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -52,7 +50,7 @@ public class LoginTests : EndpointTestBase
         });
 
         // check that login was successful:
-        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        response.EnsureSuccessStatusCode();
 
         // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");

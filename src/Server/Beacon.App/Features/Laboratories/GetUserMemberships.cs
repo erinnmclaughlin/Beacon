@@ -1,5 +1,4 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.Common.Laboratories.Enums;
 using MediatR;
@@ -65,20 +64,7 @@ public static class GetUserMemberships
                 .AsSplitQuery()
                 .ToListAsync(cancellationToken);
 
-            if (!memberships.Any())
-            {
-                await VerifyThatUserExists(request.MemberId, cancellationToken);
-            }
-
             return new Response(memberships);
-        }
-
-        private async Task VerifyThatUserExists(Guid userId, CancellationToken ct)
-        {
-            var userExists = await _queryService.QueryFor<User>().AnyAsync(u => u.Id == userId, ct);
-
-            if (!userExists)
-                throw new UserNotFoundException(userId);
         }
     }
 }
