@@ -39,7 +39,15 @@ public static class BeaconAPI
                 return Task.CompletedTask;
             };
         });
-        services.AddAuthorization();
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy("LabMember", config =>
+            {
+                config.RequireClaim("LaboratoryId");
+            });
+        });
+
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();

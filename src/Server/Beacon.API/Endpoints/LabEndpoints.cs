@@ -1,9 +1,11 @@
 ﻿using Beacon.App.Features.Laboratories;
 using Beacon.App.Helpers;
+using Beacon.App.Services;
 using Beacon.Common;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 using MediatR;
+using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -15,6 +17,8 @@ internal sealed class LabEndpoints : IApiEndpointMapper
 {
     public static void Map(IEndpointRouteBuilder app)
     {
+        app.MapGet("laboratories/{labId:Guid}/sign-in", SignIn);
+        app.MapGet("laboratories/current", GetCurrentLabDetails).RequireAuthorization("LabMember");
         app.MapPost("laboratories", Create);
         app.MapGet("laboratories/{labId:Guid}", GetDetails);
         app.MapPost("laboratories/{labId:Guid}/invitations", InviteMember);
@@ -22,6 +26,36 @@ internal sealed class LabEndpoints : IApiEndpointMapper
         app.MapGet("users/me/memberships", GetCurrentUserMemberships);
         app.MapGet("users/{memberId:Guid}/memberships", GetMembershipsByMemberId);
         app.MapGet("invitations/{inviteId:Guid}/accept", AcceptInvitation);
+    }
+
+    private static async Task<IResult> SignIn(Guid labId, ICurrentUser currentUser, HttpContext context, ISender sender, CancellationToken ct)
+    {
+        var userId = currentUser.UserId;
+        var getLabResponse = await sender.Send(new GetLaboratoryDetails.Query(labId), ct);
+
+        if (getLabResponse.Laboratory?.Members.FirstOrDefault(m => m.Id == userId) is not { } member)
+            return Results.NotFound();
+
+        var membershipIdentity = new ClaimsIdentity("LabAuth");
+        membershipIdentity.AddClaim(new Claim("LaboratoryId", labId.ToString()));
+        membershipIdentity.AddClaim(new Claim(ClaimTypes.Role, member.MembershipType.ToString()));
+
+        context.User.AddIdentity(membershipIdentity);
+
+        await context.SignInAsync(context.User);
+        return Results.NoContent();
+    }
+
+    private static async Task<IResult> GetCurrentLabDetails(HttpContext context, ISender sender, CancellationToken ct)
+    {
+        var labIdentity = context.User.Identities.First(i => i.AuthenticationType == "LabAuth");
+        var labIdValue = labIdentity.FindFirst("LaboratoryId")?.Value;
+
+        if (!Guid.TryParse(labIdValue ?? "", out var labId))
+            return Results.NotFound();
+
+        var result = await sender.Send(new GetLaboratoryDetails.Query(labId), ct);
+        return Results.Ok(result);
     }
 
     private static async Task<IResult> Create(CreateLaboratoryRequest request, ISender sender, CancellationToken ct)
