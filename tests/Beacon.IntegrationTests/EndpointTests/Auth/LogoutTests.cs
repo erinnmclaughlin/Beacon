@@ -2,27 +2,23 @@
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
-public class LogoutTests : IClassFixture<BeaconTestApplicationFactory>
+public class LogoutTests : EndpointTestBase
 {
-    private readonly BeaconTestApplicationFactory _factory;
     private readonly HttpClient _httpClient;
 
-    public LogoutTests(BeaconTestApplicationFactory factory)
+    public LogoutTests(BeaconTestApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _httpClient = _factory.CreateClient();
+        _httpClient = CreateClient();
     }
 
     [Fact]
     public async Task Logout_ShouldSucceed()
     {
-        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
-
         // log in:
         await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
-            EmailAddress = "test@test.com",
-            Password = "pwd12345"
+            EmailAddress = TestData.DefaultUser.EmailAddress,
+            Password = TestData.DefaultPassword
         });
 
         // current user should be available after logging in:

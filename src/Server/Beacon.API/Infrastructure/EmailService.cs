@@ -1,8 +1,8 @@
 ﻿using Azure.Communication.Email;
 using Azure;
 using Microsoft.Extensions.Options;
-using Beacon.API.App.Settings;
-using Beacon.API.App.Services.Email;
+using Beacon.App.Settings;
+using Beacon.App.Services;
 
 namespace Beacon.API.Infrastructure;
 

@@ -1,5 +1,5 @@
-﻿using Beacon.WebApp.IntegrationTests.Auth;
-using Beacon.WebApp.IntegrationTests.Http;
+﻿using Beacon.WebApp.IntegrationTests.Http;
+using Beacon.WebApp.IntegrationTests.Pages;
 using BeaconUI.Core.Services;
 using Bunit.TestDoubles;
 using Microsoft.AspNetCore.Authorization;

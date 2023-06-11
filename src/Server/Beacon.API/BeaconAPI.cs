@@ -1,17 +1,13 @@
-﻿using Beacon.API.App.Services;
-using Beacon.API.App.Services.Email;
-using Beacon.API.App.Services.Security;
-using Beacon.API.App.Settings;
+﻿using Beacon.API.Endpoints;
 using Beacon.API.Infrastructure;
+using Beacon.API.Middleware;
 using Beacon.API.Persistence;
-using Beacon.API.Presentation.Endpoints;
-using Beacon.API.Presentation.Middleware;
-using Beacon.API.Presentation.Services;
-using Beacon.Common.Auth.Requests;
-using FluentValidation;
+using Beacon.API.Services;
+using Beacon.App;
+using Beacon.App.Services;
+using Beacon.App.Settings;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -22,8 +18,10 @@ namespace Beacon.API;
 
 public static class BeaconAPI
 { 
-    public static IServiceCollection AddBeaconCore(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
+    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
     {
+        services.AddBeaconCore();
+
         // Api
         services.AddEndpointsApiExplorer().ConfigureHttpJsonOptions(jsonOptions =>
         {
@@ -49,18 +47,6 @@ public static class BeaconAPI
         services.AddScoped<LabInvitationEmailService>();
         services.Configure<EmailSettings>(config.GetRequiredSection("EmailSettings"));
 
-        // Framework
-        services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssembly(typeof(BeaconAPI).Assembly);
-        });
-
-        services.AddValidatorsFromAssemblies(new[]
-        {
-            typeof(BeaconAPI).Assembly,
-            typeof(LoginRequest).Assembly
-        });
-
         return services;
     }
 
@@ -76,7 +62,6 @@ public static class BeaconAPI
         // TODO: register via reflection
         AuthEndpoints.Map(endpointRoot);
         LabEndpoints.Map(endpointRoot);
-        UsersEndpoints.Map(endpointRoot);
 
         return app;
     }

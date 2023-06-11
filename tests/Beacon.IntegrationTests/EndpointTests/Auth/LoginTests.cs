@@ -2,15 +2,13 @@
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
-public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
+public class LoginTests : EndpointTestBase
 {
-    private readonly BeaconTestApplicationFactory _factory;
     private readonly HttpClient _httpClient;
 
-    public LoginTests(BeaconTestApplicationFactory factory)
+    public LoginTests(BeaconTestApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _httpClient = _factory.CreateClient();
+        _httpClient = CreateClient();
     }
 
     [Fact]
@@ -29,12 +27,10 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldFail_WhenPasswordIsInvalid()
     {
-        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
-
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
-            EmailAddress = "test@test.com",
-            Password = "pwd123456"
+            EmailAddress = TestData.DefaultUser.EmailAddress,
+            Password = "not" + TestData.DefaultPassword // an invalid password
         });
 
         response.IsSuccessStatusCode.Should().BeFalse();
@@ -44,8 +40,6 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Login_ShouldSucceed_WhenCredentialsAreValid()
     {
-        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
-
         // getting current user should fail if we're not logged in:
         var currentUser = await _httpClient.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
@@ -53,12 +47,11 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
         // log in:
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
-            EmailAddress = "test@test.com",
-            Password = "pwd12345"
+            EmailAddress = TestData.DefaultUser.EmailAddress,
+            Password = TestData.DefaultPassword
         });
 
         // check that login was successful:
-        response.IsSuccessStatusCode.Should().BeTrue();
         response.StatusCode.Should().Be(HttpStatusCode.OK);
 
         // check that auth cookie was included in the response:
@@ -66,6 +59,6 @@ public class LoginTests : IClassFixture<BeaconTestApplicationFactory>
 
         // try getting current user again; this time response should be successful:
         currentUser = await _httpClient.GetAsync("api/auth/me");
-        currentUser.IsSuccessStatusCode.Should().BeTrue();
+        currentUser.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

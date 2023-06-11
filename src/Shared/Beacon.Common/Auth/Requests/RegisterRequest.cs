@@ -1,4 +1,5 @@
-﻿using FluentValidation;
+﻿using Beacon.Common.Validation.Rules;
+using FluentValidation;
 
 namespace Beacon.Common.Auth.Requests;
 
@@ -18,8 +19,7 @@ public class RegisterRequest
             RuleFor(r => r.DisplayName)
                 .NotEmpty().WithMessage("Display name is required.");
 
-            RuleFor(r => r.Password)
-                .NotEmpty().WithMessage("Password is required.");
+            RuleFor(r => r.Password).IsValidPassword();
         }
     }
 

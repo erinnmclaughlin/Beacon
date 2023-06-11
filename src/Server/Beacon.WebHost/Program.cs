@@ -1,10 +1,9 @@
 using Beacon.API;
-using Beacon.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddBeaconCore(builder.Configuration, options =>
+builder.Services.AddBeaconApi(builder.Configuration, options =>
 {
     var connectionString = builder.Configuration.GetConnectionString("SqlServerDb");
     options.UseSqlServer(connectionString);

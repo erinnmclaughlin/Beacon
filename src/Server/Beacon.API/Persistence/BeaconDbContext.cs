@@ -1,5 +1,5 @@
-﻿using Beacon.API.App.Services;
-using Beacon.API.Domain.Entities;
+﻿using Beacon.App.Entities;
+using Beacon.App.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;

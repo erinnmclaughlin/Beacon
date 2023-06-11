@@ -19,7 +19,7 @@
                 </div>
             </CascadingValue>
         }
-        else if (ActiveLaboratory is { })
+        else if (ActiveLaboratory is { IsError: true })
         {
             <div class="alert alert-danger" role="alert">
                 <h5>There was a problem loading lab details.</h5>

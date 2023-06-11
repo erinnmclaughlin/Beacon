@@ -1,41 +1,18 @@
-﻿using Beacon.API.Persistence;
-using Beacon.Common.Auth.Requests;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
+﻿using Beacon.Common.Auth.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
-public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
+public class RegisterTests : EndpointTestBase
 {
-    private readonly BeaconTestApplicationFactory _factory;
-    private readonly HttpClient _httpClient;
-
-    public RegisterTests(BeaconTestApplicationFactory factory)
+    public RegisterTests(BeaconTestApplicationFactory factory) : base(factory)
     {
-        _factory = factory;
-        _httpClient = _factory.CreateClient();
-    }
-
-    [Fact]
-    public async Task Register_ShouldFail_IfEmailIsTaken()
-    {
-        await _factory.SeedDbWithUserData("test@test.com", "test", "pwd12345");
-
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
-        {
-            EmailAddress = "test@test.com",
-            DisplayName = "someValidName",
-            Password = "someValidPassword"
-        });
-
-        response.IsSuccessStatusCode.Should().BeFalse();
-        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
     [Fact]
     public async Task Register_ShouldFail_IfEmailIsMissing()
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "",
             DisplayName = "someValidName",
@@ -51,9 +28,10 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     [InlineData("nope@")]
     [InlineData("@nope")]
     [InlineData("@nope@")]
-    public async Task Register_ShouldFail_IfEmailIsMissingOrInvalid(string invalidEmail)
+    public async Task Register_ShouldFail_IfEmailIsInvalid(string invalidEmail)
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = invalidEmail,
             DisplayName = "someValidName",
@@ -67,7 +45,8 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Register_ShouldFail_IfPasswordIsMissing()
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "someValidName",
@@ -81,7 +60,8 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     [Fact]
     public async Task Register_ShouldFail_IfDisplayNameIsMissing()
     {
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        var client = CreateClient();
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "",
@@ -93,14 +73,31 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
     }
 
     [Fact]
+    public async Task Register_ShouldFail_IfEmailIsTaken()
+    {
+        var client = CreateClient();
+
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        {
+            EmailAddress = TestData.DefaultUser.EmailAddress,
+            DisplayName = "someValidName",
+            Password = "someValidPassword"
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
+    }
+
+    [Fact]
     public async Task Register_ShouldSucceed_WhenRequestIsValid()
     {
+        var client = CreateClient();
+
         // getting current user should fail if we're not logged in:
-        var currentUser = await _httpClient.GetAsync("api/auth/me");
+        var currentUser = await client.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // register:
-        var response = await _httpClient.PostAsJsonAsync("api/auth/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "someValidName",
@@ -108,14 +105,13 @@ public class RegisterTests : IClassFixture<BeaconTestApplicationFactory>
         });
 
         // check that register was successful:
-        response.IsSuccessStatusCode.Should().BeTrue();
         response.StatusCode.Should().Be(HttpStatusCode.Created);
 
         // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await _httpClient.GetAsync("api/auth/me");
+        currentUser = await client.GetAsync("api/auth/me");
         currentUser.IsSuccessStatusCode.Should().BeTrue();
     }
 }
