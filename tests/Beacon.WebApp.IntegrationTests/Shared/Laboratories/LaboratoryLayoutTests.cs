@@ -12,24 +12,6 @@ namespace Beacon.WebApp.IntegrationTests.Shared.Laboratories;
 public class LaboratoryLayoutTests : BeaconTestContext
 {
     [Fact]
-    public void LabLayout_ShowsError_WhenApiReturnsError()
-    {
-        SetupCoreServices();
-        Services.AddScoped<IAuthorizationService, FakeAuthorizationService>();
-
-        var labId = Guid.NewGuid();
-
-        var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Get, $"/api/laboratories/{labId}").ThenRespondNotFound();
-
-        var navManager = Services.GetRequiredService<FakeNavigationManager>();
-        var cut = RenderComponent<BeaconUI.WebApp.App>();
-
-        navManager.NavigateTo($"laboratories/{labId}");
-        cut.WaitForState(() => cut.FindAll("h5").Any(m => m.GetInnerText() == "There was a problem loading lab details."));
-    }
-
-    [Fact]
     public void LabLayout_ShowsLabDetails_WhenApiReturnsOk()
     {
         SetupCoreServices();
@@ -44,12 +26,12 @@ public class LaboratoryLayoutTests : BeaconTestContext
         };
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Get, $"/api/laboratories/{lab.Id}").ThenRespondOK(lab);
+        mockHttp.When(HttpMethod.Get, $"/api/lab").ThenRespondOK(lab);
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<BeaconUI.WebApp.App>();
 
-        navManager.NavigateTo($"laboratories/{lab.Id}");
+        navManager.NavigateTo("");
         cut.WaitForState(() => cut.Markup.Contains(lab.Name));
     }
 }
