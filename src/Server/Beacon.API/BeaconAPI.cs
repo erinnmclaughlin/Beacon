@@ -12,7 +12,6 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace Beacon.API;
@@ -24,14 +23,10 @@ public static class BeaconAPI
         services.AddBeaconCore();
 
         // Api
-        services
-            .AddMvc()
-            .AddApplicationPart(Assembly.GetExecutingAssembly())
-            .AddControllersAsServices()
-            .AddJsonOptions(options =>
-            {
-                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
-            });
+        services.AddControllers().AddJsonOptions(options =>
+        {
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
 
         services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
