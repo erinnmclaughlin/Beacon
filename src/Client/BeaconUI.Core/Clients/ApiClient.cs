@@ -47,7 +47,7 @@ internal sealed class ApiClient : ApiClientBase
 
     public async Task<ErrorOr<Success>> LoginToLaboratory(Guid labId)
     {
-        return await PostAsync($"api/laboratories/{labId}", null);
+        return await PostAsync($"api/laboratories/{labId}/login", null);
     }
 
     public async Task<ErrorOr<LaboratoryDetailDto>> GetCurrentLaboratory()
