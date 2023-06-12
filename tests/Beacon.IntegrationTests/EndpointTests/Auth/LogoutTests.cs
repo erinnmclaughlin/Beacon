@@ -15,23 +15,23 @@ public class LogoutTests : EndpointTestBase
     public async Task Logout_ShouldSucceed()
     {
         // log in:
-        await _httpClient.PostAsJsonAsync("portal/login", new LoginRequest
+        await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = TestData.DefaultUser.EmailAddress,
             Password = TestData.DefaultPassword
         });
 
         // current user should be available after logging in:
-        var currentUser = await _httpClient.GetAsync("portal/me");
+        var currentUser = await _httpClient.GetAsync("api/me");
         currentUser.IsSuccessStatusCode.Should().BeTrue();
 
         // log out:
-        var response = await _httpClient.GetAsync("portal/logout");
+        var response = await _httpClient.GetAsync("api/auth/logout");
 
         response.IsSuccessStatusCode.Should().BeTrue();
 
         // current user should no longer be available after logging out:
-        currentUser = await _httpClient.GetAsync("portal/me");
+        currentUser = await _httpClient.GetAsync("api/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
     }
 }

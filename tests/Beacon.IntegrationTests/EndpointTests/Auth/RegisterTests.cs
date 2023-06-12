@@ -12,7 +12,7 @@ public class RegisterTests : EndpointTestBase
     public async Task Register_ShouldFail_IfEmailIsMissing()
     {
         var client = CreateClient();
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "",
             DisplayName = "someValidName",
@@ -30,7 +30,7 @@ public class RegisterTests : EndpointTestBase
     public async Task Register_ShouldFail_IfEmailIsInvalid(string invalidEmail)
     {
         var client = CreateClient();
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = invalidEmail,
             DisplayName = "someValidName",
@@ -44,7 +44,7 @@ public class RegisterTests : EndpointTestBase
     public async Task Register_ShouldFail_IfPasswordIsMissing()
     {
         var client = CreateClient();
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "someValidName",
@@ -58,7 +58,7 @@ public class RegisterTests : EndpointTestBase
     public async Task Register_ShouldFail_IfDisplayNameIsMissing()
     {
         var client = CreateClient();
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "",
@@ -73,7 +73,7 @@ public class RegisterTests : EndpointTestBase
     {
         var client = CreateClient();
 
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = TestData.DefaultUser.EmailAddress,
             DisplayName = "someValidName",
@@ -89,11 +89,11 @@ public class RegisterTests : EndpointTestBase
         var client = CreateClient();
 
         // getting current user should fail if we're not logged in:
-        var currentUser = await client.GetAsync("portal/me");
+        var currentUser = await client.GetAsync("api/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // register:
-        var response = await client.PostAsJsonAsync("portal/register", new RegisterRequest
+        var response = await client.PostAsJsonAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = "someValidEmail@website.com",
             DisplayName = "someValidName",
@@ -107,7 +107,7 @@ public class RegisterTests : EndpointTestBase
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await client.GetAsync("portal/me");
+        currentUser = await client.GetAsync("api/me");
         currentUser.EnsureSuccessStatusCode();
     }
 }

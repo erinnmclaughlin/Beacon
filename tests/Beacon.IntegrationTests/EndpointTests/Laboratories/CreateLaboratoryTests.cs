@@ -13,7 +13,7 @@ public class CreateLaboratoryTests : EndpointTestBase
     public async Task CreateLab_ShouldFail_WhenRequestIsInvalid()
     {
         AddTestAuthorization();
-        var response = await CreateClient().PostAsJsonAsync("portal/laboratories", new CreateLaboratoryRequest
+        var response = await CreateClient().PostAsJsonAsync("api/laboratories", new CreateLaboratoryRequest
         {
             LaboratoryName = "no" // must be at least 3 characters
         });
@@ -25,13 +25,13 @@ public class CreateLaboratoryTests : EndpointTestBase
     public async Task CreateLab_ShouldSucceed_WhenRequestIsValid()
     {
         var client = CreateClient();
-        await client.PostAsJsonAsync("portal/login", new LoginRequest
+        await client.PostAsJsonAsync("api/auth/login", new LoginRequest
         {
             EmailAddress = TestData.DefaultUser.EmailAddress,
             Password = TestData.DefaultPassword
         });
 
-        var response = await client.PostAsJsonAsync("portal/laboratories", new CreateLaboratoryRequest
+        var response = await client.PostAsJsonAsync("api/laboratories", new CreateLaboratoryRequest
         {
             LaboratoryName = "Test Lab"
         });

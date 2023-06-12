@@ -18,7 +18,7 @@ public class AppTests : BeaconTestContext
         SetupCoreServices();
 
         Services.AddMockHttpClient()
-            .When(HttpMethod.Get, "/api/auth/me")
+            .When(HttpMethod.Get, "/api/me")
             .ThenRespondNotFound();
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
@@ -39,8 +39,8 @@ public class AppTests : BeaconTestContext
         Services.AddScoped<IAuthorizationService, FakeAuthorizationService>();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Get, "/portal/me").ThenRespondOK(AuthHelper.DefaultUser);
-        mockHttp.When(HttpMethod.Get, "/portal/logout").ThenRespondNoContent();
+        mockHttp.When(HttpMethod.Get, "/api/me").ThenRespondOK(AuthHelper.DefaultUser);
+        mockHttp.When(HttpMethod.Get, "/api/auth/logout").ThenRespondNoContent();
 
         var authProvider = Services.GetRequiredService<BeaconAuthStateProvider>();
         var navManager = Services.GetRequiredService<FakeNavigationManager>();

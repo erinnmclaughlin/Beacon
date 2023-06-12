@@ -16,7 +16,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
     {
         AddTestAuthorization(LaboratoryMembershipType.Admin);
 
-        var uri = $"api/memberships/{Guid.NewGuid()}/membershipType";
+        var uri = $"api/members/{Guid.NewGuid()}/membershipType";
         var response = await CreateClient().PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
         {
             MembershipType = LaboratoryMembershipType.Manager
@@ -54,7 +54,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var uri = $"api/memberships/{memberId}/membershipType";
+        var uri = $"api/members/{memberId}/membershipType";
         var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
         { 
             MembershipType = LaboratoryMembershipType.Manager 
