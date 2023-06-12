@@ -1,4 +1,4 @@
-﻿@page "/laboratories/{LabId:guid}/invitations/{InviteId:guid}/accept"
+﻿@page "/invitations/{InviteId:guid}/accept"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
 @layout EmptyLayout
 
@@ -13,9 +13,6 @@
     [Inject]
     private NavigationManager NavManager { get; set; } = null!;
 
-    [Parameter]
-    public Guid LabId { get; set; }
-
     [Parameter] 
     public Guid InviteId { get; set; }
 
@@ -28,16 +25,16 @@
 
         if (authState.User.Identity is not { IsAuthenticated: true })
         {
-            var redirectUri = $"laboratories/{LabId}/invitations/{InviteId}/accept?emailId={EmailId}";
+            var redirectUri = $"invitations/{InviteId}/accept?emailId={EmailId}";
             NavManager.NavigateToLogin($"login?redirectUri={redirectUri}");
             return;
         }
 
         using var httpClient = HttpClientFactory.CreateBeaconClient();
 
-        var response = await httpClient.GetAsync($"api/invitations/{InviteId}/accept?emailId={EmailId}");
+        var response = await httpClient.GetAsync($"portal/invitations/{InviteId}/accept?emailId={EmailId}");
 
         if (response.IsSuccessStatusCode)
-            NavManager.NavigateTo(NavigationHelper.GetLabDetailsHref(LabId));
+            NavManager.NavigateTo("");
     }
 }
