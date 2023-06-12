@@ -15,8 +15,8 @@ public static class BeaconUISetup
         services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
         services.AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
 
-        services.AddScoped<AuthClient>();
-        services.AddScoped<LabClient>();
+        services.AddScoped<ApiClient>();
+        services.AddScoped<AuthService>();
 
         services.AddBlazoredModal();
 

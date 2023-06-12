@@ -1,5 +1,4 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Infrastructure;
+﻿using Beacon.API.Infrastructure;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
@@ -13,6 +12,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using System.Reflection;
 using System.Text.Json.Serialization;
 
 namespace Beacon.API;
@@ -24,11 +24,16 @@ public static class BeaconAPI
         services.AddBeaconCore();
 
         // Api
-        services.AddEndpointsApiExplorer().ConfigureHttpJsonOptions(jsonOptions =>
-        {
-            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
+        services
+            .AddMvc()
+            .AddApplicationPart(Assembly.GetExecutingAssembly())
+            .AddControllersAsServices()
+            .AddJsonOptions(options =>
+            {
+                options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            });
 
+        services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
 
         // Auth
@@ -49,7 +54,7 @@ public static class BeaconAPI
 
         services.AddAuthorization(options =>
         {
-            options.AddPolicy("ApiAuth", config =>
+            options.AddPolicy(AuthConstants.LabAuth, config =>
             {
                 config.RequireClaim(BeaconClaimTypes.LabId);
             });
@@ -82,8 +87,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        PortalEndpoints.Map(app);
-        ApiEndpoints.Map(app);
+        app.MapControllers();
 
         return app;
     }

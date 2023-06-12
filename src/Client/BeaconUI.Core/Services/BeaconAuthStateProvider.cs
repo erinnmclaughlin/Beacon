@@ -7,41 +7,30 @@ using System.Security.Claims;
 
 namespace BeaconUI.Core.Services;
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IDisposable
+internal sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 {
-    private readonly AuthClient _authClient;
-    private readonly LabClient _labClient;
+    private readonly ApiClient _apiClient;
 
     public ClaimsPrincipal? CurrentUser { get; private set; }
 
-    public BeaconAuthStateProvider(AuthClient authClient, LabClient labClient)
+    public BeaconAuthStateProvider(ApiClient apiClient)
     {
-        _authClient = authClient;
-        _authClient.OnChange += HandleAuthenticationStateChanged;
-
-        _labClient = labClient;
-        _labClient.OnCurrentLabChanged += HandleAuthenticationStateChanged;
-    }
-
-    public void Dispose()
-    {
-        _authClient.OnChange -= HandleAuthenticationStateChanged;
-        _labClient.OnCurrentLabChanged -= HandleAuthenticationStateChanged;
+        _apiClient = apiClient;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
         if (CurrentUser == null)
         {
-            var errorOrCurrentUser = await _authClient.GetCurrentUserAsync();
-            var errorOrCurrentLab = await _labClient.GetLaboratoryDetails();
+            var errorOrCurrentUser = await _apiClient.GetCurrentUser();
+            var errorOrCurrentLab = await _apiClient.GetCurrentLaboratory();
             CurrentUser = GetClaimsPrincipal(errorOrCurrentUser, errorOrCurrentLab);
         }
 
         return new AuthenticationState(CurrentUser);
     }
 
-    private void HandleAuthenticationStateChanged()
+    public void NotifyAuthenticationStateChanged()
     {
         CurrentUser = null;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());

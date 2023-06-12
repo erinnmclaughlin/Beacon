@@ -21,14 +21,14 @@
 
 @code {
 
-    [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
-    [Inject] private LabClient LabClient { get; set; } = null!;
+    [CascadingParameter] 
+    private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
 
     private LaboratoryDetailDto? ActiveLaboratory { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        var result = await LabClient.GetLaboratoryDetails();
+        var result = await ApiClient.GetCurrentLaboratory();
         ActiveLaboratory = result.IsError ? null : result.Value;
     }
 }

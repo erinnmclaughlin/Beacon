@@ -10,7 +10,6 @@ public static class Register
 {
     public sealed record Command : IRequest
     {
-        public Guid UserId { get; init; } = Guid.NewGuid();
         public required string DisplayName { get; init; }
         public required string EmailAddress { get; init; }
         public required string PlainTextPassword { get; init; }
@@ -57,7 +56,7 @@ public static class Register
         {
             _unitOfWork.GetRepository<User>().Add(new User
             {
-                Id = request.UserId,
+                Id = Guid.NewGuid(),
                 DisplayName = request.DisplayName,
                 EmailAddress = request.EmailAddress,
                 HashedPassword = _passwordHasher.Hash(request.PlainTextPassword, out var salt),

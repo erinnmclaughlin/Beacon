@@ -27,5 +27,11 @@
   <ItemGroup>
     <ProjectReference Include="..\..\Shared\Beacon.Common\Beacon.Common.csproj" />
   </ItemGroup>
+
+  <ItemGroup>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+      <_Parameter1>Beacon.WebApp.IntegrationTests</_Parameter1>
+    </AssemblyAttribute>
+  </ItemGroup>
   
 </Project>

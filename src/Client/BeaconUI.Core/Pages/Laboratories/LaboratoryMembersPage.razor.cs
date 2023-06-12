@@ -15,7 +15,7 @@ public partial class LaboratoryMembersPage
     [CascadingParameter] public required LaboratoryDetailDto Details { get; set; }
     [CascadingParameter] private IModalService ModalService { get; set; } = null!;
 
-    private AuthenticationState AuthState { get; set; } = null !;
+    private AuthenticationState AuthState { get; set; } = null!;
     
     protected async override Task OnParametersSetAsync()
     {

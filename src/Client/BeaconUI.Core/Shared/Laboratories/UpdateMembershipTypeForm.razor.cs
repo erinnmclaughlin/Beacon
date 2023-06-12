@@ -11,9 +11,6 @@ namespace BeaconUI.Core.Shared.Laboratories;
 
 public partial class UpdateMembershipTypeForm
 {
-    [Inject]
-    private LabClient LabClient { get; set; } = null !;
-
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
 
@@ -22,6 +19,7 @@ public partial class UpdateMembershipTypeForm
 
     [Parameter]
     public required LaboratoryMembershipDto MemberToUpdate { get; set; }
+
     private UpdateMembershipTypeRequest Model { get; set; } = new();
 
     protected override void OnParametersSet()
@@ -31,7 +29,7 @@ public partial class UpdateMembershipTypeForm
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await LabClient.UpdateMembershipType(MemberToUpdate.Member, Model);
+        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Member.Id, Model);
 
         if (result.IsError)
         {

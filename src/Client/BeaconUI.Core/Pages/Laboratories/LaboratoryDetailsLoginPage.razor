@@ -3,14 +3,12 @@
 
 @code {
 
-    [Inject] private LabClient LabClient { get; set; } = null!;
-    [Inject] private NavigationManager NavigationManager { get; set; } = null!;
-
-    [Parameter] public Guid Id { get; set; }
+    [Parameter] 
+    public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await LabClient.SetCurrentLab(Id);
+        await ApiClient.LoginToLaboratory(Id);
         NavigationManager.NavigateTo("");
     }
 }
