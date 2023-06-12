@@ -1,27 +1,30 @@
 ﻿@page "/"
 @attribute [Authorize]
 
-@if (ActiveLab is null)
-{
-    <div class="flex">
-        <h3 class="flex-grow-1">My Laboratories</h3>
-        <a href="new-lab" class="btn btn-link">New lab</a>
-    </div>
-
-    <MyLaboratories Context="labs">
-        <LaboratoriesTable Laboratories="labs" />
-    </MyLaboratories>
-}
-else
+@if (ActiveLab is not null)
 {
     <LaboratoryPageHeader />
-
-    <div class="content flex-grow-1" style="background-color: #f8fafc">
-        <div class="px-4 h-100">
-            <p>This is the laboratory details page.</p>
-        </div>
-    </div>
 }
+
+<div class="content flex-grow-1" style="background-color: #f8fafc">
+    <div class="px-4 h-100">
+        @if (ActiveLab is not null)
+        {
+            <p>This is the laboratory details page.</p>
+        }
+        else
+        {
+            <div class="flex">
+                <h3 class="flex-grow-1">My Laboratories</h3>
+                <a href="new-lab" class="btn btn-link">New lab</a>
+            </div>
+
+            <MyLaboratories Context="labs">
+                <LaboratoriesTable Laboratories="labs" />
+            </MyLaboratories>
+        }
+    </div>
+</div>
 
 @code {
     
