@@ -23,7 +23,7 @@ public sealed class ApiEndpoints : IApiEndpointMapper
         api.MapGet("lab", async (ISender sender, CancellationToken ct) =>
         {
             var response = await sender.Send(new GetCurrentLaboratory.Query(), ct);
-            return Results.Ok(response);
+            return response.Laboratory is { } lab ? Results.Ok(lab) : Results.NoContent();
         });
 
         InvitationsEndpoints.Map(api);
