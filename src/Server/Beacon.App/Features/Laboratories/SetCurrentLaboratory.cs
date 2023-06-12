@@ -32,7 +32,7 @@ public static class SetCurrentLaboratory
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new LaboratoryNotFoundException(request.LabId);
 
-            _sessionManager.SetCurrentLab(request.LabId, membershipInfo.MembershipType);
+            await _sessionManager.SetCurrentLabAsync(request.LabId, membershipInfo.MembershipType);
         }
     }
 }

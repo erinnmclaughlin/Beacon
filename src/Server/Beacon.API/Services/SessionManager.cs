@@ -25,12 +25,12 @@ internal sealed class SessionManager : ICurrentUser, ICurrentLab, ISessionManage
         }
     }
 
-    public LaboratoryMembershipType? MembershipType
+    public LaboratoryMembershipType MembershipType
     {
         get
         {
             var value = GetValue(BeaconClaimTypes.MembershipType);
-            return Enum.TryParse<LaboratoryMembershipType>(value, out var role) ? role : null;
+            return Enum.Parse<LaboratoryMembershipType>(value ?? "");
         }
     }
 
@@ -43,22 +43,32 @@ internal sealed class SessionManager : ICurrentUser, ICurrentLab, ISessionManage
         }
     }
 
-    public void ClearCurrentLab()
+    public async Task ClearCurrentLabAsync()
     {
         var identity = _httpContextAccessor.HttpContext!.User.Identity as ClaimsIdentity;
 
-        identity?.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.LabId));
-        identity?.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.MembershipType));
+        if (identity is null)
+            return;
+
+        identity.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.LabId));
+        identity.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.MembershipType));
+
+        await SignInAsync(new ClaimsPrincipal(identity));
     }
 
-    public void SetCurrentLab(Guid labId, LaboratoryMembershipType membershipType)
+    public async Task SetCurrentLabAsync(Guid labId, LaboratoryMembershipType membershipType)
     {
-        ClearCurrentLab();
-
         var identity = _httpContextAccessor.HttpContext!.User.Identity as ClaimsIdentity;
 
-        identity?.AddClaim(BeaconClaimTypes.LabId, labId.ToString());
-        identity?.AddClaim(BeaconClaimTypes.MembershipType, membershipType.ToString());
+        if (identity is null)
+            return;
+
+        identity.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.LabId));
+        identity.TryRemoveClaim(identity.Claims.FirstOrDefault(c => c.Type == BeaconClaimTypes.MembershipType));
+        identity.AddClaim(BeaconClaimTypes.LabId, labId.ToString());
+        identity.AddClaim(BeaconClaimTypes.MembershipType, membershipType.ToString());
+
+        await SignInAsync(new ClaimsPrincipal(identity));
     }
 
     public Task SignInAsync(Guid userId)

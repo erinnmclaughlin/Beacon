@@ -40,7 +40,7 @@ public static class CreateLaboratory
             _unitOfWork.GetRepository<Laboratory>().Add(lab);
             await _unitOfWork.SaveChangesAsync(ct);
 
-            _sessionManager.SetCurrentLab(lab.Id, LaboratoryMembershipType.Admin);
+            await _sessionManager.SetCurrentLabAsync(lab.Id, LaboratoryMembershipType.Admin);
         }
 
         private async Task<User> GetCurrentUserAsync(CancellationToken ct)

@@ -20,6 +20,7 @@
 </div>
 
 @code {
+
     [CascadingParameter] private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
     [Inject] private LabClient LabClient { get; set; } = null!;
 

@@ -18,12 +18,15 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IDisp
     {
         _authClient = authClient;
         _authClient.OnChange += HandleAuthenticationStateChanged;
+
         _labClient = labClient;
+        _labClient.OnCurrentLabChanged += HandleAuthenticationStateChanged;
     }
 
     public void Dispose()
     {
         _authClient.OnChange -= HandleAuthenticationStateChanged;
+        _labClient.OnCurrentLabChanged -= HandleAuthenticationStateChanged;
     }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()

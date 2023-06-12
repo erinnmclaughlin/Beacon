@@ -6,11 +6,11 @@ public interface ISessionManager
 {
     Guid UserId { get; }
     Guid LabId { get; }
-    LaboratoryMembershipType? MembershipType { get; }
+    LaboratoryMembershipType MembershipType { get; }
 
     Task SignInAsync(Guid userId);
     Task SignOutAsync();
 
-    void SetCurrentLab(Guid labId, LaboratoryMembershipType membershipType);
-    void ClearCurrentLab();
+    Task SetCurrentLabAsync(Guid labId, LaboratoryMembershipType membershipType);
+    Task ClearCurrentLabAsync();
 }

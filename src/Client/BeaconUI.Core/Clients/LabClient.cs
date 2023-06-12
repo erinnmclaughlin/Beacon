@@ -7,8 +7,20 @@ namespace BeaconUI.Core.Clients;
 
 public sealed class LabClient : ApiClientBase
 {
+    public Action? OnCurrentLabChanged;
+
     public LabClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory)
     {
+    }
+
+    public async Task<ErrorOr<Success>> SetCurrentLab(Guid labId, CancellationToken ct = default)
+    {
+        var result = await PostAsync($"api/lab?labId={labId}", null, ct);
+
+        if (!result.IsError)
+            OnCurrentLabChanged?.Invoke();
+
+        return result;
     }
 
     public async Task<ErrorOr<LaboratoryDetailDto>> GetLaboratoryDetails(CancellationToken ct = default)

@@ -16,6 +16,7 @@ public static class GetCurrentLaboratory
     {
         public required Guid Id { get; init; }
         public required string Name { get; init; }
+        public required LaboratoryMembershipType CurrentUserMembershipType { get; init; }
         public required List<MemberDto> Members { get; init; }
     }
 
@@ -41,6 +42,7 @@ public static class GetCurrentLaboratory
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
             var labId = _currentLab.LabId;
+            var membershipType = _currentLab.MembershipType;
 
             var lab = await _queryService
                 .QueryFor<Laboratory>()
@@ -49,6 +51,7 @@ public static class GetCurrentLaboratory
                 {
                     Id = l.Id,
                     Name = l.Name,
+                    CurrentUserMembershipType = membershipType,
                     Members = l.Memberships.Select(m => new MemberDto
                     {
                         Id = m.Member.Id,
