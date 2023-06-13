@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.App.Features.Laboratories;
 
-public static class SetCurrentLaboratory
+public static class LoginToLaboratory
 {
     public sealed record Command(Guid LabId) : IRequest;
 

@@ -18,7 +18,7 @@ public sealed class LaboratoriesController : ApiControllerBase
     [HttpPost("{labId:Guid}/login")]
     public async Task<IActionResult> LoginToLaboratory(Guid labId, CancellationToken ct)
     {
-        await ExecuteAsync(new SetCurrentLaboratory.Command(labId), ct);
+        await ExecuteAsync(new LoginToLaboratory.Command(labId), ct);
         return NoContent();
     }
 
@@ -27,5 +27,12 @@ public sealed class LaboratoriesController : ApiControllerBase
     {
         var response = await GetAsync(new GetCurrentLaboratory.Query(), ct);
         return Ok(response.Laboratory);
+    }
+
+    [Authorize(AuthConstants.LabAuth), HttpGet("logout")]
+    public async Task<IActionResult> LogoutOfLaboratory(CancellationToken ct)
+    {
+        await ExecuteAsync(new LogoutOfLaboratory.Command(), ct);
+        return NoContent();
     }
 }
