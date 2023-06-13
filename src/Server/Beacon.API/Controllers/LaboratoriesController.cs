@@ -26,6 +26,6 @@ public sealed class LaboratoriesController : ApiControllerBase
     public async Task<IActionResult> GetCurrentLaboratory(CancellationToken ct)
     {
         var response = await GetAsync(new GetCurrentLaboratory.Query(), ct);
-        return response.Laboratory is { } lab ? Ok(lab) : NotFound();
+        return Ok(response.Laboratory);
     }
 }
