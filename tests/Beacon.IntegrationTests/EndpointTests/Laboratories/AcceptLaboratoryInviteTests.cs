@@ -23,8 +23,15 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
             (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db);
         });
 
-        var response = await client.GetAsync($"portal/invitations/{inviteId}/accept?emailId={emailId}");
+        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
         response.EnsureSuccessStatusCode();
+    }
+
+    [Fact]
+    public async Task AcceptInvitation_ShouldFail_WhenRequestIsInvalid()
+    {
+        var response = await CreateClient().GetAsync($"api/invitations/{Guid.NewGuid()}/accept?emailId={Guid.NewGuid()}");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext)
