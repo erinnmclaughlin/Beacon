@@ -1,4 +1,6 @@
-﻿namespace Beacon.App.Entities;
+﻿using Beacon.App.Exceptions;
+
+namespace Beacon.App.Entities;
 
 public class LaboratoryInvitationEmail
 {
@@ -11,10 +13,10 @@ public class LaboratoryInvitationEmail
     public required Guid LaboratoryInvitationId { get; init; }
     public LaboratoryInvitation LaboratoryInvitation { get; init; } = null!;
 
-    public void Accept(User acceptingUser)
+    public void Accept(User acceptingUser, DateTimeOffset acceptedOn)
     {
-        if (IsExpired(DateTime.UtcNow))
-            throw new Exception("This email invitation is expired.");
+        if (IsExpired(acceptedOn))
+            throw new EmailInvitationExpiredException();
 
         LaboratoryInvitation.Accept(acceptingUser);
     }

@@ -13,5 +13,6 @@ public class BeaconException : Exception
 public enum BeaconExceptionType
 {
     NotFound,
-    NotAuthorized
+    NotAuthorized,
+    BadRequest
 }

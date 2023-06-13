@@ -28,6 +28,7 @@ public static class ExceptionHandler
             {
                 BeaconExceptionType.NotAuthorized => Results.Forbid(),
                 BeaconExceptionType.NotFound => Results.NotFound(beaconException.Message),
+                BeaconExceptionType.BadRequest => Results.BadRequest(beaconException.Message),
                 _ => Results.StatusCode(500)
             };
 
