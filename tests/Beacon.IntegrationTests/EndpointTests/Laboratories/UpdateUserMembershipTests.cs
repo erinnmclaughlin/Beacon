@@ -32,7 +32,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
 
         var memberId = Guid.NewGuid();
 
-        var client = CreateClient(db =>
+        var client = CreateClient(async db =>
         {
             var member = new User
             {
@@ -51,7 +51,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
                 MembershipType = LaboratoryMembershipType.Analyst
             });
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
         var uri = $"api/members/{memberId}/membershipType";
