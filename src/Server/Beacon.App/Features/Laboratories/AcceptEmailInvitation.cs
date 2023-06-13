@@ -24,7 +24,11 @@ public static class AcceptEmailInvitation
 
         public async Task Handle(Command request, CancellationToken ct)
         {
-            var currentUser = await _currentUser.GetCurrentUserAsync(ct);
+            var currentUserId = _currentUser.UserId;
+
+            var currentUser = await _unitOfWork
+                .QueryFor<User>()
+                .FirstAsync(u => u.Id == currentUserId, ct);
 
             var invitation = await FindInvitation(request, ct);
 
@@ -68,5 +72,4 @@ public static class AcceptEmailInvitation
                 });
         }
     }
-
 }

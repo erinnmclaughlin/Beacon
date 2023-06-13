@@ -9,64 +9,49 @@ namespace Beacon.App.Features.Laboratories;
 
 public static class UpdateUserMembership
 {
-    public sealed record Command(Guid LaboratoryId, Guid MemberId, LaboratoryMembershipType MembershipType) : IRequest;
+    public sealed record Command(Guid MemberId, LaboratoryMembershipType MembershipType) : IRequest;
 
     internal sealed class CommandHandler : IRequestHandler<Command>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ISessionManager _sessionManager;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CommandHandler(ICurrentUser currentUser, IUnitOfWork unitOfWork)
+        public CommandHandler(ISessionManager sessionManager, IUnitOfWork unitOfWork)
         {
-            _currentUser = currentUser;
+            _sessionManager = sessionManager;
             _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(Command request, CancellationToken ct)
         {
-            await EnsureLaboratoryExists(request.LaboratoryId, ct);
+            var labId = _sessionManager.LabId;
 
             var member = await _unitOfWork
                 .QueryFor<LaboratoryMembership>(enableChangeTracking: true)
-                .FirstOrDefaultAsync(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == request.MemberId, ct)
-                ?? throw new LaboratoryMembershipNotFoundException(request.LaboratoryId, request.MemberId);
+                .FirstOrDefaultAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct)
+                ?? throw new LaboratoryMembershipNotFoundException(labId, request.MemberId);
 
-            await EnsureCurrentUserHasPermission(request, member, ct);
+            EnsureCurrentUserHasPermission(request, member);
 
             member.MembershipType = request.MembershipType;
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        private async Task EnsureLaboratoryExists(Guid labId, CancellationToken ct)
+        private void EnsureCurrentUserHasPermission(Command request, LaboratoryMembership membership)
         {
-            var labExists = await _unitOfWork.QueryFor<Laboratory>().AnyAsync(l => l.Id == labId, ct);
-
-            if (!labExists)
-                throw new LaboratoryNotFoundException(labId);
-        }
-
-        private async Task EnsureCurrentUserHasPermission(Command request, LaboratoryMembership membership, CancellationToken ct)
-        {
-            var currentUserId = _currentUser.UserId;
+            var currentUserId = _sessionManager.UserId;
 
             if (request.MemberId == currentUserId)
                 throw new UserNotAllowedException("Users are not allowed to change their own permissions.");
 
-            var currentUser = await _unitOfWork
-                .QueryFor<LaboratoryMembership>()
-                .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == currentUserId)
-                .Select(m => new { m.MembershipType })
-                .FirstOrDefaultAsync(ct);
-
-            if (currentUser is null || currentUser.MembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
-                throw new UserNotAllowedException("The current user does not have permission to modify user priveleges for this laboratory.");
-
-            if (currentUser.MembershipType is LaboratoryMembershipType.Admin)
+            if (_sessionManager.MembershipType is LaboratoryMembershipType.Admin)
                 return;
+
+            if (_sessionManager.MembershipType is not LaboratoryMembershipType.Manager)
+                throw new UserNotAllowedException("The current user does not have permission to modify user priveleges for this laboratory.");
 
             if (request.MembershipType is LaboratoryMembershipType.Admin || membership.MembershipType is LaboratoryMembershipType.Admin)
                 throw new UserNotAllowedException("Only admins are allowed to grant access to other admins.");
         }
-
     }
 }

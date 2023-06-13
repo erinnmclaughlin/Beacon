@@ -1,11 +1,10 @@
-﻿@inject NavigationManager NavManager
+﻿@code {
 
-@code {
-
-    [Parameter, EditorRequired] public required string Uri { get; set; }
+    [Parameter, EditorRequired] 
+    public required string Uri { get; set; }
 
     protected override void OnInitialized()
     {
-        NavManager.NavigateTo(Uri);
+        NavigationManager.NavigateTo(Uri);
     }
 }

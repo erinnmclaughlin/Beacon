@@ -6,16 +6,17 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.App.Features.Laboratories;
 
-public static class GetLaboratoryDetails
+public static class GetCurrentLaboratory
 {
-    public sealed record Query(Guid LaboratoryId) : IRequest<Response>;
+    public sealed record Query : IRequest<Response>;
 
-    public sealed record Response(LaboratoryDto? Laboratory);
+    public sealed record Response(LaboratoryDto Laboratory);
 
     public sealed record LaboratoryDto
     {
         public required Guid Id { get; init; }
         public required string Name { get; init; }
+        public required LaboratoryMembershipType CurrentUserMembershipType { get; init; }
         public required List<MemberDto> Members { get; init; }
     }
 
@@ -29,24 +30,28 @@ public static class GetLaboratoryDetails
 
     public sealed class QueryHandler : IRequestHandler<Query, Response>
     {
-        private readonly ICurrentUser _currentUser;
-        private readonly IUnitOfWork _unitOfWork;
+        private readonly ICurrentLab _currentLab;
+        private readonly IQueryService _queryService;
 
-        public QueryHandler(ICurrentUser currentUser, IUnitOfWork unitOfWork)
+        public QueryHandler(ICurrentLab currentLab, IQueryService queryService)
         {
-            _currentUser = currentUser;
-            _unitOfWork = unitOfWork;
+            _currentLab = currentLab;
+            _queryService = queryService;
         }
 
         public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
         {
-            var lab = await _unitOfWork
+            var labId = _currentLab.LabId;
+            var membershipType = _currentLab.MembershipType;
+
+            var lab = await _queryService
                 .QueryFor<Laboratory>()
-                .Where(l => l.Id == request.LaboratoryId)
+                .Where(l => l.Id == labId)
                 .Select(l => new LaboratoryDto
                 {
                     Id = l.Id,
                     Name = l.Name,
+                    CurrentUserMembershipType = membershipType,
                     Members = l.Memberships.Select(m => new MemberDto
                     {
                         Id = m.Member.Id,
@@ -56,10 +61,7 @@ public static class GetLaboratoryDetails
                     }).ToList()
                 })
                 .AsSplitQuery()
-                .FirstOrDefaultAsync(cancellationToken);
-
-            if (lab is not null && !lab.Members.Any(m => m.Id == _currentUser.UserId))
-                return new Response(null);
+                .FirstAsync(cancellationToken);
 
             return new Response(lab);
         }

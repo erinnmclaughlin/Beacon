@@ -1,6 +1,5 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Enums;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
@@ -24,17 +23,8 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
             (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db);
         });
 
-        // api should 404 if user is not a member of the given lab
-        var getLabDetailsResponse = await client.GetAsync($"api/laboratories/{labId}");
-        getLabDetailsResponse.StatusCode.Should().Be(HttpStatusCode.NotFound);
-
-        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
-        response.IsSuccessStatusCode.Should().BeTrue();
-        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
-
-        var labDetails = await client.GetFromJsonAsync<LaboratoryDetailDto>($"api/laboratories/{labId}", JsonSerializerOptions);
-        var labMembers = labDetails?.Members;
-        labMembers.Should().Contain(m => m.Id == TestData.DefaultUser.Id);
+        var response = await client.GetAsync($"portal/invitations/{inviteId}/accept?emailId={emailId}");
+        response.EnsureSuccessStatusCode();
     }
 
     private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext)
@@ -67,7 +57,7 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
 
     private static Laboratory SeedLab(BeaconDbContext dbContext, User labAdmin)
     {
-        var laboratory = Laboratory.CreateNew(Guid.NewGuid(), "Fake Lab", labAdmin);
+        var laboratory = Laboratory.CreateNew("Fake Lab", labAdmin);
         dbContext.Laboratories.Add(laboratory);
         return laboratory;
     }

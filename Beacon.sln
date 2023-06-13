@@ -32,7 +32,7 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tests", "Tests", "{532CBA62
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "App", "App", "{0967D4A1-55B2-4FBC-9130-42F3ADC693CC}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.App", "src\Server\Beacon.App\Beacon.App.csproj", "{51444B34-7596-4783-9321-0B8ADC1BDF67}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.App", "src\Server\Beacon.App\Beacon.App.csproj", "{51444B34-7596-4783-9321-0B8ADC1BDF67}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -1,0 +1,20 @@
+﻿@page "/laboratories/{Id:guid}"
+@using BeaconUI.Core.Services
+@attribute [Authorize]
+
+@code {
+
+    [Inject]
+    private BeaconAuthStateProvider AuthStateProvider { get; set; } = null!;
+
+    [Parameter] 
+    public Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await ApiClient.LoginToLaboratory(Id);
+
+        AuthStateProvider.NotifyAuthenticationStateChanged();
+        NavigationManager.NavigateTo("");
+    }
+}

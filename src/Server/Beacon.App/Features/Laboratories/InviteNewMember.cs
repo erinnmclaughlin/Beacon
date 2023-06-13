@@ -15,7 +15,6 @@ public static class InviteNewMember
     {
         public required string NewMemberEmailAddress { get; init; }
         public required LaboratoryMembershipType MembershipType { get; init; }
-        public required Guid LaboratoryId { get; init; }
     }
 
     public sealed class CommandValidator : AbstractValidator<Command>
@@ -29,22 +28,22 @@ public static class InviteNewMember
 
     internal sealed class CommandHandler : IRequestHandler<Command>
     {
-        private readonly ICurrentUser _currentUser;
         private readonly LabInvitationEmailService _emailService;
+        private readonly ISessionManager _sessionManager;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CommandHandler(ICurrentUser currentUser, LabInvitationEmailService emailService, IUnitOfWork unitOfWork)
+        public CommandHandler(LabInvitationEmailService emailService, ISessionManager sessionManger, IUnitOfWork unitOfWork)
         {
-            _currentUser = currentUser;
             _emailService = emailService;
+            _sessionManager = sessionManger;
             _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(Command request, CancellationToken ct)
         {
-            await EnsureLaboratoryExists(request.LaboratoryId, ct);
-            await EnsureInviteeIsNotAlreadyAMember(request.LaboratoryId, request.NewMemberEmailAddress, ct);
-            await EnsureCurrentUserCanSendInvites(request.LaboratoryId);
+            EnsureCurrentUserIsAllowed(request);
+
+            await EnsureInviteeIsNotAlreadyAMember(request.NewMemberEmailAddress, ct);
 
             var invitation = await CreateInvitation(request, ct);
             await _emailService.SendAsync(invitation.Id, ct);
@@ -61,8 +60,8 @@ public static class InviteNewMember
                 ExpireAfterDays = 10, //TODO: make this configurable
                 NewMemberEmailAddress = request.NewMemberEmailAddress,
                 MembershipType = request.MembershipType,
-                LaboratoryId = request.LaboratoryId,
-                CreatedById = _currentUser.UserId
+                LaboratoryId = _sessionManager.LabId,
+                CreatedById = _sessionManager.UserId
             };
 
             var emailInvitation = invitation.AddEmailInvitation();
@@ -73,18 +72,22 @@ public static class InviteNewMember
             return emailInvitation;
         }
 
-        private async Task EnsureLaboratoryExists(Guid labId, CancellationToken ct)
+        private void EnsureCurrentUserIsAllowed(Command request)
         {
-            var labExists = await _unitOfWork
-                .QueryFor<Laboratory>()
-                .AnyAsync(l => l.Id == labId, ct);
+            if (_sessionManager.MembershipType is LaboratoryMembershipType.Admin)
+                return;
 
-            if (!labExists)
-                throw new LaboratoryNotFoundException(labId);
+            if (request.MembershipType is LaboratoryMembershipType.Admin)
+                throw new UserNotAllowedException("Only laboratory admins are allowed to invite new admins.");
+
+            if (_sessionManager.MembershipType is not LaboratoryMembershipType.Manager)
+                throw new UserNotAllowedException("Only laboratory admins or managers are allowed to invite new members.");
         }
 
-        private async Task EnsureInviteeIsNotAlreadyAMember(Guid labId, string newMemberEmailAddress, CancellationToken ct)
+        private async Task EnsureInviteeIsNotAlreadyAMember(string newMemberEmailAddress, CancellationToken ct)
         {
+            var labId = _sessionManager.LabId;
+
             var isMember = await _unitOfWork
                 .QueryFor<LaboratoryMembership>()
                 .AnyAsync(m => m.LaboratoryId == labId && m.Member.EmailAddress == newMemberEmailAddress, ct);
@@ -94,19 +97,6 @@ public static class InviteNewMember
                 var failure = new ValidationFailure(nameof(Command.NewMemberEmailAddress), $"User with email {newMemberEmailAddress} is already a member of the specified lab.");
                 throw new ValidationException(new[] { failure });
             }
-        }
-
-        private async Task EnsureCurrentUserCanSendInvites(Guid labId)
-        {
-            var currentUserId = _currentUser.UserId;
-
-            var membership = await _unitOfWork
-                .QueryFor<LaboratoryMembership>()
-                .FirstOrDefaultAsync(m => m.MemberId == currentUserId && m.LaboratoryId == labId)
-                ?? throw new LaboratoryMembershipRequiredException(labId);
-
-            if (membership.MembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
-                throw new UserNotAllowedException("Only laboratory admins or managers are allowed to invite new members.");
         }
     }
 }

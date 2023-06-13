@@ -4,7 +4,12 @@
 
 @code {
 
-    [Parameter, EditorRequired] public required char Value { get; set; }
-    [Parameter] public string Size { get; set; } = "2rem";
-    [Parameter] public string FontSize { get; set; } = "1.5rem";
+    [Parameter, EditorRequired] 
+    public required char Value { get; set; }
+
+    [Parameter] 
+    public string Size { get; set; } = "2rem";
+
+    [Parameter] 
+    public string FontSize { get; set; } = "1.5rem";
 }

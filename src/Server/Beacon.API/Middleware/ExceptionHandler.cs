@@ -26,7 +26,7 @@ public static class ExceptionHandler
         {
             var result = beaconException.Type switch
             {
-                BeaconExceptionType.NotAuthorized => Results.Unauthorized(),
+                BeaconExceptionType.NotAuthorized => Results.Forbid(),
                 BeaconExceptionType.NotFound => Results.NotFound(beaconException.Message),
                 _ => Results.StatusCode(500)
             };

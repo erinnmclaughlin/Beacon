@@ -7,14 +7,14 @@
         </tr>
     </thead>
     <tbody>
-        @foreach (var membership in Memberships)
+        @foreach (var lab in Laboratories)
         {
             <tr>
                 <td></td>
                 <td>
-                    <a href="@NavigationHelper.GetLabDetailsHref(membership.Laboratory.Id)">
-                        <AvatarSquare Value="@membership.Laboratory.Name[0]" FontSize="1rem" Size="1.5rem" />
-                        <span class="nav-text">@membership.Laboratory.Name</span>
+                    <a href="@($"laboratories/{lab.Id}")">
+                        <AvatarSquare Value="@lab.Name[0]" FontSize="1rem" Size="1.5rem" />
+                        <span class="nav-text">@lab.Name</span>
                     </a>
                 </td>
                 <td></td>
@@ -25,5 +25,5 @@
 
 @code {
     [Parameter, EditorRequired] 
-    public required IList<LaboratoryMembershipDto> Memberships { get; set; }
+    public required IList<LaboratoryDto> Laboratories { get; set; }
 }

@@ -12,6 +12,11 @@ public class Laboratory
 
     private Laboratory() { }
 
+    public static Laboratory CreateNew(string name, User admin)
+    {
+        return CreateNew(Guid.NewGuid(), name, admin);
+    }
+
     public static Laboratory CreateNew(Guid id, string name, User admin)
     {
         var laboratory = new Laboratory

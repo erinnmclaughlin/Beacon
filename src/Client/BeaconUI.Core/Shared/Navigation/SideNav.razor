@@ -1,6 +1,4 @@
-﻿@using Beacon.Common.Laboratories
-
-<AuthorizeView>
+﻿<AuthorizeView>
     <nav class="navbar navbar-vertical navbar-expand-lg">
         <div id="navbarVerticalCollapse" style="width: 100%;">
             <div class="navbar-vertical-content">
@@ -12,7 +10,8 @@
 
 @code {
 
-    [Parameter] public RenderFragment? ChildContent { get; set; }
+    [Parameter] 
+    public RenderFragment? ChildContent { get; set; }
 
     private bool IsNarrow { get; set; }
     private bool ShowNav { get; set; }

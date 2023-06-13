@@ -30,28 +30,28 @@ public abstract class ApiClientBase
     protected async Task<ErrorOr<Success>> PostAsync(string requestUri, object? requestBody, CancellationToken ct = default)
     {
         using var httpClient = _httpClientFactory.CreateBeaconClient();
-        var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, ct);
+        var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult(ct);
     }
 
     protected async Task<ErrorOr<T>> PostAsync<T>(string requestUri, object? requestBody, CancellationToken ct = default)
     {
         using var httpClient = _httpClientFactory.CreateBeaconClient();
-        var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, ct);
+        var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult<T>(ct);
     }
 
     protected async Task<ErrorOr<Success>> PutAsync(string requestUri, object? requestBody, CancellationToken ct = default)
     {
         using var httpClient = _httpClientFactory.CreateBeaconClient();
-        var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, ct);
+        var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult(ct);
     }
 
     protected async Task<ErrorOr<T>> PutAsync<T>(string requestUri, object? requestBody, CancellationToken ct = default)
     {
         using var httpClient = _httpClientFactory.CreateBeaconClient();
-        var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, ct);
+        var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult<T>(ct);
     }
 }

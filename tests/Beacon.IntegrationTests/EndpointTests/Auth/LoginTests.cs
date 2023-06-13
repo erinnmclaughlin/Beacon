@@ -39,7 +39,7 @@ public class LoginTests : EndpointTestBase
     public async Task Login_ShouldSucceed_WhenCredentialsAreValid()
     {
         // getting current user should fail if we're not logged in:
-        var currentUser = await _httpClient.GetAsync("api/auth/me");
+        var currentUser = await _httpClient.GetAsync("api/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // log in:
@@ -56,7 +56,7 @@ public class LoginTests : EndpointTestBase
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await _httpClient.GetAsync("api/auth/me");
+        currentUser = await _httpClient.GetAsync("api/me");
         currentUser.StatusCode.Should().Be(HttpStatusCode.OK);
     }
 }

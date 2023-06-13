@@ -18,17 +18,14 @@
 
 @code {
 
-    [Inject] private LabClient LabClient { get; set; } = null!;
-
-    [CascadingParameter] private BlazoredModalInstance Modal { get; set; } = null!;
-
-    [Parameter] public Guid LaboratoryId { get; set; }
+    [CascadingParameter] 
+    private BlazoredModalInstance Modal { get; set; } = null!;
 
     private InviteLabMemberRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await LabClient.InviteMemberAsync(LaboratoryId, Model);
+        var result = await ApiClient.SendEmailInvitation(Model);
 
         if (result.IsError)
         {

@@ -1,0 +1,38 @@
+﻿using Beacon.App.Features.Laboratories;
+using Beacon.Common.Laboratories.Requests;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+
+namespace Beacon.API.Controllers;
+
+[Route("api/laboratories")]
+public sealed class LaboratoriesController : ApiControllerBase
+{
+    [HttpPost]
+    public async Task<IActionResult> CreateLaboratory(CreateLaboratoryRequest request, CancellationToken ct)
+    {
+        await ExecuteAsync(new CreateLaboratory.Command(request.LaboratoryName), ct);
+        return NoContent();
+    }
+
+    [HttpPost("{labId:Guid}/login")]
+    public async Task<IActionResult> LoginToLaboratory(Guid labId, CancellationToken ct)
+    {
+        await ExecuteAsync(new LoginToLaboratory.Command(labId), ct);
+        return NoContent();
+    }
+
+    [Authorize(AuthConstants.LabAuth), HttpGet("current")]
+    public async Task<IActionResult> GetCurrentLaboratory(CancellationToken ct)
+    {
+        var response = await GetAsync(new GetCurrentLaboratory.Query(), ct);
+        return Ok(response.Laboratory);
+    }
+
+    [Authorize(AuthConstants.LabAuth), HttpGet("logout")]
+    public async Task<IActionResult> LogoutOfLaboratory(CancellationToken ct)
+    {
+        await ExecuteAsync(new LogoutOfLaboratory.Command(), ct);
+        return NoContent();
+    }
+}

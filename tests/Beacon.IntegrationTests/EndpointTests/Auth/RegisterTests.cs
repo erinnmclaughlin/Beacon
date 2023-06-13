@@ -19,7 +19,6 @@ public class RegisterTests : EndpointTestBase
             Password = "someValidPassword"
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -38,7 +37,6 @@ public class RegisterTests : EndpointTestBase
             Password = "someValidPassword"
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -53,7 +51,6 @@ public class RegisterTests : EndpointTestBase
             Password = ""
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -68,7 +65,6 @@ public class RegisterTests : EndpointTestBase
             Password = "someValidPassword"
         });
 
-        response.IsSuccessStatusCode.Should().BeFalse();
         response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
 
@@ -93,7 +89,7 @@ public class RegisterTests : EndpointTestBase
         var client = CreateClient();
 
         // getting current user should fail if we're not logged in:
-        var currentUser = await client.GetAsync("api/auth/me");
+        var currentUser = await client.GetAsync("api/me");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // register:
@@ -111,7 +107,7 @@ public class RegisterTests : EndpointTestBase
         response.Headers.Contains("Set-Cookie");
 
         // try getting current user again; this time response should be successful:
-        currentUser = await client.GetAsync("api/auth/me");
-        currentUser.IsSuccessStatusCode.Should().BeTrue();
+        currentUser = await client.GetAsync("api/me");
+        currentUser.EnsureSuccessStatusCode();
     }
 }

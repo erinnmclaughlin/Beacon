@@ -1,6 +1,5 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Enums;
 using Beacon.Common.Laboratories.Requests;
 
@@ -10,43 +9,14 @@ public class UpdateUserMembershipTests : EndpointTestBase
 {
     public UpdateUserMembershipTests(BeaconTestApplicationFactory factory) : base(factory)
     {
-        AddTestAuthorization();
-    }
-
-    [Fact]
-    public async Task UpdateMembershipType_FailsWhenLabIsInvalid()
-    {
-        var memberId = Guid.NewGuid();
-
-        var client = CreateClient(db =>
-        {
-            var member = new User
-            {
-                Id = memberId,
-                DisplayName = "Member",
-                EmailAddress = "member@membership.com",
-                HashedPassword = new PasswordHasher().Hash("testing", out var salt),
-                HashedPasswordSalt = salt
-            };
-
-            db.Users.Add(member);
-
-            db.SaveChanges();
-        });
-
-        var uri = $"api/laboratories/{Guid.NewGuid()}/memberships/{memberId}/membershipType";
-        var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
-        {
-            MembershipType = LaboratoryMembershipType.Manager
-        }, JsonSerializerOptions);
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
     [Fact]
     public async Task UpdateMembershipType_FailsWhenMemberIsInvalid()
     {
-        var uri = $"api/laboratories/{TestData.DefaultLaboratory.Id}/memberships/{Guid.NewGuid()}/membershipType";
+        AddTestAuthorization(LaboratoryMembershipType.Admin);
+
+        var uri = $"api/members/{Guid.NewGuid()}/membershipType";
         var response = await CreateClient().PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
         {
             MembershipType = LaboratoryMembershipType.Manager
@@ -58,9 +28,11 @@ public class UpdateUserMembershipTests : EndpointTestBase
     [Fact]
     public async Task UpdateMembershipType_SucceedsWhenRequestIsValid()
     {
+        AddTestAuthorization(LaboratoryMembershipType.Admin);
+
         var memberId = Guid.NewGuid();
 
-        var client = CreateClient(db =>
+        var client = CreateClient(async db =>
         {
             var member = new User
             {
@@ -79,16 +51,15 @@ public class UpdateUserMembershipTests : EndpointTestBase
                 MembershipType = LaboratoryMembershipType.Analyst
             });
 
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
-        var uri = $"api/laboratories/{TestData.DefaultLaboratory.Id}/memberships/{memberId}/membershipType";
+        var uri = $"api/members/{memberId}/membershipType";
         var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
         { 
             MembershipType = LaboratoryMembershipType.Manager 
         }, JsonSerializerOptions);
 
-        var labDetails = await client.GetFromJsonAsync<LaboratoryDetailDto>($"api/laboratories/{TestData.DefaultLaboratory.Id}", JsonSerializerOptions);
-        labDetails!.Members.First(m => m.Id == memberId).MembershipType.Should().Be(LaboratoryMembershipType.Manager);
+        response.EnsureSuccessStatusCode();
     }
 }

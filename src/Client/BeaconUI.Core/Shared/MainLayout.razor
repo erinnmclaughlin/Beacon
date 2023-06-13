@@ -1,14 +1,45 @@
-﻿@inherits LayoutComponentBase
+﻿@using BeaconUI.Core.Services
 
-<div class="page d-flex flex-column h-100">
+@inherits LayoutComponentBase
+
+<div class="page d-flex flex-column h-100" style="overflow-x: hidden;">
     <TopNav>
         <NavbarBrand>
-            <a class="navbar-brand" href="">Beacon LMS</a>
+            <a class="navbar-brand" href="" @onclick="LogoutOfLab">Beacon LMS</a>
         </NavbarBrand>
     </TopNav>
     <main class="d-flex flex-row flex-grow-1">
-        <div class="content px-4 flex-grow-1">
-            @Body
-        </div>
+        <CascadingValue Value="@ActiveLaboratory">
+            @if (ActiveLaboratory is not null)
+            {
+                <LaboratorySideNav />
+            }
+            <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+                @Body
+            </div>
+        </CascadingValue>
     </main>
 </div>
+
+@code {
+
+    [Inject] 
+    private BeaconAuthStateProvider AuthStateProvider { get; set; } = null!;
+
+    [CascadingParameter] 
+    private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
+
+    private LaboratoryDetailDto? ActiveLaboratory { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var result = await ApiClient.GetCurrentLaboratory();
+        ActiveLaboratory = result.IsError ? null : result.Value;
+    }
+
+    private async Task LogoutOfLab()
+    {
+        var result = await ApiClient.LogoutOfLaboratory();
+        AuthStateProvider.NotifyAuthenticationStateChanged();
+    }
+}

@@ -1,11 +1,11 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Infrastructure;
+﻿using Beacon.API.Infrastructure;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App;
 using Beacon.App.Services;
 using Beacon.App.Settings;
+using Beacon.Common.Auth;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -23,11 +23,12 @@ public static class BeaconAPI
         services.AddBeaconCore();
 
         // Api
-        services.AddEndpointsApiExplorer().ConfigureHttpJsonOptions(jsonOptions =>
+        services.AddControllers().AddJsonOptions(options =>
         {
-            jsonOptions.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
 
+        services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
 
         // Auth
@@ -38,12 +39,28 @@ public static class BeaconAPI
                 context.Response.StatusCode = 401;
                 return Task.CompletedTask;
             };
+
+            options.Events.OnRedirectToAccessDenied = context =>
+            {
+                context.Response.StatusCode = 403;
+                return Task.CompletedTask;
+            };
         });
-        services.AddAuthorization();
+
+        services.AddAuthorization(options =>
+        {
+            options.AddPolicy(AuthConstants.LabAuth, config =>
+            {
+                config.RequireClaim(BeaconClaimTypes.LabId);
+            });
+        });
+
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<ICurrentUser, SessionManager>();
+        services.AddScoped<ICurrentLab, SessionManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ISignInManager, SignInManager>();
+        services.AddScoped<ISignInManager, SessionManager>();
+        services.AddScoped<ISessionManager, SessionManager>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
@@ -65,11 +82,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        var endpointRoot = app.MapGroup("api").RequireAuthorization();
-
-        // TODO: register via reflection
-        AuthEndpoints.Map(endpointRoot);
-        LabEndpoints.Map(endpointRoot);
+        app.MapControllers();
 
         return app;
     }
