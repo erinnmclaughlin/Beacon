@@ -55,11 +55,6 @@ public sealed class ApiClient : ApiClientBase
         return await PostAsync($"api/laboratories/{labId}/login", null);
     }
 
-    public async Task<ErrorOr<Success>> LogoutOfLaboratory()
-    {
-        return await GetAsync("api/laboratories/logout");
-    }
-
     public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
     {
         return await GetAsync<LaboratoryMemberDto[]>("api/members");

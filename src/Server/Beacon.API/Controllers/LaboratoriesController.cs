@@ -29,11 +29,4 @@ public sealed class LaboratoriesController : ApiControllerBase
         await ExecuteAsync(new LoginToLaboratory.Command(labId), ct);
         return NoContent();
     }
-
-    [Authorize(AuthConstants.LabAuth), HttpGet("logout")]
-    public async Task<IActionResult> LogoutOfLaboratory(CancellationToken ct)
-    {
-        await ExecuteAsync(new LogoutOfLaboratory.Command(), ct);
-        return NoContent();
-    }
 }
