@@ -9,7 +9,19 @@
         </NavbarBrand>
     </TopNav>
     <main class="d-flex flex-row flex-grow-1">
-        @Body
+        <SessionInfo Context="session">
+            @if (session.CurrentLab is null)
+            {
+                <RedirectTo Uri="" />
+            }
+            else
+            {
+                <LaboratorySideNav />
+                <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+                    @Body
+                </div>
+            }
+        </SessionInfo>
     </main>
 </div>
 

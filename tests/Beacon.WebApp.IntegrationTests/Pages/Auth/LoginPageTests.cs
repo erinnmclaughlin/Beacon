@@ -16,7 +16,7 @@ public class LoginPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultUser);
+        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultSession);
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<LoginPage>();

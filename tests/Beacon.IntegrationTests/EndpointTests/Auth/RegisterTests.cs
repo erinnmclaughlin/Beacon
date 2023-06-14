@@ -88,8 +88,8 @@ public class RegisterTests : EndpointTestBase
     {
         var client = CreateClient();
 
-        // getting current user should fail if we're not logged in:
-        var currentUser = await client.GetAsync("api/me");
+        // getting current session should fail if we're not logged in:
+        var currentUser = await client.GetAsync("api/session");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
 
         // register:
@@ -106,8 +106,8 @@ public class RegisterTests : EndpointTestBase
         // check that auth cookie was included in the response:
         response.Headers.Contains("Set-Cookie");
 
-        // try getting current user again; this time response should be successful:
-        currentUser = await client.GetAsync("api/me");
+        // try getting current session again; this time response should be successful:
+        currentUser = await client.GetAsync("api/session");
         currentUser.EnsureSuccessStatusCode();
     }
 }

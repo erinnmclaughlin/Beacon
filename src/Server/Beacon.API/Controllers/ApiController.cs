@@ -6,9 +6,9 @@ namespace Beacon.API.Controllers;
 [Route("api")]
 public sealed class ApiController : ApiControllerBase
 {
-    [HttpGet("me")]
+    [HttpGet("session")]
     public async Task<IActionResult> GetCurrentUser(CancellationToken ct)
     {
-        return Ok(await GetAsync(new GetCurrentUser.Query(), ct));
+        return Ok(await GetAsync(new GetSessionInfo.Query(), ct));
     }
 }

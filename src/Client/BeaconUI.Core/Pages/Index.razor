@@ -1,31 +1,15 @@
 ﻿@page "/"
 @attribute [Authorize]
 
-@if (CurrentLaboratory is not null)
-{
-    <LaboratoryPageHeader />
-}
-
-<div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 h-100">
-        @if (CurrentLaboratory is not null)
-        {
-            <p>This is the laboratory details page.</p>
-        }
-        else
-        {
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
             <div class="flex">
                 <h3 class="flex-grow-1">My Laboratories</h3>
                 <a href="new-lab" class="btn btn-link">New lab</a>
             </div>
 
             <MyLaboratoriesTable />
-        }
+        </div>
     </div>
 </div>
-
-@code {
-    
-    [CascadingParameter] 
-    private LaboratoryDto? CurrentLaboratory { get; set; }
-}

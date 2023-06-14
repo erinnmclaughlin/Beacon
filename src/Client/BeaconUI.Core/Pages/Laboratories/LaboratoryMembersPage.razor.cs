@@ -13,25 +13,31 @@ namespace BeaconUI.Core.Pages.Laboratories;
 public partial class LaboratoryMembersPage
 {
     [CascadingParameter] public required Task<AuthenticationState> AuthStateTask { get; set; }
-    [CascadingParameter] public required LaboratoryDto CurrentLaboratory { get; set; }
     [CascadingParameter] private IModalService ModalService { get; set; } = null!;
 
     private AuthenticationState AuthState { get; set; } = null!;
     
     private ErrorOr<LaboratoryMemberDto[]>? ErrorOrMembers { get; set; }
     
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
+    }
+
     protected async override Task OnParametersSetAsync()
     {
         AuthState = await AuthStateTask;
-        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
     }
 
     private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
-        if (AuthState.User.FindFirst(BeaconClaimTypes.UserId)?.Value == memberToUpdate.Id.ToString())
+        if (SessionInfoDto.FromClaimsPrincipal(AuthState.User) is not { CurrentLab: { } } session)
             return false;
 
-        if (CurrentLaboratory.MyMembershipType is LaboratoryMembershipType.Admin)
+        if (session.CurrentUser.Id == memberToUpdate.Id)
+            return false;
+
+        if (session.CurrentLab.MembershipType is LaboratoryMembershipType.Admin)
             return true;
         
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;

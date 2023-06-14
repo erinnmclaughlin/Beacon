@@ -1,84 +1,87 @@
-﻿@page "/members"
+﻿@page "/l/members"
 @attribute [Authorize]
+@layout LaboratoryLayout
 
-<LaboratoryPageHeader>
-    <ButtonsContent>
-        <button type="button" class="btn btn-primary" @onclick="ShowInviteMemberModal">
-            <span class="icon">
-                <i class="fa-solid fa-user-plus"></i>
-            </span>
-            <span>Invite member</span>
-        </button>
-    </ButtonsContent>
-</LaboratoryPageHeader>
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <LaboratoryPageHeader>
+        <ButtonsContent>
+            <button type="button" class="btn btn-primary" @onclick="ShowInviteMemberModal">
+                <span class="icon">
+                    <i class="fa-solid fa-user-plus"></i>
+                </span>
+                <span>Invite member</span>
+            </button>
+        </ButtonsContent>
+    </LaboratoryPageHeader>
 
-<div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 h-100">
-        @if (ErrorOrMembers is not { } errorOrMembers)
-        {
-            <p>Loading...</p>
-        }
-        else if (errorOrMembers.IsError)
-        {
-            <p class="text-danger">There was an error loading laboratory members.</p>
-        }
-        else
-        {
-            <div class="table-responsive h-100">
-                <table class="table align-middle">
-                    <thead>
-                        <tr>
-                            <th>Display Name</th>
-                            <th>Email Address</th>
-                            <th>Role</th>
-                            <th style="width: 0%;"></th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var member in errorOrMembers.Value)
-                        {
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
+            @if (ErrorOrMembers is not { } errorOrMembers)
+            {
+                <p>Loading...</p>
+            }
+            else if (errorOrMembers.IsError)
+            {
+                <p class="text-danger">There was an error loading laboratory members.</p>
+            }
+            else
+            {
+                <div class="table-responsive h-100">
+                    <table class="table align-middle">
+                        <thead>
                             <tr>
-                                <td>@member.DisplayName</td>
-                                <td>
-                                    <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
-                                </td>
-                                <td>@member.MembershipType</td>
-                                <td>
-                                    <div class="dropdown">
-                                        <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="icon">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
-                                            </span>
-                                        </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                @if (CanManagePermissions(member))
-                                                {
-                                                    <button class="dropdown-item" type="button" @onclick="() => ShowManagePermissionsModal(member)">
-                                                        <span class="icon">
-                                                            <i class="fa-regular fa-pencil"></i>
-                                                        </span>
-                                                        <span>Manage Permissions</span>
-                                                    </button>
-                                                }
-                                                else
-                                                {
-                                                    <div class="dropdown-item disabled">
-                                                        <span class="icon">
-                                                            <i class="fa-regular fa-pencil"></i>
-                                                        </span>
-                                                        <span>Manage Permissions</span>
-                                                    </div>
-                                                }
-                                            </li>
-                                        </ul>
-                                    </div>
-                                </td>
+                                <th>Display Name</th>
+                                <th>Email Address</th>
+                                <th>Role</th>
+                                <th style="width: 0%;"></th>
                             </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
+                        </thead>
+                        <tbody>
+                            @foreach (var member in errorOrMembers.Value)
+                            {
+                                <tr>
+                                    <td>@member.DisplayName</td>
+                                    <td>
+                                        <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
+                                    </td>
+                                    <td>@member.MembershipType</td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="icon">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    @if (CanManagePermissions(member))
+                                                    {
+                                                        <button class="dropdown-item" type="button" @onclick="() => ShowManagePermissionsModal(member)">
+                                                            <span class="icon">
+                                                                <i class="fa-regular fa-pencil"></i>
+                                                            </span>
+                                                            <span>Manage Permissions</span>
+                                                        </button>
+                                                    }
+                                                    else
+                                                    {
+                                                        <div class="dropdown-item disabled">
+                                                            <span class="icon">
+                                                                <i class="fa-regular fa-pencil"></i>
+                                                            </span>
+                                                            <span>Manage Permissions</span>
+                                                        </div>
+                                                    }
+                                                </li>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        </tbody>
+                    </table>
+                </div>
+            }
+        </div>
     </div>
 </div>

@@ -34,7 +34,7 @@ else
 
     private LaboratoryDto[]? Laboratories { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
         var errorOrLaboratories = await ApiClient.GetMyLaboratories();
         Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;

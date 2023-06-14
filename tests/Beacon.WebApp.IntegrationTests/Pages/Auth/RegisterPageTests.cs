@@ -16,7 +16,7 @@ public class RegisterPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultUser);
+        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultSession);
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<RegisterPage>();

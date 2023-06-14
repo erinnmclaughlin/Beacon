@@ -6,13 +6,13 @@ using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
 
-internal sealed class ApiClient : ApiClientBase
+public sealed class ApiClient : ApiClientBase
 {
     public ApiClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
-    public async Task<ErrorOr<AuthUserDto>> GetCurrentUser()
+    public async Task<ErrorOr<SessionInfoDto>> GetSessionInfo()
     {
-        return await GetAsync<AuthUserDto>("api/me");
+        return await GetAsync<SessionInfoDto>("api/session");
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)
