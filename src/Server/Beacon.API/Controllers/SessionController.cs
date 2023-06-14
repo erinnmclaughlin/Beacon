@@ -3,10 +3,10 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace Beacon.API.Controllers;
 
-[Route("api")]
-public sealed class ApiController : ApiControllerBase
+[Route("api/session")]
+public sealed class SessionController : ApiControllerBase
 {
-    [HttpGet("session")]
+    [HttpGet]
     public async Task<IActionResult> GetCurrentUser(CancellationToken ct)
     {
         return Ok(await GetAsync(new GetSessionInfo.Query(), ct));
