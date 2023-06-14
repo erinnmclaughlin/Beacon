@@ -16,10 +16,6 @@ html, body {
     height: var(--topnav-height);
 }
 
-    #topnav + * {
-        margin-top: var(--topnav-height);
-    }
-
 h1:focus {
     outline: none;
 }

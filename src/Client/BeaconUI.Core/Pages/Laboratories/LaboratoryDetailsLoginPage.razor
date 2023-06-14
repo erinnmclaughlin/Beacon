@@ -15,6 +15,6 @@
         await ApiClient.LoginToLaboratory(Id);
 
         AuthStateProvider.NotifyAuthenticationStateChanged();
-        NavigationManager.NavigateTo("");
+        NavigationManager.NavigateTo("l", replace: true);
     }
 }

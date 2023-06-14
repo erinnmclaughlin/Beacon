@@ -22,7 +22,7 @@ public class LogoutTests : EndpointTestBase
         });
 
         // current user should be available after logging in:
-        var currentUser = await _httpClient.GetAsync("api/me");
+        var currentUser = await _httpClient.GetAsync("api/session");
         currentUser.IsSuccessStatusCode.Should().BeTrue();
 
         // log out:
@@ -31,7 +31,7 @@ public class LogoutTests : EndpointTestBase
         response.IsSuccessStatusCode.Should().BeTrue();
 
         // current user should no longer be available after logging out:
-        currentUser = await _httpClient.GetAsync("api/me");
+        currentUser = await _httpClient.GetAsync("api/session");
         currentUser.IsSuccessStatusCode.Should().BeFalse();
     }
 }

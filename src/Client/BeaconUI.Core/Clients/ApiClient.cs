@@ -6,13 +6,13 @@ using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
 
-internal sealed class ApiClient : ApiClientBase
+public sealed class ApiClient : ApiClientBase
 {
     public ApiClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
 
-    public async Task<ErrorOr<AuthUserDto>> GetCurrentUser()
+    public async Task<ErrorOr<SessionInfoDto>> GetSessionInfo()
     {
-        return await GetAsync<AuthUserDto>("api/me");
+        return await GetAsync<SessionInfoDto>("api/session");
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)
@@ -40,6 +40,11 @@ internal sealed class ApiClient : ApiClientBase
         return await GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
     }
 
+    public async Task<ErrorOr<LaboratoryDto[]>> GetMyLaboratories()
+    {
+        return await GetAsync<LaboratoryDto[]>("api/laboratories");
+    }
+
     public async Task<ErrorOr<Success>> CreateLaboratory(CreateLaboratoryRequest request)
     {
         return await PostAsync("api/laboratories", request);
@@ -50,14 +55,9 @@ internal sealed class ApiClient : ApiClientBase
         return await PostAsync($"api/laboratories/{labId}/login", null);
     }
 
-    public async Task<ErrorOr<Success>> LogoutOfLaboratory()
+    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
     {
-        return await GetAsync("api/laboratories/logout");
-    }
-
-    public async Task<ErrorOr<LaboratoryDetailDto>> GetCurrentLaboratory()
-    {
-        return await GetAsync<LaboratoryDetailDto>("api/laboratories/current");
+        return await GetAsync<LaboratoryMemberDto[]>("api/members");
     }
 
     public async Task<ErrorOr<Success>> UpdateMembershipType(Guid memberId, UpdateMembershipTypeRequest request)
