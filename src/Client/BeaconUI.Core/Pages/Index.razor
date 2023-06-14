@@ -6,10 +6,21 @@
         <div class="px-4 h-100">
             <div class="flex">
                 <h3 class="flex-grow-1">My Laboratories</h3>
-                <a href="new-lab" class="btn btn-link">New lab</a>
+                <button type="button" class="btn btn-link" @onclick="ShowCreateLabModal">New lab</button>
             </div>
 
             <MyLaboratoriesTable />
         </div>
     </div>
 </div>
+
+@code {
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
+
+    private async Task ShowCreateLabModal()
+    {
+        await ModalService.Show<CreateLaboratoryForm>("Create New Lab").Result;
+    }
+}

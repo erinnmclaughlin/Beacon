@@ -1,0 +1,37 @@
+﻿@using Beacon.Common.Laboratories.Requests;
+
+<BeaconForm Model="Model" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="lab-name">Laboratory Name</label>
+                <InputText @bind-Value="Model.LaboratoryName" class="form-control" id="lab-name" placeholder="e.g., Beacon Labs" />
+                <ValidationMessage For="() => Model.LaboratoryName" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton class="btn btn-primary">Create Lab</SubmitButton>
+            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+    
+    [CascadingParameter] 
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    private CreateLaboratoryRequest Model { get; } = new();
+
+    private async Task Submit(BeaconForm formContext)
+    {
+        var result = await ApiClient.CreateLaboratory(Model);
+
+        if (result.IsError)
+            formContext.AddErrors(result.Errors);
+
+        NavigationManager.NavigateTo("l");
+    }
+
+    private async Task Cancel() => await Modal.CancelAsync();
+}

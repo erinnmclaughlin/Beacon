@@ -2,12 +2,13 @@
 
 @inherits LayoutComponentBase
 
-<div class="page d-flex flex-column h-100" style="overflow-x: hidden;">
-    <TopNav>
-        <NavbarBrand>
-            <a class="navbar-brand" href="" @onclick="LogoutOfLab">Beacon LMS</a>
-        </NavbarBrand>
-    </TopNav>
+<TopNav>
+    <NavbarBrand>
+        <a class="navbar-brand" href="" @onclick="LogoutOfLab">Beacon LMS</a>
+    </NavbarBrand>
+</TopNav>
+
+<div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height);">
     <main class="d-flex flex-row flex-grow-1">
         @Body
     </main>
