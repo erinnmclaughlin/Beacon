@@ -1,6 +1,6 @@
-﻿using Beacon.App.Services;
-using Beacon.Common.Laboratories.Enums;
-using Beacon.Common.Laboratories.Responses;
+﻿using Beacon.App.Entities;
+using Beacon.App.Services;
+using Beacon.Common.Laboratories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -8,9 +8,9 @@ namespace Beacon.App.Features.Laboratories.Queries;
 
 public static class GetMyLaboratoriesFeature
 {
-    public sealed record Query : IRequest<GetMyLaboratories.Laboratory[]>;
+    public sealed record Query : IRequest<LaboratoryDto[]>;
 
-    internal sealed class Handler : IRequestHandler<Query, GetMyLaboratories.Laboratory[]>
+    internal sealed class Handler : IRequestHandler<Query, LaboratoryDto[]>
     {
         private readonly ICurrentUser _currentUser;
         private readonly IQueryService _queryService;
@@ -21,29 +21,20 @@ public static class GetMyLaboratoriesFeature
             _queryService = queryService;
         }
 
-        public async Task<GetMyLaboratories.Laboratory[]> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<LaboratoryDto[]> Handle(Query request, CancellationToken cancellationToken)
         {
             var currentUserId = _currentUser.UserId;
 
-            var data = await _queryService
-                .QueryFor<Entities.LaboratoryMembership>()
+            return await _queryService
+                .QueryFor<LaboratoryMembership>()
                 .Where(m => m.MemberId == currentUserId)
-                .Select(m => new
+                .Select(m => new LaboratoryDto
                 {
-                    m.Laboratory.Id,
-                    m.Laboratory.Name,
-                    m.MembershipType,
-                    Admin = m.Laboratory.Memberships.First(m => m.MembershipType == LaboratoryMembershipType.Admin).Member
+                    Id = m.Laboratory.Id,
+                    Name = m.Laboratory.Name,
+                    MyMembershipType = m.MembershipType
                 })
-                .ToListAsync(cancellationToken);
-
-            return data.Select(l => new GetMyLaboratories.Laboratory
-            {
-                Id = l.Id,
-                Name = l.Name,
-                MembershipType = l.MembershipType,
-                Admin = new GetMyLaboratories.LaboratoryMember { Id = l.Admin.Id, DisplayName = l.Admin.DisplayName }
-            }).ToArray();
+                .ToArrayAsync(cancellationToken);
         }
     }
 }

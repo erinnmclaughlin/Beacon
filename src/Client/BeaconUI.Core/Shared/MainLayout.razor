@@ -9,8 +9,8 @@
         </NavbarBrand>
     </TopNav>
     <main class="d-flex flex-row flex-grow-1">
-        <CascadingValue Value="@ActiveLaboratory">
-            @if (ActiveLaboratory is not null)
+        <CascadingValue Value="@CurrentLaboratory">
+            @if (CurrentLaboratory is not null)
             {
                 <LaboratorySideNav />
             }
@@ -29,12 +29,12 @@
     [CascadingParameter] 
     private Task<AuthenticationState> AuthStateTask { get; set; } = null!;
 
-    private LaboratoryDetailDto? ActiveLaboratory { get; set; }
+    private LaboratoryDto? CurrentLaboratory { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
         var result = await ApiClient.GetCurrentLaboratory();
-        ActiveLaboratory = result.IsError ? null : result.Value;
+        CurrentLaboratory = result.IsError ? null : result.Value;
     }
 
     private async Task LogoutOfLab()

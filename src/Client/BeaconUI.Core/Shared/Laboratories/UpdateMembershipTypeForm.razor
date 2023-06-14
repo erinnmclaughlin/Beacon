@@ -3,7 +3,7 @@
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
-            @if (Detail?.CurrentUserMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
+            @if (CurrentLaboratory?.MyMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)
             {
                 <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
             }
@@ -11,7 +11,7 @@
             {
                 <div class="field">
                     <label class="form-label" for="member">Member</label>
-                    <input class="form-control" id="member" readonly value="@MemberToUpdate.Member.DisplayName" />
+                    <input class="form-control" id="member" readonly value="@MemberToUpdate.DisplayName" />
                 </div>
                 <div class="field">
                     <label class="form-label" for="type">Membership Type</label>

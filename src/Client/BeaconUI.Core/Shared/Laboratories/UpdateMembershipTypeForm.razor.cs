@@ -15,10 +15,10 @@ public partial class UpdateMembershipTypeForm
     private BlazoredModalInstance Modal { get; set; } = null!;
 
     [CascadingParameter]
-    private LaboratoryDetailDto Detail { get; set; } = null!;
+    private LaboratoryDto CurrentLaboratory { get; set; } = null!;
 
     [Parameter]
-    public required LaboratoryMembershipDto MemberToUpdate { get; set; }
+    public required LaboratoryMemberDto MemberToUpdate { get; set; }
 
     private UpdateMembershipTypeRequest Model { get; set; } = new();
 
@@ -29,7 +29,7 @@ public partial class UpdateMembershipTypeForm
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Member.Id, Model);
+        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Id, Model);
 
         if (result.IsError)
         {
@@ -42,7 +42,7 @@ public partial class UpdateMembershipTypeForm
 
     private bool IsDisabled(LaboratoryMembershipType targetType)
     {
-        var myMembership = Detail.CurrentUserMembershipType;
+        var myMembership = CurrentLaboratory.MyMembershipType;
 
         if (myMembership is LaboratoryMembershipType.Admin)
             return false;

@@ -1,14 +1,14 @@
 ﻿@page "/"
 @attribute [Authorize]
 
-@if (ActiveLab is not null)
+@if (CurrentLaboratory is not null)
 {
     <LaboratoryPageHeader />
 }
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
     <div class="px-4 h-100">
-        @if (ActiveLab is not null)
+        @if (CurrentLaboratory is not null)
         {
             <p>This is the laboratory details page.</p>
         }
@@ -27,5 +27,5 @@
 @code {
     
     [CascadingParameter] 
-    private LaboratoryDetailDto? ActiveLab { get; set; }
+    private LaboratoryDto? CurrentLaboratory { get; set; }
 }

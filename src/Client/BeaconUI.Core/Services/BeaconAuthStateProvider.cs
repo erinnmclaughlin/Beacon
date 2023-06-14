@@ -38,7 +38,7 @@ internal sealed class BeaconAuthStateProvider : AuthenticationStateProvider
 
     private static ClaimsPrincipal AnonymousUser { get; } = new ClaimsPrincipal(new ClaimsIdentity());
 
-    private static ClaimsPrincipal GetClaimsPrincipal(ErrorOr<AuthUserDto> errorOrUser, ErrorOr<LaboratoryDetailDto> errorOrLab)
+    private static ClaimsPrincipal GetClaimsPrincipal(ErrorOr<AuthUserDto> errorOrUser, ErrorOr<LaboratoryDto> errorOrLab)
     {
         if (errorOrUser.IsError)
             return AnonymousUser;
@@ -59,7 +59,7 @@ internal sealed class BeaconAuthStateProvider : AuthenticationStateProvider
             identity.AddClaims(new[]
             {
                 new Claim(BeaconClaimTypes.LabId, errorOrLab.Value.Id.ToString()),
-                new Claim(BeaconClaimTypes.MembershipType, errorOrLab.Value.CurrentUserMembershipType.ToString())
+                new Claim(BeaconClaimTypes.MembershipType, errorOrLab.Value.MyMembershipType.ToString())
             });
         }
 

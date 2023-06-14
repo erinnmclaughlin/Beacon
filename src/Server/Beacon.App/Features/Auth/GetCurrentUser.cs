@@ -1,5 +1,6 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.Services;
+using Beacon.Common.Auth;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -7,18 +8,9 @@ namespace Beacon.App.Features.Auth;
 
 public static class GetCurrentUser
 {
-    public sealed record Query : IRequest<Response>;
+    public sealed record Query : IRequest<AuthUserDto>;
 
-    public sealed record Response
-    {
-        public required Guid Id { get; init; }
-        public required string DisplayName { get; init; }
-        public required string EmailAddress { get; init; }
-    }
-
-    public sealed record Laboratory(Guid Id, string Name);
-
-    internal sealed class Handler : IRequestHandler<Query, Response>
+    internal sealed class Handler : IRequestHandler<Query, AuthUserDto>
     {
         private readonly ICurrentUser _currentUser;
         private readonly IQueryService _queryService;
@@ -29,14 +21,14 @@ public static class GetCurrentUser
             _queryService = queryService;
         }
 
-        public async Task<Response> Handle(Query request, CancellationToken cancellationToken)
+        public async Task<AuthUserDto> Handle(Query request, CancellationToken cancellationToken)
         {
             var currentUserId = _currentUser.UserId;
 
             return await _queryService
                 .QueryFor<User>()
                 .Where(u => u.Id == currentUserId)
-                .Select(u => new Response
+                .Select(u => new AuthUserDto
                 {
                     Id = u.Id,
                     DisplayName = u.DisplayName,

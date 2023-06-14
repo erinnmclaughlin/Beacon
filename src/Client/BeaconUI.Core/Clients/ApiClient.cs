@@ -2,7 +2,6 @@
 using Beacon.Common.Auth.Requests;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
-using Beacon.Common.Laboratories.Responses;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
@@ -41,9 +40,9 @@ internal sealed class ApiClient : ApiClientBase
         return await GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
     }
 
-    public async Task<ErrorOr<GetMyLaboratories.Laboratory[]>> GetMyLaboratories()
+    public async Task<ErrorOr<LaboratoryDto[]>> GetMyLaboratories()
     {
-        return await GetAsync<GetMyLaboratories.Laboratory[]>("api/laboratories");
+        return await GetAsync<LaboratoryDto[]>("api/laboratories");
     }
 
     public async Task<ErrorOr<Success>> CreateLaboratory(CreateLaboratoryRequest request)
@@ -61,9 +60,14 @@ internal sealed class ApiClient : ApiClientBase
         return await GetAsync("api/laboratories/logout");
     }
 
-    public async Task<ErrorOr<LaboratoryDetailDto>> GetCurrentLaboratory()
+    public async Task<ErrorOr<LaboratoryDto>> GetCurrentLaboratory()
     {
-        return await GetAsync<LaboratoryDetailDto>("api/laboratories/current");
+        return await GetAsync<LaboratoryDto>("api/laboratories/current");
+    }
+
+    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
+    {
+        return await GetAsync<LaboratoryMemberDto[]>("api/members");
     }
 
     public async Task<ErrorOr<Success>> UpdateMembershipType(Guid memberId, UpdateMembershipTypeRequest request)

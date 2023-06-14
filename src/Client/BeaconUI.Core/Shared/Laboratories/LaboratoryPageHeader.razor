@@ -1,6 +1,6 @@
 ﻿<header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
     <h3 class="mb-0 flex-grow-1">
-        <span>@ActiveLaboratory.Name</span>
+        <span>@CurrentLaboratory.Name</span>
     </h3>
     <div>
         @ButtonsContent
@@ -9,7 +9,9 @@
 
 @code {
 
-    [CascadingParameter] public required LaboratoryDetailDto ActiveLaboratory { get; set; }
+    [CascadingParameter] 
+    public required LaboratoryDto CurrentLaboratory { get; set; }
 
-    [Parameter] public RenderFragment? ButtonsContent { get; set; }
+    [Parameter]
+    public RenderFragment? ButtonsContent { get; set; }
 }

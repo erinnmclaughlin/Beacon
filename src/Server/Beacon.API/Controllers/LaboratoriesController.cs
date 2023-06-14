@@ -34,7 +34,7 @@ public sealed class LaboratoriesController : ApiControllerBase
     public async Task<IActionResult> GetCurrentLaboratory(CancellationToken ct)
     {
         var response = await GetAsync(new GetCurrentLaboratory.Query(), ct);
-        return Ok(response.Laboratory);
+        return Ok(response);
     }
 
     [Authorize(AuthConstants.LabAuth), HttpGet("logout")]
