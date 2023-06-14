@@ -2,6 +2,7 @@
 using Beacon.Common.Auth.Requests;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Laboratories.Responses;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
@@ -38,6 +39,11 @@ internal sealed class ApiClient : ApiClientBase
     public async Task<ErrorOr<Success>> AcceptEmailInvitation(Guid inviteId, Guid emailId)
     {
         return await GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
+    }
+
+    public async Task<ErrorOr<GetMyLaboratories.Laboratory[]>> GetMyLaboratories()
+    {
+        return await GetAsync<GetMyLaboratories.Laboratory[]>("api/laboratories");
     }
 
     public async Task<ErrorOr<Success>> CreateLaboratory(CreateLaboratoryRequest request)

@@ -4,7 +4,7 @@ using Beacon.Common.Laboratories.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories;
+namespace Beacon.App.Features.Laboratories.Queries;
 
 public static class GetCurrentLaboratory
 {

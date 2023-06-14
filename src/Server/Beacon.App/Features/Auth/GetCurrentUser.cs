@@ -14,7 +14,6 @@ public static class GetCurrentUser
         public required Guid Id { get; init; }
         public required string DisplayName { get; init; }
         public required string EmailAddress { get; init; }
-        public required Laboratory[] Laboratories { get; init; }
     }
 
     public sealed record Laboratory(Guid Id, string Name);
@@ -41,12 +40,8 @@ public static class GetCurrentUser
                 {
                     Id = u.Id,
                     DisplayName = u.DisplayName,
-                    EmailAddress = u.EmailAddress,
-                    Laboratories = u.Memberships
-                        .Select(m => new Laboratory(m.Laboratory.Id, m.Laboratory.Name))
-                        .ToArray()
+                    EmailAddress = u.EmailAddress
                 })
-                .AsSplitQuery()
                 .FirstAsync(cancellationToken);
         }
     }

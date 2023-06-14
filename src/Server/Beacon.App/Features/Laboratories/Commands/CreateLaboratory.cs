@@ -6,7 +6,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories;
+namespace Beacon.App.Features.Laboratories.Commands;
 
 public static class CreateLaboratory
 {
@@ -46,7 +46,7 @@ public static class CreateLaboratory
         private async Task<User> GetCurrentUserAsync(CancellationToken ct)
         {
             var currentUserId = _sessionManager.UserId;
-            
+
             return await _unitOfWork
                 .QueryFor<User>(enableChangeTracking: true)
                 .FirstAsync(u => u.Id == currentUserId, ct);

@@ -1,0 +1,45 @@
+﻿@using Beacon.Common.Laboratories.Responses
+
+@if (Laboratories is null)
+{
+    <p>Loading...</p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var lab in Laboratories)
+            {
+                <tr>
+                    <td></td>
+                    <td>
+                        <a href="@($"laboratories/{lab.Id}")">
+                            <AvatarSquare Value="@lab.Name[0]" FontSize="1rem" Size="1.5rem" />
+                            <span class="nav-text">@lab.Name</span>
+                        </a>
+                    </td>
+                    <td></td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+
+    private GetMyLaboratories.Laboratory[]? Laboratories { get; set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        var errorOrLaboratories = await ApiClient.GetMyLaboratories();
+        Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;
+    }
+
+}
