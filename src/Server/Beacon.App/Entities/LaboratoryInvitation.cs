@@ -26,23 +26,20 @@ public class LaboratoryInvitation
 
     public void Accept(User acceptingUser)
     {
-        // TODO: throw a better exception
         if (acceptingUser.EmailAddress != NewMemberEmailAddress)
             throw new UserNotAllowedException("Current user's email address does not match the email address in the invitation.");
 
         AcceptedById = acceptingUser.Id;
     }
 
-    public LaboratoryInvitationEmail AddEmailInvitation()
+    public LaboratoryInvitationEmail AddEmailInvitation(DateTimeOffset sentOn)
     {
-        var now = DateTimeOffset.UtcNow;
-
         var invitationEmail = new LaboratoryInvitationEmail
         {
             Id = Guid.NewGuid(),
             LaboratoryInvitationId = Id,
-            SentOn = now,
-            ExpiresOn = now.AddDays(ExpireAfterDays)
+            SentOn = sentOn,
+            ExpiresOn = sentOn.AddDays(ExpireAfterDays)
         };
 
         _emailInvitations.Add(invitationEmail);

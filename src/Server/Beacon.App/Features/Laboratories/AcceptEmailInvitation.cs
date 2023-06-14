@@ -30,27 +30,22 @@ public static class AcceptEmailInvitation
                 .QueryFor<User>()
                 .FirstAsync(u => u.Id == currentUserId, ct);
 
-            var invitation = await FindInvitation(request, ct);
+            var emailInvite = await FindInvitation(request, ct);
 
-            invitation.Accept(currentUser);
+            emailInvite.Accept(currentUser, DateTimeOffset.UtcNow);
 
-            await AddLabMember(currentUser.Id, invitation.LaboratoryId, invitation.MembershipType, ct);
+            await AddLabMember(currentUser.Id, emailInvite.LaboratoryInvitation.LaboratoryId, emailInvite.LaboratoryInvitation.MembershipType, ct);
 
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        private async Task<LaboratoryInvitation> FindInvitation(Command request, CancellationToken ct)
+        private async Task<LaboratoryInvitationEmail> FindInvitation(Command request, CancellationToken ct)
         {
-            var invitation = await _unitOfWork
-                .QueryFor<LaboratoryInvitation>(enableChangeTracking: true)
-                .Include(i => i.EmailInvitations)
-                .AsSingleQuery()
-                .FirstOrDefaultAsync(i => i.Id == request.InviteId, ct);
-
-            if (invitation?.EmailInvitations.FirstOrDefault(i => i.Id == request.EmailId) is null)
-                throw new EmailInvitationNotFoundException(request.EmailId, request.InviteId);
-
-            return invitation;
+            return await _unitOfWork
+                .QueryFor<LaboratoryInvitationEmail>(enableChangeTracking: true)
+                .Include(i => i.LaboratoryInvitation)
+                .FirstOrDefaultAsync(i => i.Id == request.EmailId && i.LaboratoryInvitationId == request.InviteId, ct)
+                ?? throw new EmailInvitationNotFoundException(request.EmailId, request.InviteId);
         }
 
         private async Task AddLabMember(Guid acceptingUserId, Guid labId, LaboratoryMembershipType membershipType, CancellationToken ct)

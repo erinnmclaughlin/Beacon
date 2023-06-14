@@ -64,7 +64,7 @@ public static class InviteNewMember
                 CreatedById = _sessionManager.UserId
             };
 
-            var emailInvitation = invitation.AddEmailInvitation();
+            var emailInvitation = invitation.AddEmailInvitation(now);
 
             _unitOfWork.GetRepository<LaboratoryInvitation>().Add(invitation);
             await _unitOfWork.SaveChangesAsync(ct);

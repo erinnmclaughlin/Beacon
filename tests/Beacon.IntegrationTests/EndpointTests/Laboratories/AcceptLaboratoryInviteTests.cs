@@ -20,19 +20,42 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
 
         var client = CreateClient(db =>
         {
-            (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db);
+            (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: false);
         });
 
-        var response = await client.GetAsync($"portal/invitations/{inviteId}/accept?emailId={emailId}");
+        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
         response.EnsureSuccessStatusCode();
     }
 
-    private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext)
+    [Fact]
+    public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
+    {
+        Guid inviteId = Guid.Empty;
+        Guid emailId = Guid.Empty;
+        Guid labId = Guid.Empty;
+
+        var client = CreateClient(db =>
+        {
+            (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: true);
+        });
+
+        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task AcceptInvitation_ShouldFail_WhenRequestIsInvalid()
+    {
+        var response = await CreateClient().GetAsync($"api/invitations/{Guid.NewGuid()}/accept?emailId={Guid.NewGuid()}");
+        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+    }
+
+    private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext, bool isExpired)
     {
         var labAdmin = SeedLabAdmin(dbContext);
         var lab = SeedLab(dbContext, labAdmin);
-        var labInvite = SeedInvite(dbContext, labAdmin.Id, lab.Id);
-        var emailInvite = labInvite.AddEmailInvitation();
+        var labInvite = SeedInvite(dbContext, labAdmin.Id, lab.Id, isExpired);
+        var emailInvite = labInvite.AddEmailInvitation(DateTimeOffset.UtcNow.AddDays(isExpired ? -30 : 0));
 
         dbContext.SaveChanges();
 
@@ -62,7 +85,7 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
         return laboratory;
     }
 
-    private static LaboratoryInvitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId)
+    private static LaboratoryInvitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId, bool isExpired = false)
     {
         var labInvite = new LaboratoryInvitation
         {
