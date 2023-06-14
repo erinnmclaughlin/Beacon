@@ -1,27 +1,9 @@
-﻿@using BeaconUI.Core.Services
+﻿@inherits LayoutComponentBase
 
-@inherits LayoutComponentBase
-
-<TopNav>
-    <NavbarBrand>
-        <a class="navbar-brand" href="" @onclick="LogoutOfLab">Beacon LMS</a>
-    </NavbarBrand>
-</TopNav>
+<TopNav />
 
 <div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height);">
     <main class="d-flex flex-row flex-grow-1">
         @Body
     </main>
 </div>
-
-@code {
-
-    [Inject] 
-    private BeaconAuthStateProvider AuthStateProvider { get; set; } = null!;
-
-    private async Task LogoutOfLab()
-    {
-        var result = await ApiClient.LogoutOfLaboratory();
-        AuthStateProvider.NotifyAuthenticationStateChanged();
-    }
-}
