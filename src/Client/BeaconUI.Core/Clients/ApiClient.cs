@@ -60,11 +60,6 @@ public sealed class ApiClient : ApiClientBase
         return await GetAsync("api/laboratories/logout");
     }
 
-    public async Task<ErrorOr<LaboratoryDto>> GetCurrentLaboratory()
-    {
-        return await GetAsync<LaboratoryDto>("api/laboratories/current");
-    }
-
     public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
     {
         return await GetAsync<LaboratoryMemberDto[]>("api/members");

@@ -30,13 +30,6 @@ public sealed class LaboratoriesController : ApiControllerBase
         return NoContent();
     }
 
-    [Authorize(AuthConstants.LabAuth), HttpGet("current")]
-    public async Task<IActionResult> GetCurrentLaboratory(CancellationToken ct)
-    {
-        var response = await GetAsync(new GetCurrentLaboratory.Query(), ct);
-        return Ok(response);
-    }
-
     [Authorize(AuthConstants.LabAuth), HttpGet("logout")]
     public async Task<IActionResult> LogoutOfLaboratory(CancellationToken ct)
     {

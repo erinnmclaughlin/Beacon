@@ -12,7 +12,7 @@ public sealed class MembersController : ApiControllerBase
     [HttpGet]
     public async Task<IActionResult> GetMembers(CancellationToken ct)
     {
-        var members = await GetAsync(new GetCurrentLaboratoryMembers.Query(), ct);
+        var members = await GetAsync(new GetLaboratoryMembers.Query(), ct);
         return Ok(members);
     }
 

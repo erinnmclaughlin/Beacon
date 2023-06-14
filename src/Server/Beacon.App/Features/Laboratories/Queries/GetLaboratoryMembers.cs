@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.App.Features.Laboratories.Queries;
 
-public static class GetCurrentLaboratoryMembers
+public static class GetLaboratoryMembers
 {
     public sealed record Query : IRequest<LaboratoryMemberDto[]>;
 
