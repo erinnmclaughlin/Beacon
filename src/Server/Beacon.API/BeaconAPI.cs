@@ -1,5 +1,4 @@
-﻿using Beacon.API.Infrastructure;
-using Beacon.API.Middleware;
+﻿using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App;
