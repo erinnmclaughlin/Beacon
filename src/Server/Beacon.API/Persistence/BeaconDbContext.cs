@@ -42,20 +42,21 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
         {
             builder.Property(x => x.NewMemberEmailAddress).HasMaxLength(255);
             builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
-            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<LaboratoryInvitationEmail>(builder =>
         {
             builder.HasOne(x => x.LaboratoryInvitation).WithMany(x => x.EmailInvitations).OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<LaboratoryMembership>(builder =>
         {
-            builder.HasKey("LaboratoryId", "MemberId");
+            builder.HasKey(x => new { x.LaboratoryId, x.MemberId });
             builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
-            builder.HasOne(x => x.Laboratory).WithMany(x => x.Memberships);
+            builder.HasOne(x => x.Laboratory).WithMany(x => x.Memberships).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.Member).WithMany(x => x.Memberships);
         });
 

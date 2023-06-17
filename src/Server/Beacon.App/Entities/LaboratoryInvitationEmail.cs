@@ -2,7 +2,7 @@
 
 namespace Beacon.App.Entities;
 
-public class LaboratoryInvitationEmail
+public class LaboratoryInvitationEmail : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset SentOn { get; init; }

@@ -3,7 +3,7 @@ using Beacon.Common.Laboratories.Enums;
 
 namespace Beacon.App.Entities;
 
-public class LaboratoryInvitation
+public class LaboratoryInvitation : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset CreatedOn { get; init; }
@@ -11,9 +11,6 @@ public class LaboratoryInvitation
 
     public required string NewMemberEmailAddress { get; init; }
     public required LaboratoryMembershipType MembershipType { get; init; }
-
-    public required Guid LaboratoryId { get; init; }
-    public Laboratory Laboratory { get; init; } = null!;
 
     public Guid? AcceptedById { get; private set; }
     public User? AcceptedBy { get; private set; }
