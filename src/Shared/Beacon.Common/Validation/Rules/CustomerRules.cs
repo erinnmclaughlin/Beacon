@@ -4,22 +4,22 @@ namespace Beacon.Common.Validation.Rules;
 
 public static class CustomerRules
 {
-    public const int CompanyCodeLength = 3;
-    public const int MinimumCompanyNameLength = 3;
-    public const int MaximumCompanyNameLength = 50;
+    public const int CustomerCodeLength = 3;
+    public const int MinimumCustomerNameLength = 3;
+    public const int MaximumCustomerNameLength = 50;
 
-    public static IRuleBuilderOptions<T, string> IsValidCompanyCode<T>(this IRuleBuilder<T, string> builder)
+    public static IRuleBuilderOptions<T, string> IsValidCustomerCode<T>(this IRuleBuilder<T, string> builder)
     {
         return builder
-            .NotEmpty().WithMessage("Company code is required.")
-            .Length(CompanyCodeLength).WithMessage($"Company code must be exactly {CompanyCodeLength} characters.");
+            .NotEmpty().WithMessage("Customer code is required.")
+            .Length(CustomerCodeLength).WithMessage($"Customer code must be exactly {CustomerCodeLength} characters.");
     }
 
-    public static IRuleBuilderOptions<T, string> IsValidCompanyName<T>(this IRuleBuilder<T, string> builder)
+    public static IRuleBuilderOptions<T, string> IsValidCustomerName<T>(this IRuleBuilder<T, string> builder)
     {
         return builder
-            .NotEmpty().WithMessage("Comany name is required.")
-            .MinimumLength(MinimumCompanyNameLength).WithMessage($"Company name must contain at least {MinimumCompanyNameLength} characters.")
-            .MaximumLength(MaximumCompanyNameLength).WithMessage($"Company name cannot exceed {MaximumCompanyNameLength} characters.");
+            .NotEmpty().WithMessage("Customer name is required.")
+            .MinimumLength(MinimumCustomerNameLength).WithMessage($"Customer name must contain at least {MinimumCustomerNameLength} characters.")
+            .MaximumLength(MaximumCustomerNameLength).WithMessage($"Customer name cannot exceed {MaximumCustomerNameLength} characters.");
     }
 }

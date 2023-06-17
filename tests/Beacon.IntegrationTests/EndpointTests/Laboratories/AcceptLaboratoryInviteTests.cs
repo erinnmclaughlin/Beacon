@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.Common.Laboratories.Enums;
+using Beacon.Common.Laboratories;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 

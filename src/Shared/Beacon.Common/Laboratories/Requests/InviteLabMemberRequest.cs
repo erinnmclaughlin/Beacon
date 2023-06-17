@@ -1,5 +1,4 @@
-﻿using Beacon.Common.Laboratories.Enums;
-using FluentValidation;
+﻿using FluentValidation;
 
 namespace Beacon.Common.Laboratories.Requests;
 

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Laboratories.Enums;
+﻿using Beacon.Common.Laboratories;
 
 namespace Beacon.App.Entities;
 

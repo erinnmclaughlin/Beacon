@@ -1,5 +1,4 @@
 using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Enums;
 using Beacon.Common.Laboratories.Requests;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;
@@ -15,10 +14,10 @@ public partial class UpdateMembershipTypeForm
     private BlazoredModalInstance Modal { get; set; } = null!;
 
     [CascadingParameter]
-    private LaboratoryDto CurrentLaboratory { get; set; } = null!;
+    private LaboratoryDetailDto Detail { get; set; } = null!;
 
     [Parameter]
-    public required LaboratoryMemberDto MemberToUpdate { get; set; }
+    public required LaboratoryMembershipDto MemberToUpdate { get; set; }
 
     private UpdateMembershipTypeRequest Model { get; set; } = new();
 
@@ -29,7 +28,7 @@ public partial class UpdateMembershipTypeForm
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Id, Model);
+        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Member.Id, Model);
 
         if (result.IsError)
         {
@@ -42,7 +41,7 @@ public partial class UpdateMembershipTypeForm
 
     private bool IsDisabled(LaboratoryMembershipType targetType)
     {
-        var myMembership = CurrentLaboratory.MyMembershipType;
+        var myMembership = Detail.CurrentUserMembershipType;
 
         if (myMembership is LaboratoryMembershipType.Admin)
             return false;

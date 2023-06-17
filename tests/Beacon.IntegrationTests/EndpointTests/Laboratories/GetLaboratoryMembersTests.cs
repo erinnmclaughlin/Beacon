@@ -1,5 +1,4 @@
 ﻿using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Enums;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 

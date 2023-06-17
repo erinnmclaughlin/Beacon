@@ -7,7 +7,8 @@ namespace Beacon.API.Controllers;
 [ApiController]
 public abstract class ApiControllerBase : ControllerBase
 {
-    private ISender Sender => HttpContext.RequestServices.GetRequiredService<ISender>();
+    private ISender? _sender;
+    private ISender Sender => _sender ??= HttpContext.RequestServices.GetRequiredService<ISender>();
 
     protected Task<T> GetAsync<T>(IRequest<T> query, CancellationToken ct)
     {
