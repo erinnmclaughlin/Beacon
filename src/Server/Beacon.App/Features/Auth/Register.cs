@@ -43,27 +43,32 @@ public static class Register
 
     public sealed class CommandHandler : IRequestHandler<Command>
     {
+        private readonly ISessionManager _currentSession;
         private readonly IPasswordHasher _passwordHasher;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CommandHandler(IPasswordHasher passwordHasher, IUnitOfWork unitOfWork)
+        public CommandHandler(ISessionManager currentSession, IPasswordHasher passwordHasher, IUnitOfWork unitOfWork)
         {
+            _currentSession = currentSession;
             _passwordHasher = passwordHasher;
             _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
-            _unitOfWork.GetRepository<User>().Add(new User
+            var user = new User
             {
                 Id = Guid.NewGuid(),
                 DisplayName = request.DisplayName,
                 EmailAddress = request.EmailAddress,
                 HashedPassword = _passwordHasher.Hash(request.PlainTextPassword, out var salt),
                 HashedPasswordSalt = salt
-            });
+            };
 
+            _unitOfWork.GetRepository<User>().Add(user);
             await _unitOfWork.SaveChangesAsync(cancellationToken);
+
+            await _currentSession.SignInAsync(user.Id);
         }
     }
 }

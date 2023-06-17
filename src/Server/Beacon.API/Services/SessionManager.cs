@@ -7,7 +7,7 @@ using System.Security.Claims;
 
 namespace Beacon.API.Services;
 
-internal sealed class SessionManager : ICurrentUser, ICurrentLab, ISessionManager, ISignInManager
+internal sealed class SessionManager : ISessionManager
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

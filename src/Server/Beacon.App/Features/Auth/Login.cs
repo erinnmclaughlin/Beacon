@@ -13,14 +13,14 @@ public static class Login
 
     internal sealed class CommandHandler : IRequestHandler<Command>
     {
+        private readonly ISessionManager _currentSession;
         private readonly IPasswordHasher _passwordHasher;
-        private readonly ISignInManager _signInManager;
         private readonly IQueryService _queryService;
 
-        public CommandHandler(IPasswordHasher passwordHasher, ISignInManager signInManager, IQueryService queryService)
+        public CommandHandler(ISessionManager currentSession, IPasswordHasher passwordHasher, IQueryService queryService)
         {
+            _currentSession = currentSession;
             _passwordHasher = passwordHasher;
-            _signInManager = signInManager;
             _queryService = queryService;
         }
 
@@ -36,7 +36,7 @@ public static class Login
                 throw new ValidationException(new[] { failure });
             }
 
-            await _signInManager.SignInAsync(user.Id);
+            await _currentSession.SignInAsync(user.Id);
         }
     }
 }

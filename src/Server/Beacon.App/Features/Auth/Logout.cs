@@ -9,16 +9,16 @@ public static class Logout
 
     internal sealed class Handler : IRequestHandler<Command>
     {
-        private readonly ISignInManager _signInManager;
+        private readonly ISessionManager _currentSession;
 
-        public Handler(ISignInManager signInManager)
+        public Handler(ISessionManager currentSession)
         {
-            _signInManager = signInManager;
+            _currentSession = currentSession;
         }
 
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
-            await _signInManager.SignOutAsync();
+            await _currentSession.SignOutAsync();
         }
     }
 }

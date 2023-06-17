@@ -22,12 +22,12 @@ public static class CreateLaboratory
 
     internal sealed class CommandHandler : IRequestHandler<Command>
     {
-        private readonly ISessionManager _sessionManager;
+        private readonly ISessionManager _currentSession;
         private readonly IUnitOfWork _unitOfWork;
 
-        public CommandHandler(ISessionManager sessionManager, IUnitOfWork unitOfWork)
+        public CommandHandler(ISessionManager currentSession, IUnitOfWork unitOfWork)
         {
-            _sessionManager = sessionManager;
+            _currentSession = currentSession;
             _unitOfWork = unitOfWork;
         }
 
@@ -40,12 +40,12 @@ public static class CreateLaboratory
             _unitOfWork.GetRepository<Laboratory>().Add(lab);
             await _unitOfWork.SaveChangesAsync(ct);
 
-            await _sessionManager.SetCurrentLabAsync(lab.Id, LaboratoryMembershipType.Admin);
+            await _currentSession.SetCurrentLabAsync(lab.Id, LaboratoryMembershipType.Admin);
         }
 
         private async Task<User> GetCurrentUserAsync(CancellationToken ct)
         {
-            var currentUserId = _sessionManager.UserId;
+            var currentUserId = _currentSession.UserId;
 
             return await _unitOfWork
                 .QueryFor<User>(enableChangeTracking: true)

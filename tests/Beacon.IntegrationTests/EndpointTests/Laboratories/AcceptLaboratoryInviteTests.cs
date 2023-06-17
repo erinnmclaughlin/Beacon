@@ -54,7 +54,7 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
     {
         var labAdmin = SeedLabAdmin(dbContext);
         var lab = SeedLab(dbContext, labAdmin);
-        var labInvite = SeedInvite(dbContext, labAdmin.Id, lab.Id, isExpired);
+        var labInvite = SeedInvite(dbContext, labAdmin.Id, lab.Id);
         var emailInvite = labInvite.AddEmailInvitation(DateTimeOffset.UtcNow.AddDays(isExpired ? -30 : 0));
 
         dbContext.SaveChanges();
@@ -85,7 +85,7 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
         return laboratory;
     }
 
-    private static Invitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId, bool isExpired = false)
+    private static Invitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId)
     {
         var labInvite = new Invitation
         {
