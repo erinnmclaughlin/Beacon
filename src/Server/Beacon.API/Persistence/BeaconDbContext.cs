@@ -6,7 +6,6 @@ namespace Beacon.API.Persistence;
 
 public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
 {
-    public DbSet<Customer> Customers => Set<Customer>();
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
     public DbSet<Laboratory> Laboratories => Set<Laboratory>();
@@ -35,12 +34,6 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        modelBuilder.Entity<Customer>(builder =>
-        {
-            builder.Property(x => x.Name).HasMaxLength(100);
-            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
-        });
-
         modelBuilder.Entity<Invitation>(builder =>
         {
             builder.Property(x => x.NewMemberEmailAddress).HasMaxLength(255);
@@ -71,9 +64,11 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
         modelBuilder.Entity<Project>(builder =>
         {
             builder.HasKey(x => x.Id);
-            builder.HasIndex(x => x.ProjectId).IsUnique();
-            builder.Property(x => x.ProjectId).HasMaxLength(50);
-            builder.HasOne(x => x.Customer).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.OwnsOne(x => x.ProjectCode, b =>
+            {
+                b.Property(x => x.CompanyCode).HasMaxLength(3);
+                b.HasIndex(x => new { x.CompanyCode, x.Suffix }).IsUnique();
+            });
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
         });

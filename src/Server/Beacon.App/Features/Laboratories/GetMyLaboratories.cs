@@ -4,7 +4,7 @@ using Beacon.Common.Laboratories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Queries;
+namespace Beacon.App.Features.Laboratories;
 
 public static class GetMyLaboratoriesFeature
 {

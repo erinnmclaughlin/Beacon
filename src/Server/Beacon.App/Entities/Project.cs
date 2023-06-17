@@ -1,12 +1,12 @@
-﻿namespace Beacon.App.Entities;
+﻿using Beacon.App.ValueObjects;
+
+namespace Beacon.App.Entities;
 
 public class Project : LaboratoryScopedEntityBase
 {
-    public Guid Id { get; init; }
-    public string ProjectId { get; init; } = string.Empty;
-
-    public Guid CustomerId { get; init; }
-    public Customer Customer { get; init; } = null!;
+    public required Guid Id { get; init; }
+    public required string CustomerName { get; set; }
+    public required ProjectCode ProjectCode { get; init; }
 
     public Guid CreatedById { get; init; }
     public User CreatedBy { get; init; } = null!;

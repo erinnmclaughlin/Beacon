@@ -5,7 +5,7 @@ using Beacon.Common.Laboratories.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Invitations;
 
 public static class AcceptEmailInvitation
 {

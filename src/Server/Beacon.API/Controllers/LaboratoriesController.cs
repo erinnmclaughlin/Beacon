@@ -1,7 +1,5 @@
-﻿using Beacon.App.Features.Laboratories.Commands;
-using Beacon.App.Features.Laboratories.Queries;
+﻿using Beacon.App.Features.Laboratories;
 using Beacon.Common.Laboratories.Requests;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Beacon.API.Controllers;

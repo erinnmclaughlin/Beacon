@@ -5,9 +5,9 @@ using Beacon.Common.Laboratories.Enums;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Memberships;
 
-public static class UpdateUserMembership
+public static class UpdateMembershipType
 {
     public sealed record Command(Guid MemberId, LaboratoryMembershipType MembershipType) : IRequest;
 

@@ -6,7 +6,7 @@ using FluentValidation;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Laboratories;
 
 public static class CreateLaboratory
 {
