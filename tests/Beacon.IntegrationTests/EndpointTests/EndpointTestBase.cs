@@ -50,7 +50,10 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
         using (var scope = factory.Services.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-            db.EnsureSeeded();
+
+            if (db.Database.EnsureCreated())
+                db.SeedWithTestData();
+
             dbAction?.Invoke(db);
         }
 

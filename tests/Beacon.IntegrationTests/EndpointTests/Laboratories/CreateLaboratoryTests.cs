@@ -3,6 +3,7 @@ using Beacon.Common.Laboratories.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 
+[Collection("LaboratoryTests")]
 public class CreateLaboratoryTests : EndpointTestBase
 {
     public CreateLaboratoryTests(BeaconTestApplicationFactory factory) : base(factory)
