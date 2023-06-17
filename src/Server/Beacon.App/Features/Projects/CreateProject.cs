@@ -1,6 +1,8 @@
 ﻿using Beacon.App.Entities;
+using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.App.ValueObjects;
+using Beacon.Common.Laboratories;
 using Beacon.Common.Validation.Rules;
 using FluentValidation;
 using MediatR;
@@ -23,24 +25,27 @@ public static class CreateProject
 
     internal sealed class Handler : IRequestHandler<Command>
     {
-        private readonly ISessionManager _sessionManager;
+        private readonly ISessionManager _currentSession;
         private readonly IUnitOfWork _unitOfWork;
 
-        public Handler(ISessionManager sessionManger, IUnitOfWork unitOfWork)
+        public Handler(ISessionManager currentSession, IUnitOfWork unitOfWork)
         {
-            _sessionManager = sessionManger;
+            _currentSession = currentSession;
             _unitOfWork = unitOfWork;
         }
 
         public async Task Handle(Command request, CancellationToken ct)
         {
+            if (_currentSession.MembershipType is LaboratoryMembershipType.Member)
+                throw new UserNotAllowedException("Only laboratory analysts or higher are allowed to create new projects.");
+
             _unitOfWork.GetRepository<Project>().Add(new Project
             {
                 Id = request.Id,
                 ProjectCode = await GenerateProjectCode(request.CustomerCode, ct),
                 CustomerName = request.CustomerName,
-                CreatedById = _sessionManager.UserId,
-                LaboratoryId = _sessionManager.LabId
+                CreatedById = _currentSession.UserId,
+                LaboratoryId = _currentSession.LabId
             });
 
             await _unitOfWork.SaveChangesAsync(ct);

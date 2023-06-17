@@ -28,7 +28,11 @@ public static class GetProjectByCode
 
             var project = await _queryService
                 .QueryFor<Project>()
-                .FirstOrDefaultAsync(p => p.LaboratoryId == labId && p.ProjectCode == request.ProjectCode, ct);
+                .FirstOrDefaultAsync(p => 
+                    p.LaboratoryId == labId &&
+                    p.ProjectCode.CustomerCode == request.ProjectCode.CustomerCode && 
+                    p.ProjectCode.Suffix == request.ProjectCode.Suffix,
+                ct);
 
             return project is null ? null : new ProjectDto
             {
