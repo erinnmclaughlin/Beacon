@@ -6,11 +6,4 @@ public record LaboratoryMemberDto
     public required string DisplayName { get; init; }
     public required string EmailAddress { get; init; }
     public required LaboratoryMembershipType MembershipType { get; init; }
-
-    public UserDto ToUserDto() => new()
-    {
-        Id = Id,
-        DisplayName = DisplayName,
-        EmailAddress = EmailAddress
-    };
 }
