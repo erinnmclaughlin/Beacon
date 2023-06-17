@@ -1,4 +1,4 @@
-﻿@using Beacon.Common.Laboratories.Requests;
+﻿@using Beacon.Common.Laboratories.Requests
 
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
@@ -17,7 +17,7 @@
 </BeaconForm>
 
 @code {
-    
+
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = null!;
 
@@ -28,9 +28,12 @@
         var result = await ApiClient.CreateLaboratory(Model);
 
         if (result.IsError)
+        {
             formContext.AddErrors(result.Errors);
+            return;
+        }
 
-        NavigationManager.NavigateTo("l");
+        await Modal.CloseAsync(ModalResult.Ok());
     }
 
     private async Task Cancel() => await Modal.CancelAsync();

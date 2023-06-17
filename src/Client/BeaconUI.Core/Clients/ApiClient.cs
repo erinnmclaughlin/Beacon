@@ -3,6 +3,7 @@ using Beacon.Common.Auth.Requests;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 using Beacon.Common.Projects;
+using Beacon.Common.Projects.Requests;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
@@ -68,6 +69,11 @@ public sealed class ApiClient : ApiClientBase
 
     public async Task<ErrorOr<ProjectDto[]>> GetProjects()
     {
-        return await GetAsync<ProjectDto[]>($"api/projects");
+        return await GetAsync<ProjectDto[]>("api/projects");
+    }
+
+    public async Task<ErrorOr<ProjectDto>> CreateProject(CreateProjectRequest request)
+    {
+        return await PostAsync<ProjectDto>("api/projects", request);
     }
 }

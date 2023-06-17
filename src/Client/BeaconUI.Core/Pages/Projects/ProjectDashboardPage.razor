@@ -1,12 +1,11 @@
 ﻿@page "/l/projects"
-@using Beacon.Common.Projects;
 @attribute [Authorize]
 @layout LaboratoryLayout
 
 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
     <LaboratoryPageHeader>
         <ButtonsContent>
-            <button type="button" class="btn btn-primary">
+            <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal">
                 <span class="icon">
                     <i class="fa-solid fa-plus"></i>
                 </span>
@@ -23,7 +22,7 @@
             }
             else if (projectsOrError.IsError)
             {
-                <p>There was an error loading lab projects. Please try again later.</p>
+                <p class="text-danger">There was an error loading lab projects. Please try again later.</p>
             }
             else if (projectsOrError.Value.Length == 0)
             {
@@ -44,10 +43,28 @@
 
 @code {
 
+    [CascadingParameter] public required IModalService ModalService { get; set; }
+
     private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        ProjectsOrError = await ApiClient.GetProjects();
+        await LoadProjects();
+    }
+
+    private async Task ShowCreateProjectsModal()
+    {
+        var result = await ModalService.Show<CreateProjectForm>("Create New Project").Result;
+
+        if (!result.Cancelled)
+        {
+            ProjectsOrError = null;
+            await LoadProjects();
+        }
+    }
+
+    private async Task LoadProjects()
+    {
+        ProjectsOrError = await ApiClient.GetProjects();        
     }
 }
