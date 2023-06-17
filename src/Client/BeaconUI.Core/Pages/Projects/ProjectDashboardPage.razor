@@ -1,0 +1,53 @@
+﻿@page "/l/projects"
+@using Beacon.Common.Projects;
+@attribute [Authorize]
+@layout LaboratoryLayout
+
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <LaboratoryPageHeader>
+        <ButtonsContent>
+            <button type="button" class="btn btn-primary">
+                <span class="icon">
+                    <i class="fa-solid fa-plus"></i>
+                </span>
+                <span>Create project</span>
+            </button>
+        </ButtonsContent>
+    </LaboratoryPageHeader>
+
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
+            @if (ProjectsOrError is not { } projectsOrError)
+            {
+                <p>Loading...</p>
+            }
+            else if (projectsOrError.IsError)
+            {
+                <p>There was an error loading lab projects. Please try again later.</p>
+            }
+            else if (projectsOrError.Value.Length == 0)
+            {
+                <p>No projects found!</p>
+            }
+            else
+            {
+                <ul>
+                    @foreach (var project in projectsOrError.Value)
+                    {
+                        <li>@project.CustomerName (@project.ProjectCode)</li>
+                    }
+                </ul>
+            }
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ProjectsOrError = await ApiClient.GetProjects();
+    }
+}

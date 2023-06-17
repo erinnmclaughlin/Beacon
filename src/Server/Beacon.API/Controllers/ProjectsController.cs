@@ -9,6 +9,12 @@ namespace Beacon.API.Controllers;
 [Authorize(AuthConstants.LabAuth), Route("api/projects")]
 public class ProjectsController : ApiControllerBase
 {
+    [HttpGet]
+    public async Task<IActionResult> GetProjects(CancellationToken ct)
+    {
+        return Ok(await GetAsync(new GetProjects.Query(), ct));
+    }
+
     [HttpPost]
     public async Task<IActionResult> CreateProject(CreateProjectRequest request, CancellationToken ct)
     {
