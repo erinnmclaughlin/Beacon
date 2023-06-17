@@ -36,7 +36,8 @@ public class Invitation : LaboratoryScopedEntityBase
             Id = Guid.NewGuid(),
             LaboratoryInvitationId = Id,
             SentOn = sentOn,
-            ExpiresOn = sentOn.AddDays(ExpireAfterDays)
+            ExpiresOn = sentOn.AddDays(ExpireAfterDays),
+            LaboratoryId  = LaboratoryId
         };
 
         _emailInvitations.Add(invitationEmail);
