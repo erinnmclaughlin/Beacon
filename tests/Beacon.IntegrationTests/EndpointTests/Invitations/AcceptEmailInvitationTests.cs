@@ -2,11 +2,12 @@
 using Beacon.App.Entities;
 using Beacon.Common.Laboratories;
 
-namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
+namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 
-public class AcceptLaboratoryInviteTests : EndpointTestBase
+[Collection("InvitationTests")]
+public class AcceptEmailInvitationTests : EndpointTestBase
 {
-    public AcceptLaboratoryInviteTests(BeaconTestApplicationFactory factory) : base(factory)
+    public AcceptEmailInvitationTests(BeaconTestApplicationFactory factory) : base(factory)
     {
         AddTestAuthorization();
     }

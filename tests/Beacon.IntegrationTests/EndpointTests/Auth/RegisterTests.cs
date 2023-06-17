@@ -2,6 +2,7 @@
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
+[Collection("AuthTests")]
 public class RegisterTests : EndpointTestBase
 {
     public RegisterTests(BeaconTestApplicationFactory factory) : base(factory)

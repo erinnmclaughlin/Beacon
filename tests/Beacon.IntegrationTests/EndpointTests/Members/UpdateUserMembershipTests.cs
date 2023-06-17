@@ -3,8 +3,9 @@ using Beacon.App.Entities;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 
-namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
+namespace Beacon.IntegrationTests.EndpointTests.Members;
 
+[Collection("MembershipTests")]
 public class UpdateUserMembershipTests : EndpointTestBase
 {
     public UpdateUserMembershipTests(BeaconTestApplicationFactory factory) : base(factory)
@@ -56,8 +57,8 @@ public class UpdateUserMembershipTests : EndpointTestBase
 
         var uri = $"api/members/{memberId}/membershipType";
         var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
-        { 
-            MembershipType = LaboratoryMembershipType.Manager 
+        {
+            MembershipType = LaboratoryMembershipType.Manager
         }, JsonSerializerOptions);
 
         response.EnsureSuccessStatusCode();

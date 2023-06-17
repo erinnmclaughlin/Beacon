@@ -1,7 +1,8 @@
 ﻿using Beacon.Common.Laboratories;
 
-namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
+namespace Beacon.IntegrationTests.EndpointTests.Members;
 
+[Collection("MembershipTests")]
 public sealed class GetLaboratoryMembersTests : EndpointTestBase
 {
     public GetLaboratoryMembersTests(BeaconTestApplicationFactory factory) : base(factory)
@@ -15,6 +16,6 @@ public sealed class GetLaboratoryMembersTests : EndpointTestBase
         var members = await CreateClient().GetFromJsonAsync<LaboratoryMemberDto[]>("api/members", JsonSerializerOptions);
 
         members.Should().ContainSingle().Which.Id.Should().Be(TestData.DefaultUser.Id);
-        
+
     }
 }

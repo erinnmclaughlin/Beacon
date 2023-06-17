@@ -5,6 +5,7 @@ using Beacon.Common.Projects;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
+[Collection("ProjectTests")]
 public class GetProjectsTests : EndpointTestBase
 {
     public GetProjectsTests(BeaconTestApplicationFactory factory) : base(factory)

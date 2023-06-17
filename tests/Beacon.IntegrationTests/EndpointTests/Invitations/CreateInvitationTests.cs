@@ -1,11 +1,12 @@
 ﻿using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 
-namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
+namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 
-public class CreateLaboratoryInvitationTests : EndpointTestBase
+[Collection("InvitationTests")]
+public class CreateInvitationTests : EndpointTestBase
 {
-    public CreateLaboratoryInvitationTests(BeaconTestApplicationFactory factory) : base(factory)
+    public CreateInvitationTests(BeaconTestApplicationFactory factory) : base(factory)
     {
     }
 

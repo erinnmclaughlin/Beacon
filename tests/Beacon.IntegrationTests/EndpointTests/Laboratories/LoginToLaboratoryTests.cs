@@ -4,6 +4,7 @@ using Beacon.Common.Auth.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 
+[Collection("LaboratoryTests")]
 public class LoginToLaboratoryTests : EndpointTestBase
 {
     public LoginToLaboratoryTests(BeaconTestApplicationFactory factory) : base(factory)

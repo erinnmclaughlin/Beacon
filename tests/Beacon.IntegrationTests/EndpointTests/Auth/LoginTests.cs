@@ -2,6 +2,7 @@
 
 namespace Beacon.IntegrationTests.EndpointTests.Auth;
 
+[Collection("AuthTests")]
 public class LoginTests : EndpointTestBase
 {
     private readonly HttpClient _httpClient;
