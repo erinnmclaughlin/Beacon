@@ -1,13 +1,13 @@
 ﻿using Beacon.App.Services;
 using Beacon.Common.Auth;
-using Beacon.Common.Laboratories.Enums;
+using Beacon.Common.Laboratories;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 
 namespace Beacon.API.Services;
 
-internal sealed class SessionManager : ICurrentUser, ICurrentLab, ISessionManager, ISignInManager
+internal sealed class SessionManager : ISessionManager
 {
     private readonly IHttpContextAccessor _httpContextAccessor;
 

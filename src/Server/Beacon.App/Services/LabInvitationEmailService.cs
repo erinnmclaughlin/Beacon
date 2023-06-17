@@ -22,7 +22,7 @@ public sealed class LabInvitationEmailService
     public async Task SendAsync(Guid emailInvitationId, CancellationToken ct)
     {
         var emailInvitation = await _unitOfWork
-            .QueryFor<LaboratoryInvitationEmail>(enableChangeTracking: true)
+            .QueryFor<InvitationEmail>(enableChangeTracking: true)
             .Include(l => l.LaboratoryInvitation)
                 .ThenInclude(i => i.CreatedBy)
             .Include(l => l.LaboratoryInvitation)
@@ -41,18 +41,18 @@ public sealed class LabInvitationEmailService
         await _unitOfWork.SaveChangesAsync(ct);
     }
 
-    private static string GetSubject(LaboratoryInvitation invitation)
+    private static string GetSubject(Invitation invitation)
     {
         return $"{invitation.CreatedBy.DisplayName} invites you to join a lab!";
 
     }
 
-    private static string GetAcceptUrl(string baseUrl, LaboratoryInvitationEmail invitation)
+    private static string GetAcceptUrl(string baseUrl, InvitationEmail invitation)
     {
         return $"{baseUrl}/invitations/{invitation.LaboratoryInvitationId}/accept?emailId={invitation.Id}";
     }
 
-    private static string GetBody(string baseUrl, LaboratoryInvitationEmail emailInvitation)
+    private static string GetBody(string baseUrl, InvitationEmail emailInvitation)
     {
         var invitation = emailInvitation.LaboratoryInvitation;
 

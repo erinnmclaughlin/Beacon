@@ -1,4 +1,4 @@
-﻿using Beacon.App.Features.Laboratories.Commands;
+﻿using Beacon.App.Features.Invitations;
 using Beacon.Common.Laboratories.Requests;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -11,7 +11,7 @@ public sealed class InvitationsController : ApiControllerBase
     [Authorize(AuthConstants.LabAuth), HttpPost]
     public async Task<IActionResult> SendEmailInvitation(InviteLabMemberRequest request, CancellationToken ct)
     {
-        await ExecuteAsync(new InviteNewMember.Command
+        await ExecuteAsync(new InviteMember.Command
         {
             NewMemberEmailAddress = request.NewMemberEmailAddress,
             MembershipType = request.MembershipType

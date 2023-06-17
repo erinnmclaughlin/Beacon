@@ -1,6 +1,5 @@
 using Beacon.Common.Auth;
 using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Enums;
 using BeaconUI.Core.Shared.Laboratories;
 using Blazored.Modal;
 using Blazored.Modal.Services;

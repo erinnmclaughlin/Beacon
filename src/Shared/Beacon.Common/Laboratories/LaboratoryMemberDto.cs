@@ -1,6 +1,4 @@
-﻿using Beacon.Common.Laboratories.Enums;
-
-namespace Beacon.Common.Laboratories;
+﻿namespace Beacon.Common.Laboratories;
 
 public record LaboratoryMemberDto
 {

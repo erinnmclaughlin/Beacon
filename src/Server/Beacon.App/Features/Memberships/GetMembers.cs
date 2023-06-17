@@ -4,9 +4,9 @@ using Beacon.Common.Laboratories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Queries;
+namespace Beacon.App.Features.Memberships;
 
-public static class GetLaboratoryMembers
+public static class GetMembers
 {
     public sealed record Query : IRequest<LaboratoryMemberDto[]>;
 
@@ -26,7 +26,7 @@ public static class GetLaboratoryMembers
             var labId = _currentLab.LabId;
 
             return await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.LaboratoryId == labId)
                 .Select(m => new LaboratoryMemberDto
                 {

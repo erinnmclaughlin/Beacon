@@ -6,10 +6,11 @@ namespace Beacon.API.Persistence;
 
 public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
 {
+    public DbSet<Invitation> Invitations => Set<Invitation>();
+    public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
     public DbSet<Laboratory> Laboratories => Set<Laboratory>();
-    public DbSet<LaboratoryInvitation> LaboratoryInvitations => Set<LaboratoryInvitation>();
-    public DbSet<LaboratoryInvitationEmail> LaboratoryInvitationEmails => Set<LaboratoryInvitationEmail>();
-    public DbSet<LaboratoryMembership> LaboratoryMemberships => Set<LaboratoryMembership>();
+    public DbSet<Membership> Memberships => Set<Membership>();
+    public DbSet<Project> Projects => Set<Project>();
     public DbSet<User> Users => Set<User>();
 
     public BeaconDbContext(DbContextOptions<BeaconDbContext> options) : base(options)
@@ -33,30 +34,43 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
+        modelBuilder.Entity<Invitation>(builder =>
+        {
+            builder.Property(x => x.NewMemberEmailAddress).HasMaxLength(255);
+            builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<InvitationEmail>(builder =>
+        {
+            builder.HasOne(x => x.LaboratoryInvitation).WithMany(x => x.EmailInvitations).OnDelete(DeleteBehavior.Cascade);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<Laboratory>(builder =>
         {
             builder.Property(x => x.Name).HasMaxLength(50);
         });
 
-        modelBuilder.Entity<LaboratoryInvitation>(builder =>
+        modelBuilder.Entity<Membership>(builder =>
         {
-            builder.Property(x => x.NewMemberEmailAddress).HasMaxLength(255);
+            builder.HasKey(x => new { x.LaboratoryId, x.MemberId });
             builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
-            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Cascade);
-            builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
-        });
-
-        modelBuilder.Entity<LaboratoryInvitationEmail>(builder =>
-        {
-            builder.HasOne(x => x.LaboratoryInvitation).WithMany(x => x.EmailInvitations).OnDelete(DeleteBehavior.Cascade);
-        });
-
-        modelBuilder.Entity<LaboratoryMembership>(builder =>
-        {
-            builder.HasKey("LaboratoryId", "MemberId");
-            builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
-            builder.HasOne(x => x.Laboratory).WithMany(x => x.Memberships);
+            builder.HasOne(x => x.Laboratory).WithMany(x => x.Memberships).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.Member).WithMany(x => x.Memberships);
+        });
+
+        modelBuilder.Entity<Project>(builder =>
+        {
+            builder.HasKey(x => x.Id);
+            builder.OwnsOne(x => x.ProjectCode, b =>
+            {
+                b.Property(x => x.CustomerCode).HasMaxLength(3);
+                b.HasIndex(x => new { x.CustomerCode, x.Suffix }).IsUnique();
+            });
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(builder =>

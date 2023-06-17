@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Laboratories.Enums;
+﻿using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;

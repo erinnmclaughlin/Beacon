@@ -1,13 +1,9 @@
-﻿using Beacon.Common.Laboratories.Enums;
+﻿using Beacon.Common.Laboratories;
 
 namespace Beacon.App.Services;
 
-public interface ISessionManager
+public interface ISessionManager : ICurrentUser, ICurrentLab
 {
-    Guid UserId { get; }
-    Guid LabId { get; }
-    LaboratoryMembershipType MembershipType { get; }
-
     Task SignInAsync(Guid userId);
     Task SignOutAsync();
 

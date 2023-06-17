@@ -1,15 +1,15 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
-using Beacon.Common.Laboratories.Enums;
+using Beacon.Common.Laboratories;
 using FluentValidation;
 using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Invitations;
 
-public static class InviteNewMember
+public static class InviteMember
 {
     public sealed record Command : IRequest
     {
@@ -49,11 +49,11 @@ public static class InviteNewMember
             await _emailService.SendAsync(invitation.Id, ct);
         }
 
-        private async Task<LaboratoryInvitationEmail> CreateInvitation(Command request, CancellationToken ct)
+        private async Task<InvitationEmail> CreateInvitation(Command request, CancellationToken ct)
         {
             var now = DateTimeOffset.UtcNow;
 
-            var invitation = new LaboratoryInvitation
+            var invitation = new Invitation
             {
                 Id = Guid.NewGuid(),
                 CreatedOn = now,
@@ -66,7 +66,7 @@ public static class InviteNewMember
 
             var emailInvitation = invitation.AddEmailInvitation(now);
 
-            _unitOfWork.GetRepository<LaboratoryInvitation>().Add(invitation);
+            _unitOfWork.GetRepository<Invitation>().Add(invitation);
             await _unitOfWork.SaveChangesAsync(ct);
 
             return emailInvitation;
@@ -89,7 +89,7 @@ public static class InviteNewMember
             var labId = _sessionManager.LabId;
 
             var isMember = await _unitOfWork
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .AnyAsync(m => m.LaboratoryId == labId && m.Member.EmailAddress == newMemberEmailAddress, ct);
 
             if (isMember)

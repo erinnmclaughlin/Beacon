@@ -33,7 +33,7 @@ public static class GetSessionInfo
                 .FirstAsync(cancellationToken);
 
             var currentLab = await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.LaboratoryId == currentLabId && m.MemberId == currentUserId)
                 .Select(m => new SessionInfoDto.LabDto(m.Laboratory.Id, m.Laboratory.Name, m.MembershipType))
                 .FirstOrDefaultAsync(cancellationToken);

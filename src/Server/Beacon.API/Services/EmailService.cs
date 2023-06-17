@@ -4,7 +4,7 @@ using Microsoft.Extensions.Options;
 using Beacon.App.Settings;
 using Beacon.App.Services;
 
-namespace Beacon.API.Infrastructure;
+namespace Beacon.API.Services;
 
 internal sealed class EmailService : IEmailService
 {

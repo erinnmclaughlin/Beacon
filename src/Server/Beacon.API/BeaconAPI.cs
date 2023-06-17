@@ -1,5 +1,4 @@
-﻿using Beacon.API.Infrastructure;
-using Beacon.API.Middleware;
+﻿using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App;
@@ -59,7 +58,6 @@ public static class BeaconAPI
         services.AddScoped<ICurrentUser, SessionManager>();
         services.AddScoped<ICurrentLab, SessionManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ISignInManager, SessionManager>();
         services.AddScoped<ISessionManager, SessionManager>();
 
         // Data

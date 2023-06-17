@@ -4,7 +4,7 @@
         <SideNav>
             <ul class="navbar-nav flex-column">
                 <li class="nav-item">
-                    <div class="d-flex align-items-center justify-content-center">
+                    <div class="d-flex align-items-center justify-content-center px-2">
                         <span class="nav-icon">
                             <AvatarSquare Value="@lab.Name.ToUpper()[0]" FontSize="1rem" Size="1.5rem" />
                         </span>
@@ -12,7 +12,7 @@
                     </div>
                 </li>
                 <li class="nav-item">
-                    <NavLink Match="NavLinkMatch.All" href="l" class="nav-link px-0 d-flex align-items-center justify-content-center">
+                    <NavLink Match="NavLinkMatch.All" href="l" class="nav-link d-flex align-items-center justify-content-center">
                         <span class="nav-icon">
                             <i class="fa-regular fa-chart-line"></i>
                         </span>
@@ -20,7 +20,15 @@
                     </NavLink>
                 </li>
                 <li class="nav-item">
-                    <NavLink href="l/members" class="nav-link px-0 d-flex align-items-center justify-content-center">
+                    <NavLink href="l/projects" class="nav-link d-flex align-items-center justify-content-center">
+                        <span class="nav-icon">
+                            <i class="fa-light fa-table-tree"></i>
+                        </span>
+                        <span class="nav-text flex-grow-1">Projects</span>
+                    </NavLink>
+                </li>
+                <li class="nav-item">
+                    <NavLink href="l/members" class="nav-link d-flex align-items-center justify-content-center">
                         <span class="nav-icon">
                             <i class="fa-light fa-users"></i>
                         </span>

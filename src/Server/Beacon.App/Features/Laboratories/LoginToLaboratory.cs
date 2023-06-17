@@ -4,7 +4,7 @@ using Beacon.App.Services;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Laboratories;
 
 public static class LoginToLaboratory
 {
@@ -12,27 +12,27 @@ public static class LoginToLaboratory
 
     internal sealed class Handler : IRequestHandler<Command>
     {
+        private readonly ISessionManager _currentSession;
         private readonly IQueryService _queryService;
-        private readonly ISessionManager _sessionManager;
 
-        public Handler(IQueryService queryService, ISessionManager sessionManager)
+        public Handler(ISessionManager currentSession, IQueryService queryService)
         {
+            _currentSession = currentSession;
             _queryService = queryService;
-            _sessionManager = sessionManager;
         }
 
         public async Task Handle(Command request, CancellationToken cancellationToken)
         {
-            var userId = _sessionManager.UserId;
+            var userId = _currentSession.UserId;
 
             var membershipInfo = await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.MemberId == userId && m.LaboratoryId == request.LabId)
                 .Select(m => new { m.MembershipType })
                 .FirstOrDefaultAsync(cancellationToken)
                 ?? throw new LaboratoryNotFoundException(request.LabId);
 
-            await _sessionManager.SetCurrentLabAsync(request.LabId, membershipInfo.MembershipType);
+            await _currentSession.SetCurrentLabAsync(request.LabId, membershipInfo.MembershipType);
         }
     }
 }

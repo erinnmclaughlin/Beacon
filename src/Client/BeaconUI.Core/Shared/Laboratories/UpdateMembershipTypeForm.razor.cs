@@ -1,5 +1,5 @@
+using Beacon.Common.Auth;
 using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Enums;
 using Beacon.Common.Laboratories.Requests;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;
@@ -13,9 +13,6 @@ public partial class UpdateMembershipTypeForm
 {
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
-
-    [CascadingParameter]
-    private LaboratoryDto CurrentLaboratory { get; set; } = null!;
 
     [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }
@@ -40,9 +37,9 @@ public partial class UpdateMembershipTypeForm
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private bool IsDisabled(LaboratoryMembershipType targetType)
+    private bool IsDisabled(SessionInfoDto sessionInfo, LaboratoryMembershipType targetType)
     {
-        var myMembership = CurrentLaboratory.MyMembershipType;
+        var myMembership = sessionInfo.CurrentLab?.MembershipType;
 
         if (myMembership is LaboratoryMembershipType.Admin)
             return false;

@@ -1,11 +1,11 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
-using Beacon.Common.Laboratories.Enums;
+using Beacon.Common.Laboratories;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.App.Features.Laboratories.Commands;
+namespace Beacon.App.Features.Invitations;
 
 public static class AcceptEmailInvitation
 {
@@ -39,10 +39,10 @@ public static class AcceptEmailInvitation
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        private async Task<LaboratoryInvitationEmail> FindInvitation(Command request, CancellationToken ct)
+        private async Task<InvitationEmail> FindInvitation(Command request, CancellationToken ct)
         {
             return await _unitOfWork
-                .QueryFor<LaboratoryInvitationEmail>(enableChangeTracking: true)
+                .QueryFor<InvitationEmail>(enableChangeTracking: true)
                 .Include(i => i.LaboratoryInvitation)
                 .FirstOrDefaultAsync(i => i.Id == request.EmailId && i.LaboratoryInvitationId == request.InviteId, ct)
                 ?? throw new EmailInvitationNotFoundException(request.EmailId, request.InviteId);
@@ -51,15 +51,15 @@ public static class AcceptEmailInvitation
         private async Task AddLabMember(Guid acceptingUserId, Guid labId, LaboratoryMembershipType membershipType, CancellationToken ct)
         {
             var alreadyAMember = await _unitOfWork
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .AnyAsync(m => m.LaboratoryId == labId && m.MemberId == acceptingUserId, ct);
 
             if (alreadyAMember)
                 return;
 
             _unitOfWork
-                .GetRepository<LaboratoryMembership>()
-                .Add(new LaboratoryMembership
+                .GetRepository<Membership>()
+                .Add(new Membership
                 {
                     LaboratoryId = labId,
                     MemberId = acceptingUserId,

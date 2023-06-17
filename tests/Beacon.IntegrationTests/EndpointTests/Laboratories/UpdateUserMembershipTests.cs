@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Laboratories.Enums;
+using Beacon.Common.Laboratories;
 using Beacon.Common.Laboratories.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
@@ -44,7 +44,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
             };
 
             db.Users.Add(member);
-            db.LaboratoryMemberships.Add(new LaboratoryMembership
+            db.Memberships.Add(new Membership
             {
                 LaboratoryId = TestData.DefaultLaboratory.Id,
                 MemberId = memberId,
