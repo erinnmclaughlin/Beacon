@@ -2,7 +2,7 @@
 
 namespace Beacon.App.Entities;
 
-public class LaboratoryMembership : LaboratoryScopedEntityBase
+public class Membership : LaboratoryScopedEntityBase
 {
     public required LaboratoryMembershipType MembershipType { get; set; }
 

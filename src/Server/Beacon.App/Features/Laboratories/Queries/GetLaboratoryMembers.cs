@@ -26,7 +26,7 @@ public static class GetLaboratoryMembers
             var labId = _currentLab.LabId;
 
             return await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.LaboratoryId == labId)
                 .Select(m => new LaboratoryMemberDto
                 {

@@ -7,8 +7,8 @@ public class Laboratory
     public required Guid Id { get; init; }
     public required string Name { get; set; }
 
-    private readonly List<LaboratoryMembership> _memberships = new();
-    public IReadOnlyList<LaboratoryMembership> Memberships => _memberships;
+    private readonly List<Membership> _memberships = new();
+    public IReadOnlyList<Membership> Memberships => _memberships;
 
     private Laboratory() { }
 
@@ -30,9 +30,9 @@ public class Laboratory
         return laboratory;
     }
 
-    public LaboratoryMembership AddMember(User member, LaboratoryMembershipType membershipType = LaboratoryMembershipType.Member)
+    public Membership AddMember(User member, LaboratoryMembershipType membershipType = LaboratoryMembershipType.Member)
     {
-        var membership = new LaboratoryMembership
+        var membership = new Membership
         {
             LaboratoryId = Id,
             MemberId = member.Id,

@@ -85,9 +85,9 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
         return laboratory;
     }
 
-    private static LaboratoryInvitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId, bool isExpired = false)
+    private static Invitation SeedInvite(BeaconDbContext dbContext, Guid adminId, Guid labId, bool isExpired = false)
     {
-        var labInvite = new LaboratoryInvitation
+        var labInvite = new Invitation
         {
             Id = Guid.NewGuid(),
             ExpireAfterDays = 10,
@@ -98,7 +98,7 @@ public class AcceptLaboratoryInviteTests : EndpointTestBase
             MembershipType = LaboratoryMembershipType.Member
         };
 
-        dbContext.LaboratoryInvitations.Add(labInvite);
+        dbContext.Invitations.Add(labInvite);
 
         return labInvite;
     }

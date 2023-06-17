@@ -44,7 +44,7 @@ public class UpdateUserMembershipTests : EndpointTestBase
             };
 
             db.Users.Add(member);
-            db.LaboratoryMemberships.Add(new LaboratoryMembership
+            db.Memberships.Add(new Membership
             {
                 LaboratoryId = TestData.DefaultLaboratory.Id,
                 MemberId = memberId,

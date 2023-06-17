@@ -27,7 +27,7 @@ public static class UpdateUserMembership
             var labId = _sessionManager.LabId;
 
             var member = await _unitOfWork
-                .QueryFor<LaboratoryMembership>(enableChangeTracking: true)
+                .QueryFor<Membership>(enableChangeTracking: true)
                 .FirstOrDefaultAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct)
                 ?? throw new LaboratoryMembershipNotFoundException(labId, request.MemberId);
 
@@ -37,7 +37,7 @@ public static class UpdateUserMembership
             await _unitOfWork.SaveChangesAsync(ct);
         }
 
-        private void EnsureCurrentUserHasPermission(Command request, LaboratoryMembership membership)
+        private void EnsureCurrentUserHasPermission(Command request, Membership membership)
         {
             var currentUserId = _sessionManager.UserId;
 

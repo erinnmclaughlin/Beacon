@@ -2,7 +2,7 @@
 
 namespace Beacon.App.Entities;
 
-public class LaboratoryInvitationEmail : LaboratoryScopedEntityBase
+public class InvitationEmail : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset SentOn { get; init; }
@@ -11,7 +11,7 @@ public class LaboratoryInvitationEmail : LaboratoryScopedEntityBase
     public string? OperationId { get; set; }
 
     public required Guid LaboratoryInvitationId { get; init; }
-    public LaboratoryInvitation LaboratoryInvitation { get; init; } = null!;
+    public Invitation LaboratoryInvitation { get; init; } = null!;
 
     public void Accept(User acceptingUser, DateTimeOffset acceptedOn)
     {

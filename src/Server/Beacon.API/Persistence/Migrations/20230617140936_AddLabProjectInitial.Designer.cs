@@ -4,6 +4,7 @@ using Beacon.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Beacon.API.Persistence.Migrations
 {
     [DbContext(typeof(BeaconDbContext))]
-    partial class BeaconDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230617140936_AddLabProjectInitial")]
+    partial class AddLabProjectInitial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -82,7 +85,7 @@ namespace Beacon.API.Persistence.Migrations
 
                     b.HasIndex("LaboratoryId");
 
-                    b.ToTable("Invitations");
+                    b.ToTable("LaboratoryInvitations");
                 });
 
             modelBuilder.Entity("Beacon.App.Entities.InvitationEmail", b =>
@@ -112,7 +115,7 @@ namespace Beacon.API.Persistence.Migrations
 
                     b.HasIndex("LaboratoryInvitationId");
 
-                    b.ToTable("InvitationEmails");
+                    b.ToTable("LaboratoryInvitationEmails");
                 });
 
             modelBuilder.Entity("Beacon.App.Entities.Laboratory", b =>
@@ -148,7 +151,7 @@ namespace Beacon.API.Persistence.Migrations
 
                     b.HasIndex("MemberId");
 
-                    b.ToTable("Memberships");
+                    b.ToTable("LaboratoryMemberships");
                 });
 
             modelBuilder.Entity("Beacon.App.Entities.Project", b =>

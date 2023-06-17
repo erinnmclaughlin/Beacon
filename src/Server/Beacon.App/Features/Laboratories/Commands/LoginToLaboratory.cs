@@ -26,7 +26,7 @@ public static class LoginToLaboratory
             var userId = _sessionManager.UserId;
 
             var membershipInfo = await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.MemberId == userId && m.LaboratoryId == request.LabId)
                 .Select(m => new { m.MembershipType })
                 .FirstOrDefaultAsync(cancellationToken)

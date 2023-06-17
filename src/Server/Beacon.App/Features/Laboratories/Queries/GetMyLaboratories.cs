@@ -26,7 +26,7 @@ public static class GetMyLaboratoriesFeature
             var currentUserId = _currentUser.UserId;
 
             return await _queryService
-                .QueryFor<LaboratoryMembership>()
+                .QueryFor<Membership>()
                 .Where(m => m.MemberId == currentUserId)
                 .Select(m => new LaboratoryDto
                 {

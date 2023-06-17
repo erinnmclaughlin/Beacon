@@ -3,7 +3,7 @@ using Beacon.Common.Laboratories.Enums;
 
 namespace Beacon.App.Entities;
 
-public class LaboratoryInvitation : LaboratoryScopedEntityBase
+public class Invitation : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset CreatedOn { get; init; }
@@ -18,8 +18,8 @@ public class LaboratoryInvitation : LaboratoryScopedEntityBase
     public required Guid CreatedById { get; init; }
     public User CreatedBy { get; init; } = null!;
 
-    private readonly List<LaboratoryInvitationEmail> _emailInvitations = new();
-    public IReadOnlyList<LaboratoryInvitationEmail> EmailInvitations => _emailInvitations.AsReadOnly();
+    private readonly List<InvitationEmail> _emailInvitations = new();
+    public IReadOnlyList<InvitationEmail> EmailInvitations => _emailInvitations.AsReadOnly();
 
     public void Accept(User acceptingUser)
     {
@@ -29,9 +29,9 @@ public class LaboratoryInvitation : LaboratoryScopedEntityBase
         AcceptedById = acceptingUser.Id;
     }
 
-    public LaboratoryInvitationEmail AddEmailInvitation(DateTimeOffset sentOn)
+    public InvitationEmail AddEmailInvitation(DateTimeOffset sentOn)
     {
-        var invitationEmail = new LaboratoryInvitationEmail
+        var invitationEmail = new InvitationEmail
         {
             Id = Guid.NewGuid(),
             LaboratoryInvitationId = Id,
