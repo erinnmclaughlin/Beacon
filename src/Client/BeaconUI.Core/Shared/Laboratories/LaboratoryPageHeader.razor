@@ -1,8 +1,6 @@
 ﻿<SessionInfo Context="session">
     <header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
-        <h3 class="mb-0 flex-grow-1">
-            <span>@session.CurrentLab?.Name</span>
-        </h3>
+        @TitleContent?.Invoke(session)
         <div>
             @ButtonsContent
         </div>
@@ -10,6 +8,9 @@
 </SessionInfo>
 
 @code {
+
+    [Parameter]
+    public RenderFragment<SessionInfoDto>? TitleContent { get; set; }
 
     [Parameter]
     public RenderFragment? ButtonsContent { get; set; }

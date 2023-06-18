@@ -3,6 +3,11 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
+    <TitleContent Context="session">
+        <h3 class="mb-0 flex-grow-1">
+            <span>@session.CurrentLab?.Name</span>
+        </h3>
+    </TitleContent>
     <ButtonsContent>
         <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal">
             <span class="icon">

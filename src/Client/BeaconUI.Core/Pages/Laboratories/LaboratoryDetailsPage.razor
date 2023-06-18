@@ -2,7 +2,13 @@
 @attribute [Authorize]
 @layout LaboratoryLayout
 
-<LaboratoryPageHeader />
+<LaboratoryPageHeader>
+    <TitleContent Context="session">
+        <h3 class="mb-0 flex-grow-1">
+            <span>@session.CurrentLab?.Name</span>
+        </h3>
+    </TitleContent>
+</LaboratoryPageHeader>
 
 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
     <div class="content flex-grow-1" style="background-color: #f8fafc">
