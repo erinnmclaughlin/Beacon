@@ -2,70 +2,68 @@
 @attribute [Authorize]
 @layout LaboratoryLayout
 
-<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
-    <LaboratoryPageHeader>
-        <ButtonsContent>
-            <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal">
-                <span class="icon">
-                    <i class="fa-solid fa-plus"></i>
-                </span>
-                <span>Create project</span>
-            </button>
-        </ButtonsContent>
-    </LaboratoryPageHeader>
+<LaboratoryPageHeader>
+    <ButtonsContent>
+        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal">
+            <span class="icon">
+                <i class="fa-solid fa-plus"></i>
+            </span>
+            <span>Create project</span>
+        </button>
+    </ButtonsContent>
+</LaboratoryPageHeader>
 
-    <div class="content flex-grow-1" style="background-color: #f8fafc">
-        <div class="px-4 h-100">
-            @if (ProjectsOrError is not { } projectsOrError)
-            {
-                <p>Loading...</p>
-            }
-            else if (projectsOrError.IsError)
-            {
-                <p class="text-danger">There was an error loading lab projects. Please try again later.</p>
-            }
-            else
-            {
-                <div class="table-responsive">
-                    <table class="table table-hover align-middle">
-                        <thead>
+<div class="content flex-grow-1" style="background-color: #f8fafc">
+    <div class="px-4 h-100">
+        @if (ProjectsOrError is not { } projectsOrError)
+        {
+            <p>Loading...</p>
+        }
+        else if (projectsOrError.IsError)
+        {
+            <p class="text-danger">There was an error loading lab projects. Please try again later.</p>
+        }
+        else
+        {
+            <div class="table-responsive">
+                <table class="table table-hover align-middle">
+                    <thead>
+                        <tr>
+                            <th>Project Code</th>
+                            <th>Project Status</th>
+                            <th>Customer Name</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (projectsOrError.Value.Length == 0)
+                        {
                             <tr>
-                                <th>Project Code</th>
-                                <th>Project Status</th>
-                                <th>Customer Name</th>
+                                <td colspan="100">No projects found!</td>
                             </tr>
-                        </thead>
-                        <tbody>
-                            @if (projectsOrError.Value.Length == 0)
+                        }
+                        else
+                        {
+                            foreach (var project in projectsOrError.Value)
                             {
                                 <tr>
-                                    <td colspan="100">No projects found!</td>
+                                    <td>
+                                        <a href="l/projects/@project.ProjectCode">
+                                            @project.ProjectCode
+                                        </a>
+                                    </td>
+                                    <td>
+                                        <ProjectStatusTag Status="project.ProjectStatus" />
+                                    </td>
+                                    <td>
+                                        @project.CustomerName
+                                    </td>
                                 </tr>
                             }
-                            else
-                            {
-                                foreach (var project in projectsOrError.Value)
-                                {
-                                    <tr>
-                                        <td>
-                                            <a href="l/projects/@project.ProjectCode">
-                                                @project.ProjectCode
-                                            </a>
-                                        </td>
-                                        <td>
-                                            <ProjectStatusTag Status="project.ProjectStatus" />
-                                        </td>
-                                        <td>
-                                            @project.CustomerName
-                                        </td>
-                                    </tr>
-                                }
-                            }
-                        </tbody>
-                    </table>
-                </div>
-            }
-        </div>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        }
     </div>
 </div>
 

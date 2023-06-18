@@ -2,12 +2,11 @@
 @attribute [Authorize]
 @layout LaboratoryLayout
 
-<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
-    <LaboratoryPageHeader />
-    <div class="content flex-grow-1" style="background-color: #f8fafc">
-        <div class="px-4 h-100">
-            <p>This is the project details page for project @ProjectCode.</p>
-        </div>
+<LaboratoryPageHeader />
+
+<div class="content flex-grow-1" style="background-color: #f8fafc">
+    <div class="px-4 h-100">
+        <p>This is the project details page for project @ProjectCode.</p>
     </div>
 </div>
 
