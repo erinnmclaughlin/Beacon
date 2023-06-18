@@ -4,7 +4,7 @@ using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 
-[Collection("InvitationTests")]
+[Collection("InvitationTests"), CollectionDefinition("InvitationTests", DisableParallelization = true)]
 public class AcceptEmailInvitationTests : EndpointTestBase
 {
     public AcceptEmailInvitationTests(BeaconTestApplicationFactory factory) : base(factory)
