@@ -3,6 +3,9 @@ trigger:
 
 variables:
   solution: '**/*.sln'
+  projects: |
+    **/Beacon.WebHost.csproj
+    **/BeaconUI.WebApp.csproj
   buildConfiguration: 'Release'
 
 pool: 
@@ -18,20 +21,20 @@ steps:
     displayName: 'Restore dependencies'
     inputs:
       command: 'restore'
-      projects: '$(solution)'
+      projects: '$(projects)'
 
   - task: DotNetCoreCLI@2
     displayName: 'Build'
     inputs:
       command: build
-      projects: '$(solution)'
+      projects: '$(projects)'
       arguments: '--configuration $(buildConfiguration)'
 
   - task: DotNetCoreCLI@2
     displayName: 'Run tests'
     inputs:
       command: test
-      projects: '$(solution)'
+      projects: '**/tests/**/*.csproj'
       arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
       publishTestResults: true
 
