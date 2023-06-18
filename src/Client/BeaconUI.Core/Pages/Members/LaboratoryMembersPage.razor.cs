@@ -7,17 +7,20 @@ using ErrorOr;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace BeaconUI.Core.Pages.Laboratories;
+namespace BeaconUI.Core.Pages.Members;
 
 public partial class LaboratoryMembersPage
 {
-    [CascadingParameter] public required Task<AuthenticationState> AuthStateTask { get; set; }
-    [CascadingParameter] private IModalService ModalService { get; set; } = null!;
+    [CascadingParameter] 
+    public required Task<AuthenticationState> AuthStateTask { get; set; }
+
+    [CascadingParameter] 
+    private IModalService ModalService { get; set; } = null!;
 
     private AuthenticationState AuthState { get; set; } = null!;
-    
+
     private ErrorOr<LaboratoryMemberDto[]>? ErrorOrMembers { get; set; }
-    
+
     protected override async Task OnInitializedAsync()
     {
         ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
@@ -38,7 +41,7 @@ public partial class LaboratoryMembersPage
 
         if (session.CurrentLab.MembershipType is LaboratoryMembershipType.Admin)
             return true;
-        
+
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;
     }
 
