@@ -1,7 +1,7 @@
 ﻿using Beacon.Common.Validation.Rules;
 using FluentValidation;
 
-namespace Beacon.Common.Auth.Requests;
+namespace Beacon.Common.Auth;
 
 public class RegisterRequest
 {

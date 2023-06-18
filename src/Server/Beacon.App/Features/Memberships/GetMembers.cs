@@ -1,6 +1,6 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.Services;
-using Beacon.Common.Laboratories;
+using Beacon.Common.Memberships;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 

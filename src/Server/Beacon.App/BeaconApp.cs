@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth.Requests;
+﻿using Beacon.Common.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 

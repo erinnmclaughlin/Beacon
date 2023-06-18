@@ -1,6 +1,5 @@
 using Beacon.Common.Auth;
-using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Memberships;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;
 using Blazored.Modal;

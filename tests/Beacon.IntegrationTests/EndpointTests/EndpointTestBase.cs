@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.Common.Laboratories;
+using Beacon.Common.Memberships;
 using Beacon.WebHost;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;

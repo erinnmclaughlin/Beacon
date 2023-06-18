@@ -26,6 +26,13 @@ namespace Beacon.API.Persistence.Migrations
                 nullable: false,
                 defaultValue: new Guid("00000000-0000-0000-0000-000000000000"));
 
+            migrationBuilder.Sql("""
+                update LaboratoryInvitationEmails
+                set LaboratoryId = i.LaboratoryId
+                from LaboratoryInvitations i
+                where i.Id = LaboratoryInvitationId
+                """);
+
             migrationBuilder.CreateIndex(
                 name: "IX_LaboratoryInvitationEmails_LaboratoryId",
                 table: "LaboratoryInvitationEmails",

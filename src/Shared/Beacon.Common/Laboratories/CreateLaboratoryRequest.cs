@@ -1,7 +1,7 @@
 ﻿using Beacon.Common.Validation.Rules;
 using FluentValidation;
 
-namespace Beacon.Common.Laboratories.Requests;
+namespace Beacon.Common.Laboratories;
 
 public class CreateLaboratoryRequest
 {

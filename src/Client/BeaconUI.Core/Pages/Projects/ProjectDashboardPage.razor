@@ -33,7 +33,9 @@
                 <ul>
                     @foreach (var project in projectsOrError.Value)
                     {
-                        <li>@project.CustomerName (@project.ProjectCode)</li>
+                        <li>
+                            <a href="l/projects/@project.ProjectCode">@project.CustomerName (@project.ProjectCode)</a>
+                        </li>
                     }
                 </ul>
             }

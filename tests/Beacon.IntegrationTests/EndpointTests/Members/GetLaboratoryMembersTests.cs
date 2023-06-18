@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Laboratories;
+﻿using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Members;
 

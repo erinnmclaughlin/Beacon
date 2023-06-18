@@ -1,5 +1,5 @@
 ﻿using Beacon.App.Features.Memberships;
-using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Memberships;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

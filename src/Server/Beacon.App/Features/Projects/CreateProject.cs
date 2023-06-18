@@ -2,7 +2,7 @@
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.App.ValueObjects;
-using Beacon.Common.Laboratories;
+using Beacon.Common.Memberships;
 using Beacon.Common.Validation.Rules;
 using FluentValidation;
 using MediatR;
