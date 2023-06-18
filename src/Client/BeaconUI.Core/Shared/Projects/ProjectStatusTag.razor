@@ -1,0 +1,15 @@
+﻿<span class="badge @CssTagColor">@Status</span>
+
+@code {
+
+    private string CssTagColor => Status switch
+    {
+        ProjectStatus.Active => "bg-primary text-bg-primary",
+        ProjectStatus.Canceled => "bg-danger text-bg-danger",
+        ProjectStatus.Completed => "bg-success text-bg-success",
+        _ => "bg-secondary text-bg-secondary"
+    };
+
+    [Parameter, EditorRequired]
+    public required ProjectStatus Status { get; set; }
+}

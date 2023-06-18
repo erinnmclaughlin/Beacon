@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Auth;
+﻿using Beacon.App.Services;
+using Beacon.Common.Auth;
 using FluentValidation;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -18,6 +19,8 @@ public static class BeaconApp
             typeof(BeaconApp).Assembly,
             typeof(LoginRequest).Assembly
         });
+
+        services.AddScoped<IProjectCodeGenerator, ProjectCodeGenerator>();
 
         return services;
     }

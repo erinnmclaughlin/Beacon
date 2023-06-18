@@ -1,0 +1,27 @@
+﻿<BeaconForm Model="this" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            @Content
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton class="btn btn-primary">Confirm</SubmitButton>
+            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+
+    [Parameter]
+    public required string Content { get; set; }
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    private async Task Submit()
+    {
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+
+    private async Task Cancel() => await Modal.CancelAsync();
+}

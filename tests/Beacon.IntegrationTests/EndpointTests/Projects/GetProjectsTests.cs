@@ -43,7 +43,7 @@ public class GetProjectsTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var projects = await client.GetFromJsonAsync<ProjectDto[]>("api/projects");
+        var projects = await client.GetFromJsonAsync<ProjectDto[]>("api/projects", JsonSerializerOptions);
         projects.Should().ContainSingle().Which.ProjectCode.Should().Be("ABC-001");
     }
 
