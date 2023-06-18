@@ -34,7 +34,7 @@ steps:
     displayName: 'Run tests'
     inputs:
       command: test
-      projects: './tests/*.csproj'
+      projects: '**/tests/*.csproj'
       arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
       publishTestResults: true
 
