@@ -2,6 +2,7 @@
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.App.ValueObjects;
+using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -25,6 +26,9 @@ public static class CancelProject
 
         public async Task Handle(Command request, CancellationToken ct)
         {
+            if (_currentLab.MembershipType is LaboratoryMembershipType.Member)
+                throw new UserNotAllowedException();
+
             var labId = _currentLab.LabId;
 
             var project = await _unitOfWork

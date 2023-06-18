@@ -76,4 +76,14 @@ public sealed class ApiClient : ApiClientBase
     {
         return await PostAsync<ProjectDto>("api/projects", request);
     }
+
+    public async Task<ErrorOr<Success>> CancelProject(string projectCode)
+    {
+        return await PostAsync($"api/projects/{projectCode}/cancel", null);
+    }
+
+    public async Task<ErrorOr<Success>> CompleteProject(string projectCode)
+    {
+        return await PostAsync($"api/projects/{projectCode}/complete", null);
+    }
 }

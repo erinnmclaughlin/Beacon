@@ -6,7 +6,8 @@
     {
         ProjectStatus.Active => "bg-primary text-bg-primary",
         ProjectStatus.Canceled => "bg-danger text-bg-danger",
-        ProjectStatus.Completed or _ => "bg-secondary text-bg-secondary"
+        ProjectStatus.Completed => "bg-success text-bg-success",
+        _ => "bg-secondary text-bg-secondary"
     };
 
     [Parameter, EditorRequired]

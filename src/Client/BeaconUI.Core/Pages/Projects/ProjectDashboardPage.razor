@@ -30,13 +30,14 @@
         }
         else
         {
-            <div class="table-responsive">
+            <div class="table-responsive h-100">
                 <table class="table table-hover align-middle">
                     <thead>
                         <tr>
                             <th>Project Code</th>
                             <th>Project Status</th>
                             <th>Customer Name</th>
+                            <th style="width: 0%;"></th>
                         </tr>
                     </thead>
                     <tbody>
@@ -61,6 +62,47 @@
                                     </td>
                                     <td>
                                         @project.CustomerName
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="icon">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item" href="l/projects/@project.ProjectCode">
+                                                        <span class="icon text-primary">
+                                                            <i class="fa-regular fa-eye"></i>
+                                                        </span>
+                                                        <span>View Details</span>
+                                                    </a>
+                                                </li>
+                                                <SessionInfo Context="session">
+                                                    @if (project.ProjectStatus is ProjectStatus.Active && ShowCancelAndCompleteDropdownSection(session))
+                                                    {
+                                                        <li><hr class="dropdown-divider"></li>
+                                                        <li>
+                                                            <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
+                                                                <span class="icon text-danger">
+                                                                    <i class="fa-regular fa-ban"></i>
+                                                                </span>
+                                                                <span>Cancel project</span>
+                                                            </button>
+                                                        </li>
+                                                        <li>
+                                                            <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
+                                                                <span class="icon text-success">
+                                                                    <i class="fa-regular fa-check"></i>
+                                                                </span>
+                                                                <span>Complete project</span>
+                                                            </button>
+                                                        </li>
+                                                    }
+                                                </SessionInfo>
+                                            </ul>
+                                        </div>
                                     </td>
                                 </tr>
                             }
@@ -102,5 +144,38 @@
     private void NavigateToProjectDetails(ProjectDto project)
     {
         NavigationManager.NavigateTo($"l/projects/{project.ProjectCode}");
+    }
+
+    private bool ShowCancelAndCompleteDropdownSection(SessionInfoDto currentSession)
+    {
+        return currentSession.CurrentLab?.MembershipType is not null and not LaboratoryMembershipType.Member;
+    }
+
+    private async Task CancelProject(ProjectDto project)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AreYouSureModal.Content), $"Really cancel project {project.ProjectCode}?");
+
+        var result = await ModalService.Show<AreYouSureModal>("Confirm Action", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await ApiClient.CancelProject(project.ProjectCode);
+            await LoadProjects();
+        }
+    }
+
+    private async Task CompleteProject(ProjectDto project)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AreYouSureModal.Content), $"Really complete project {project.ProjectCode}?");
+
+        var result = await ModalService.Show<AreYouSureModal>("Confirm Action", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await ApiClient.CompleteProject(project.ProjectCode);
+            await LoadProjects();
+        }
     }
 }
