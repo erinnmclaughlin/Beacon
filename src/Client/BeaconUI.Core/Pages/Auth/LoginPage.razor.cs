@@ -1,4 +1,4 @@
-using Beacon.Common.Auth.Requests;
+using Beacon.Common.Auth;
 using BeaconUI.Core.Services;
 using BeaconUI.Core.Shared.Forms;
 using Microsoft.AspNetCore.Components;

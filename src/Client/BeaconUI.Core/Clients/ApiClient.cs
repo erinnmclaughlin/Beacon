@@ -1,7 +1,7 @@
 ﻿using Beacon.Common.Auth;
-using Beacon.Common.Auth.Requests;
+using Beacon.Common.Invitations;
 using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using ErrorOr;

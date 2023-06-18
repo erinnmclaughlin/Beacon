@@ -1,5 +1,5 @@
 ﻿using Beacon.App.Features.Laboratories;
-using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Laboratories;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Beacon.API.Controllers;

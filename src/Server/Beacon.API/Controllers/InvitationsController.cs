@@ -1,5 +1,5 @@
 ﻿using Beacon.App.Features.Invitations;
-using Beacon.Common.Laboratories.Requests;
+using Beacon.Common.Invitations;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

@@ -1,4 +1,4 @@
-﻿namespace Beacon.Common.Laboratories.Requests;
+﻿namespace Beacon.Common.Memberships;
 
 public class UpdateMembershipTypeRequest
 {

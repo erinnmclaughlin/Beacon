@@ -1,5 +1,5 @@
-﻿using Beacon.Common.Auth.Requests;
-using Beacon.Common.Laboratories.Requests;
+﻿using Beacon.Common.Auth;
+using Beacon.Common.Laboratories;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 

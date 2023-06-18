@@ -1,8 +1,7 @@
-﻿using Beacon.Common.Laboratories;
+﻿using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
-[Collection("ProjectTests")]
 public class GetProjectByIdOrCodeTests : EndpointTestBase
 {
     public GetProjectByIdOrCodeTests(BeaconTestApplicationFactory factory) : base(factory)

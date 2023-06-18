@@ -1,4 +1,6 @@
-﻿namespace Beacon.Common.Laboratories;
+﻿using Beacon.Common.Memberships;
+
+namespace Beacon.Common.Laboratories;
 
 public sealed record LaboratoryDto
 {

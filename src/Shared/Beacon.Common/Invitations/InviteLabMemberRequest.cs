@@ -1,6 +1,7 @@
-﻿using FluentValidation;
+﻿using Beacon.Common.Memberships;
+using FluentValidation;
 
-namespace Beacon.Common.Laboratories.Requests;
+namespace Beacon.Common.Invitations;
 
 public sealed class InviteLabMemberRequest
 {

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Laboratories;
+﻿using Beacon.Common.Memberships;
 using System.Security.Claims;
 
 namespace Beacon.Common.Auth;

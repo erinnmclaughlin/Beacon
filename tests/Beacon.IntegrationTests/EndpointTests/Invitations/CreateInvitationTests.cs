@@ -1,5 +1,5 @@
-﻿using Beacon.Common.Laboratories;
-using Beacon.Common.Laboratories.Requests;
+﻿using Beacon.Common.Invitations;
+using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 

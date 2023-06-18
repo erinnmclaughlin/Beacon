@@ -1,6 +1,6 @@
 ﻿using Beacon.App.Services;
 using Beacon.Common.Auth;
-using Beacon.Common.Laboratories;
+using Beacon.Common.Memberships;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;

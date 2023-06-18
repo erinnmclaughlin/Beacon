@@ -1,5 +1,5 @@
 ﻿using Beacon.App.Features.Auth;
-using Beacon.Common.Auth.Requests;
+using Beacon.Common.Auth;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 

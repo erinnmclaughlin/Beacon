@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Auth.Requests;
+using Beacon.Common.Auth;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 

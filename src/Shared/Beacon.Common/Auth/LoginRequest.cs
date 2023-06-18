@@ -1,6 +1,6 @@
 ﻿using FluentValidation;
 
-namespace Beacon.Common.Auth.Requests;
+namespace Beacon.Common.Auth;
 
 public class LoginRequest
 {
