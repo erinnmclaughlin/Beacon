@@ -3,6 +3,7 @@ using Beacon.Common.Projects.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
+[Collection("ProjectTests"), CollectionDefinition("ProjectTests", DisableParallelization = true)]
 public class CreateProjectTests : EndpointTestBase
 {
     public CreateProjectTests(BeaconTestApplicationFactory factory) : base(factory)
