@@ -30,14 +30,44 @@
             }
             else
             {
-                <ul>
-                    @foreach (var project in projectsOrError.Value)
-                    {
-                        <li>
-                            <a href="l/projects/@project.ProjectCode">@project.CustomerName (@project.ProjectCode)</a>
-                        </li>
-                    }
-                </ul>
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Project Code</th>
+                            <th>Project Status</th>
+                            <th>Customer Name</th>
+                            <th></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @if (projectsOrError.Value.Length == 0)
+                        {
+                            <tr>
+                                <td colspan="100">No projects found!</td>
+                            </tr>
+                        }
+                        else
+                        {
+                            foreach (var project in projectsOrError.Value)
+                            {
+                                <tr>
+                                    <td>
+                                        @project.ProjectCode
+                                    </td>
+                                    <td>
+                                        @project.ProjectStatus
+                                    </td>
+                                    <td>
+                                        @project.CustomerName
+                                    </td>
+                                    <td>
+                                        <a href="l/projects/@project.ProjectCode">View Details</a>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
             }
         </div>
     </div>
@@ -67,6 +97,6 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects();        
+        ProjectsOrError = await ApiClient.GetProjects();
     }
 }

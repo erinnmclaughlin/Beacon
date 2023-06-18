@@ -38,6 +38,7 @@ public static class GetProjectByCode
             {
                 Id = project.Id,
                 CustomerName = project.CustomerName,
+                ProjectStatus = project.ProjectStatus,
                 ProjectCode = project.ProjectCode.ToString()
             };
         }
