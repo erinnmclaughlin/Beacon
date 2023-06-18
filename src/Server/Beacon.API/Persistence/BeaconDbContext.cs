@@ -69,6 +69,8 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
                 b.Property(x => x.CustomerCode).HasMaxLength(3);
                 b.HasIndex(x => new { x.CustomerCode, x.Suffix }).IsUnique();
             });
+            builder.Property(x => x.ProjectStatus).HasConversion<string>().HasMaxLength(25);
+            builder.HasIndex(x => x.ProjectStatus);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
