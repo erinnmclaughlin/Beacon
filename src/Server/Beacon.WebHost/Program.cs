@@ -1,4 +1,5 @@
 using Beacon.API;
+using Beacon.API.Persistence;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
 
@@ -36,5 +37,13 @@ app.MapBeaconEndpoints();
 app.MapGet("api/ping", () => Results.Ok("pong"));
 
 app.MapFallbackToFile("index.html");
+
+if (builder.Environment.IsEnvironment("Test"))
+{
+    using var scope = app.Services.CreateScope();
+    var testDb = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+    await testDb.Database.EnsureDeletedAsync();
+    await testDb.Database.MigrateAsync();
+}
 
 app.Run();
