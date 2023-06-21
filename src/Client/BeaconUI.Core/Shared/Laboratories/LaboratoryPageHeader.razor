@@ -2,7 +2,7 @@
     <header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
         @TitleContent?.Invoke(session)
         <div>
-            @ButtonsContent
+            @ButtonsContent?.Invoke(session)
         </div>
     </header>
 </SessionInfo>
@@ -13,5 +13,5 @@
     public RenderFragment<SessionInfoDto>? TitleContent { get; set; }
 
     [Parameter]
-    public RenderFragment? ButtonsContent { get; set; }
+    public RenderFragment<SessionInfoDto>? ButtonsContent { get; set; }
 }

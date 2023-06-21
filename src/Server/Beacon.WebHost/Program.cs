@@ -1,5 +1,6 @@
 using Beacon.API;
 using Beacon.API.Persistence;
+using Beacon.WebHost;
 using Microsoft.AspNetCore.Hosting.StaticWebAssets;
 using Microsoft.EntityFrameworkCore;
 
@@ -42,8 +43,7 @@ if (builder.Environment.IsEnvironment("Test"))
 {
     using var scope = app.Services.CreateScope();
     var testDb = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-    await testDb.Database.EnsureDeletedAsync();
-    await testDb.Database.MigrateAsync();
+    await testDb.InitializeForTests();
 }
 
 app.Run();

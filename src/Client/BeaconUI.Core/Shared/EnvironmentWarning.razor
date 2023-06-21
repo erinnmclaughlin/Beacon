@@ -1,0 +1,10 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
+@inject IWebAssemblyHostEnvironment Environment
+
+@if (Environment.IsEnvironment("Test"))
+{
+    <div class="alert alert-danger alert-dismissible fade show" role="alert" style="position: fixed; bottom: 0; margin: 0; width: 100%; text-align: center">
+        <span>This is not a production environment. You are currently running in a @Environment.Environment environment.</span>
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    </div>
+}

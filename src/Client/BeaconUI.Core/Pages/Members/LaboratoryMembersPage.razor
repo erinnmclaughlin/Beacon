@@ -8,8 +8,8 @@
             <span>@session.CurrentLab?.Name</span>
         </h3>
     </TitleContent>
-    <ButtonsContent>
-        <button type="button" class="btn btn-primary" @onclick="ShowInviteMemberModal">
+    <ButtonsContent Context="session">
+        <button type="button" class="btn btn-primary" disabled="@(session.CurrentLab?.MembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)" @onclick="ShowInviteMemberModal">
             <span class="icon">
                 <i class="fa-solid fa-user-plus"></i>
             </span>

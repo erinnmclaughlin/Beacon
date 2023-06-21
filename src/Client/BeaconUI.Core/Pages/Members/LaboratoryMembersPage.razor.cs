@@ -42,6 +42,9 @@ public partial class LaboratoryMembersPage
         if (session.CurrentLab.MembershipType is LaboratoryMembershipType.Admin)
             return true;
 
+        if (session.CurrentLab.MembershipType is not LaboratoryMembershipType.Manager)
+            return false;
+
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;
     }
 

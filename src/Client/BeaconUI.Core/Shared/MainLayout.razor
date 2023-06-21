@@ -1,17 +1,12 @@
-﻿@using Microsoft.AspNetCore.Components.WebAssembly.Hosting
-@inherits LayoutComponentBase
-@inject IWebAssemblyHostEnvironment Environment
+﻿@inherits LayoutComponentBase
 
 <TopNav />
 
-<div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height);">
-
-    @if (Environment.IsEnvironment("Test"))
-    {
-        <p class="text-danger">This is not a production environment. You are currently running in a @Environment.Environment environment.</p>
-    }
-
+<div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height); position: relative;">
     <main class="d-flex flex-row flex-grow-1">
         @Body
     </main>
+
+    <EnvironmentWarning />
+
 </div>
