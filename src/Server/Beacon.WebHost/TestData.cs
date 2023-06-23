@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.WebHost;
 
-public static class TestData
+internal static class TestData
 {
     public static async Task InitializeForTests(this BeaconDbContext dbContext)
     {
@@ -60,10 +60,16 @@ public static class TestData
     {
         get
         {
-            var lab = Laboratory.CreateNew(Guid.Parse("0fa24c7c-eefb-4909-809d-4b14f0f6f247"), "Test Lab", AdminUser);
-            lab.AddMember(ManagerUser, LaboratoryMembershipType.Manager);
-            lab.AddMember(AnalystUser, LaboratoryMembershipType.Analyst);
-            lab.AddMember(MemberUser, LaboratoryMembershipType.Member);
+            var lab = new Laboratory
+            {
+                Id = Guid.Parse("0fa24c7c-eefb-4909-809d-4b14f0f6f247"),
+                Name = "Test Lab"
+            };
+
+            lab.AddMember(AdminUser.Id, LaboratoryMembershipType.Admin);
+            lab.AddMember(ManagerUser.Id, LaboratoryMembershipType.Manager);
+            lab.AddMember(AnalystUser.Id, LaboratoryMembershipType.Analyst);
+            lab.AddMember(MemberUser.Id, LaboratoryMembershipType.Member);
             return lab;
         }
     }

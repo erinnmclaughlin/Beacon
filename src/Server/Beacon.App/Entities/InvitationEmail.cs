@@ -11,14 +11,6 @@ public class InvitationEmail : LaboratoryScopedEntityBase
     public required Guid LaboratoryInvitationId { get; init; }
     public Invitation LaboratoryInvitation { get; init; } = null!;
 
-    public void Accept(User acceptingUser, DateTimeOffset acceptedOn)
-    {
-        if (IsExpired(acceptedOn))
-            throw new InvalidOperationException("The invitation email has expired.");
-
-        LaboratoryInvitation.Accept(acceptingUser);
-    }
-
     public bool IsExpired(DateTimeOffset now)
     {
         return now > ExpiresOn;

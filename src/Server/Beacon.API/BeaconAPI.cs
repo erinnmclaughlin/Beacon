@@ -1,10 +1,16 @@
-﻿using Beacon.API.Middleware;
+﻿using Beacon.API.Endpoints.Auth;
+using Beacon.API.Endpoints.Invitations;
+using Beacon.API.Endpoints.Laboratories;
+using Beacon.API.Endpoints.Memberships;
+using Beacon.API.Endpoints.Projects;
+using Beacon.API.Endpoints.Session;
+using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
-using Beacon.App;
 using Beacon.App.Services;
 using Beacon.App.Settings;
 using Beacon.Common.Auth;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -19,16 +25,25 @@ public static class BeaconAPI
 { 
     public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
     {
-        services.AddBeaconCore();
-
-        // Api
-        services.AddControllers().AddJsonOptions(options =>
+        // Framework:
+        services.AddMediatR(config =>
         {
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
         });
 
+        services.AddValidatorsFromAssemblies(new[]
+        {
+            typeof(BeaconAPI).Assembly,
+            typeof(LoginRequest).Assembly
+        });
+
+        // Api
         services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
+        services.ConfigureHttpJsonOptions(options => {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
 
         // Auth
         services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -56,18 +71,14 @@ public static class BeaconAPI
 
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, SessionManager>();
-        services.AddScoped<ICurrentLab, SessionManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ISessionManager, SessionManager>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
-        services.AddScoped<IUnitOfWork, BeaconDbContext>();
-        services.AddScoped<IQueryService, BeaconDbContext>();
 
         // Email
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<LabInvitationEmailService>();
         services.Configure<EmailSettings>(config.GetRequiredSection("EmailSettings"));
 
         return services;
@@ -80,7 +91,21 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        app.MapControllers();
+        var api = app.MapGroup("api");
+        Login.Map(api);
+        Logout.Map(api);
+        Register.Map(api);
+        CreateLaboratory.Map(api);
+        GetMyLaboratories.Map(api);
+        AcceptInvitation.Map(api);
+        CreateInvitation.Map(api);
+        GetMemberships.Map(api);
+        UpdateMembership.Map(api);
+        CancelProject.Map(api);
+        CompleteProject.Map(api);
+        CreateProject.Map(api);
+        GetProjects.Map(api);
+        GetSessionInfo.Map(api);
 
         return app;
     }

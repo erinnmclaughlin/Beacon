@@ -40,9 +40,10 @@ public class UpdateUserMembershipTests : EndpointTestBase
             await db.SaveChangesAsync();
         });
 
-        var uri = $"api/members/{memberId}/membershipType";
-        var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
+        var response = await client.PutAsJsonAsync("api/memberships", new UpdateMembershipRequest
         {
+            MemberId = memberId,
+            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Manager
         }, JsonSerializerOptions);
 

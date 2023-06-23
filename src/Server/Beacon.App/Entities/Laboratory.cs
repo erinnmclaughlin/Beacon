@@ -10,32 +10,12 @@ public class Laboratory
     private readonly List<Membership> _memberships = new();
     public IReadOnlyList<Membership> Memberships => _memberships;
 
-    private Laboratory() { }
-
-    public static Laboratory CreateNew(string name, User admin)
-    {
-        return CreateNew(Guid.NewGuid(), name, admin);
-    }
-
-    public static Laboratory CreateNew(Guid id, string name, User admin)
-    {
-        var laboratory = new Laboratory
-        {
-            Id = id,
-            Name = name
-        };
-
-        laboratory.AddMember(admin, LaboratoryMembershipType.Admin);
-
-        return laboratory;
-    }
-
-    public Membership AddMember(User member, LaboratoryMembershipType membershipType = LaboratoryMembershipType.Member)
+    public Membership AddMember(Guid userId, LaboratoryMembershipType membershipType = LaboratoryMembershipType.Member)
     {
         var membership = new Membership
         {
             LaboratoryId = Id,
-            MemberId = member.Id,
+            MemberId = userId,
             MembershipType = membershipType
         };
 
@@ -43,4 +23,6 @@ public class Laboratory
 
         return membership;
     }
+
+    public bool HasMember(User user) => _memberships.Any(m => m.MemberId == user.Id);
 }

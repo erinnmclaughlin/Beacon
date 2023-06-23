@@ -17,8 +17,11 @@ public static class TestData
         HashedPasswordSalt = salt
     };
 
-    public static Laboratory DefaultLaboratory { get; } = Laboratory
-        .CreateNew(new Guid("8b4f86b7-95fc-401c-a322-202e8d1ab0c3"), "Test Lab", DefaultUser);
+    public static Laboratory DefaultLaboratory { get; } = new Laboratory 
+    {
+        Id = new Guid("8b4f86b7-95fc-401c-a322-202e8d1ab0c3"),
+        Name = "Test Lab"
+    };
 
     public static void SeedWithTestData(this BeaconDbContext dbContext)
     {

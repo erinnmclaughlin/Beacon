@@ -19,8 +19,15 @@ public class GetProjectsTests : EndpointTestBase
 
         var client = CreateClient(db =>
         {
-            var labId = Guid.NewGuid();
-            db.Laboratories.Add(Laboratory.CreateNew(labId, "Other Lab", TestData.DefaultUser));
+            var lab = new Laboratory
+            {
+                Id = Guid.NewGuid(),
+                Name = "Other Lab"
+            };
+
+            lab.AddMember(TestData.DefaultUser.Id, LaboratoryMembershipType.Admin);
+
+            db.Laboratories.Add(lab);
             db.Projects.AddRange(new[]
             {
                 new Project
@@ -37,7 +44,7 @@ public class GetProjectsTests : EndpointTestBase
                     CreatedById = TestData.DefaultUser.Id,
                     CustomerName = "123 Customer",
                     ProjectCode = new ProjectCode("123", 1),
-                    LaboratoryId = labId
+                    LaboratoryId = lab.Id
                 }
             });
             db.SaveChanges();

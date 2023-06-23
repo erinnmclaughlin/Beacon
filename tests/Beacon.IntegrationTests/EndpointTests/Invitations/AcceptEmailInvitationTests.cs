@@ -74,7 +74,14 @@ public class AcceptEmailInvitationTests : EndpointTestBase
 
     private static Laboratory SeedLab(BeaconDbContext dbContext, User labAdmin)
     {
-        var laboratory = Laboratory.CreateNew("Fake Lab", labAdmin);
+        var laboratory = new Laboratory
+        {
+            Id = Guid.NewGuid(),
+            Name = "Fake Lab"
+        };
+
+        laboratory.AddMember(labAdmin.Id, LaboratoryMembershipType.Admin);
+
         dbContext.Laboratories.Add(laboratory);
         return laboratory;
     }

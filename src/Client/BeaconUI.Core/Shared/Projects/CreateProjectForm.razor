@@ -25,10 +25,14 @@
 
 @code {
 
+    [Parameter]
+    public required Guid LaboratoryId { get; set; }
+
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private CreateProjectRequest Model { get; } = new();
+    private CreateProjectRequest? _model;
+    private CreateProjectRequest Model => _model ??= new() { LaboratoryId = LaboratoryId };
 
     private async Task Submit(BeaconForm formContext)
     {

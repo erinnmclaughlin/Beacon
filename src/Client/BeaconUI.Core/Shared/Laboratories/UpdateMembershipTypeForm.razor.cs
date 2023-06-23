@@ -14,14 +14,18 @@ public partial class UpdateMembershipTypeForm
     private BlazoredModalInstance Modal { get; set; } = null!;
 
     [Parameter]
+    public required Guid LaboratoryId { get; set; }
+
+    [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }
 
-    private UpdateMembershipTypeRequest Model { get; set; } = new();
-
-    protected override void OnParametersSet()
+    private UpdateMembershipRequest? _model;
+    private UpdateMembershipRequest Model => _model ??= new()
     {
-        Model.MembershipType = MemberToUpdate.MembershipType;
-    }
+        LaboratoryId = LaboratoryId,
+        MemberId = MemberToUpdate.Id,
+        MembershipType = MemberToUpdate.MembershipType
+    };
 
     private async Task Submit(BeaconForm form)
     {

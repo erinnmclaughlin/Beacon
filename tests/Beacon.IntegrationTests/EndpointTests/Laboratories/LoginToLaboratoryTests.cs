@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.Common.Auth;
+using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Laboratories;
 
@@ -18,15 +19,19 @@ public class LoginToLaboratoryTests : EndpointTestBase
 
         var client = CreateClient(async db =>
         {
-            db.Add(Laboratory.CreateNew(labId, "Lab 2", new User 
+            var otherUser = new User
             {
                 Id = Guid.NewGuid(),
                 DisplayName = "other user",
                 EmailAddress = "other@test.com",
                 HashedPassword = new PasswordHasher().Hash("testing123", out var salt),
                 HashedPasswordSalt = salt
-            }));
+            };
 
+            var lab = new Laboratory { Id = labId, Name = "Lab 2" };
+            lab.AddMember(otherUser.Id, LaboratoryMembershipType.Admin);
+
+            db.AddRange(otherUser, lab);
             await db.SaveChangesAsync();
         });
 

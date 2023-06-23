@@ -1,12 +1,7 @@
-﻿using Beacon.Common.Memberships;
+﻿namespace Beacon.App.Services;
 
-namespace Beacon.App.Services;
-
-public interface ISessionManager : ICurrentUser, ICurrentLab
+public interface ISessionManager
 {
     Task SignInAsync(Guid userId);
     Task SignOutAsync();
-
-    Task SetCurrentLabAsync(Guid labId, LaboratoryMembershipType membershipType);
-    Task ClearCurrentLabAsync();
 }
