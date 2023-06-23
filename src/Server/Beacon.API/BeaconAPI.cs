@@ -97,6 +97,7 @@ public static class BeaconAPI
         Register.Map(api);
         CreateLaboratory.Map(api);
         GetMyLaboratories.Map(api);
+        GetLaboratoryById.Map(api);
         AcceptInvitation.Map(api);
         CreateInvitation.Map(api);
         GetMemberships.Map(api);

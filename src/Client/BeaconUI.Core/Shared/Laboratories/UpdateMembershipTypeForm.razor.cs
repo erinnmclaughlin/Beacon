@@ -1,4 +1,4 @@
-using Beacon.Common.Auth;
+using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;
@@ -11,10 +11,10 @@ namespace BeaconUI.Core.Shared.Laboratories;
 public partial class UpdateMembershipTypeForm
 {
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private LaboratoryDto CurrentLab { get; set; } = null!;
 
-    [Parameter]
-    public required Guid LaboratoryId { get; set; }
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
 
     [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }
@@ -22,7 +22,7 @@ public partial class UpdateMembershipTypeForm
     private UpdateMembershipRequest? _model;
     private UpdateMembershipRequest Model => _model ??= new()
     {
-        LaboratoryId = LaboratoryId,
+        LaboratoryId = CurrentLab.Id,
         MemberId = MemberToUpdate.Id,
         MembershipType = MemberToUpdate.MembershipType
     };
@@ -40,14 +40,12 @@ public partial class UpdateMembershipTypeForm
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private bool IsDisabled(SessionInfoDto sessionInfo, LaboratoryMembershipType targetType)
+    private bool IsDisabled(LaboratoryMembershipType targetType)
     {
-        var myMembership = sessionInfo.CurrentLab?.MembershipType;
-
-        if (myMembership is LaboratoryMembershipType.Admin)
+        if (CurrentLab.MyMembershipType is LaboratoryMembershipType.Admin)
             return false;
 
-        if (myMembership is not LaboratoryMembershipType.Manager)
+        if (CurrentLab.MyMembershipType is not LaboratoryMembershipType.Manager)
             return true;
 
         return MemberToUpdate.MembershipType is LaboratoryMembershipType.Admin || targetType is LaboratoryMembershipType.Admin;

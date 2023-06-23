@@ -4,9 +4,12 @@
 }
 
 @code {
-    [CascadingParameter] public required Task<AuthenticationState> AuthStateTask { get; set; }
+    
+    [CascadingParameter] 
+    public required Task<AuthenticationState> AuthStateTask { get; set; }
 
-    [Parameter] public RenderFragment<SessionInfoDto>? ChildContent { get; set; }
+    [Parameter] 
+    public RenderFragment<SessionInfoDto>? ChildContent { get; set; }
 
     private SessionInfoDto? Session { get; set; }
 

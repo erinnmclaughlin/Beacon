@@ -1,48 +1,34 @@
-using Beacon.Common.Auth;
+using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using BeaconUI.Core.Shared.Laboratories;
 using Blazored.Modal;
 using Blazored.Modal.Services;
 using ErrorOr;
 using Microsoft.AspNetCore.Components;
-using Microsoft.AspNetCore.Components.Authorization;
 
 namespace BeaconUI.Core.Pages.Members;
 
 public partial class LaboratoryMembersPage
 {
-    [CascadingParameter] 
-    public required Task<AuthenticationState> AuthStateTask { get; set; }
+    [CascadingParameter]
+    private LaboratoryDto CurrentLab { get; set; } = null!;
 
     [CascadingParameter] 
     private IModalService ModalService { get; set; } = null!;
-
-    private AuthenticationState AuthState { get; set; } = null!;
 
     private ErrorOr<LaboratoryMemberDto[]>? ErrorOrMembers { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
-    }
-
-    protected async override Task OnParametersSetAsync()
-    {
-        AuthState = await AuthStateTask;
+        ErrorOrMembers = await ApiClient.GetLaboratoryMembers(CurrentLab.Id);
     }
 
     private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
-        if (SessionInfoDto.FromClaimsPrincipal(AuthState.User) is not { CurrentLab: { } } session)
-            return false;
-
-        if (session.CurrentUser.Id == memberToUpdate.Id)
-            return false;
-
-        if (session.CurrentLab.MembershipType is LaboratoryMembershipType.Admin)
+        if (CurrentLab.MyMembershipType is LaboratoryMembershipType.Admin)
             return true;
 
-        if (session.CurrentLab.MembershipType is not LaboratoryMembershipType.Manager)
+        if (CurrentLab.MyMembershipType is not LaboratoryMembershipType.Manager)
             return false;
 
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;

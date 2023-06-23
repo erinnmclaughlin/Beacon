@@ -3,19 +3,17 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent Context="session">
-        <h3 class="mb-0 flex-grow-1">
-            <span>@session.CurrentLab?.Name</span>
-        </h3>
-    </TitleContent>
-    <ButtonsContent Context="session">
-        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(session.CurrentLab?.MembershipType is null or LaboratoryMembershipType.Member)">
+    <h3 class="mb-0 flex-grow-1">
+        <span>@context.Name</span>
+    </h3>
+    <div>
+        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(context.MyMembershipType is LaboratoryMembershipType.Member)">
             <span class="icon">
                 <i class="fa-solid fa-plus"></i>
             </span>
             <span>Create project</span>
         </button>
-    </ButtonsContent>
+    </div>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
@@ -80,7 +78,7 @@
                                                     </a>
                                                 </li>
                                                 <SessionInfo Context="session">
-                                                    @if (project.ProjectStatus is ProjectStatus.Active && ShowCancelAndCompleteDropdownSection(session))
+                                                    @if (ShowCancelAndCompleteDropdownSection(project))
                                                     {
                                                         <li><hr class="dropdown-divider"></li>
                                                         <li>
@@ -116,7 +114,11 @@
 
 @code {
 
-    [CascadingParameter] public required IModalService ModalService { get; set; }
+    [CascadingParameter]
+    private LaboratoryDto CurrentLab { get; set; } = null!;
+
+    [CascadingParameter]
+    public required IModalService ModalService { get; set; }
 
     private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
 
@@ -146,9 +148,10 @@
         NavigationManager.NavigateTo($"l/projects/{project.ProjectCode}");
     }
 
-    private bool ShowCancelAndCompleteDropdownSection(SessionInfoDto currentSession)
+    private bool ShowCancelAndCompleteDropdownSection(ProjectDto project)
     {
-        return currentSession.CurrentLab?.MembershipType is not null and not LaboratoryMembershipType.Member;
+        return project.ProjectStatus is ProjectStatus.Active && 
+            CurrentLab.MyMembershipType is not LaboratoryMembershipType.Member;
     }
 
     private async Task CancelProject(ProjectDto project)

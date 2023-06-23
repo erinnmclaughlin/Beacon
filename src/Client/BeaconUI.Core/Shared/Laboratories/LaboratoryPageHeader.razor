@@ -1,17 +1,12 @@
-﻿<SessionInfo Context="session">
-    <header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
-        @TitleContent?.Invoke(session)
-        <div>
-            @ButtonsContent?.Invoke(session)
-        </div>
-    </header>
-</SessionInfo>
+﻿<header class="d-flex border-bottom align-items-center px-4 py-3" style="min-height: 4.5rem;">
+    @ChildContent?.Invoke(CurrentLab)
+</header>
 
 @code {
 
-    [Parameter]
-    public RenderFragment<SessionInfoDto>? TitleContent { get; set; }
+    [CascadingParameter]
+    public required LaboratoryDto CurrentLab { get; set; }
 
     [Parameter]
-    public RenderFragment<SessionInfoDto>? ButtonsContent { get; set; }
+    public RenderFragment<LaboratoryDto>? ChildContent { get; set; }
 }

@@ -38,7 +38,7 @@ public sealed class GetSessionInfo : IBeaconEndpoint
                 .Select(u => new SessionInfoDto.UserDto(u.Id, u.DisplayName))
                 .SingleAsync(ct);
 
-            return new SessionInfoDto(currentUser, null);
+            return new SessionInfoDto(currentUser);
         }
     }
 }

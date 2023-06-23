@@ -57,14 +57,14 @@ public sealed class ApiClient : ApiClientBase
         return await GetAsync<LaboratoryDto>($"api/laboratories/{labId}");
     }
 
-    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
+    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers(Guid labId)
     {
-        return await GetAsync<LaboratoryMemberDto[]>("api/members");
+        return await GetAsync<LaboratoryMemberDto[]>($"api/memberships?laboratoryId={labId}");
     }
 
     public async Task<ErrorOr<Success>> UpdateMembershipType(Guid memberId, UpdateMembershipRequest request)
     {
-        return await PutAsync($"api/members/{memberId}/membershipType", request);
+        return await PutAsync($"api/memberships", request);
     }
 
     public async Task<ErrorOr<ProjectDto[]>> GetProjects()
