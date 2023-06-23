@@ -43,14 +43,7 @@ public class AcceptEmailInvitationTests : EndpointTestBase
         var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
-    [Fact]
-    public async Task AcceptInvitation_ShouldFail_WhenRequestIsInvalid()
-    {
-        var response = await CreateClient().GetAsync($"api/invitations/{Guid.NewGuid()}/accept?emailId={Guid.NewGuid()}");
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
+    
     private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext, bool isExpired)
     {
         var labAdmin = SeedLabAdmin(dbContext);

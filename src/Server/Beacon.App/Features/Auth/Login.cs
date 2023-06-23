@@ -1,7 +1,6 @@
 ﻿using Beacon.App.Entities;
+using Beacon.App.Exceptions;
 using Beacon.App.Services;
-using FluentValidation;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -32,8 +31,7 @@ public static class Login
 
             if (user is null || !_passwordHasher.Verify(request.PlainTextPassword, user.HashedPassword, user.HashedPasswordSalt))
             {
-                var failure = new ValidationFailure(nameof(Command.EmailAddress), "Email address or password is incorrect.");
-                throw new ValidationException(new[] { failure });
+                throw new BeaconValidationException(nameof(Command.EmailAddress), "Email address or password is incorrect.");
             }
 
             await _currentSession.SignInAsync(user.Id);

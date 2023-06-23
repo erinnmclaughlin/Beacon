@@ -27,8 +27,7 @@ public sealed class LabInvitationEmailService
                 .ThenInclude(i => i.CreatedBy)
             .Include(l => l.LaboratoryInvitation)
                 .ThenInclude(i => i.Laboratory)
-            .FirstOrDefaultAsync(l => l.Id == emailInvitationId, ct)
-            ?? throw new EmailInvitationNotFoundException(emailInvitationId);
+            .SingleAsync(l => l.Id == emailInvitationId, ct);
 
         var emailSendOperation = await _emailService.SendAsync(
             GetSubject(emailInvitation.LaboratoryInvitation),

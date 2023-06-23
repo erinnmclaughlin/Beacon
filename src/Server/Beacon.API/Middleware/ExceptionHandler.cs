@@ -14,25 +14,32 @@ public static class ExceptionHandler
 
         if (ex is ValidationException validationException)
         {
-            var errors = validationException.Errors
-                .GroupBy(e => e.PropertyName)
-                .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).Distinct().ToArray());
-
-            var result = Results.UnprocessableEntity(new BeaconValidationProblem { Errors = errors });
-            await result.ExecuteAsync(context);
+            await HandleValidationException(validationException, context);
+            return;
         }
-
-        if (ex is BeaconException beaconException)
+        
+        if (ex is UserNotAllowedException)
         {
-            var result = beaconException.Type switch
-            {
-                BeaconExceptionType.NotAuthorized => Results.Forbid(),
-                BeaconExceptionType.NotFound => Results.NotFound(beaconException.Message),
-                BeaconExceptionType.BadRequest => Results.BadRequest(beaconException.Message),
-                _ => Results.StatusCode(500)
-            };
-
-            await result.ExecuteAsync(context);
+            await Results.Forbid().ExecuteAsync(context);
+            return;
         }
+
+        if (ex is InvalidOperationException)
+        {
+            await Results.BadRequest(ex.Message).ExecuteAsync(context);
+            return;
+        }
+
+        await Results.StatusCode(500).ExecuteAsync(context);
+    }
+
+    private static async Task HandleValidationException(ValidationException ex, HttpContext context)
+    {
+        var errors = ex.Errors
+            .GroupBy(e => e.PropertyName)
+            .ToDictionary(g => g.Key, g => g.Select(e => e.ErrorMessage).Distinct().ToArray());
+
+        var result = Results.UnprocessableEntity(new BeaconValidationProblem { Errors = errors });
+        await result.ExecuteAsync(context);
     }
 }

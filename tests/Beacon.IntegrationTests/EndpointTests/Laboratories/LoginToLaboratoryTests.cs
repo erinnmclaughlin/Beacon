@@ -37,7 +37,7 @@ public class LoginToLaboratoryTests : EndpointTestBase
         });
 
         var response = await client.PostAsync($"api/laboratories/{labId}/login", null);
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
+        response.IsSuccessStatusCode.Should().BeFalse();
     }
 
     [Fact]

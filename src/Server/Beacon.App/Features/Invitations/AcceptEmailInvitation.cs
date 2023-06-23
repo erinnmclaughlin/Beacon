@@ -44,8 +44,7 @@ public static class AcceptEmailInvitation
             return await _unitOfWork
                 .QueryFor<InvitationEmail>(enableChangeTracking: true)
                 .Include(i => i.LaboratoryInvitation)
-                .FirstOrDefaultAsync(i => i.Id == request.EmailId && i.LaboratoryInvitationId == request.InviteId, ct)
-                ?? throw new EmailInvitationNotFoundException(request.EmailId, request.InviteId);
+                .SingleAsync(i => i.Id == request.EmailId && i.LaboratoryInvitationId == request.InviteId, ct);
         }
 
         private async Task AddLabMember(Guid acceptingUserId, Guid labId, LaboratoryMembershipType membershipType, CancellationToken ct)

@@ -24,7 +24,7 @@ public class Invitation : LaboratoryScopedEntityBase
     public void Accept(User acceptingUser)
     {
         if (acceptingUser.EmailAddress != NewMemberEmailAddress)
-            throw new UserNotAllowedException("Current user's email address does not match the email address in the invitation.");
+            throw new ApplicationException("Current user's email address does not match the email address in the invitation.");
 
         AcceptedById = acceptingUser.Id;
     }

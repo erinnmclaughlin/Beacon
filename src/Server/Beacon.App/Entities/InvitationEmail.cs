@@ -1,6 +1,4 @@
-﻿using Beacon.App.Exceptions;
-
-namespace Beacon.App.Entities;
+﻿namespace Beacon.App.Entities;
 
 public class InvitationEmail : LaboratoryScopedEntityBase
 {
@@ -16,7 +14,7 @@ public class InvitationEmail : LaboratoryScopedEntityBase
     public void Accept(User acceptingUser, DateTimeOffset acceptedOn)
     {
         if (IsExpired(acceptedOn))
-            throw new EmailInvitationExpiredException();
+            throw new InvalidOperationException("The invitation email has expired.");
 
         LaboratoryInvitation.Accept(acceptingUser);
     }

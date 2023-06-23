@@ -37,14 +37,13 @@ public static class CompleteProject
                     p.LaboratoryId == labId &&
                     p.ProjectCode.CustomerCode == request.ProjectCode.CustomerCode &&
                     p.ProjectCode.Suffix == request.ProjectCode.Suffix)
-                .FirstOrDefaultAsync(ct)
-                ?? throw new ProjectNotFoundException(request.ProjectCode);
+                .SingleAsync(ct);
 
             if (project.ProjectStatus is ProjectStatus.Completed)
                 return;
 
             if (project.ProjectStatus is ProjectStatus.Canceled)
-                throw new ProjectStatusException("Projects that have been canceled cannot be marked as complete.");
+                throw new BeaconValidationException(nameof(Project.ProjectStatus), "Projects that have been canceled cannot be marked as complete.");
 
             project.ProjectStatus = ProjectStatus.Completed;
             await _unitOfWork.SaveChangesAsync(ct);

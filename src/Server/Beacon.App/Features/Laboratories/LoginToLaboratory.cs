@@ -29,8 +29,7 @@ public static class LoginToLaboratory
                 .QueryFor<Membership>()
                 .Where(m => m.MemberId == userId && m.LaboratoryId == request.LabId)
                 .Select(m => new { m.MembershipType })
-                .FirstOrDefaultAsync(cancellationToken)
-                ?? throw new LaboratoryNotFoundException(request.LabId);
+                .SingleAsync(cancellationToken);
 
             await _currentSession.SetCurrentLabAsync(request.LabId, membershipInfo.MembershipType);
         }

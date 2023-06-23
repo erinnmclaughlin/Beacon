@@ -28,8 +28,7 @@ public static class UpdateMembershipType
 
             var member = await _unitOfWork
                 .QueryFor<Membership>(enableChangeTracking: true)
-                .FirstOrDefaultAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct)
-                ?? throw new LaboratoryMembershipNotFoundException(labId, request.MemberId);
+                .SingleAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct);
 
             EnsureCurrentUserHasPermission(request, member);
 

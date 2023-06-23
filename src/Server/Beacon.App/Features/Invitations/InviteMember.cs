@@ -3,7 +3,6 @@ using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.Common.Memberships;
 using FluentValidation;
-using FluentValidation.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -94,8 +93,7 @@ public static class InviteMember
 
             if (isMember)
             {
-                var failure = new ValidationFailure(nameof(Command.NewMemberEmailAddress), $"User with email {newMemberEmailAddress} is already a member of the specified lab.");
-                throw new ValidationException(new[] { failure });
+                throw new BeaconValidationException(nameof(Command.NewMemberEmailAddress), $"User with email {newMemberEmailAddress} is already a member of the specified lab.");
             }
         }
     }
