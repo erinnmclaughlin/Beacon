@@ -5,16 +5,14 @@
 @code {
 
     [Inject]
-    private BeaconAuthStateProvider AuthStateProvider { get; set; } = null!;
+    private CurrentLabService CurrentLabService { get; set; } = null!;
 
     [Parameter] 
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await ApiClient.LoginToLaboratory(Id);
-
-        AuthStateProvider.NotifyAuthenticationStateChanged();
+        await CurrentLabService.SetCurrentLaboratory(Id);
         NavigationManager.NavigateTo("l", replace: true);
     }
 }
