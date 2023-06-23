@@ -15,36 +15,34 @@ public class AcceptEmailInvitationTests : EndpointTestBase
     [Fact]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
-        Guid inviteId = Guid.Empty;
         Guid emailId = Guid.Empty;
         Guid labId = Guid.Empty;
 
         var client = CreateClient(db =>
         {
-            (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: false);
+            (emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: false);
         });
 
-        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
+        var response = await client.GetAsync($"api/invitations/{emailId}/accept");
         response.EnsureSuccessStatusCode();
     }
 
     [Fact]
     public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
     {
-        Guid inviteId = Guid.Empty;
         Guid emailId = Guid.Empty;
         Guid labId = Guid.Empty;
 
         var client = CreateClient(db =>
         {
-            (inviteId, emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: true);
+            (emailId, labId) = SeedDbWithEmailInvitation(db, isExpired: true);
         });
 
-        var response = await client.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
-        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        var response = await client.GetAsync($"api/invitations/{emailId}/accept");
+        response.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
     }
     
-    private static (Guid InviteId, Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext, bool isExpired)
+    private static (Guid EmailId, Guid LabId) SeedDbWithEmailInvitation(BeaconDbContext dbContext, bool isExpired)
     {
         var labAdmin = SeedLabAdmin(dbContext);
         var lab = SeedLab(dbContext, labAdmin);
@@ -53,7 +51,7 @@ public class AcceptEmailInvitationTests : EndpointTestBase
 
         dbContext.SaveChanges();
 
-        return (labInvite.Id, emailInvite.Id, lab.Id);
+        return (emailInvite.Id, lab.Id);
     }
 
     private static User SeedLabAdmin(BeaconDbContext dbContext)

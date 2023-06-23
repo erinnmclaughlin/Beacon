@@ -15,9 +15,9 @@ public sealed class AcceptInvitation : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var builder = app.MapGet("invitations/{inviteId:Guid}/accept", async (Guid inviteId, IMediator m, CancellationToken ct) =>
+        var builder = app.MapGet("invitations/{emailId:Guid}/accept", async (Guid emailId, IMediator m, CancellationToken ct) =>
         {
-            await m.Send(new Request(inviteId), ct);
+            await m.Send(new Request(emailId), ct);
             return Results.NoContent();
         });
 
@@ -71,10 +71,13 @@ public sealed class AcceptInvitation : IBeaconEndpoint
 
         private async Task<Invitation> GetInvitation(Request request, Guid currentUserId, CancellationToken ct)
         {
-            return await _dbContext.Invitations
-                .Include(i => i.Laboratory)
-                    .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
-                .SingleAsync(i => i.Id == request.EmailId, ct);
+            return await _dbContext.InvitationEmails
+                .Include(i => i.LaboratoryInvitation)
+                .ThenInclude(i => i.Laboratory)
+                .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
+                .Where(i => i.Id == request.EmailId)
+                .Select(i => i.LaboratoryInvitation)
+                .SingleAsync(ct);
         }
     }
 }

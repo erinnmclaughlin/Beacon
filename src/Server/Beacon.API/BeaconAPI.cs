@@ -106,6 +106,7 @@ public static class BeaconAPI
         CompleteProject.Map(api);
         CreateProject.Map(api);
         GetProjects.Map(api);
+        GetProjectDetails.Map(api);
         GetSessionInfo.Map(api);
 
         return app;

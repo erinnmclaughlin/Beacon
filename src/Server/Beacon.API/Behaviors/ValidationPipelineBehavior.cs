@@ -2,7 +2,7 @@
 using FluentValidation.Results;
 using MediatR.Pipeline;
 
-namespace Beacon.App.Behaviors;
+namespace Beacon.API.Behaviors;
 
 public sealed class ValidationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {

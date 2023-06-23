@@ -35,6 +35,6 @@ public class CreateProjectTests : EndpointTestBase
             CustomerName = "ABC Company"
         });
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

@@ -1,5 +1,4 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
@@ -8,7 +7,6 @@ using Beacon.Common.Invitations;
 using Beacon.Common.Memberships;
 using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -20,8 +18,7 @@ public sealed class CreateInvitation : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var builder = app.MapPost<InviteLabMemberRequest>("invitations");
-        builder.WithTags(EndpointTags.Invitations);
+        app.MapPost<InviteLabMemberRequest>("invitations").WithTags(EndpointTags.Invitations);
     }
 
     public sealed class Validator : AbstractValidator<InviteLabMemberRequest>
@@ -63,10 +60,59 @@ public sealed class CreateInvitation : IBeaconEndpoint
 
         public async Task Handle(InviteLabMemberRequest request, CancellationToken ct)
         {
-            await EnsureCurrentUserIsAllowed(request);
+            var user = await GetCurrentUser(ct);
+            await EnsureCurrentUserIsAllowed(request, user, ct);
 
-            var invitation = await CreateInvitation(request, ct);
+            var invitation = await CreateInvitation(request, user, ct);
             await SendAsync(invitation, ct);
+        }
+
+        private async Task<User> GetCurrentUser(CancellationToken ct)
+        {
+            var id = _currentUser.UserId;
+            return await _dbContext.Users.SingleAsync(x => x.Id == id, ct);
+        }
+
+        private async Task EnsureCurrentUserIsAllowed(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
+        {
+            var membership = await _dbContext.Memberships
+                .AsNoTracking()
+                .Where(m => m.MemberId == currentUser.Id && m.LaboratoryId == request.LaboratoryId)
+                .SingleOrDefaultAsync(ct);
+
+            if (membership?.MembershipType is LaboratoryMembershipType.Admin)
+                return;
+
+            if (request.MembershipType is LaboratoryMembershipType.Admin)
+                throw new UserNotAllowedException("Only laboratory admins are allowed to invite new admins.");
+
+            if (membership?.MembershipType is not LaboratoryMembershipType.Manager)
+                throw new UserNotAllowedException("Only laboratory admins or managers are allowed to invite new members.");
+        }
+
+        private async Task<InvitationEmail> CreateInvitation(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
+        {
+            var now = DateTimeOffset.UtcNow;
+
+            var invitation = new Invitation
+            {
+                Id = Guid.NewGuid(),
+                CreatedOn = now,
+                ExpireAfterDays = 10, // TODO: make this configurable
+                NewMemberEmailAddress = request.NewMemberEmailAddress,
+                MembershipType = request.MembershipType,
+                Laboratory = await _dbContext.Laboratories.SingleAsync(x => x.Id == request.LaboratoryId, ct),
+                LaboratoryId = request.LaboratoryId,
+                CreatedById = currentUser.Id,
+                CreatedBy = currentUser
+            };
+
+            var emailInvitation = invitation.AddEmailInvitation(now);
+
+            _dbContext.Invitations.Add(invitation);
+            await _dbContext.SaveChangesAsync(ct);
+
+            return emailInvitation;
         }
 
         private async Task SendAsync(InvitationEmail emailInvitation, CancellationToken ct)
@@ -80,47 +126,6 @@ public sealed class CreateInvitation : IBeaconEndpoint
             emailInvitation.OperationId = emailSendOperation.OperationId;
 
             await _dbContext.SaveChangesAsync(ct);
-        }
-
-        private async Task<InvitationEmail> CreateInvitation(InviteLabMemberRequest request, CancellationToken ct)
-        {
-            var now = DateTimeOffset.UtcNow;
-
-            var invitation = new Invitation
-            {
-                Id = Guid.NewGuid(),
-                CreatedOn = now,
-                ExpireAfterDays = 10, // TODO: make this configurable
-                NewMemberEmailAddress = request.NewMemberEmailAddress,
-                MembershipType = request.MembershipType,
-                LaboratoryId = request.LaboratoryId,
-                CreatedById = _currentUser.UserId
-            };
-
-            var emailInvitation = invitation.AddEmailInvitation(now);
-
-            _dbContext.Invitations.Add(invitation);
-            await _dbContext.SaveChangesAsync(ct);
-
-            return emailInvitation;
-        }
-
-        private async Task EnsureCurrentUserIsAllowed(InviteLabMemberRequest request)
-        {
-            var currentUserId = _currentUser.UserId;
-
-            var membership = await _dbContext.Memberships
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.MemberId == currentUserId && m.LaboratoryId == request.LaboratoryId);
-
-            if (membership?.MembershipType is LaboratoryMembershipType.Admin)
-                return;
-
-            if (request.MembershipType is LaboratoryMembershipType.Admin)
-                throw new UserNotAllowedException("Only laboratory admins are allowed to invite new admins.");
-
-            if (membership?.MembershipType is not LaboratoryMembershipType.Manager)
-                throw new UserNotAllowedException("Only laboratory admins or managers are allowed to invite new members.");
         }
 
         private static string GetSubject(Invitation invitation)

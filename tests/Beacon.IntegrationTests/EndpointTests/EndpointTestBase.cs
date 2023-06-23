@@ -52,7 +52,7 @@ public abstract class EndpointTestBase : IClassFixture<BeaconTestApplicationFact
             var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
             if (db.Database.EnsureCreated())
-                db.SeedWithTestData();
+                db.SeedWithTestData(MembershipType);
 
             dbAction?.Invoke(db);
         }
