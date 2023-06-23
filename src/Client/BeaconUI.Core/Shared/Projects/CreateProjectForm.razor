@@ -44,7 +44,7 @@
             return;
         }
 
-        await Modal.CloseAsync(ModalResult.Ok(result.Value));
+        await Modal.CloseAsync(ModalResult.Ok());
     }
 
     private async Task Cancel() => await Modal.CancelAsync();

@@ -72,18 +72,18 @@ public sealed class ApiClient : ApiClientBase
         return await GetAsync<ProjectDto[]>($"api/projects?laboratoryId={labId}");
     }
 
-    public async Task<ErrorOr<ProjectDto>> CreateProject(CreateProjectRequest request)
+    public async Task<ErrorOr<Success>> CreateProject(CreateProjectRequest request)
     {
-        return await PostAsync<ProjectDto>("api/projects", request);
+        return await PostAsync("api/projects", request);
     }
 
-    public async Task<ErrorOr<Success>> CancelProject(string projectCode)
+    public async Task<ErrorOr<Success>> CancelProject(Guid projectId)
     {
-        return await PostAsync($"api/projects/{projectCode}/cancel", null);
+        return await PostAsync($"api/projects/{projectId}/cancel", null);
     }
 
-    public async Task<ErrorOr<Success>> CompleteProject(string projectCode)
+    public async Task<ErrorOr<Success>> CompleteProject(Guid projectId)
     {
-        return await PostAsync($"api/projects/{projectCode}/complete", null);
+        return await PostAsync($"api/projects/{projectId}/complete", null);
     }
 }

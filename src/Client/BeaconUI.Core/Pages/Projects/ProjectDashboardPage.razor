@@ -165,7 +165,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(project.ProjectCode);
+            await ApiClient.CancelProject(project.Id);
             await LoadProjects();
         }
     }
@@ -179,7 +179,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(project.ProjectCode);
+            await ApiClient.CompleteProject(project.Id);
             await LoadProjects();
         }
     }
