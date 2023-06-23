@@ -38,13 +38,11 @@ public sealed class Register : IBeaconEndpoint
 
     public sealed class Handler : IRequestHandler<RegisterRequest>
     {
-        private readonly ISessionManager _currentSession;
         private readonly BeaconDbContext _dbContext;
         private readonly IPasswordHasher _passwordHasher;
 
-        public Handler(ISessionManager currentSession, BeaconDbContext dbContext, IPasswordHasher passwordHasher)
+        public Handler(BeaconDbContext dbContext, IPasswordHasher passwordHasher)
         {
-            _currentSession = currentSession;
             _dbContext = dbContext;
             _passwordHasher = passwordHasher;
         }
@@ -62,8 +60,6 @@ public sealed class Register : IBeaconEndpoint
 
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync(ct);
-
-            await _currentSession.SignInAsync(user.Id);
         }
     }
 }

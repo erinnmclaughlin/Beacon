@@ -1,11 +1,10 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.Services;
 using Beacon.App.Exceptions;
-using Beacon.App.Services;
 using Beacon.Common.Auth;
-using MediatR;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Auth;
 
@@ -13,34 +12,17 @@ public sealed class Login : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPost<LoginRequest>("auth/login").WithTags(EndpointTags.Authentication);
-    }
-
-    internal sealed class Handler : IRequestHandler<LoginRequest>
-    {
-        private readonly ISessionManager _currentSession;
-        private readonly BeaconDbContext _dbContext;
-        private readonly IPasswordHasher _passwordHasher;
-
-        public Handler(ISessionManager currentSession, BeaconDbContext dbContext, IPasswordHasher passwordHasher)
+        var builder = app.MapPost("auth/login", async (LoginRequest request, BeaconAuthenticationService authService, HttpContext context, CancellationToken ct) =>
         {
-            _currentSession = currentSession;
-            _dbContext = dbContext;
-            _passwordHasher = passwordHasher;
-        }
+            var user = await authService.AuthenticateAsync(request.EmailAddress, request.Password, ct);
 
-        public async Task Handle(LoginRequest request, CancellationToken ct)
-        {
-            var user = await _dbContext.Users
-                .AsNoTracking()
-                .FirstOrDefaultAsync(u => u.EmailAddress == request.EmailAddress, ct);
+            if (user.Identity?.IsAuthenticated is not true)
+                throw new BeaconValidationException(nameof(LoginRequest.EmailAddress), "Email address or password is invalid.");
 
-            if (user is null || !_passwordHasher.Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt))
-            {
-                throw new BeaconValidationException(nameof(LoginRequest.EmailAddress), "Email address or password is incorrect.");
-            }
+            await context.SignInAsync(user);
 
-            await _currentSession.SignInAsync(user.Id);
-        }
+        });
+        
+        builder.WithTags(EndpointTags.Authentication);
     }
 }

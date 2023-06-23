@@ -68,7 +68,7 @@ public static class BeaconAPI
                 config.RequireClaim(BeaconClaimTypes.LabId);
             });
         });
-
+        services.AddScoped<BeaconAuthenticationService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, SessionManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();

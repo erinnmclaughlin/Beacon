@@ -25,6 +25,12 @@ public partial class RegisterPage
             return;
         }
 
+        await AuthService.LoginAsync(new LoginRequest
+        {
+            EmailAddress = Model.EmailAddress,
+            Password = Model.Password
+        });
+
         NavigationManager.NavigateTo(RedirectUri ?? "");
     }
 
