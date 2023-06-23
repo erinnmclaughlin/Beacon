@@ -29,7 +29,7 @@ public partial class UpdateMembershipTypeForm
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await ApiClient.UpdateMembershipType(MemberToUpdate.Id, Model);
+        var result = await ApiClient.UpdateMembershipType(Model);
 
         if (result.IsError)
         {

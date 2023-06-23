@@ -129,7 +129,9 @@
 
     private async Task ShowCreateProjectsModal()
     {
-        var result = await ModalService.Show<CreateProjectForm>("Create New Project").Result;
+        var parameters = new ModalParameters().Add(nameof(CreateProjectForm.LaboratoryId), CurrentLab.Id);
+
+        var result = await ModalService.Show<CreateProjectForm>("Create New Project", parameters).Result;
 
         if (!result.Cancelled)
         {
@@ -140,7 +142,7 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects();
+        ProjectsOrError = await ApiClient.GetProjects(CurrentLab.Id);
     }
 
     private void NavigateToProjectDetails(ProjectDto project)

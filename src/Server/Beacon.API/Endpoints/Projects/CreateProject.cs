@@ -5,6 +5,7 @@ using Beacon.App.Services;
 using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects.Requests;
+using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -18,7 +19,7 @@ public sealed class CreateProject : IBeaconEndpoint
         app.MapPost<CreateProjectRequest>("projects").WithTags(EndpointTags.Projects);
     }
 
-    internal sealed class Handler
+    internal sealed class Handler : IRequestHandler<CreateProjectRequest>
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;

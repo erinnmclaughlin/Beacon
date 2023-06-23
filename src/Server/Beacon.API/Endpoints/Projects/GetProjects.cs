@@ -32,12 +32,10 @@ public sealed class GetProjects : IBeaconEndpoint
 
         public async Task<ProjectDto[]> Handle(GetProjectsRequest request, CancellationToken ct)
         {
-            var query = _dbContext.Projects.Where(x => x.LaboratoryId == request.LaboratoryId);
-
-            if (request.IncludedStatuses is { } statuses)
-                query = query.Where(x => statuses.Contains(x.ProjectStatus));
-
-            var projects = await query.AsNoTracking().ToArrayAsync(ct);
+            var projects = await _dbContext.Projects
+                .Where(x => x.LaboratoryId == request.LaboratoryId)
+                .AsNoTracking()
+                .ToArrayAsync(ct);
 
             return projects.Select(x => new ProjectDto
             {
