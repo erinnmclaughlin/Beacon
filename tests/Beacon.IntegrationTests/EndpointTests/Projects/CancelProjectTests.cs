@@ -4,6 +4,7 @@ using Beacon.Common.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
+[Collection("ProjectTests")]
 public class CancelProjectTests : EndpointTestBase
 {
     public CancelProjectTests(BeaconTestApplicationFactory factory) : base(factory)
