@@ -1,9 +1,4 @@
-﻿using Beacon.API.Endpoints.Auth;
-using Beacon.API.Endpoints.Invitations;
-using Beacon.API.Endpoints.Laboratories;
-using Beacon.API.Endpoints.Memberships;
-using Beacon.API.Endpoints.Projects;
-using Beacon.API.Endpoints.Session;
+﻿using Beacon.API.Endpoints;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
@@ -90,23 +85,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        var api = app.MapGroup("api");
-        Login.Map(api);
-        Logout.Map(api);
-        Register.Map(api);
-        CreateLaboratory.Map(api);
-        GetMyLaboratories.Map(api);
-        GetLaboratoryById.Map(api);
-        AcceptInvitation.Map(api);
-        CreateInvitation.Map(api);
-        GetMemberships.Map(api);
-        UpdateMembership.Map(api);
-        CancelProject.Map(api);
-        CompleteProject.Map(api);
-        CreateProject.Map(api);
-        GetProjects.Map(api);
-        GetProjectDetails.Map(api);
-        GetSessionInfo.Map(api);
+        app.MapGroup("api").MapBeaconEndpoints();
 
         return app;
     }
