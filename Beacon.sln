@@ -6,8 +6,10 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "_Solution Items", "_Solution Items", "{E0E47628-E0FF-4587-88A1-A375A7590053}"
 	ProjectSection(SolutionItems) = preProject
 		.gitignore = .gitignore
+		azure-pipeline.main.yml = azure-pipeline.main.yml
 		azure-pipelines.yml = azure-pipelines.yml
 		global.json = global.json
+		readme.md = readme.md
 	EndProjectSection
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.API", "src\Server\Beacon.API\Beacon.API.csproj", "{EF052325-92BB-48D4-885A-B5E60F6DDEC8}"
