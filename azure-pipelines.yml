@@ -1,8 +1,3 @@
-trigger:
-  branches:
-    include:
-      - dev
-
 variables:
   solution: '**/*.sln'
   projects: |
@@ -50,6 +45,28 @@ steps:
     inputs:
       codeCoverageTool: 'Cobertura'
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Install EF Core Tools'
+    inputs:
+      command: custom
+      custom: tool
+      arguments: install --global dotnet-ef
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Generate Db Migrations Script'
+    inputs:
+      command: 'custom'
+      custom: 'ef'
+      arguments: migrations script --idempotent --output $(Build.ArtifactStagingDirectory)/Migrations.sql --project ./src/Server/Beacon.API/Beacon.API.csproj --startup-project ./src/Server/Beacon.WebHost/Beacon.WebHost.csproj
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Publish web app'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: '**/Beacon.WebHost.csproj'
+      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
     displayName: 'Publish artifacts'
