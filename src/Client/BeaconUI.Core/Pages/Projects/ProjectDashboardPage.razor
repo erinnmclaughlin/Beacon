@@ -77,28 +77,26 @@
                                                         <span>View Details</span>
                                                     </a>
                                                 </li>
-                                                <SessionInfo Context="session">
-                                                    @if (ShowCancelAndCompleteDropdownSection(project))
-                                                    {
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
-                                                                <span class="icon text-danger">
-                                                                    <i class="fa-regular fa-ban"></i>
-                                                                </span>
-                                                                <span>Cancel project</span>
-                                                            </button>
-                                                        </li>
-                                                        <li>
-                                                            <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
-                                                                <span class="icon text-success">
-                                                                    <i class="fa-regular fa-check"></i>
-                                                                </span>
-                                                                <span>Complete project</span>
-                                                            </button>
-                                                        </li>
-                                                    }
-                                                </SessionInfo>
+                                                @if (ShowCancelAndCompleteDropdownSection(project))
+                                                {
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
+                                                            <span class="icon text-danger">
+                                                                <i class="fa-regular fa-ban"></i>
+                                                            </span>
+                                                            <span>Cancel project</span>
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
+                                                            <span class="icon text-success">
+                                                                <i class="fa-regular fa-check"></i>
+                                                            </span>
+                                                            <span>Complete project</span>
+                                                        </button>
+                                                    </li>
+                                                }
                                             </ul>
                                         </div>
                                     </td>

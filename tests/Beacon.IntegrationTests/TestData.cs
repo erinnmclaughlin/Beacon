@@ -9,7 +9,7 @@ public static class TestData
 {
     public static string DefaultPassword { get; } = "password123";
 
-    public static User DefaultUser => new User
+    public static User DefaultUser => new()
     {
         Id = new Guid("3e8d5902-9574-450a-8f23-7243a82795e9"),
         DisplayName = "Test",
@@ -18,7 +18,7 @@ public static class TestData
         HashedPasswordSalt = salt
     };
 
-    public static Laboratory DefaultLaboratory => new Laboratory 
+    public static Laboratory DefaultLaboratory => new() 
     {
         Id = new Guid("8b4f86b7-95fc-401c-a322-202e8d1ab0c3"),
         Name = "Test Lab"

@@ -33,12 +33,10 @@ public sealed class GetSessionInfo : IBeaconEndpoint
         {
             var currentUserId = _currentUser.UserId;
 
-            var currentUser = await _dbContext.Users
+            return await _dbContext.Users
                 .Where(u => u.Id == currentUserId)
-                .Select(u => new SessionInfoDto.UserDto(u.Id, u.DisplayName))
+                .Select(u => new SessionInfoDto(u.Id, u.DisplayName))
                 .SingleAsync(ct);
-
-            return new SessionInfoDto(currentUser);
         }
     }
 }
