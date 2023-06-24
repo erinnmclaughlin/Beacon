@@ -13,15 +13,14 @@ public class GetProjectTests : EndpointTestBase
     [Fact]
     public async Task GetProject_ReturnsBadRequest_IfProjectCodeIsInvalid()
     {
-        var response = await CreateClient().GetAsync("api/projects/invalid");
+        var response = await CreateClient().GetAsync($"api/projects/invalid?laboratoryId={TestData.DefaultLaboratory.Id}");
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
-
 
     [Fact]
     public async Task GetProjectById_ReturnsNotFound_WhenProjectDoesNotExist()
     {
-        var response = await CreateClient().GetAsync($"api/projects/IDK-123");
+        var response = await CreateClient().GetAsync($"api/projects/IDK-123?laboratoryId={TestData.DefaultLaboratory.Id}");
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 }

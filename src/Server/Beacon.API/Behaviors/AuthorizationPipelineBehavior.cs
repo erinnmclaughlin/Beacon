@@ -21,12 +21,12 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
         _dbContext = dbContext;
     }
 
-    public async Task Process(TRequest request, CancellationToken cancellationToken)
+    public async Task Process(TRequest request, CancellationToken ct)
     {
         if (typeof(TRequest).GetCustomAttribute<RequireMinimumMembershipAttribute>() is not { } requirement)
             return;
 
-        var membershipType = await GetCurrentUserMembershipType(request.LaboratoryId, cancellationToken);
+        var membershipType = await GetCurrentUserMembershipType(request.LaboratoryId, ct);
 
         if (membershipType is null || !requirement.AllowedRoles.Contains(membershipType.Value))
             throw new UserNotAllowedException();

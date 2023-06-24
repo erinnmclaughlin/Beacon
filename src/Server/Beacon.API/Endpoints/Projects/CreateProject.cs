@@ -2,8 +2,8 @@
 using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
-using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
+using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
 using Microsoft.AspNetCore.Http;

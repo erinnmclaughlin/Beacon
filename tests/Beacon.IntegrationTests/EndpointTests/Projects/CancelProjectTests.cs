@@ -1,6 +1,6 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
+using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;

@@ -1,5 +1,4 @@
-﻿using Beacon.App.ValueObjects;
-using Beacon.Common.Projects;
+﻿using Beacon.Common.Projects;
 
 namespace Beacon.App.Entities;
 

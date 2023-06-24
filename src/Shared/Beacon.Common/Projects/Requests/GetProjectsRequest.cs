@@ -4,7 +4,6 @@ using MediatR;
 namespace Beacon.Common.Projects.Requests;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
-public sealed class GetProjectsRequest : IRequest<ProjectDto[]>
+public sealed class GetProjectsRequest : LaboratoryRequestBase, IRequest<ProjectDto[]>
 {
-    public required Guid LaboratoryId { get; set; }
 }

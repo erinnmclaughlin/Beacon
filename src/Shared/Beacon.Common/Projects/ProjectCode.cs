@@ -1,4 +1,4 @@
-﻿namespace Beacon.App.ValueObjects;
+﻿namespace Beacon.Common.Projects;
 
 public sealed record ProjectCode
 {

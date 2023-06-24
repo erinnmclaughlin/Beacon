@@ -1,5 +1,4 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 
