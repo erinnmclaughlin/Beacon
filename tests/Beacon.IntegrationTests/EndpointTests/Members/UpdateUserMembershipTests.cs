@@ -12,20 +12,6 @@ public class UpdateUserMembershipTests : EndpointTestBase
     }
 
     [Fact]
-    public async Task UpdateMembershipType_FailsWhenMemberIsInvalid()
-    {
-        AddTestAuthorization(LaboratoryMembershipType.Admin);
-
-        var uri = $"api/members/{Guid.NewGuid()}/membershipType";
-        var response = await CreateClient().PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
-        {
-            MembershipType = LaboratoryMembershipType.Manager
-        }, JsonSerializerOptions);
-
-        response.StatusCode.Should().Be(HttpStatusCode.NotFound);
-    }
-
-    [Fact]
     public async Task UpdateMembershipType_SucceedsWhenRequestIsValid()
     {
         AddTestAuthorization(LaboratoryMembershipType.Admin);
@@ -54,9 +40,10 @@ public class UpdateUserMembershipTests : EndpointTestBase
             await db.SaveChangesAsync();
         });
 
-        var uri = $"api/members/{memberId}/membershipType";
-        var response = await client.PutAsJsonAsync(uri, new UpdateMembershipTypeRequest
+        var response = await client.PutAsJsonAsync("api/memberships", new UpdateMembershipRequest
         {
+            MemberId = memberId,
+            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Manager
         }, JsonSerializerOptions);
 

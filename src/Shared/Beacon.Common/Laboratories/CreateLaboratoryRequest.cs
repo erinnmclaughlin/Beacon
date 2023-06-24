@@ -1,9 +1,10 @@
 ﻿using Beacon.Common.Validation.Rules;
 using FluentValidation;
+using MediatR;
 
 namespace Beacon.Common.Laboratories;
 
-public class CreateLaboratoryRequest
+public class CreateLaboratoryRequest : IRequest
 {
     public string LaboratoryName { get; set; } = string.Empty;
 

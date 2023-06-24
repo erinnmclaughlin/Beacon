@@ -1,10 +1,11 @@
-﻿using Beacon.API.Middleware;
+﻿using Beacon.API.Endpoints;
+using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
-using Beacon.App;
 using Beacon.App.Services;
 using Beacon.App.Settings;
 using Beacon.Common.Auth;
+using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Routing;
@@ -19,16 +20,25 @@ public static class BeaconAPI
 { 
     public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
     {
-        services.AddBeaconCore();
-
-        // Api
-        services.AddControllers().AddJsonOptions(options =>
+        // Framework:
+        services.AddMediatR(config =>
         {
-            options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+            config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
         });
 
+        services.AddValidatorsFromAssemblies(new[]
+        {
+            typeof(BeaconAPI).Assembly,
+            typeof(LoginRequest).Assembly
+        });
+
+        // Api
         services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
+        services.ConfigureHttpJsonOptions(options => {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
+
 
         // Auth
         services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -53,21 +63,16 @@ public static class BeaconAPI
                 config.RequireClaim(BeaconClaimTypes.LabId);
             });
         });
-
+        services.AddScoped<BeaconAuthenticationService>();
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, SessionManager>();
-        services.AddScoped<ICurrentLab, SessionManager>();
+        services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<ISessionManager, SessionManager>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
-        services.AddScoped<IUnitOfWork, BeaconDbContext>();
-        services.AddScoped<IQueryService, BeaconDbContext>();
 
         // Email
         services.AddScoped<IEmailService, EmailService>();
-        services.AddScoped<LabInvitationEmailService>();
         services.Configure<EmailSettings>(config.GetRequiredSection("EmailSettings"));
 
         return services;
@@ -80,7 +85,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        app.MapControllers();
+        app.MapGroup("api").MapBeaconEndpoints();
 
         return app;
     }

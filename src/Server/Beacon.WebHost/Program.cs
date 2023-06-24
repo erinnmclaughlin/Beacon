@@ -35,7 +35,7 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapBeaconEndpoints();
-app.MapGet("api/ping", () => Results.Ok("pong"));
+app.MapGet("api/ping", () => Results.Ok("pong")).ExcludeFromDescription();
 
 app.MapFallbackToFile("index.html");
 

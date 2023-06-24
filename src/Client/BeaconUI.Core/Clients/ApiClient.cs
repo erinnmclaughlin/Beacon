@@ -52,38 +52,38 @@ public sealed class ApiClient : ApiClientBase
         return await PostAsync("api/laboratories", request);
     }
 
-    public async Task<ErrorOr<Success>> LoginToLaboratory(Guid labId)
+    public async Task<ErrorOr<LaboratoryDto>> GetLaboratoryById(Guid labId)
     {
-        return await PostAsync($"api/laboratories/{labId}/login", null);
+        return await GetAsync<LaboratoryDto>($"api/laboratories/{labId}");
     }
 
-    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
+    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers(Guid labId)
     {
-        return await GetAsync<LaboratoryMemberDto[]>("api/members");
+        return await GetAsync<LaboratoryMemberDto[]>($"api/memberships?laboratoryId={labId}");
     }
 
-    public async Task<ErrorOr<Success>> UpdateMembershipType(Guid memberId, UpdateMembershipTypeRequest request)
+    public async Task<ErrorOr<Success>> UpdateMembershipType(UpdateMembershipRequest request)
     {
-        return await PutAsync($"api/members/{memberId}/membershipType", request);
+        return await PutAsync($"api/memberships", request);
     }
 
-    public async Task<ErrorOr<ProjectDto[]>> GetProjects()
+    public async Task<ErrorOr<ProjectDto[]>> GetProjects(Guid labId)
     {
-        return await GetAsync<ProjectDto[]>("api/projects");
+        return await GetAsync<ProjectDto[]>($"api/projects?laboratoryId={labId}");
     }
 
-    public async Task<ErrorOr<ProjectDto>> CreateProject(CreateProjectRequest request)
+    public async Task<ErrorOr<Success>> CreateProject(CreateProjectRequest request)
     {
-        return await PostAsync<ProjectDto>("api/projects", request);
+        return await PostAsync("api/projects", request);
     }
 
-    public async Task<ErrorOr<Success>> CancelProject(string projectCode)
+    public async Task<ErrorOr<Success>> CancelProject(Guid projectId)
     {
-        return await PostAsync($"api/projects/{projectCode}/cancel", null);
+        return await PostAsync($"api/projects/{projectId}/cancel", null);
     }
 
-    public async Task<ErrorOr<Success>> CompleteProject(string projectCode)
+    public async Task<ErrorOr<Success>> CompleteProject(Guid projectId)
     {
-        return await PostAsync($"api/projects/{projectCode}/complete", null);
+        return await PostAsync($"api/projects/{projectId}/complete", null);
     }
 }

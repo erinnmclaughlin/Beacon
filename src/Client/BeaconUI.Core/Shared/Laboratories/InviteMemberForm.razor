@@ -16,10 +16,14 @@
 
 @code {
 
+    [Parameter]
+    public required Guid LaboratoryId { get; set; }
+
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private InviteLabMemberRequest Model { get; } = new();
+    private InviteLabMemberRequest? _model;
+    private InviteLabMemberRequest Model => _model ??= new() { LaboratoryId = LaboratoryId };
 
     private async Task Submit(BeaconForm form)
     {

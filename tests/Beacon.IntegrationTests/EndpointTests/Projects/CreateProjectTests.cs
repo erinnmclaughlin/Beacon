@@ -16,6 +16,7 @@ public class CreateProjectTests : EndpointTestBase
         AddTestAuthorization(LaboratoryMembershipType.Member);
         var response = await CreateClient().PostAsJsonAsync("api/projects", new CreateProjectRequest
         {
+            LaboratoryId = TestData.DefaultLaboratory.Id,
             CustomerCode = "ABC",
             CustomerName = "ABC Company"
         });
@@ -29,10 +30,11 @@ public class CreateProjectTests : EndpointTestBase
         AddTestAuthorization(LaboratoryMembershipType.Admin);
         var response = await CreateClient().PostAsJsonAsync("api/projects", new CreateProjectRequest
         {
+            LaboratoryId = TestData.DefaultLaboratory.Id,
             CustomerCode = "ABC",
             CustomerName = "ABC Company"
         });
 
-        response.StatusCode.Should().Be(HttpStatusCode.Created);
+        response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

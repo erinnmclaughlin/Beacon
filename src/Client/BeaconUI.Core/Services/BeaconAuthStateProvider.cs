@@ -20,7 +20,7 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider
         if (ClaimsPrincipal == null)
         {
             var errorOrSessionInfo = await _apiClient.GetSessionInfo();
-            ClaimsPrincipal = errorOrSessionInfo.IsError ? AnonymousUser : errorOrSessionInfo.Value.ToClaimsPrincipal();
+            ClaimsPrincipal = errorOrSessionInfo.Match(user => user.ToClaimsPrincipal(), _ => AnonymousUser);
         }
 
         return new AuthenticationState(ClaimsPrincipal);

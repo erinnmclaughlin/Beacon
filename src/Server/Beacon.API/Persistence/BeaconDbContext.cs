@@ -1,10 +1,9 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;
 
-public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
+public class BeaconDbContext : DbContext
 {
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
@@ -15,21 +14,6 @@ public class BeaconDbContext : DbContext, IUnitOfWork, IQueryService
 
     public BeaconDbContext(DbContextOptions<BeaconDbContext> options) : base(options)
     {
-    }
-
-    public IRepository<T> GetRepository<T>() where T : class
-    {
-        return new Repository<T>(this);
-    }
-
-    public IQueryable<T> QueryFor<T>() where T : class
-    {
-        return QueryFor<T>(enableChangeTracking: false);
-    }
-
-    public IQueryable<T> QueryFor<T>(bool enableChangeTracking) where T : class
-    {
-        return enableChangeTracking ? Set<T>() : Set<T>().AsNoTracking();
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

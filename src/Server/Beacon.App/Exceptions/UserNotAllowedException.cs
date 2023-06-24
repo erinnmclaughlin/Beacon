@@ -1,9 +1,10 @@
 ﻿namespace Beacon.App.Exceptions;
 
-public class UserNotAllowedException : BeaconException
+public class UserNotAllowedException : ApplicationException
 {
-    public UserNotAllowedException(string message = "The current user is not authorized to perform this action.")
-        : base(BeaconExceptionType.NotAuthorized, message)
+    public const string DefaultMessage = "The current user is not authorized to perform this action.";
+
+    public UserNotAllowedException(string message = DefaultMessage) : base(message)
     {
     }
 }

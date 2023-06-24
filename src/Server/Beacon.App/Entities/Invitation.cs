@@ -21,12 +21,21 @@ public class Invitation : LaboratoryScopedEntityBase
     private readonly List<InvitationEmail> _emailInvitations = new();
     public IReadOnlyList<InvitationEmail> EmailInvitations => _emailInvitations.AsReadOnly();
 
+    public bool IsFor(User user)
+    {
+        return user.EmailAddress == NewMemberEmailAddress;
+    }
+
     public void Accept(User acceptingUser)
     {
-        if (acceptingUser.EmailAddress != NewMemberEmailAddress)
+        if (!IsFor(acceptingUser))
             throw new UserNotAllowedException("Current user's email address does not match the email address in the invitation.");
 
-        AcceptedById = acceptingUser.Id;
+        if (!Laboratory.HasMember(acceptingUser))
+        {
+            AcceptedById = acceptingUser.Id;
+            Laboratory.AddMember(acceptingUser.Id, MembershipType);
+        }
     }
 
     public InvitationEmail AddEmailInvitation(DateTimeOffset sentOn)

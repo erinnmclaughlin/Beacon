@@ -3,19 +3,17 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent Context="session">
-        <h3 class="mb-0 flex-grow-1">
-            <span>@session.CurrentLab?.Name</span>
-        </h3>
-    </TitleContent>
-    <ButtonsContent Context="session">
-        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(session.CurrentLab?.MembershipType is null or LaboratoryMembershipType.Member)">
+    <h3 class="mb-0 flex-grow-1">
+        <span>@context.Name</span>
+    </h3>
+    <div>
+        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(context.MyMembershipType is LaboratoryMembershipType.Member)">
             <span class="icon">
                 <i class="fa-solid fa-plus"></i>
             </span>
             <span>Create project</span>
         </button>
-    </ButtonsContent>
+    </div>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
@@ -79,28 +77,26 @@
                                                         <span>View Details</span>
                                                     </a>
                                                 </li>
-                                                <SessionInfo Context="session">
-                                                    @if (project.ProjectStatus is ProjectStatus.Active && ShowCancelAndCompleteDropdownSection(session))
-                                                    {
-                                                        <li><hr class="dropdown-divider"></li>
-                                                        <li>
-                                                            <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
-                                                                <span class="icon text-danger">
-                                                                    <i class="fa-regular fa-ban"></i>
-                                                                </span>
-                                                                <span>Cancel project</span>
-                                                            </button>
-                                                        </li>
-                                                        <li>
-                                                            <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
-                                                                <span class="icon text-success">
-                                                                    <i class="fa-regular fa-check"></i>
-                                                                </span>
-                                                                <span>Complete project</span>
-                                                            </button>
-                                                        </li>
-                                                    }
-                                                </SessionInfo>
+                                                @if (ShowCancelAndCompleteDropdownSection(project))
+                                                {
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
+                                                            <span class="icon text-danger">
+                                                                <i class="fa-regular fa-ban"></i>
+                                                            </span>
+                                                            <span>Cancel project</span>
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
+                                                            <span class="icon text-success">
+                                                                <i class="fa-regular fa-check"></i>
+                                                            </span>
+                                                            <span>Complete project</span>
+                                                        </button>
+                                                    </li>
+                                                }
                                             </ul>
                                         </div>
                                     </td>
@@ -116,7 +112,11 @@
 
 @code {
 
-    [CascadingParameter] public required IModalService ModalService { get; set; }
+    [CascadingParameter]
+    private LaboratoryDto CurrentLab { get; set; } = null!;
+
+    [CascadingParameter]
+    public required IModalService ModalService { get; set; }
 
     private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
 
@@ -127,7 +127,9 @@
 
     private async Task ShowCreateProjectsModal()
     {
-        var result = await ModalService.Show<CreateProjectForm>("Create New Project").Result;
+        var parameters = new ModalParameters().Add(nameof(CreateProjectForm.LaboratoryId), CurrentLab.Id);
+
+        var result = await ModalService.Show<CreateProjectForm>("Create New Project", parameters).Result;
 
         if (!result.Cancelled)
         {
@@ -138,7 +140,7 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects();
+        ProjectsOrError = await ApiClient.GetProjects(CurrentLab.Id);
     }
 
     private void NavigateToProjectDetails(ProjectDto project)
@@ -146,9 +148,10 @@
         NavigationManager.NavigateTo($"l/projects/{project.ProjectCode}");
     }
 
-    private bool ShowCancelAndCompleteDropdownSection(SessionInfoDto currentSession)
+    private bool ShowCancelAndCompleteDropdownSection(ProjectDto project)
     {
-        return currentSession.CurrentLab?.MembershipType is not null and not LaboratoryMembershipType.Member;
+        return project.ProjectStatus is ProjectStatus.Active && 
+            CurrentLab.MyMembershipType is not LaboratoryMembershipType.Member;
     }
 
     private async Task CancelProject(ProjectDto project)
@@ -160,7 +163,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(project.ProjectCode);
+            await ApiClient.CancelProject(project.Id);
             await LoadProjects();
         }
     }
@@ -174,7 +177,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(project.ProjectCode);
+            await ApiClient.CompleteProject(project.Id);
             await LoadProjects();
         }
     }
