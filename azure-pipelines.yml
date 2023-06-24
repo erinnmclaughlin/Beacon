@@ -52,6 +52,7 @@ steps:
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
 
   - task: DotNetCoreCLI@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Install EF Core Tools'
     inputs:
       command: custom
@@ -59,6 +60,7 @@ steps:
       arguments: install --global dotnet-ef
 
   - task: DotNetCoreCLI@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Generate Db Migrations Script'
     inputs:
       command: 'custom'
@@ -66,6 +68,7 @@ steps:
       arguments: migrations script --idempotent --output $(Build.ArtifactStagingDirectory)/Migrations.sql --project ./src/Server/Beacon.API/Beacon.API.csproj --startup-project ./src/Server/Beacon.WebHost/Beacon.WebHost.csproj
 
   - task: DotNetCoreCLI@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Publish web app'
     inputs:
       command: 'publish'
@@ -74,6 +77,7 @@ steps:
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
 
   - task: PublishBuildArtifacts@1
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Publish artifacts'
     inputs:
       PathtoPublish: '$(Build.ArtifactStagingDirectory)'
