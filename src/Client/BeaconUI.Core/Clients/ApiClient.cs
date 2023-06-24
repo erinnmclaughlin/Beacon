@@ -77,13 +77,13 @@ public sealed class ApiClient : ApiClientBase
         return await PostAsync("api/projects", request);
     }
 
-    public async Task<ErrorOr<Success>> CancelProject(Guid projectId)
+    public async Task<ErrorOr<Success>> CancelProject(CancelProjectRequest request)
     {
-        return await PostAsync($"api/projects/{projectId}/cancel", null);
+        return await PostAsync($"api/projects/cancel", request);
     }
 
-    public async Task<ErrorOr<Success>> CompleteProject(Guid projectId)
+    public async Task<ErrorOr<Success>> CompleteProject(CompleteProjectRequest request)
     {
-        return await PostAsync($"api/projects/{projectId}/complete", null);
+        return await PostAsync($"api/projects/complete", request);
     }
 }

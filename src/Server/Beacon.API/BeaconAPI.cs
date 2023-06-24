@@ -1,4 +1,5 @@
-﻿using Beacon.API.Endpoints;
+﻿using Beacon.API.Behaviors;
+using Beacon.API.Endpoints;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
@@ -24,6 +25,7 @@ public static class BeaconAPI
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
+            config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
         services.AddValidatorsFromAssemblies(new[]

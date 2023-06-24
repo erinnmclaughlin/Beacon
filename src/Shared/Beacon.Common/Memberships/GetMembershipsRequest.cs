@@ -2,7 +2,7 @@
 
 namespace Beacon.Common.Memberships;
 
-public class GetMembershipsRequest : IRequest<LaboratoryMemberDto[]>
+[RequireMinimumMembership(LaboratoryMembershipType.Member)]
+public class GetMembershipsRequest : LaboratoryRequestBase, IRequest<LaboratoryMemberDto[]>
 {
-    public required Guid LaboratoryId { get; set; }
 }

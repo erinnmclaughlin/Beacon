@@ -6,7 +6,6 @@ using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -17,14 +16,7 @@ public sealed class CompleteProject : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var builder = app.MapPost("projects/{projectId:Guid}/complete", async (Guid projectId, IMediator m, CancellationToken ct) =>
-        {
-            var request = new CompleteProjectRequest { ProjectId = projectId };
-            await m.Send(request, ct);
-            return Results.NoContent();
-        });
-
-        builder.WithTags(EndpointTags.Projects);
+        app.MapPost<CompleteProjectRequest>("projects/complete").WithTags(EndpointTags.Projects);
     }
 
     internal sealed class Handler : IRequestHandler<CompleteProjectRequest>

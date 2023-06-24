@@ -1,12 +1,13 @@
-﻿using Beacon.Common.Validation.Rules;
+﻿using Beacon.Common.Memberships;
+using Beacon.Common.Validation.Rules;
 using FluentValidation;
 using MediatR;
 
 namespace Beacon.Common.Projects.Requests;
 
-public class CreateProjectRequest : IRequest
+[RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
+public class CreateProjectRequest : LaboratoryRequestBase, IRequest
 {
-    public required Guid LaboratoryId { get; set; }
     public string CustomerCode { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
 

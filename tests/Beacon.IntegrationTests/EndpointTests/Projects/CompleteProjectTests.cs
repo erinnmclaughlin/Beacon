@@ -1,6 +1,7 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
+using Beacon.Common.Projects.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
@@ -30,7 +31,8 @@ public class CompleteProjectTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var response = await client.PostAsync($"api/projects/{projectId}/complete", null);
+        var request = new CompleteProjectRequest { LaboratoryId = TestData.DefaultLaboratory.Id, ProjectId = projectId };
+        var response = await client.PostAsJsonAsync($"api/projects/complete", request);
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

@@ -1,6 +1,7 @@
 ﻿using Beacon.App.Entities;
 using Beacon.App.ValueObjects;
 using Beacon.Common.Memberships;
+using Beacon.Common.Projects.Requests;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
@@ -30,7 +31,8 @@ public class CancelProjectTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var response = await client.PostAsync($"api/projects/{projectId}/cancel", null);
+        var request = new CancelProjectRequest { LaboratoryId = TestData.DefaultLaboratory.Id, ProjectId = projectId };
+        var response = await client.PostAsJsonAsync($"api/projects/cancel", request);
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

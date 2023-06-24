@@ -2,8 +2,8 @@
 
 public enum LaboratoryMembershipType
 {
-    Admin,
-    Manager,
-    Analyst,
-    Member
+    Member = 0,
+    Analyst = 1,
+    Manager = 2,
+    Admin = 3
 }

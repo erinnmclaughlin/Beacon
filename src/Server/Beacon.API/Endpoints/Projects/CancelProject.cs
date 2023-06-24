@@ -6,7 +6,6 @@ using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +16,7 @@ public sealed class CancelProject : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var builder = app.MapPost("projects/{projectId:Guid}/cancel", async (Guid projectId, IMediator m, CancellationToken ct) =>
-        {
-            await m.Send(new CancelProjectRequest { ProjectId = projectId }, ct);
-            return Results.NoContent();
-        });
-
-        builder.WithTags(EndpointTags.Projects);
+        app.MapPost<CancelProjectRequest>("projects/cancel").WithTags(EndpointTags.Projects);
     }
 
     internal sealed class Handler : IRequestHandler<CancelProjectRequest>

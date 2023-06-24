@@ -1,8 +1,10 @@
-﻿using MediatR;
+﻿using Beacon.Common.Memberships;
+using MediatR;
 
 namespace Beacon.Common.Projects.Requests;
 
-public sealed class CancelProjectRequest : IRequest
+[RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
+public sealed class CancelProjectRequest : LaboratoryRequestBase, IRequest
 {
     public required Guid ProjectId { get; set; }
 }

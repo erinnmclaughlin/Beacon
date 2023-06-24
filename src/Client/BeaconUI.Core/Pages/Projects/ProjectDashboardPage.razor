@@ -163,7 +163,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(project.Id);
+            await ApiClient.CancelProject(new() { LaboratoryId = CurrentLab.Id, ProjectId = project.Id });
             await LoadProjects();
         }
     }
@@ -177,7 +177,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(project.Id);
+            await ApiClient.CompleteProject(new() { LaboratoryId = CurrentLab.Id, ProjectId = project.Id });
             await LoadProjects();
         }
     }

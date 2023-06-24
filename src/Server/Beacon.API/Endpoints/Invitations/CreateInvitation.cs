@@ -76,18 +76,12 @@ public sealed class CreateInvitation : IBeaconEndpoint
         private async Task EnsureCurrentUserIsAllowed(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
         {
             var membership = await _dbContext.Memberships
-                .AsNoTracking()
                 .Where(m => m.MemberId == currentUser.Id && m.LaboratoryId == request.LaboratoryId)
-                .SingleOrDefaultAsync(ct);
+                .AsNoTracking()
+                .SingleAsync(ct);
 
-            if (membership?.MembershipType is LaboratoryMembershipType.Admin)
-                return;
-
-            if (request.MembershipType is LaboratoryMembershipType.Admin)
+            if (membership.MembershipType is LaboratoryMembershipType.Manager && request.MembershipType is LaboratoryMembershipType.Admin)
                 throw new UserNotAllowedException("Only laboratory admins are allowed to invite new admins.");
-
-            if (membership?.MembershipType is not LaboratoryMembershipType.Manager)
-                throw new UserNotAllowedException("Only laboratory admins or managers are allowed to invite new members.");
         }
 
         private async Task<InvitationEmail> CreateInvitation(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
