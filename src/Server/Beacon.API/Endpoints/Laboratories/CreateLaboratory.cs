@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common;
-using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
+using Beacon.Common.Requests.Laboratories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

@@ -5,6 +5,7 @@ using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Invitations;
+using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Helpers;
 using ErrorOr;
 

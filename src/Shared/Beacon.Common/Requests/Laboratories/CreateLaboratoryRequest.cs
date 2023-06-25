@@ -2,7 +2,7 @@
 using FluentValidation;
 using MediatR;
 
-namespace Beacon.Common.Laboratories;
+namespace Beacon.Common.Requests.Laboratories;
 
 public class CreateLaboratoryRequest : IRequest
 {

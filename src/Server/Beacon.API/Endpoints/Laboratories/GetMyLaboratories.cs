@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common;
 using Beacon.Common.Laboratories;
+using Beacon.Common.Requests.Laboratories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -12,12 +13,10 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("laboratories", new Request()).WithTags(EndpointTags.Laboratories);
+        app.MapGet("laboratories", new GetMyLaboratoriesRequest()).WithTags(EndpointTags.Laboratories);
     }
 
-    public sealed record Request : IRequest<LaboratoryDto[]>;
-
-    internal sealed class Handler : IRequestHandler<Request, LaboratoryDto[]>
+    internal sealed class Handler : IRequestHandler<GetMyLaboratoriesRequest, LaboratoryDto[]>
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
@@ -28,7 +27,7 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
             _dbContext = dbContext;
         }
 
-        public async Task<LaboratoryDto[]> Handle(Request request, CancellationToken ct)
+        public async Task<LaboratoryDto[]> Handle(GetMyLaboratoriesRequest request, CancellationToken ct)
         {
             var currentUserId = _currentUser.UserId;
 
