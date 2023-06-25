@@ -1,4 +1,5 @@
-﻿using BeaconUI.Core.Clients;
+﻿using Beacon.Common;
+using BeaconUI.Core.Clients;
 using BeaconUI.Core.Services;
 using Blazored.LocalStorage;
 using Blazored.Modal;
@@ -20,7 +21,7 @@ public static class BeaconUISetup
         services.AddScoped<AuthService>();
 
         services.AddBlazoredLocalStorage();
-        services.AddScoped<CurrentLabService>();
+        services.AddScoped<ILabContext, CurrentLabService>();
 
         services.AddBlazoredModal();
 

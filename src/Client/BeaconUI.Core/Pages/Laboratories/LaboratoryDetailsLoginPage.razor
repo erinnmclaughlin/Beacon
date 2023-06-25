@@ -5,14 +5,14 @@
 @code {
 
     [Inject]
-    private CurrentLabService CurrentLabService { get; set; } = null!;
+    private ILabContext LabContext { get; set; } = null!;
 
     [Parameter] 
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await CurrentLabService.SetCurrentLaboratory(Id);
+        await LabContext.SetLaboratoryId(Id);
         NavigationManager.NavigateTo("l", replace: true);
     }
 }

@@ -1,18 +1,18 @@
-﻿using Beacon.Common.Auth;
+﻿using Beacon.Common;
+using Beacon.Common.Auth;
 using Beacon.Common.Invitations;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
-using BeaconUI.Core.Services;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
 
 public sealed class ApiClient : ApiClientBase
 {
-    public ApiClient(CurrentLabService currentLabService, IHttpClientFactory httpClientFactory)
-        : base(currentLabService, httpClientFactory) { }
+    public ApiClient(ILabContext labContext, IHttpClientFactory httpClientFactory)
+        : base(labContext, httpClientFactory) { }
 
     public async Task<ErrorOr<SessionInfoDto>> GetSessionInfo()
     {

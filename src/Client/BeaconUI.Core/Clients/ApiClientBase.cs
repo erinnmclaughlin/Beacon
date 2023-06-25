@@ -1,5 +1,5 @@
-﻿using BeaconUI.Core.Helpers;
-using BeaconUI.Core.Services;
+﻿using Beacon.Common;
+using BeaconUI.Core.Helpers;
 using ErrorOr;
 using System.Net.Http.Json;
 
@@ -7,12 +7,12 @@ namespace BeaconUI.Core.Clients;
 
 public abstract class ApiClientBase
 {
-    private readonly CurrentLabService _currentLabService;
+    private readonly ILabContext _labContext;
     private readonly IHttpClientFactory _httpClientFactory;
 
-    protected ApiClientBase(CurrentLabService currentLabService, IHttpClientFactory httpClientFactory)
+    protected ApiClientBase(ILabContext labContext, IHttpClientFactory httpClientFactory)
     {
-        _currentLabService = currentLabService;
+        _labContext = labContext;
         _httpClientFactory = httpClientFactory;
     }
 
@@ -60,11 +60,11 @@ public abstract class ApiClientBase
 
     private async Task<HttpClient> CreateBeaconClient()
     {
-        var labId = await _currentLabService.GetCurrentLaboratoryId();
+        var labId = await _labContext.GetLaboratoryId();
 
         var httpClient = _httpClientFactory.CreateBeaconClient();
 
-        if (labId is not null)
+        if (labId != default)
             httpClient.DefaultRequestHeaders.Add("X-LaboratoryId", labId.ToString());
 
         return httpClient;

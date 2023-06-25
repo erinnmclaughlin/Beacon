@@ -1,4 +1,5 @@
-﻿@inherits LayoutComponentBase
+﻿@using Beacon.Common
+@inherits LayoutComponentBase
 
 <TopNav />
 
@@ -22,13 +23,13 @@
 @code {
 
     [Inject]
-    private Services.CurrentLabService CurrentLabService { get; set; } = null!;
+    private ILabContext LabContext { get; set; } = null!;
 
     private LaboratoryDto? CurrentLab { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {
-        if (await CurrentLabService.GetCurrentLaboratoryId() is { } labId)
+        if (await LabContext.GetLaboratoryId() is { } labId)
         {
             var labOrError = await ApiClient.GetLaboratoryById(labId);
             CurrentLab = labOrError.IsError ? null : labOrError.Value;
