@@ -1,16 +1,21 @@
-﻿using Beacon.Common.Services;
+﻿using Beacon.Common.Models;
+using Beacon.Common.Services;
+using BeaconUI.Core.Clients;
 using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;
 
 public sealed class LabContext : ILabContext, IDisposable
 {
+    private readonly ApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;
 
     public Guid LaboratoryId { get; private set; }
+    public LaboratoryMembershipType? MembershipType { get; private set; }
 
-    public LabContext(ILocalStorageService localStorage)
+    public LabContext(ApiClient apiClient, ILocalStorageService localStorage)
     {
+        _apiClient = apiClient;
         _localStorage = localStorage;
         _localStorage.Changed += HandleChange;
 
@@ -25,6 +30,12 @@ public sealed class LabContext : ILabContext, IDisposable
     private async void Initialize()
     {
         LaboratoryId = await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
+
+        if (LaboratoryId != Guid.Empty)
+        {
+            var lab = await _apiClient.GetCurrentLaboratory();
+            MembershipType = lab.IsError ? null : lab.Value.MyMembershipType;
+        }
     }
 
     private void HandleChange(object? o, ChangedEventArgs e)
