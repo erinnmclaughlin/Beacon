@@ -3,6 +3,7 @@ using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.Common;
 using Beacon.Common.Memberships;
+using Beacon.Common.Requests.Memberships;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

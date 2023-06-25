@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.Common.Memberships;
+using Beacon.Common.Requests.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Members;
 
