@@ -4,13 +4,15 @@ using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
+using BeaconUI.Core.Services;
 using ErrorOr;
 
 namespace BeaconUI.Core.Clients;
 
 public sealed class ApiClient : ApiClientBase
 {
-    public ApiClient(IHttpClientFactory httpClientFactory) : base(httpClientFactory) { }
+    public ApiClient(CurrentLabService currentLabService, IHttpClientFactory httpClientFactory)
+        : base(currentLabService, httpClientFactory) { }
 
     public async Task<ErrorOr<SessionInfoDto>> GetSessionInfo()
     {

@@ -28,7 +28,11 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        CurrentLab = await CurrentLabService.GetCurrentLaboratory();
+        if (await CurrentLabService.GetCurrentLaboratoryId() is { } labId)
+        {
+            var labOrError = await ApiClient.GetLaboratoryById(labId);
+            CurrentLab = labOrError.IsError ? null : labOrError.Value;
+        }
 
         if (CurrentLab is null)
             NavigationManager.NavigateTo("");

@@ -1,17 +1,13 @@
-﻿using Beacon.Common.Laboratories;
-using BeaconUI.Core.Clients;
-using Blazored.LocalStorage;
+﻿using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;
 
 public sealed class CurrentLabService
 {
-    private readonly ApiClient _apiClient;
     private readonly ILocalStorageService _localStorage;
 
-    public CurrentLabService(ApiClient apiClient, ILocalStorageService localStorage)
+    public CurrentLabService(ILocalStorageService localStorage)
     {
-        _apiClient = apiClient;
         _localStorage = localStorage;
     }
 
@@ -20,14 +16,12 @@ public sealed class CurrentLabService
         await _localStorage.SetItemAsync("CurrentLaboratoryId", id);
     }
 
-    public async Task<LaboratoryDto?> GetCurrentLaboratory()
+    public async Task<Guid?> GetCurrentLaboratoryId()
     {
         if (!await _localStorage.ContainKeyAsync("CurrentLaboratoryId"))
             return null;
 
-        var labId = await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
-        var errorOrLab = await _apiClient.GetLaboratoryById(labId);
-        return errorOrLab.IsError ? null : errorOrLab.Value;
+        return await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
     }
 
     public async Task ClearCurrentLaboratory()
