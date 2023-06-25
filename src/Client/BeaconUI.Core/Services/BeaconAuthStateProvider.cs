@@ -23,16 +23,16 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
     {
         if (ClaimsPrincipal == null)
         {
-            var errorOrSessionInfo = await _apiClient.GetSessionInfo();
+            var errorOrUser = await _apiClient.GetCurrentUser();
 
-            if (errorOrSessionInfo.IsError)
+            if (errorOrUser.IsError)
             {
                 ClaimsPrincipal = AnonymousUser;
                 _userId = Guid.Empty;
             }
             else
             {
-                var session = errorOrSessionInfo.Value;
+                var session = errorOrUser.Value;
                 ClaimsPrincipal = session.ToClaimsPrincipal();
                 _userId = session.Id;
             }

@@ -2,7 +2,7 @@
 
 namespace Beacon.Common.Models;
 
-public sealed record SessionInfoDto(Guid Id, string DisplayName)
+public sealed record CurrentUserDto(Guid Id, string DisplayName)
 {
     public ClaimsPrincipal ToClaimsPrincipal()
     {

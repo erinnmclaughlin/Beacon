@@ -18,9 +18,9 @@ public sealed class ApiClient
         _httpClientFactory = httpClientFactory;
     }
 
-    public async Task<ErrorOr<SessionInfoDto>> GetSessionInfo()
+    public async Task<ErrorOr<CurrentUserDto>> GetCurrentUser()
     {
-        return await _httpClientFactory.GetAsync<SessionInfoDto>("api/session");
+        return await _httpClientFactory.GetAsync<CurrentUserDto>("api/users/current");
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)

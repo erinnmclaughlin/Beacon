@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -7,18 +8,16 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.API.Endpoints.Session;
+namespace Beacon.API.Endpoints.Auth;
 
-public sealed class GetSessionInfo : IBeaconEndpoint
+public sealed class GetCurrentUser : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("session", new Request()).RequireAuthorization().WithTags(EndpointTags.Authentication);
+        app.MapGet("users/current", new GetCurrentUserRequest()).RequireAuthorization().WithTags(EndpointTags.Authentication);
     }
 
-    internal sealed record Request : IRequest<SessionInfoDto>;
-
-    internal sealed class Handler : IRequestHandler<Request, SessionInfoDto>
+    internal sealed class Handler : IRequestHandler<GetCurrentUserRequest, CurrentUserDto>
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
@@ -29,13 +28,11 @@ public sealed class GetSessionInfo : IBeaconEndpoint
             _dbContext = dbContext;
         }
 
-        public async Task<SessionInfoDto> Handle(Request request, CancellationToken ct)
+        public async Task<CurrentUserDto> Handle(GetCurrentUserRequest request, CancellationToken ct)
         {
-            var currentUserId = _currentUser.UserId;
-
             return await _dbContext.Users
-                .Where(u => u.Id == currentUserId)
-                .Select(u => new SessionInfoDto(u.Id, u.DisplayName))
+                .Where(u => u.Id == _currentUser.UserId)
+                .Select(u => new CurrentUserDto(u.Id, u.DisplayName))
                 .SingleAsync(ct);
         }
     }
