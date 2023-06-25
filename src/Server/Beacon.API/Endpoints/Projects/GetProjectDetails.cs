@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common.Projects;
-using Beacon.Common.Projects.Requests;
+using Beacon.Common.Requests.Projects;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -58,9 +58,7 @@ public sealed class GetProjectDetails : IBeaconEndpoint
 
         private async Task<ProjectDto?> GetAsync(Expression<Func<Project, bool>> filter, CancellationToken ct)
         {
-            var project = await _dbContext.Projects
-                .AsNoTracking()
-                .SingleOrDefaultAsync(filter, ct);
+            var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(filter, ct);
 
             return project is null ? null : new ProjectDto
             {

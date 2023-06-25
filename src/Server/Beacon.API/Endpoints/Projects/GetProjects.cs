@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common;
 using Beacon.Common.Projects;
-using Beacon.Common.Projects.Requests;
+using Beacon.Common.Requests.Projects;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

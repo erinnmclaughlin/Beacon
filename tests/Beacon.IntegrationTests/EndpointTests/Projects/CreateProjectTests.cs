@@ -1,5 +1,5 @@
 ﻿using Beacon.Common.Memberships;
-using Beacon.Common.Projects.Requests;
+using Beacon.Common.Requests.Projects;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 

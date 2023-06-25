@@ -2,7 +2,7 @@
 using Beacon.App.Entities;
 using Beacon.Common;
 using Beacon.Common.Projects;
-using Beacon.Common.Projects.Requests;
+using Beacon.Common.Requests.Projects;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;

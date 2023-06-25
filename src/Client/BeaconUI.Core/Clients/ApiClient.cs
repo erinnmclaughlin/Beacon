@@ -2,11 +2,11 @@
 using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
-using Beacon.Common.Projects.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Requests.Memberships;
+using Beacon.Common.Requests.Projects;
 using BeaconUI.Core.Helpers;
 using ErrorOr;
 
