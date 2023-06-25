@@ -65,9 +65,9 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
 
         public async Task Handle(CreateEmailInvitationRequest request, CancellationToken ct)
         {
-            var user = await GetCurrentUser(ct);
-            await EnsureCurrentUserIsAllowed(request, user, ct);
+            EnsureCurrentUserIsAllowed(request, ct);
 
+            var user = await GetCurrentUser(ct);
             var invitation = await CreateInvitation(request, user, ct);
             await SendAsync(invitation, ct);
         }
@@ -78,14 +78,9 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
             return await _dbContext.Users.SingleAsync(x => x.Id == id, ct);
         }
 
-        private async Task EnsureCurrentUserIsAllowed(CreateEmailInvitationRequest request, User currentUser, CancellationToken ct)
+        private void EnsureCurrentUserIsAllowed(CreateEmailInvitationRequest request, CancellationToken ct)
         {
-            var membership = await _dbContext.Memberships
-                .Where(m => m.MemberId == currentUser.Id && m.LaboratoryId == _labContext.LaboratoryId)
-                .AsNoTracking()
-                .SingleAsync(ct);
-
-            if (membership.MembershipType is LaboratoryMembershipType.Manager && request.MembershipType is LaboratoryMembershipType.Admin)
+            if (_labContext.MembershipType is LaboratoryMembershipType.Manager && request.MembershipType is LaboratoryMembershipType.Admin)
                 throw new UserNotAllowedException("Only laboratory admins are allowed to invite new admins.");
         }
 

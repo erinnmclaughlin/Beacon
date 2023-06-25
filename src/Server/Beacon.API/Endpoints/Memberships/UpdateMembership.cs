@@ -37,25 +37,20 @@ public sealed class UpdateMembership : IBeaconEndpoint
             var member = await _dbContext.Memberships
                 .SingleAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct);
 
-            await EnsureCurrentUserHasPermission(request, member, ct);
+            EnsureCurrentUserHasPermission(request, member, ct);
 
             member.MembershipType = request.MembershipType;
             await _dbContext.SaveChangesAsync(ct);
         }
 
-        private async Task EnsureCurrentUserHasPermission(UpdateMembershipRequest request, Membership memberToUpdate, CancellationToken ct)
+        private void EnsureCurrentUserHasPermission(UpdateMembershipRequest request, Membership memberToUpdate, CancellationToken ct)
         {
             var currentUserId = _currentUser.UserId;
-            var labId = _labContext.LaboratoryId;
 
             if (request.MemberId == currentUserId)
                 throw new UserNotAllowedException("Users are not allowed to change their own permissions.");
 
-            var membership = await _dbContext.Memberships
-                .AsNoTracking()
-                .SingleAsync(m => m.MemberId == currentUserId && m.LaboratoryId == labId, ct);
-
-            if (membership.MembershipType is LaboratoryMembershipType.Admin)
+            if (_labContext.MembershipType is LaboratoryMembershipType.Admin)
                 return;
 
             if (request.MembershipType is LaboratoryMembershipType.Admin || memberToUpdate.MembershipType is LaboratoryMembershipType.Admin)
