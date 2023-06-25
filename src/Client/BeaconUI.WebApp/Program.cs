@@ -1,5 +1,4 @@
 using BeaconUI.Core;
-using BeaconUI.Core.Clients;
 using BeaconUI.WebApp;
 using Microsoft.AspNetCore.Components.Web;
 using Microsoft.AspNetCore.Components.WebAssembly.Hosting;
