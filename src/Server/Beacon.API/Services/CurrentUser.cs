@@ -1,4 +1,5 @@
 ﻿using Beacon.Common;
+using Beacon.Common.Services;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 

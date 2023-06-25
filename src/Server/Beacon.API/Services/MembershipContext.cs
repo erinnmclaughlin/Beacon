@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Services;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Services;

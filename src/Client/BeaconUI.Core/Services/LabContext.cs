@@ -1,4 +1,4 @@
-﻿using Beacon.Common;
+﻿using Beacon.Common.Services;
 using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;

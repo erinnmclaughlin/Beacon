@@ -1,4 +1,4 @@
-﻿using Beacon.Common;
+﻿using Beacon.Common.Services;
 using Microsoft.AspNetCore.Http;
 
 namespace Beacon.API.Services;

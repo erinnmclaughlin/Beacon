@@ -2,6 +2,7 @@
 using Beacon.App.Exceptions;
 using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Services;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
