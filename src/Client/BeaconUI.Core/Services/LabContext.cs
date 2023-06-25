@@ -24,19 +24,7 @@ public sealed class LabContext : ILabContext, IDisposable
 
     private async void Initialize()
     {
-        var task = _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
-
-        var count = 0;
-        while (!task.IsCompleted) 
-        {
-            await Task.Delay(200);
-
-            // allow max of roughly 2 seconds to initialize:
-            if (count++ >= 10)
-                throw new TimeoutException("Unable to initialize lab context. Local storage call has timed out.");
-        }
-
-        LaboratoryId = task.Result;
+        LaboratoryId = await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
     }
 
     private void HandleChange(object? o, ChangedEventArgs e)

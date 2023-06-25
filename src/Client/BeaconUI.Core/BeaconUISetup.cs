@@ -10,20 +10,23 @@ namespace BeaconUI.Core;
 
 public static class BeaconUISetup
 {
-    public static IServiceCollection AddBeaconUI(this IServiceCollection services)
+    public static IServiceCollection AddBeaconUI(this IServiceCollection services, string baseUri)
     {
-        services.AddOptions();
-        services.AddAuthorizationCore();
-        services.AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>();
-        services.AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>());
+        services
+            .AddTransient<BeaconHttpHeaderHandler>()
+            .AddHttpClient("BeaconApi", o => o.BaseAddress = new Uri(baseUri))
+            .AddHttpMessageHandler<BeaconHttpHeaderHandler>();
 
-        services.AddScoped<ApiClient>();
-        services.AddScoped<AuthService>();
-
-        services.AddBlazoredLocalStorage();
-        services.AddScoped<ILabContext, LabContext>();
-
-        services.AddBlazoredModal();
+        services
+            .AddOptions()
+            .AddAuthorizationCore()
+            .AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>()
+            .AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
+            .AddScoped<ApiClient>()
+            .AddScoped<AuthService>()
+            .AddScoped<ILabContext, LabContext>()
+            .AddBlazoredLocalStorage()
+            .AddBlazoredModal();
 
         return services;
     }

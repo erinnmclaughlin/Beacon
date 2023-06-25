@@ -29,7 +29,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await ApiClient.GetCurrentLaboratory();
+        var result = await ApiClient.GetLaboratoryById(LabContext.LaboratoryId);
 
         result.Switch(
             value => CurrentLab = value,
