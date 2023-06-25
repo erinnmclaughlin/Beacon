@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Memberships;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;

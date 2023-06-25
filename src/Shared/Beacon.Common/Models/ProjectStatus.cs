@@ -1,4 +1,4 @@
-﻿namespace Beacon.Common.Projects;
+﻿namespace Beacon.Common.Models;
 
 public enum ProjectStatus
 {

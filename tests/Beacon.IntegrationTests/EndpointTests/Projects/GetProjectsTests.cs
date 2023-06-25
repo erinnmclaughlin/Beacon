@@ -1,6 +1,5 @@
 ﻿using Beacon.App.Entities;
-using Beacon.Common.Memberships;
-using Beacon.Common.Projects;
+using Beacon.Common.Models;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 

@@ -1,5 +1,4 @@
-﻿using Beacon.Common.Memberships;
-using Beacon.Common.Projects;
+﻿using Beacon.Common.Models;
 using MediatR;
 
 namespace Beacon.Common.Requests.Projects;

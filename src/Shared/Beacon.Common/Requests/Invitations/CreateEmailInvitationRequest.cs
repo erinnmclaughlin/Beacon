@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Memberships;
+﻿using Beacon.Common.Models;
 using FluentValidation;
 using MediatR;
 

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Memberships;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 
 namespace Beacon.IntegrationTests.EndpointTests.Invitations;

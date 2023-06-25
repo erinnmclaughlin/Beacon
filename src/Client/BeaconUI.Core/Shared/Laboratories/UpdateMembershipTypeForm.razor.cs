@@ -1,5 +1,4 @@
-using Beacon.Common.Laboratories;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;

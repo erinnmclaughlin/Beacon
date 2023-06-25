@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Projects;
+﻿using Beacon.Common.Models;
 
 namespace Beacon.App.Entities;
 

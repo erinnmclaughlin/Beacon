@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Exceptions;
 using Beacon.Common;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;

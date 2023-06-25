@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common;
-using Beacon.Common.Auth;
+using Beacon.Common.Models;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;

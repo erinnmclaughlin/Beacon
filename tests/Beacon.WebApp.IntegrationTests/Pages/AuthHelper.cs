@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth;
+﻿using Beacon.Common.Models;
 
 namespace Beacon.WebApp.IntegrationTests.Pages;
 

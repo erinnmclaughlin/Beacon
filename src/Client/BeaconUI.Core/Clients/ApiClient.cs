@@ -1,7 +1,4 @@
-﻿using Beacon.Common.Auth;
-using Beacon.Common.Laboratories;
-using Beacon.Common.Memberships;
-using Beacon.Common.Projects;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Requests.Laboratories;

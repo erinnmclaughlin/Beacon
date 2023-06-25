@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.Common.Projects;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using FluentValidation;
 using MediatR;

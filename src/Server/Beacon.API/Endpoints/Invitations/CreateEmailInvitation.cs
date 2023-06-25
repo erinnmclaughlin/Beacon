@@ -4,7 +4,7 @@ using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.App.Settings;
 using Beacon.Common;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 using FluentValidation;
 using MediatR;

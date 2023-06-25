@@ -1,5 +1,4 @@
-﻿using Beacon.Common.Laboratories;
-using Beacon.Common.Memberships;
+﻿using Beacon.Common.Models;
 using MediatR;
 
 namespace Beacon.Common.Requests.Laboratories;

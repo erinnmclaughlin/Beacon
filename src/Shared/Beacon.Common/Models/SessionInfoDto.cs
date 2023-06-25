@@ -1,6 +1,6 @@
 ﻿using System.Security.Claims;
 
-namespace Beacon.Common.Auth;
+namespace Beacon.Common.Models;
 
 public sealed record SessionInfoDto(Guid Id, string DisplayName)
 {
