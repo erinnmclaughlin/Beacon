@@ -1,18 +1,20 @@
 ﻿@page "/laboratories/{Id:guid}"
-@using BeaconUI.Core.Services
+@using Blazored.LocalStorage
 @attribute [Authorize]
 
 @code {
-
     [Inject]
     private ILabContext LabContext { get; set; } = null!;
+
+    [Inject]
+    private ILocalStorageService LocalStorage { get; set; } = null!;
 
     [Parameter] 
     public Guid Id { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        await LabContext.SetLaboratoryId(Id);
+        await LocalStorage.SetItemAsync("CurrentLaboratoryId", Id);
         NavigationManager.NavigateTo("l", replace: true);
     }
 }

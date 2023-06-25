@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.App.Services;
+using Beacon.Common;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
@@ -22,9 +22,9 @@ public sealed class CreateProject : IBeaconEndpoint
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
-        private readonly LaboratoryContext _labContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, LaboratoryContext labContext)
+        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;
@@ -47,10 +47,8 @@ public sealed class CreateProject : IBeaconEndpoint
 
         private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
         {
-            var labId = _labContext.LaboratoryId;
-
             var lastSuffix = await _dbContext.Projects
-                .Where(p => p.LaboratoryId == labId && p.ProjectCode.CustomerCode == request.CustomerCode)
+                .Where(p => p.LaboratoryId == _labContext.LaboratoryId && p.ProjectCode.CustomerCode == request.CustomerCode)
                 .OrderBy(p => p.ProjectCode.Suffix)
                 .Select(p => p.ProjectCode.Suffix)
                 .LastOrDefaultAsync(ct);

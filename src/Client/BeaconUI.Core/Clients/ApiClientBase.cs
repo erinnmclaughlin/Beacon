@@ -7,8 +7,8 @@ namespace BeaconUI.Core.Clients;
 
 public abstract class ApiClientBase
 {
-    private readonly ILabContext _labContext;
-    private readonly IHttpClientFactory _httpClientFactory;
+    protected readonly ILabContext _labContext;
+    protected readonly IHttpClientFactory _httpClientFactory;
 
     protected ApiClientBase(ILabContext labContext, IHttpClientFactory httpClientFactory)
     {
@@ -18,49 +18,49 @@ public abstract class ApiClientBase
 
     protected async Task<ErrorOr<Success>> GetAsync(string requestUri, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.GetAsync(requestUri, ct);
         return await response.ToErrorOrResult(ct);
     }
 
     protected async Task<ErrorOr<T>> GetAsync<T>(string requestUri, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.GetAsync(requestUri, ct);
         return await response.ToErrorOrResult<T>(ct);
     }
 
     protected async Task<ErrorOr<Success>> PostAsync(string requestUri, object? requestBody, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult(ct);
     }
 
     protected async Task<ErrorOr<T>> PostAsync<T>(string requestUri, object? requestBody, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.PostAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult<T>(ct);
     }
 
     protected async Task<ErrorOr<Success>> PutAsync(string requestUri, object? requestBody, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult(ct);
     }
 
     protected async Task<ErrorOr<T>> PutAsync<T>(string requestUri, object? requestBody, CancellationToken ct = default)
     {
-        using var httpClient = await CreateBeaconClient();
+        using var httpClient = CreateBeaconClient();
         var response = await httpClient.PutAsJsonAsync(requestUri, requestBody, JsonDefaults.JsonSerializerOptions, ct);
         return await response.ToErrorOrResult<T>(ct);
     }
 
-    private async Task<HttpClient> CreateBeaconClient()
+    private HttpClient CreateBeaconClient()
     {
-        var labId = await _labContext.GetLaboratoryId();
+        var labId = _labContext.LaboratoryId;
 
         var httpClient = _httpClientFactory.CreateBeaconClient();
 

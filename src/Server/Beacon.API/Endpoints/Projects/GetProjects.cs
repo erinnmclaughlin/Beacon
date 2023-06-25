@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
+using Beacon.Common;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
@@ -25,9 +25,9 @@ public sealed class GetProjects : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<GetProjectsRequest, ProjectDto[]>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly LaboratoryContext _labContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext, LaboratoryContext labContext)
+        public Handler(BeaconDbContext dbContext, ILabContext labContext)
         {
             _dbContext = dbContext;
             _labContext = labContext;

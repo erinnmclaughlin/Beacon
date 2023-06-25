@@ -1,4 +1,5 @@
-﻿using Beacon.API.Services;
+﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.Common;
@@ -12,11 +13,13 @@ namespace Beacon.API.Behaviors;
 public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
     private readonly ICurrentUser _currentUser;
-    private readonly LaboratoryContext _labContext;
+    private readonly BeaconDbContext _dbContext;
+    private readonly ILabContext _labContext;
 
-    public AuthorizationPipelineBehavior(ICurrentUser currentUser, LaboratoryContext labContext)
+    public AuthorizationPipelineBehavior(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
     {
         _currentUser = currentUser;
+        _dbContext = dbContext;
         _labContext = labContext;
     }
 
@@ -35,6 +38,8 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
 
     private async Task<bool> CurrentUserIsMember(LaboratoryMembershipType[] types, CancellationToken ct)
     {
-        return await _labContext.GetMembershipAsync(_currentUser.UserId, ct) is { } m && types.Contains(m.MembershipType);
+        var userId = _currentUser.UserId;
+        var m = await _dbContext.Memberships.SingleAsync(x => x.LaboratoryId == _labContext.LaboratoryId && x.MemberId == userId, ct);
+        return types.Contains(m.MembershipType);
     }
 }

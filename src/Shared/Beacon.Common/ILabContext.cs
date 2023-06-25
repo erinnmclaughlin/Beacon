@@ -2,6 +2,5 @@
 
 public interface ILabContext
 {
-    Task<Guid> GetLaboratoryId();
-    Task SetLaboratoryId(Guid id);
+    Guid LaboratoryId { get; }
 }

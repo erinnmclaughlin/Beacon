@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
+using Beacon.Common;
 using Beacon.Common.Memberships;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -18,9 +18,9 @@ public sealed class GetMemberships : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<GetMembershipsRequest, LaboratoryMemberDto[]>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly LaboratoryContext _labContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext, LaboratoryContext labContext)
+        public Handler(BeaconDbContext dbContext, ILabContext labContext)
         {
             _dbContext = dbContext;
             _labContext = labContext;
@@ -28,10 +28,8 @@ public sealed class GetMemberships : IBeaconEndpoint
 
         public async Task<LaboratoryMemberDto[]> Handle(GetMembershipsRequest request, CancellationToken ct)
         {
-            var labId = _labContext.LaboratoryId;
-
             return await _dbContext.Memberships
-                .Where(m => m.LaboratoryId == labId)
+                .Where(m => m.LaboratoryId == _labContext.LaboratoryId)
                 .Select(m => new LaboratoryMemberDto
                 {
                     Id = m.Member.Id,

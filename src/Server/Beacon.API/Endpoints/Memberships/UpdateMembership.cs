@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
+using Beacon.Common;
 using Beacon.Common.Memberships;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -22,9 +22,9 @@ public sealed class UpdateMembership : IBeaconEndpoint
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
-        private readonly LaboratoryContext _labContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, LaboratoryContext labContext)
+        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;

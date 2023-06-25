@@ -27,15 +27,13 @@
 
     private LaboratoryDto? CurrentLab { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        if (await LabContext.GetLaboratoryId() is { } labId)
-        {
-            var labOrError = await ApiClient.GetLaboratoryById(labId);
-            CurrentLab = labOrError.IsError ? null : labOrError.Value;
-        }
+        var result = await ApiClient.GetCurrentLaboratory();
 
-        if (CurrentLab is null)
-            NavigationManager.NavigateTo("");
+        result.Switch(
+            value => CurrentLab = value,
+            error => NavigationManager.NavigateTo("")
+        );
     }
 }

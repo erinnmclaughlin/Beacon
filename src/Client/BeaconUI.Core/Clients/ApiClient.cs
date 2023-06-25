@@ -54,6 +54,14 @@ public sealed class ApiClient : ApiClientBase
         return await PostAsync("api/laboratories", request);
     }
 
+    public async Task<ErrorOr<LaboratoryDto>> GetCurrentLaboratory()
+    {
+        if (_labContext.LaboratoryId == Guid.Empty)
+            return Error.NotFound();
+
+        return await GetLaboratoryById(_labContext.LaboratoryId);
+    }
+
     public async Task<ErrorOr<LaboratoryDto>> GetLaboratoryById(Guid labId)
     {
         return await GetAsync<LaboratoryDto>($"api/laboratories/{labId}");

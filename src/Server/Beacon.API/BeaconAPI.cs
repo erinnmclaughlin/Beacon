@@ -5,6 +5,7 @@ using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App.Services;
 using Beacon.App.Settings;
+using Beacon.Common;
 using Beacon.Common.Auth;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
@@ -69,7 +70,7 @@ public static class BeaconAPI
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
-        services.AddScoped<LaboratoryContext>();
+        services.AddScoped<ILabContext, LaboratoryContext>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);

@@ -3,22 +3,42 @@ using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;
 
-public sealed class CurrentLabService : ILabContext
+public sealed class CurrentLabService : ILabContext, IDisposable
 {
     private readonly ILocalStorageService _localStorage;
+
+    public Guid LaboratoryId { get; private set; }
 
     public CurrentLabService(ILocalStorageService localStorage)
     {
         _localStorage = localStorage;
+        _localStorage.Changed += HandleChange;
+
+        Initialize();
     }
 
-    public async Task<Guid> GetLaboratoryId()
+    public void Dispose()
     {
-        return await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
+        _localStorage.Changed -= HandleChange;
     }
 
-    public async Task SetLaboratoryId(Guid id)
+    private async void Initialize()
     {
-        await _localStorage.SetItemAsync("CurrentLaboratoryId", id);
+        var task = _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
+
+        while (!task.IsCompleted) 
+        {
+            await Task.Delay(200);
+        }
+
+        LaboratoryId = task.Result;
+    }
+
+    private void HandleChange(object? o, ChangedEventArgs e)
+    {
+        if (e.Key != "CurrentLaboratoryId")
+            return;
+
+        LaboratoryId = e.NewValue is Guid id ? id : Guid.Empty;
     }
 }
