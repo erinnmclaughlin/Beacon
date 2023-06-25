@@ -22,14 +22,11 @@
 
 @code {
 
-    [Inject]
-    private ILabContext LabContext { get; set; } = null!;
-
     private LaboratoryDto? CurrentLab { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var result = await ApiClient.GetLaboratoryById(LabContext.LaboratoryId);
+        var result = await ApiClient.GetCurrentLaboratory();
 
         result.Switch(
             value => CurrentLab = value,
