@@ -22,6 +22,7 @@ public static class BeaconUISetup
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>()
             .AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
+            .AddScoped<ICurrentUser, BeaconAuthStateProvider>()
             .AddScoped<ApiClient>()
             .AddScoped<AuthService>()
             .AddScoped<ILabContext, LabContext>()

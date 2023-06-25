@@ -1,6 +1,5 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Exceptions;
-using Beacon.App.Services;
 using Beacon.Common;
 using Beacon.Common.Memberships;
 using MediatR.Pipeline;

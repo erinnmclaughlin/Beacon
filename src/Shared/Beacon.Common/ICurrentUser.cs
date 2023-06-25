@@ -1,4 +1,4 @@
-﻿namespace Beacon.App.Services;
+﻿namespace Beacon.Common;
 
 public interface ICurrentUser
 {

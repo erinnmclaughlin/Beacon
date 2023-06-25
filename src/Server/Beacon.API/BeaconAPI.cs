@@ -59,13 +59,7 @@ public static class BeaconAPI
             };
         });
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(AuthConstants.LabAuth, config =>
-            {
-                config.RequireClaim(BeaconClaimTypes.LabId);
-            });
-        });
+        services.AddAuthorization();
         services.AddScoped<BeaconAuthenticationService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();

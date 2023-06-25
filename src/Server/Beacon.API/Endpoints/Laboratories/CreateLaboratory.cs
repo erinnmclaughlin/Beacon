@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.App.Services;
+using Beacon.Common;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using MediatR;

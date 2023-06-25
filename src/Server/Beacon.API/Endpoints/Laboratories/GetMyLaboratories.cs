@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
+using Beacon.Common;
 using Beacon.Common.Laboratories;
 using MediatR;
 using Microsoft.AspNetCore.Http;
