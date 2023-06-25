@@ -1,4 +1,6 @@
-﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿@using Beacon.Common.Requests.Invitations
+
+<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="field">
@@ -22,7 +24,7 @@
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private InviteLabMemberRequest Model { get; } = new();
+    private CreateEmailInvitationRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm form)
     {

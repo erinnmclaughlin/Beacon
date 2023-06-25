@@ -2,6 +2,7 @@
 using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common;
+using Beacon.Common.Requests.Invitations;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -11,29 +12,29 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Invitations;
 
-public sealed class AcceptInvitation : IBeaconEndpoint
+public sealed class AcceptEmailInvitation : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
         var builder = app.MapGet("invitations/{emailId:Guid}/accept", async (Guid emailId, IMediator m, CancellationToken ct) =>
         {
-            await m.Send(new Request(emailId), ct);
+            await m.Send(new AcceptEmailInvitationRequest { EmailInvitationId = emailId }, ct);
             return Results.NoContent();
         });
 
         builder.WithTags(EndpointTags.Invitations);
     }
 
-    public sealed record Request(Guid EmailId) : IRequest;
-
-    public sealed class ExpirationDateValidator : AbstractValidator<Request>
+    public sealed class Validator : AbstractValidator<AcceptEmailInvitationRequest>
     {
         private readonly BeaconDbContext _dbContext;
 
-        public ExpirationDateValidator(BeaconDbContext dbContext)
+        public Validator(BeaconDbContext dbContext)
         {
             _dbContext = dbContext;
-            RuleFor(x => x.EmailId).MustAsync(NotBeExpired).WithMessage("This invitation has expired.");
+
+            RuleFor(x => x.EmailInvitationId)
+                .MustAsync(NotBeExpired).WithMessage("This invitation has expired.");
         }
 
         private async Task<bool> NotBeExpired(Guid emailId, CancellationToken ct)
@@ -43,7 +44,7 @@ public sealed class AcceptInvitation : IBeaconEndpoint
         }
     }
 
-    internal sealed class Handler : IRequestHandler<Request>
+    internal sealed class Handler : IRequestHandler<AcceptEmailInvitationRequest>
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
@@ -54,7 +55,7 @@ public sealed class AcceptInvitation : IBeaconEndpoint
             _dbContext = dbContext;
         }
 
-        public async Task Handle(Request request, CancellationToken ct)
+        public async Task Handle(AcceptEmailInvitationRequest request, CancellationToken ct)
         {
             var currentUser = await GetCurrentUser(ct);
             var invitation = await GetInvitation(request, currentUser.Id, ct);
@@ -69,13 +70,13 @@ public sealed class AcceptInvitation : IBeaconEndpoint
             return await _dbContext.Users.SingleAsync(u => u.Id == currentUserId, ct);
         }
 
-        private async Task<Invitation> GetInvitation(Request request, Guid currentUserId, CancellationToken ct)
+        private async Task<Invitation> GetInvitation(AcceptEmailInvitationRequest request, Guid currentUserId, CancellationToken ct)
         {
             return await _dbContext.InvitationEmails
                 .Include(i => i.LaboratoryInvitation)
                 .ThenInclude(i => i.Laboratory)
                 .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
-                .Where(i => i.Id == request.EmailId)
+                .Where(i => i.Id == request.EmailInvitationId)
                 .Select(i => i.LaboratoryInvitation)
                 .SingleAsync(ct);
         }

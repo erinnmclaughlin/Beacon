@@ -2,15 +2,15 @@
 using FluentValidation;
 using MediatR;
 
-namespace Beacon.Common.Invitations;
+namespace Beacon.Common.Requests.Invitations;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Manager)]
-public sealed class InviteLabMemberRequest : IRequest
+public sealed class CreateEmailInvitationRequest : IRequest
 {
     public string NewMemberEmailAddress { get; set; } = string.Empty;
     public LaboratoryMembershipType MembershipType { get; set; } = LaboratoryMembershipType.Member;
 
-    public sealed class Validator : AbstractValidator<InviteLabMemberRequest>
+    public sealed class Validator : AbstractValidator<CreateEmailInvitationRequest>
     {
         public Validator()
         {

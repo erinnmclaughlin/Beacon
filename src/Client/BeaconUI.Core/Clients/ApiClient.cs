@@ -1,10 +1,10 @@
 ﻿using Beacon.Common.Auth;
-using Beacon.Common.Invitations;
 using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using Beacon.Common.Requests.Auth;
+using Beacon.Common.Requests.Invitations;
 using BeaconUI.Core.Helpers;
 using ErrorOr;
 
@@ -39,14 +39,14 @@ public sealed class ApiClient
         return await _httpClientFactory.GetAsync("api/auth/logout");
     }
 
-    public async Task<ErrorOr<Success>> SendEmailInvitation(InviteLabMemberRequest request)
+    public async Task<ErrorOr<Success>> SendEmailInvitation(CreateEmailInvitationRequest request)
     {
         return await _httpClientFactory.PostAsync("api/invitations", request);
     }
 
-    public async Task<ErrorOr<Success>> AcceptEmailInvitation(Guid inviteId, Guid emailId)
+    public async Task<ErrorOr<Success>> AcceptEmailInvitation(Guid emailId)
     {
-        return await _httpClientFactory.GetAsync($"api/invitations/{inviteId}/accept?emailId={emailId}");
+        return await _httpClientFactory.GetAsync($"api/invitations/{emailId}/accept");
     }
 
     public async Task<ErrorOr<LaboratoryDto[]>> GetMyLaboratories()

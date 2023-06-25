@@ -1,5 +1,5 @@
-﻿using Beacon.Common.Invitations;
-using Beacon.Common.Memberships;
+﻿using Beacon.Common.Memberships;
+using Beacon.Common.Requests.Invitations;
 
 namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 
@@ -19,7 +19,7 @@ public class CreateInvitationTests : EndpointTestBase
 
         var client = CreateClient().AddLabHeader();
 
-        var request = new InviteLabMemberRequest
+        var request = new CreateEmailInvitationRequest
         {
             MembershipType = LaboratoryMembershipType.Member,
             NewMemberEmailAddress = "fake@fake.net"
@@ -38,7 +38,7 @@ public class CreateInvitationTests : EndpointTestBase
 
         var client = CreateClient().AddLabHeader();
 
-        var request = new InviteLabMemberRequest
+        var request = new CreateEmailInvitationRequest
         {
             MembershipType = LaboratoryMembershipType.Member,
             NewMemberEmailAddress = "fake@fake.net"
