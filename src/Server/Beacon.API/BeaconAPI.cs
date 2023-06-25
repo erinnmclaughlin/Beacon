@@ -6,7 +6,7 @@ using Beacon.API.Services;
 using Beacon.App.Services;
 using Beacon.App.Settings;
 using Beacon.Common;
-using Beacon.Common.Auth;
+using Beacon.Common.Requests.Auth;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -29,11 +29,7 @@ public static class BeaconAPI
             config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
-        services.AddValidatorsFromAssemblies(new[]
-        {
-            typeof(BeaconAPI).Assembly,
-            typeof(LoginRequest).Assembly
-        });
+        services.AddValidatorsFromAssemblies(new[] {typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
 
         // Api
         services.AddEndpointsApiExplorer();

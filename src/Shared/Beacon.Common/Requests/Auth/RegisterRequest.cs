@@ -2,9 +2,9 @@
 using FluentValidation;
 using MediatR;
 
-namespace Beacon.Common.Auth;
+namespace Beacon.Common.Requests.Auth;
 
-public class RegisterRequest : IRequest
+public sealed class RegisterRequest : IRequest
 {
     public string DisplayName { get; set; } = string.Empty;
     public string EmailAddress { get; set; } = string.Empty;

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Auth;
+﻿using Beacon.Common.Requests.Auth;
 using Beacon.WebApp.IntegrationTests.Http;
 using BeaconUI.Core.Pages.Auth;
 using Bunit.TestDoubles;

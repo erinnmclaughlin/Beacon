@@ -4,6 +4,7 @@ using Beacon.Common.Laboratories;
 using Beacon.Common.Memberships;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
+using Beacon.Common.Requests.Auth;
 using BeaconUI.Core.Helpers;
 using ErrorOr;
 
