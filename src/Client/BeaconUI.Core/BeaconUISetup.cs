@@ -21,7 +21,7 @@ public static class BeaconUISetup
         services.AddScoped<AuthService>();
 
         services.AddBlazoredLocalStorage();
-        services.AddScoped<ILabContext, CurrentLabService>();
+        services.AddScoped<ILabContext, LabContext>();
 
         services.AddBlazoredModal();
 

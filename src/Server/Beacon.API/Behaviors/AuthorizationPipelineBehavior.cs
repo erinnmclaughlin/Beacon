@@ -1,5 +1,4 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.Common;
@@ -39,7 +38,12 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
     private async Task<bool> CurrentUserIsMember(LaboratoryMembershipType[] types, CancellationToken ct)
     {
         var userId = _currentUser.UserId;
-        var m = await _dbContext.Memberships.SingleAsync(x => x.LaboratoryId == _labContext.LaboratoryId && x.MemberId == userId, ct);
-        return types.Contains(m.MembershipType);
+
+        var m = await _dbContext.Memberships
+            .Where(x => x.LaboratoryId == _labContext.LaboratoryId && x.MemberId == userId)
+            .Select(x => new { x.MembershipType })
+            .SingleOrDefaultAsync(ct);
+
+        return m != null && types.Contains(m.MembershipType);
     }
 }

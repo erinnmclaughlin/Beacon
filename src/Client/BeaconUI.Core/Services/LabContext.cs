@@ -3,13 +3,13 @@ using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;
 
-public sealed class CurrentLabService : ILabContext, IDisposable
+public sealed class LabContext : ILabContext, IDisposable
 {
     private readonly ILocalStorageService _localStorage;
 
     public Guid LaboratoryId { get; private set; }
 
-    public CurrentLabService(ILocalStorageService localStorage)
+    public LabContext(ILocalStorageService localStorage)
     {
         _localStorage = localStorage;
         _localStorage.Changed += HandleChange;
@@ -26,9 +26,14 @@ public sealed class CurrentLabService : ILabContext, IDisposable
     {
         var task = _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
 
+        var count = 0;
         while (!task.IsCompleted) 
         {
             await Task.Delay(200);
+
+            // allow max of roughly 2 seconds to initialize:
+            if (count++ >= 10)
+                throw new TimeoutException("Unable to initialize lab context. Local storage call has timed out.");
         }
 
         LaboratoryId = task.Result;
