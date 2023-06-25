@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
@@ -21,17 +22,20 @@ public sealed class UpdateMembership : IBeaconEndpoint
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
+        private readonly LaboratoryContext _labContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext)
+        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, LaboratoryContext labContext)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;
+            _labContext = labContext;
         }
 
         public async Task Handle(UpdateMembershipRequest request, CancellationToken ct)
         {
+            var labId = _labContext.LaboratoryId;
             var member = await _dbContext.Memberships
-                .SingleAsync(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == request.MemberId, ct);
+                .SingleAsync(m => m.LaboratoryId == labId && m.MemberId == request.MemberId, ct);
 
             await EnsureCurrentUserHasPermission(request, member, ct);
 
@@ -42,22 +46,20 @@ public sealed class UpdateMembership : IBeaconEndpoint
         private async Task EnsureCurrentUserHasPermission(UpdateMembershipRequest request, Membership memberToUpdate, CancellationToken ct)
         {
             var currentUserId = _currentUser.UserId;
+            var labId = _labContext.LaboratoryId;
 
             if (request.MemberId == currentUserId)
                 throw new UserNotAllowedException("Users are not allowed to change their own permissions.");
 
             var membership = await _dbContext.Memberships
                 .AsNoTracking()
-                .SingleAsync(m => m.MemberId == currentUserId && m.LaboratoryId == request.LaboratoryId, ct);
+                .SingleAsync(m => m.MemberId == currentUserId && m.LaboratoryId == labId, ct);
 
             if (membership.MembershipType is LaboratoryMembershipType.Admin)
                 return;
 
             if (request.MembershipType is LaboratoryMembershipType.Admin || memberToUpdate.MembershipType is LaboratoryMembershipType.Admin)
                 throw new UserNotAllowedException("Only admins are allowed to grant access to other admins.");
-
-            if (membership.MembershipType is not LaboratoryMembershipType.Manager)
-                throw new UserNotAllowedException("The current user does not have permission to modify membership types for this laboratory.");
         }
     }
 }

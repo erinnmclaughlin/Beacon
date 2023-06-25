@@ -5,7 +5,7 @@ using MediatR;
 namespace Beacon.Common.Invitations;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Manager)]
-public sealed class InviteLabMemberRequest : LaboratoryRequestBase, IRequest
+public sealed class InviteLabMemberRequest : IRequest
 {
     public string NewMemberEmailAddress { get; set; } = string.Empty;
     public LaboratoryMembershipType MembershipType { get; set; } = LaboratoryMembershipType.Member;

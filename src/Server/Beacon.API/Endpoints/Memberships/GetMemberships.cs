@@ -1,8 +1,7 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.Common.Memberships;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -13,28 +12,26 @@ public sealed class GetMemberships : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        var builder = app.MapGet("memberships", async ([AsParameters] GetMembershipsRequest request, IMediator m, CancellationToken ct) =>
-        {
-            var response = await m.Send(request, ct);
-            return Results.Ok(response);
-        });
-
-        builder.WithTags(EndpointTags.Memberships);
+        app.MapGet("memberships", new GetMembershipsRequest()).WithTags(EndpointTags.Memberships);
     }
 
     internal sealed class Handler : IRequestHandler<GetMembershipsRequest, LaboratoryMemberDto[]>
     {
         private readonly BeaconDbContext _dbContext;
+        private readonly LaboratoryContext _labContext;
 
-        public Handler(BeaconDbContext dbContext)
+        public Handler(BeaconDbContext dbContext, LaboratoryContext labContext)
         {
             _dbContext = dbContext;
+            _labContext = labContext;
         }
 
         public async Task<LaboratoryMemberDto[]> Handle(GetMembershipsRequest request, CancellationToken ct)
         {
+            var labId = _labContext.LaboratoryId;
+
             return await _dbContext.Memberships
-                .Where(m => m.LaboratoryId == request.LaboratoryId)
+                .Where(m => m.LaboratoryId == labId)
                 .Select(m => new LaboratoryMemberDto
                 {
                     Id = m.Member.Id,

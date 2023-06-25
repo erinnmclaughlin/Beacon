@@ -3,7 +3,7 @@ using MediatR;
 
 namespace Beacon.Common.Laboratories;
 
-[RequireMinimumMembership(LaboratoryMembershipType.Member)]
-public class GetLaboratoryByIdRequest : LaboratoryRequestBase, IRequest<LaboratoryDto>
+public class GetLaboratoryByIdRequest : IRequest<LaboratoryDto>
 {
+    public required Guid LaboratoryId { get; set; }
 }

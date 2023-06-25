@@ -31,8 +31,8 @@ public class CompleteProjectTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var request = new CompleteProjectRequest { LaboratoryId = TestData.DefaultLaboratory.Id, ProjectId = projectId };
-        var response = await client.PostAsJsonAsync($"api/projects/complete", request);
+        var request = new CompleteProjectRequest { ProjectId = projectId };
+        var response = await client.AddLabHeader().PostAsJsonAsync($"api/projects/complete", request);
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

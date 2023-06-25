@@ -69,6 +69,7 @@ public static class BeaconAPI
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<LaboratoryContext>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);

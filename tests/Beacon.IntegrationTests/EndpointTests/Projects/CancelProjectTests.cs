@@ -31,8 +31,8 @@ public class CancelProjectTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var request = new CancelProjectRequest { LaboratoryId = TestData.DefaultLaboratory.Id, ProjectId = projectId };
-        var response = await client.PostAsJsonAsync($"api/projects/cancel", request);
+        var request = new CancelProjectRequest { ProjectId = projectId };
+        var response = await client.AddLabHeader().PostAsJsonAsync($"api/projects/cancel", request);
         response.StatusCode.Should().Be(HttpStatusCode.NoContent);
     }
 }

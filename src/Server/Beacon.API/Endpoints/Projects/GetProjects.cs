@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.Common.Projects;
 using Beacon.Common.Projects.Requests;
 using MediatR;
@@ -24,16 +25,20 @@ public sealed class GetProjects : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<GetProjectsRequest, ProjectDto[]>
     {
         private readonly BeaconDbContext _dbContext;
+        private readonly LaboratoryContext _labContext;
 
-        public Handler(BeaconDbContext dbContext)
+        public Handler(BeaconDbContext dbContext, LaboratoryContext labContext)
         {
             _dbContext = dbContext;
+            _labContext = labContext;
         }
 
         public async Task<ProjectDto[]> Handle(GetProjectsRequest request, CancellationToken ct)
         {
+            var labId = _labContext.LaboratoryId;
+
             var projects = await _dbContext.Projects
-                .Where(x => x.LaboratoryId == request.LaboratoryId)
+                .Where(x => x.LaboratoryId == labId)
                 .AsNoTracking()
                 .ToArrayAsync(ct);
 
@@ -44,7 +49,6 @@ public sealed class GetProjects : IBeaconEndpoint
                 ProjectStatus = x.ProjectStatus,
                 ProjectCode = x.ProjectCode.ToString()
             }).ToArray();
-
         }
     }
 }

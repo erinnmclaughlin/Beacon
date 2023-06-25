@@ -15,18 +15,18 @@ public sealed class GetProjectDetails : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("projects/{idOrCode}", async (string idOrCode, Guid laboratoryId, IMediator m, CancellationToken ct) =>
+        app.MapGet("projects/{idOrCode}", async (string idOrCode, IMediator m, CancellationToken ct) =>
         {
             if (Guid.TryParse(idOrCode, out var id))
             {
-                var request = new GetProjectByIdRequest { LaboratoryId = laboratoryId, ProjectId = id };
+                var request = new GetProjectByIdRequest { ProjectId = id };
                 var projectOrNull = await m.Send(request, ct);
                 return projectOrNull is null ? Results.NotFound() : Results.Ok(projectOrNull);
             }
 
             if (ProjectCode.FromString(idOrCode) is { } code)
             {
-                var request = new GetProjectByProjectCodeRequest { LaboratoryId = laboratoryId, ProjectCode = code };
+                var request = new GetProjectByProjectCodeRequest { ProjectCode = code };
                 var projectOrNull = await m.Send(request, ct);
                 return projectOrNull is null ? Results.NotFound() : Results.Ok(projectOrNull);
             }

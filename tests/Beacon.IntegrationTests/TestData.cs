@@ -41,4 +41,12 @@ public static class TestData
 
         dbContext.SaveChanges();
     }
+
+    public static HttpClient AddLabHeader(this HttpClient httpClient) => AddLabHeader(httpClient, DefaultLaboratory.Id);
+
+    public static HttpClient AddLabHeader(this HttpClient httpClient, Guid labId)
+    {
+        httpClient.DefaultRequestHeaders.Add("X-LaboratoryId", labId.ToString());
+        return httpClient;
+    }
 }

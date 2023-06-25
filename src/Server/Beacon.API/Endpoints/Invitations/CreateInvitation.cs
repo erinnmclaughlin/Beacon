@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.App.Exceptions;
 using Beacon.App.Services;
@@ -24,10 +25,12 @@ public sealed class CreateInvitation : IBeaconEndpoint
     public sealed class Validator : AbstractValidator<InviteLabMemberRequest>
     {
         private readonly BeaconDbContext _dbContext;
+        private readonly LaboratoryContext _labContext;
 
-        public Validator(BeaconDbContext dbContext)
+        public Validator(BeaconDbContext dbContext, LaboratoryContext labContext)
         {
             _dbContext = dbContext;
+            _labContext = labContext;
 
             RuleFor(r => r.NewMemberEmailAddress)
                 .MustAsync(NotBeAnExistingMember)
@@ -36,8 +39,10 @@ public sealed class CreateInvitation : IBeaconEndpoint
 
         private async Task<bool> NotBeAnExistingMember(InviteLabMemberRequest request, string email, CancellationToken ct)
         {
+            var labId = _labContext.LaboratoryId;
+
             var isAMember = await _dbContext.Memberships
-                .AnyAsync(m => m.LaboratoryId == request.LaboratoryId && m.Member.EmailAddress == email, ct);
+                .AnyAsync(m => m.LaboratoryId == labId && m.Member.EmailAddress == email, ct);
 
             return !isAMember;
         }
@@ -49,13 +54,15 @@ public sealed class CreateInvitation : IBeaconEndpoint
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
         private readonly IEmailService _emailService;
+        private readonly LaboratoryContext _labContext;
 
-        public CommandHandler(IOptions<ApplicationSettings> appSettings, ICurrentUser currentUser, BeaconDbContext dbContext, IEmailService emailService)
+        public CommandHandler(IOptions<ApplicationSettings> appSettings, ICurrentUser currentUser, BeaconDbContext dbContext, IEmailService emailService, LaboratoryContext labContext)
         {
             _appSettings = appSettings.Value;
             _currentUser = currentUser;
             _dbContext = dbContext;
             _emailService = emailService;
+            _labContext = labContext;
         }
 
         public async Task Handle(InviteLabMemberRequest request, CancellationToken ct)
@@ -75,8 +82,10 @@ public sealed class CreateInvitation : IBeaconEndpoint
 
         private async Task EnsureCurrentUserIsAllowed(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
         {
+            var labId = _labContext.LaboratoryId;
+
             var membership = await _dbContext.Memberships
-                .Where(m => m.MemberId == currentUser.Id && m.LaboratoryId == request.LaboratoryId)
+                .Where(m => m.MemberId == currentUser.Id && m.LaboratoryId == labId)
                 .AsNoTracking()
                 .SingleAsync(ct);
 
@@ -87,6 +96,7 @@ public sealed class CreateInvitation : IBeaconEndpoint
         private async Task<InvitationEmail> CreateInvitation(InviteLabMemberRequest request, User currentUser, CancellationToken ct)
         {
             var now = DateTimeOffset.UtcNow;
+            var labId = _labContext.LaboratoryId;
 
             var invitation = new Invitation
             {
@@ -95,8 +105,8 @@ public sealed class CreateInvitation : IBeaconEndpoint
                 ExpireAfterDays = 10, // TODO: make this configurable
                 NewMemberEmailAddress = request.NewMemberEmailAddress,
                 MembershipType = request.MembershipType,
-                Laboratory = await _dbContext.Laboratories.SingleAsync(x => x.Id == request.LaboratoryId, ct),
-                LaboratoryId = request.LaboratoryId,
+                Laboratory = await _dbContext.Laboratories.SingleAsync(x => x.Id == labId, ct),
+                LaboratoryId = labId,
                 CreatedById = currentUser.Id,
                 CreatedBy = currentUser
             };

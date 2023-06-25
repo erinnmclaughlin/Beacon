@@ -49,8 +49,7 @@ public class GetProjectsTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var uri = $"api/projects?laboratoryId={TestData.DefaultLaboratory.Id}";
-        var projects = await client.GetFromJsonAsync<ProjectDto[]>(uri, JsonSerializerOptions);
+        var projects = await client.AddLabHeader().GetFromJsonAsync<ProjectDto[]>("api/projects", JsonSerializerOptions);
         projects.Should().ContainSingle().Which.ProjectCode.Should().Be("ABC-001");
     }
 

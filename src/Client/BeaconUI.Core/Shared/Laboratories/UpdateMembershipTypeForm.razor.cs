@@ -22,7 +22,6 @@ public partial class UpdateMembershipTypeForm
     private UpdateMembershipRequest? _model;
     private UpdateMembershipRequest Model => _model ??= new()
     {
-        LaboratoryId = CurrentLab.Id,
         MemberId = MemberToUpdate.Id,
         MembershipType = MemberToUpdate.MembershipType
     };

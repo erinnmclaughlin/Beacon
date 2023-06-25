@@ -6,7 +6,7 @@ using MediatR;
 namespace Beacon.Common.Projects.Requests;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public class CreateProjectRequest : LaboratoryRequestBase, IRequest
+public class CreateProjectRequest : IRequest
 {
     public string CustomerCode { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;

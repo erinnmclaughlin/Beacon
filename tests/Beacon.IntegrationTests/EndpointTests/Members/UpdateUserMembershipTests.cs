@@ -38,12 +38,11 @@ public class UpdateUserMembershipTests : EndpointTestBase
             });
 
             await db.SaveChangesAsync();
-        });
+        }).AddLabHeader();
 
         var response = await client.PutAsJsonAsync("api/memberships", new UpdateMembershipRequest
         {
             MemberId = memberId,
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Manager
         }, JsonSerializerOptions);
 

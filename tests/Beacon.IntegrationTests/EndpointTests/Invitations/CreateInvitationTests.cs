@@ -17,11 +17,10 @@ public class CreateInvitationTests : EndpointTestBase
     {
         AddTestAuthorization(membershipType);
 
-        var client = CreateClient();
+        var client = CreateClient().AddLabHeader();
 
         var request = new InviteLabMemberRequest
         {
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Member,
             NewMemberEmailAddress = "fake@fake.net"
         };
@@ -37,11 +36,10 @@ public class CreateInvitationTests : EndpointTestBase
     {
         AddTestAuthorization(membershipType);
 
-        var client = CreateClient();
+        var client = CreateClient().AddLabHeader();
 
         var request = new InviteLabMemberRequest
         {
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Member,
             NewMemberEmailAddress = "fake@fake.net"
         };

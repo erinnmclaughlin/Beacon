@@ -22,8 +22,7 @@
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private InviteLabMemberRequest? _model;
-    private InviteLabMemberRequest Model => _model ??= new() { LaboratoryId = LaboratoryId };
+    private InviteLabMemberRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm form)
     {

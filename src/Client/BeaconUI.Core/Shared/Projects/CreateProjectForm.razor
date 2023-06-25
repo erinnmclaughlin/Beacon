@@ -31,8 +31,7 @@
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private CreateProjectRequest? _model;
-    private CreateProjectRequest Model => _model ??= new() { LaboratoryId = LaboratoryId };
+    private CreateProjectRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm formContext)
     {

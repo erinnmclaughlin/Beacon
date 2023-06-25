@@ -67,9 +67,9 @@ public sealed class ApiClient : ApiClientBase
         return await PutAsync($"api/memberships", request);
     }
 
-    public async Task<ErrorOr<ProjectDto[]>> GetProjects(Guid labId)
+    public async Task<ErrorOr<ProjectDto[]>> GetProjects()
     {
-        return await GetAsync<ProjectDto[]>($"api/projects?laboratoryId={labId}");
+        return await GetAsync<ProjectDto[]>($"api/projects");
     }
 
     public async Task<ErrorOr<Success>> CreateProject(CreateProjectRequest request)
