@@ -2,22 +2,19 @@
 using Beacon.API.Services;
 using Beacon.App.Entities;
 using Beacon.Common.Models;
-using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.WebHost;
 
-internal static class TestData
+public static class TestData
 {
     public static async Task InitializeForTests(this BeaconDbContext dbContext)
     {
-        await dbContext.Database.EnsureDeletedAsync();
-        await dbContext.Database.MigrateAsync();
-
-        dbContext.Users.AddRange(AdminUser, ManagerUser, AnalystUser, MemberUser);
-        await dbContext.SaveChangesAsync();
-
-        dbContext.Laboratories.Add(Lab);
-        await dbContext.SaveChangesAsync();
+        if (await dbContext.Database.EnsureCreatedAsync())
+        {
+            dbContext.Users.AddRange(AdminUser, ManagerUser, AnalystUser, MemberUser);
+            dbContext.Laboratories.Add(Lab);
+            await dbContext.SaveChangesAsync();
+        }
     }
 
     public static User AdminUser => new()

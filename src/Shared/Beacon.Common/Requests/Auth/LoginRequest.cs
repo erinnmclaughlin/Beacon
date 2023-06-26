@@ -12,7 +12,6 @@ public sealed class LoginRequest : IRequest
     {
         public Validator()
         {
-
             RuleFor(r => r.EmailAddress)
                 .EmailAddress().WithMessage("Valid email address is required.");
 
