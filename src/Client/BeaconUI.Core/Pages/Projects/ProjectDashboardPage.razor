@@ -127,9 +127,7 @@
 
     private async Task ShowCreateProjectsModal()
     {
-        var parameters = new ModalParameters().Add(nameof(CreateProjectForm.LaboratoryId), CurrentLab.Id);
-
-        var result = await ModalService.Show<CreateProjectForm>("Create New Project", parameters).Result;
+        var result = await ModalService.Show<CreateProjectModal>("Create New Project").Result;
 
         if (!result.Cancelled)
         {

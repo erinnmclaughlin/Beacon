@@ -23,13 +23,13 @@
             <p>This is the project details page for project @Code.</p>
 
             <h5>Project Contacts</h5>
-            <table class="table">
+
+            <table class="table align-middle">
                 <thead>
                     <tr>
                         <th>Name</th>
                         <th>Email Address</th>
                         <th>Phone Number</th>
-                        <th style="width: 0%"></th>
                     </tr>
                 </thead>
                 <tbody>
@@ -62,14 +62,25 @@
                         {
                             <tr>
                                 <td>@contact.Name</td>
-                                <td>@contact.EmailAddress</td>
-                                <td>@contact.PhoneNumber</td>
                                 <td>
-                                    <button class="btn btn-sm" type="button">
-                                        <span>
-                                            <i class="fa-solid fa-pencil"></i>
-                                        </span>
-                                    </button>
+                                    @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
+                                    {
+                                        <span class="text-muted fst-italic">Not set</span>
+                                    }
+                                    else
+                                    {
+                                        <text>@contact.EmailAddress</text>
+                                    }
+                                </td>
+                                <td>
+                                    @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
+                                    {
+                                        <span class="text-muted fst-italic">Not set</span>
+                                    }
+                                    else
+                                    {
+                                        <text>@contact.PhoneNumber</text>
+                                    }
                                 </td>
                             </tr>
                         }
@@ -77,7 +88,7 @@
                 </tbody>
             </table>
 
-            <button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)">
+            <button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)" @onclick="() => ShowAddContactModal(p.Value.Id)">
                 <span class="icon">
                     <i class="fa-solid fa-plus"></i>
                 </span>
@@ -88,6 +99,9 @@
 </div>
 
 @code {
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
 
     [Parameter]
     public required string Code { get; set; }
@@ -118,5 +132,14 @@
         {
             Contacts = await ApiClient.GetProjectContacts(project.Value.Id);
         }
+    }
+
+    private async Task ShowAddContactModal(Guid projectId)
+    {
+        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), projectId);
+        var result = await ModalService.Show<AddContactModal>("Add Contact", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadProjectContacts();
     }
 }
