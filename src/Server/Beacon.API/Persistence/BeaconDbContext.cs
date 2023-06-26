@@ -1,4 +1,5 @@
 ﻿using Beacon.App.Entities;
+using Beacon.Common.Validation.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;
@@ -61,7 +62,7 @@ public class BeaconDbContext : DbContext
 
         modelBuilder.Entity<ProjectContact>(builder =>
         {
-            builder.Property(x => x.Name).HasMaxLength(100).IsRequired();
+            builder.Property(x => x.Name).HasMaxLength(ContactRules.MaximumNameLength).IsRequired();
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
         });

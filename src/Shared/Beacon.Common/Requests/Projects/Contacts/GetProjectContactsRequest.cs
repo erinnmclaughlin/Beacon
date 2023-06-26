@@ -1,7 +1,7 @@
 ﻿using Beacon.Common.Models;
 using MediatR;
 
-namespace Beacon.Common.Requests.Projects;
+namespace Beacon.Common.Requests.Projects.Contacts;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class GetProjectContactsRequest : IRequest<ProjectContactDto[]>

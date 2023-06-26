@@ -22,7 +22,7 @@
             </div>
         </div>
         <footer class="modal-footer">
-            <SubmitButton class="btn btn-primary">Add Contact</SubmitButton>
+            <SubmitButton class="btn btn-primary">Update Contact</SubmitButton>
             <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
         </footer>
     </Modal>
@@ -33,15 +33,25 @@
     [Parameter]
     public required Guid ProjectId { get; set; }
 
+    [Parameter]
+    public required ProjectContactDto ContactToUpdate { get; set; }
+
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
 
-    private CreateProjectContactRequest? _request;
-    private CreateProjectContactRequest Request => _request ??= new() { ProjectId = ProjectId };
+    private UpdateProjectContactRequest? _request;
+    private UpdateProjectContactRequest Request => _request ??= new()
+    {
+        ProjectId = ProjectId,
+        ContactId = ContactToUpdate.Id,
+        EmailAddress = ContactToUpdate.EmailAddress,
+        PhoneNumber = ContactToUpdate.PhoneNumber,
+        Name = ContactToUpdate.Name
+    };
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.AddProjectContact(Request);
+        var result = await ApiClient.UpdateProjectContact(Request);
 
         if (result.IsError)
         {

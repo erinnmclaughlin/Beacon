@@ -1,13 +1,14 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.Endpoints;
+using Beacon.API.Persistence;
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Projects;
+using Beacon.Common.Requests.Projects.Contacts;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.API.Endpoints.Projects;
+namespace Beacon.API.Endpoints.Projects.Contacts;
 
 public sealed class GetProjectContacts : IBeaconEndpoint
 {

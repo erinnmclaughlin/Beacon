@@ -6,6 +6,10 @@
             <th>Name</th>
             <th>Email Address</th>
             <th>Phone Number</th>
+            @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+            {
+                <th style="width: 0%"></th>
+            }
         </tr>
     </thead>
     <tbody>
@@ -58,6 +62,36 @@
                             <text>@contact.PhoneNumber</text>
                         }
                     </td>
+                    @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+                    {
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button class="dropdown-item" type="button" @onclick="() => ShowUpdateContactModal(contact)">
+                                            <span class="icon text-primary">
+                                                <i class="fa-regular fa-pencil"></i>
+                                            </span>
+                                            <span>Update Contact</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" type="button" @onclick="() => ShowDeleteContactModal(contact)">
+                                            <span class="icon text-danger">
+                                                <i class="fa-regular fa-trash"></i>
+                                            </span>
+                                            <span>Delete Contact</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    }
                 </tr>
             }
         }
@@ -74,10 +108,13 @@
 @code {
 
     [CascadingParameter]
+    public required LaboratoryDto CurrentLab { get; set; }
+
+    [CascadingParameter]
     private IModalService ModalService { get; set; } = null!;
 
     [Parameter, EditorRequired] 
-    public required Guid ProjectId { get; set; }
+    public required ProjectDto Project { get; set; }
 
     private ErrorOr<ProjectContactDto[]>? Contacts { get; set; }
 
@@ -88,15 +125,41 @@
 
     private async Task LoadProjectContacts()
     {
-        Contacts = await ApiClient.GetProjectContacts(ProjectId);
+        Contacts = await ApiClient.GetProjectContacts(Project.Id);
     }
 
     private async Task ShowAddContactModal()
     {
-        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), ProjectId);
+        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), Project.Id);
         var result = await ModalService.Show<AddContactModal>("Add Contact", parameters).Result;
 
         if (result.Confirmed)
             await LoadProjectContacts();
+    }
+
+    private async Task ShowUpdateContactModal(ProjectContactDto contact)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(UpdateContactModal.ProjectId), Project.Id)
+            .Add(nameof(UpdateContactModal.ContactToUpdate), contact);
+
+        var result = await ModalService.Show<UpdateContactModal>("Update Contact", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadProjectContacts();
+    }
+
+    private async Task ShowDeleteContactModal(ProjectContactDto contact)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AreYouSureModal.Content), $"Are you sure you want to remove {contact.Name} from project {Project.ProjectCode}?");
+
+        var result = await ModalService.Show<AreYouSureModal>("Delete Contact", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await ApiClient.DeleteProjectContact(new() { ContactId = contact.Id, ProjectId = Project.Id });
+            await LoadProjectContacts();
+        }
     }
 }

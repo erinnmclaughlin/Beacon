@@ -47,6 +47,13 @@ public static class HttpClientFactoryExtensions
         return await response.ToErrorOrResult<T>(ct);
     }
 
+    public static async Task<ErrorOr<Success>> DeleteAsync(this IHttpClientFactory httpClientFactory, string requestUri, CancellationToken ct = default)
+    {
+        using var httpClient = httpClientFactory.CreateBeaconClient();
+        var response = await httpClient.DeleteAsync(requestUri, ct);
+        return await response.ToErrorOrResult(ct);
+    }
+
     public static HttpClient CreateBeaconClient(this IHttpClientFactory httpClientFactory)
     {
         return httpClientFactory.CreateClient("BeaconApi");
