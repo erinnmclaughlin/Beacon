@@ -11,10 +11,10 @@ namespace BeaconUI.Core.Shared.Laboratories;
 public partial class UpdateMembershipTypeModal
 {
     [CascadingParameter]
-    private LaboratoryDto CurrentLab { get; set; } = null!;
-
-    [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
+
+    [Parameter]
+    public required LaboratoryDto CurrentLab { get; set; }
 
     [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }

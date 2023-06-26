@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Services;
+﻿using Beacon.Common;
+using Beacon.Common.Services;
 using BeaconUI.Core.Clients;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
@@ -11,8 +12,14 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
 
     private ClaimsPrincipal? ClaimsPrincipal { get; set; }
 
-    private Guid _userId;
-    public Guid UserId => ClaimsPrincipal == null ? Guid.Empty : _userId;
+    public Guid UserId
+    {
+        get
+        {
+            var idValue = ClaimsPrincipal?.FindFirst(BeaconClaimTypes.UserId)?.Value;
+            return Guid.TryParse(idValue, out var id) ? id : Guid.Empty;
+        }
+    }
 
     public BeaconAuthStateProvider(ApiClient apiClient)
     {
@@ -24,18 +31,9 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
         if (ClaimsPrincipal == null)
         {
             var errorOrUser = await _apiClient.GetCurrentUser();
-
-            if (errorOrUser.IsError)
-            {
-                ClaimsPrincipal = AnonymousUser;
-                _userId = Guid.Empty;
-            }
-            else
-            {
-                var session = errorOrUser.Value;
-                ClaimsPrincipal = session.ToClaimsPrincipal();
-                _userId = session.Id;
-            }
+            ClaimsPrincipal = errorOrUser.Match(
+                value => value.ToClaimsPrincipal(),
+                error => AnonymousUser);
         }
 
         return new AuthenticationState(ClaimsPrincipal);

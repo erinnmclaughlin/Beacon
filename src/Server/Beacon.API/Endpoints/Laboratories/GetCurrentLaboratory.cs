@@ -35,7 +35,8 @@ public sealed class GetCurrentLaboratory : IBeaconEndpoint
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    MyMembershipType = _labContext.MembershipType
+                    MyMembershipType = _labContext.MembershipType,
+                    MemberCount = x.Memberships.Count()
                 })
                 .SingleAsync(ct);
         }

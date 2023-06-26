@@ -4,9 +4,18 @@
 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
     <div class="content flex-grow-1" style="background-color: #f8fafc">
         <div class="px-4 h-100">
-            <div class="flex">
-                <h3 class="flex-grow-1">My Laboratories</h3>
-                <button type="button" class="btn btn-link" @onclick="ShowCreateLabModal">New lab</button>
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h3>My Laboratories</h3>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" @onclick="ShowCreateLabModal">
+                        <span class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <span>New lab</span>
+                    </button>
+                </div>
             </div>
 
             <MyLaboratoriesTable />

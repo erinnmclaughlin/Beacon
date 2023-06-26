@@ -1,4 +1,5 @@
 using Beacon.Common.Models;
+using Beacon.Common.Services;
 using BeaconUI.Core.Shared.Laboratories;
 using Blazored.Modal;
 using Blazored.Modal.Services;
@@ -9,6 +10,9 @@ namespace BeaconUI.Core.Pages.Members;
 
 public partial class LaboratoryMembersPage
 {
+    [Inject]
+    private ICurrentUser CurrentUser { get; set; } = null!;
+
     [CascadingParameter]
     private LaboratoryDto CurrentLab { get; set; } = null!;
 
@@ -24,6 +28,12 @@ public partial class LaboratoryMembersPage
 
     private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
+        Console.WriteLine($"Current user id: {CurrentUser.UserId}");
+        Console.WriteLine($"Member id: {memberToUpdate.Id}");
+
+        if (memberToUpdate.Id == CurrentUser.UserId)
+            return false;
+
         if (CurrentLab.MyMembershipType is LaboratoryMembershipType.Admin)
             return true;
 
@@ -40,7 +50,10 @@ public partial class LaboratoryMembersPage
 
     private async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)
     {
-        var modalParameters = new ModalParameters().Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
+        var modalParameters = new ModalParameters()
+            .Add(nameof(UpdateMembershipTypeModal.CurrentLab), CurrentLab)
+            .Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
+
         await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
     }
 }
