@@ -1,4 +1,5 @@
 ﻿using Beacon.App.Entities;
+using Beacon.Common.Validation.Rules;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;
@@ -10,6 +11,7 @@ public class BeaconDbContext : DbContext
     public DbSet<Laboratory> Laboratories => Set<Laboratory>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
     public DbSet<User> Users => Set<User>();
 
     public BeaconDbContext(DbContextOptions<BeaconDbContext> options) : base(options)
@@ -47,7 +49,6 @@ public class BeaconDbContext : DbContext
 
         modelBuilder.Entity<Project>(builder =>
         {
-            builder.HasKey(x => x.Id);
             builder.OwnsOne(x => x.ProjectCode, b =>
             {
                 b.Property(x => x.CustomerCode).HasMaxLength(3);
@@ -57,6 +58,13 @@ public class BeaconDbContext : DbContext
             builder.HasIndex(x => x.ProjectStatus);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ProjectContact>(builder =>
+        {
+            builder.Property(x => x.Name).HasMaxLength(ContactRules.MaximumNameLength).IsRequired();
+            builder.Property(x => x.EmailAddress).HasMaxLength(255);
+            builder.Property(x => x.PhoneNumber).HasMaxLength(20);
         });
 
         modelBuilder.Entity<User>(builder =>

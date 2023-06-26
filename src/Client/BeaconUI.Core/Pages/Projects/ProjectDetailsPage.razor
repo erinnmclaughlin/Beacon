@@ -1,21 +1,69 @@
-﻿@page "/l/projects/{ProjectCode}"
+﻿@page "/l/projects/{Code}/{Tab?}"
 @attribute [Authorize]
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <h3 class="mb-0 flex-grow-1">
-        <span>@context.Name</span>
-    </h3>
+    <TitleContent>
+        <h3 class="mb-0">@CurrentLab.Name</h3>
+    </TitleContent>
+    <TabsContent>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
+        </li>
+    </TabsContent>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
     <div class="px-4 h-100">
-        <p>This is the project details page for project @ProjectCode.</p>
+        @if (Project is not { } p)
+        {
+            <p>Loading...</p>
+        }
+        else if (p.IsError)
+        {
+            <p class="text-danger">There was an error loading project details.</p>
+        }
+        else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+        {
+            <ProjectContacts Project="p.Value" />
+        }
+        else
+        {
+            <p>This is the project details page for project @Code.</p>
+        }
     </div>
 </div>
 
 @code {
 
+    [CascadingParameter]
+    public required LaboratoryDto CurrentLab { get; set; }
+
     [Parameter]
-    public required string ProjectCode { get; set; }
+    public required string Code { get; set; }
+
+    [Parameter]
+    public string? Tab { get; set; }
+
+    private ErrorOr<ProjectDto>? Project { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProject();
+    }
+
+    private async Task LoadProject()
+    {
+        if (ProjectCode.FromString(Code) is not { } code)
+        {
+            NavigationManager.NavigateTo("l/projects");
+            return;
+        }
+
+        Project = await ApiClient.GetProject(code);
+    }
+
 }

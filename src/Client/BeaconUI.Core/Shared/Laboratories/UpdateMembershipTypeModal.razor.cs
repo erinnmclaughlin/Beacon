@@ -8,7 +8,7 @@ using Microsoft.AspNetCore.Components;
 
 namespace BeaconUI.Core.Shared.Laboratories;
 
-public partial class UpdateMembershipTypeForm
+public partial class UpdateMembershipTypeModal
 {
     [CascadingParameter]
     private LaboratoryDto CurrentLab { get; set; } = null!;

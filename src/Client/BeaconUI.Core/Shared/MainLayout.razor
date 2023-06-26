@@ -1,12 +1,15 @@
 ﻿@inherits LayoutComponentBase
 
-<TopNav />
-
-<div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height); position: relative;">
-    <main class="d-flex flex-row flex-grow-1">
-        @Body
-    </main>
-
-    <EnvironmentWarning />
-
-</div>
+<AuthorizeView>
+    <Authorized>
+        <TopNav />
+        <div class="page d-flex flex-column h-100" style="overflow-x: hidden; padding-top: var(--topnav-height); position: relative;">
+            <main class="d-flex flex-row flex-grow-1">
+                @Body
+            </main>
+            <EnvironmentWarning />
+        </div>
+    </Authorized>
+    <NotAuthorized>@Body</NotAuthorized>
+    <Authorizing>@Body</Authorizing>
+</AuthorizeView>

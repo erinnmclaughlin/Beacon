@@ -11,4 +11,6 @@ public class Project : LaboratoryScopedEntityBase
 
     public required Guid CreatedById { get; init; }
     public User CreatedBy { get; init; } = null!;
+
+    public List<ProjectContact> Contacts { get; set; } = new();
 }

@@ -1,0 +1,165 @@
+﻿<h5>Project Contacts</h5>
+
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email Address</th>
+            <th>Phone Number</th>
+            @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+            {
+                <th style="width: 0%"></th>
+            }
+        </tr>
+    </thead>
+    <tbody>
+        @if (Contacts is not { } c)
+        {
+            <tr>
+                <td colspan="100">Loading...</td>
+            </tr>
+        }
+        else if (c.IsError)
+        {
+            <tr>
+                <td colspan="100">
+                    <p class="text-danger mb-0">There was an error loading project contacts.</p>
+                </td>
+            </tr>
+        }
+        else
+        {
+            if (!c.Value.Any())
+            {
+                <tr>
+                    <td colspan="100">
+                        <p class="text-muted mb-0">No contacts have been added.</p>
+                    </td>
+                </tr>
+            }
+
+            foreach (var contact in c.Value)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
+                        {
+                            <span class="text-muted fst-italic">Not set</span>
+                        }
+                        else
+                        {
+                            <text>@contact.EmailAddress</text>
+                        }
+                    </td>
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
+                        {
+                            <span class="text-muted fst-italic">Not set</span>
+                        }
+                        else
+                        {
+                            <text>@contact.PhoneNumber</text>
+                        }
+                    </td>
+                    @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+                    {
+                        <td>
+                            <div class="dropdown">
+                                <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    <span class="icon">
+                                        <i class="fa-solid fa-ellipsis-vertical"></i>
+                                    </span>
+                                </button>
+                                <ul class="dropdown-menu">
+                                    <li>
+                                        <button class="dropdown-item" type="button" @onclick="() => ShowUpdateContactModal(contact)">
+                                            <span class="icon text-primary">
+                                                <i class="fa-regular fa-pencil"></i>
+                                            </span>
+                                            <span>Update Contact</span>
+                                        </button>
+                                    </li>
+                                    <li>
+                                        <button class="dropdown-item" type="button" @onclick="() => ShowDeleteContactModal(contact)">
+                                            <span class="icon text-danger">
+                                                <i class="fa-regular fa-trash"></i>
+                                            </span>
+                                            <span>Delete Contact</span>
+                                        </button>
+                                    </li>
+                                </ul>
+                            </div>
+                        </td>
+                    }
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)" @onclick="ShowAddContactModal">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Add Contact</span>
+</button>
+
+@code {
+
+    [CascadingParameter]
+    public required LaboratoryDto CurrentLab { get; set; }
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
+
+    [Parameter, EditorRequired] 
+    public required ProjectDto Project { get; set; }
+
+    private ErrorOr<ProjectContactDto[]>? Contacts { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjectContacts();
+    }
+
+    private async Task LoadProjectContacts()
+    {
+        Contacts = await ApiClient.GetProjectContacts(Project.Id);
+    }
+
+    private async Task ShowAddContactModal()
+    {
+        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), Project.Id);
+        var result = await ModalService.Show<AddContactModal>("Add Contact", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadProjectContacts();
+    }
+
+    private async Task ShowUpdateContactModal(ProjectContactDto contact)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(UpdateContactModal.ProjectId), Project.Id)
+            .Add(nameof(UpdateContactModal.ContactToUpdate), contact);
+
+        var result = await ModalService.Show<UpdateContactModal>("Update Contact", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadProjectContacts();
+    }
+
+    private async Task ShowDeleteContactModal(ProjectContactDto contact)
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AreYouSureModal.Content), $"Are you sure you want to remove {contact.Name} from project {Project.ProjectCode}?");
+
+        var result = await ModalService.Show<AreYouSureModal>("Delete Contact", parameters).Result;
+
+        if (result.Confirmed)
+        {
+            await ApiClient.DeleteProjectContact(new() { ContactId = contact.Id, ProjectId = Project.Id });
+            await LoadProjectContacts();
+        }
+    }
+}

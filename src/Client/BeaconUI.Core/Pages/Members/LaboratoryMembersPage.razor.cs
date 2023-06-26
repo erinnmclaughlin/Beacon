@@ -35,12 +35,12 @@ public partial class LaboratoryMembersPage
 
     private async Task ShowInviteMemberModal()
     {
-        await ModalService.Show<InviteMemberForm>("Invite Lab Member").Result;
+        await ModalService.Show<InviteMemberModal>("Invite Lab Member").Result;
     }
 
     private async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)
     {
-        var modalParameters = new ModalParameters().Add(nameof(UpdateMembershipTypeForm.MemberToUpdate), memberToUpdate);
-        await ModalService.Show<UpdateMembershipTypeForm>("Update Membership", modalParameters).Result;
+        var modalParameters = new ModalParameters().Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
+        await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
     }
 }

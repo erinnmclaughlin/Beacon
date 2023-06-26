@@ -3,17 +3,17 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <h3 class="mb-0 flex-grow-1">
-        <span>@context.Name</span>
-    </h3>
-    <div>
-        <button type="button" class="btn btn-primary" disabled="@(context.MyMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)" @onclick="ShowInviteMemberModal">
+    <TitleContent>
+        <h3 class="mb-0">@CurrentLab.Name</h3>
+    </TitleContent>   
+    <ButtonsContent>
+        <button type="button" class="btn btn-primary" disabled="@(CurrentLab.MyMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)" @onclick="ShowInviteMemberModal">
             <span class="icon">
                 <i class="fa-solid fa-user-plus"></i>
             </span>
             <span>Invite member</span>
         </button>
-    </div>
+    </ButtonsContent>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
