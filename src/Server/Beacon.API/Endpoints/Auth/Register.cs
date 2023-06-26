@@ -4,6 +4,7 @@ using Beacon.App.Services;
 using Beacon.Common.Requests.Auth;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +15,7 @@ public sealed class Register : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPost<RegisterRequest>("auth/register").WithTags(EndpointTags.Authentication);
+        app.MapPost<RegisterRequest>("auth/register").AllowAnonymous().WithTags(EndpointTags.Authentication);
     }
 
     public sealed class EmailAddressValidator : AbstractValidator<RegisterRequest>

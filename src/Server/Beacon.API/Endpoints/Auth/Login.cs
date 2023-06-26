@@ -3,6 +3,7 @@ using Beacon.App.Exceptions;
 using Beacon.Common.Requests.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
@@ -12,7 +13,7 @@ public sealed class Login : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPost<LoginRequest>("auth/login").WithTags(EndpointTags.Authentication);
+        app.MapPost<LoginRequest>("auth/login").AllowAnonymous().WithTags(EndpointTags.Authentication);
     }
 
     internal sealed class Handler : IRequestHandler<LoginRequest>

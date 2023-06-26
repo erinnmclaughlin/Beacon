@@ -79,7 +79,7 @@ public static class BeaconAPI
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        app.MapGroup("api").MapBeaconEndpoints();
+        app.MapGroup("api").RequireAuthorization().MapBeaconEndpoints();
 
         return app;
     }

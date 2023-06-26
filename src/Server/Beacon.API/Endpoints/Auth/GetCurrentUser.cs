@@ -14,7 +14,7 @@ public sealed class GetCurrentUser : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/current", new GetCurrentUserRequest()).RequireAuthorization().WithTags(EndpointTags.Authentication);
+        app.MapGet("users/current", new GetCurrentUserRequest()).WithTags(EndpointTags.Authentication);
     }
 
     internal sealed class Handler : IRequestHandler<GetCurrentUserRequest, CurrentUserDto>
