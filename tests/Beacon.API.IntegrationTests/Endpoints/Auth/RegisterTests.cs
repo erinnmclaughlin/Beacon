@@ -5,13 +5,13 @@ using System.Net.Http.Json;
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Collection(AuthTests.Name)]
-public sealed class RegisterTests : TestBase
+public sealed class RegisterTests
 {
     private readonly HttpClient _httpClient;
 
-    public RegisterTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) 
+    public RegisterTests(ApiFactory factory) 
     {
-        _httpClient = _factory.CreateClient();
+        _httpClient = factory.CreateClient();
     }
 
     [Fact(DisplayName = "Register fails when required information is missing")]

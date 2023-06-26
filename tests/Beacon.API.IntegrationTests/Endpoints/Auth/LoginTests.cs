@@ -5,13 +5,13 @@ using System.Net.Http.Json;
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Collection(AuthTests.Name)]
-public sealed class LoginTests : TestBase
+public sealed class LoginTests
 {
     private readonly HttpClient _httpClient;
 
-    public LoginTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) 
+    public LoginTests(ApiFactory factory)
     {
-        _httpClient = _factory.CreateClient();
+        _httpClient = factory.CreateClient();
     }
 
     [Fact(DisplayName = "Login fails when required information is missing")]

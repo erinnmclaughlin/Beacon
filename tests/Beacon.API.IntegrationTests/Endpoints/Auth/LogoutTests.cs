@@ -5,13 +5,13 @@ using System.Net.Http.Json;
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Collection(AuthTests.Name)]
-public sealed class LogoutTests : TestBase
+public sealed class LogoutTests
 {
     private readonly HttpClient _httpClient;
 
-    public LogoutTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) 
+    public LogoutTests(ApiFactory factory)
     {
-        _httpClient = _factory.CreateClient();
+        _httpClient = factory.CreateClient();
     }
 
     [Fact(DisplayName = "Logout succeeds when user is logged in")]
