@@ -1,11 +1,11 @@
-﻿@page "/l/projects/{Code}"
+﻿@page "/l/projects/{Code}/{Tab?}"
 @attribute [Authorize]
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <h3 class="mb-0 flex-grow-1">
-        <span>@context.Name</span>
-    </h3>
+    <TitleContent>
+        <h3 class="mb-0">@CurrentLab.Name</h3>
+    </TitleContent>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
@@ -18,82 +18,13 @@
         {
             <p class="text-danger">There was an error loading project details.</p>
         }
+        else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+        {
+            <ProjectContacts ProjectId="p.Value.Id" />
+        }
         else
         {
             <p>This is the project details page for project @Code.</p>
-
-            <h5>Project Contacts</h5>
-
-            <table class="table align-middle">
-                <thead>
-                    <tr>
-                        <th>Name</th>
-                        <th>Email Address</th>
-                        <th>Phone Number</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (Contacts is not { } c)
-                    {
-                        <tr>
-                            <td colspan="100">Loading...</td>
-                        </tr>
-                    }
-                    else if (c.IsError)
-                    {
-                        <tr>
-                            <td colspan="100">
-                                <p class="text-danger mb-0">There was an error loading project contacts.</p>
-                            </td>
-                        </tr>
-                    }
-                    else
-                    {
-                        if (!c.Value.Any())
-                        {
-                            <tr>
-                                <td colspan="100">
-                                    <p class="text-muted mb-0">No contacts have been added.</p>
-                                </td>
-                            </tr>
-                        }
-
-                        foreach (var contact in c.Value)
-                        {
-                            <tr>
-                                <td>@contact.Name</td>
-                                <td>
-                                    @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
-                                    {
-                                        <span class="text-muted fst-italic">Not set</span>
-                                    }
-                                    else
-                                    {
-                                        <text>@contact.EmailAddress</text>
-                                    }
-                                </td>
-                                <td>
-                                    @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
-                                    {
-                                        <span class="text-muted fst-italic">Not set</span>
-                                    }
-                                    else
-                                    {
-                                        <text>@contact.PhoneNumber</text>
-                                    }
-                                </td>
-                            </tr>
-                        }
-                    }
-                </tbody>
-            </table>
-
-            <button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)" @onclick="() => ShowAddContactModal(p.Value.Id)">
-                <span class="icon">
-                    <i class="fa-solid fa-plus"></i>
-                </span>
-                <span>Add Contact</span>
-            </button>
         }
     </div>
 </div>
@@ -101,18 +32,19 @@
 @code {
 
     [CascadingParameter]
-    private IModalService ModalService { get; set; } = null!;
+    public required LaboratoryDto CurrentLab { get; set; }
 
     [Parameter]
     public required string Code { get; set; }
 
+    [Parameter]
+    public string? Tab { get; set; }
+
     private ErrorOr<ProjectDto>? Project { get; set; }
-    private ErrorOr<ProjectContactDto[]>? Contacts { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         await LoadProject();
-        await LoadProjectContacts();
     }
 
     private async Task LoadProject()
@@ -126,20 +58,4 @@
         Project = await ApiClient.GetProject(code);
     }
 
-    private async Task LoadProjectContacts()
-    {
-        if (Project is { IsError: false } project)
-        {
-            Contacts = await ApiClient.GetProjectContacts(project.Value.Id);
-        }
-    }
-
-    private async Task ShowAddContactModal(Guid projectId)
-    {
-        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), projectId);
-        var result = await ModalService.Show<AddContactModal>("Add Contact", parameters).Result;
-
-        if (result.Confirmed)
-            await LoadProjectContacts();
-    }
 }

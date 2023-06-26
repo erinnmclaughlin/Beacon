@@ -1,0 +1,102 @@
+﻿<h5>Project Contacts</h5>
+
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Name</th>
+            <th>Email Address</th>
+            <th>Phone Number</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (Contacts is not { } c)
+        {
+            <tr>
+                <td colspan="100">Loading...</td>
+            </tr>
+        }
+        else if (c.IsError)
+        {
+            <tr>
+                <td colspan="100">
+                    <p class="text-danger mb-0">There was an error loading project contacts.</p>
+                </td>
+            </tr>
+        }
+        else
+        {
+            if (!c.Value.Any())
+            {
+                <tr>
+                    <td colspan="100">
+                        <p class="text-muted mb-0">No contacts have been added.</p>
+                    </td>
+                </tr>
+            }
+
+            foreach (var contact in c.Value)
+            {
+                <tr>
+                    <td>@contact.Name</td>
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
+                        {
+                            <span class="text-muted fst-italic">Not set</span>
+                        }
+                        else
+                        {
+                            <text>@contact.EmailAddress</text>
+                        }
+                    </td>
+                    <td>
+                        @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
+                        {
+                            <span class="text-muted fst-italic">Not set</span>
+                        }
+                        else
+                        {
+                            <text>@contact.PhoneNumber</text>
+                        }
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)" @onclick="ShowAddContactModal">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Add Contact</span>
+</button>
+
+@code {
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
+
+    [Parameter, EditorRequired] 
+    public required Guid ProjectId { get; set; }
+
+    private ErrorOr<ProjectContactDto[]>? Contacts { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProjectContacts();
+    }
+
+    private async Task LoadProjectContacts()
+    {
+        Contacts = await ApiClient.GetProjectContacts(ProjectId);
+    }
+
+    private async Task ShowAddContactModal()
+    {
+        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), ProjectId);
+        var result = await ModalService.Show<AddContactModal>("Add Contact", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadProjectContacts();
+    }
+}

@@ -3,9 +3,9 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <h3 class="mb-0 flex-grow-1">
-        <span>@context.Name</span>
-    </h3>
+    <TitleContent>
+        <h3 class="mb-0">@CurrentLab.Name</h3>
+    </TitleContent>
 </LaboratoryPageHeader>
 
 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
@@ -15,3 +15,8 @@
         </div>
     </div>
 </div>
+
+@code {
+    [CascadingParameter]
+    public required LaboratoryDto CurrentLab { get; set; }
+}
