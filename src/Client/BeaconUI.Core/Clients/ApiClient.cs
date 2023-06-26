@@ -75,7 +75,12 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<ProjectDto[]>> GetProjects()
     {
-        return await _httpClientFactory.GetAsync<ProjectDto[]>($"api/projects");
+        return await _httpClientFactory.GetAsync<ProjectDto[]>("api/projects");
+    }
+
+    public async Task<ErrorOr<ProjectDto>> GetProject(ProjectCode projectCode)
+    {
+        return await _httpClientFactory.GetAsync<ProjectDto>($"api/projects/{projectCode}");
     }
 
     public async Task<ErrorOr<Success>> CreateProject(CreateProjectRequest request)
@@ -91,5 +96,15 @@ public sealed class ApiClient
     public async Task<ErrorOr<Success>> CompleteProject(CompleteProjectRequest request)
     {
         return await _httpClientFactory.PostAsync($"api/projects/complete", request);
+    }
+
+    public async Task<ErrorOr<Success>> AddProjectContact(AddProjectContactRequest request)
+    {
+        return await _httpClientFactory.PostAsync($"api/projects/{request.ProjectId}/contacts", request);
+    }
+
+    public async Task<ErrorOr<ProjectContactDto[]>> GetProjectContacts(Guid projectId)
+    {
+        return await _httpClientFactory.GetAsync<ProjectContactDto[]>($"api/projects/{projectId}/contacts");
     }
 }

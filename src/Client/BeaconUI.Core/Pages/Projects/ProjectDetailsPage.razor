@@ -1,4 +1,4 @@
-﻿@page "/l/projects/{ProjectCode}"
+﻿@page "/l/projects/{Code}"
 @attribute [Authorize]
 @layout LaboratoryLayout
 
@@ -10,12 +10,113 @@
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
     <div class="px-4 h-100">
-        <p>This is the project details page for project @ProjectCode.</p>
+        @if (Project is not { } p)
+        {
+            <p>Loading...</p>
+        }
+        else if (p.IsError)
+        {
+            <p class="text-danger">There was an error loading project details.</p>
+        }
+        else
+        {
+            <p>This is the project details page for project @Code.</p>
+
+            <h5>Project Contacts</h5>
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Email Address</th>
+                        <th>Phone Number</th>
+                        <th style="width: 0%"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (Contacts is not { } c)
+                    {
+                        <tr>
+                            <td colspan="100">Loading...</td>
+                        </tr>
+                    }
+                    else if (c.IsError)
+                    {
+                        <tr>
+                            <td colspan="100">
+                                <p class="text-danger mb-0">There was an error loading project contacts.</p>
+                            </td>
+                        </tr>
+                    }
+                    else
+                    {
+                        if (!c.Value.Any())
+                        {
+                            <tr>
+                                <td colspan="100">
+                                    <p class="text-muted mb-0">No contacts have been added.</p>
+                                </td>
+                            </tr>
+                        }
+
+                        foreach (var contact in c.Value)
+                        {
+                            <tr>
+                                <td>@contact.Name</td>
+                                <td>@contact.EmailAddress</td>
+                                <td>@contact.PhoneNumber</td>
+                                <td>
+                                    <button class="btn btn-sm" type="button">
+                                        <span>
+                                            <i class="fa-solid fa-pencil"></i>
+                                        </span>
+                                    </button>
+                                </td>
+                            </tr>
+                        }
+                    }
+                </tbody>
+            </table>
+
+            <button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)">
+                <span class="icon">
+                    <i class="fa-solid fa-plus"></i>
+                </span>
+                <span>Add Contact</span>
+            </button>
+        }
     </div>
 </div>
 
 @code {
 
     [Parameter]
-    public required string ProjectCode { get; set; }
+    public required string Code { get; set; }
+
+    private ErrorOr<ProjectDto>? Project { get; set; }
+    private ErrorOr<ProjectContactDto[]>? Contacts { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadProject();
+        await LoadProjectContacts();
+    }
+
+    private async Task LoadProject()
+    {
+        if (ProjectCode.FromString(Code) is not { } code)
+        {
+            NavigationManager.NavigateTo("l/projects");
+            return;
+        }
+
+        Project = await ApiClient.GetProject(code);
+    }
+
+    private async Task LoadProjectContacts()
+    {
+        if (Project is { IsError: false } project)
+        {
+            Contacts = await ApiClient.GetProjectContacts(project.Value.Id);
+        }
+    }
 }
