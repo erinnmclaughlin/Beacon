@@ -8,7 +8,10 @@
             @ButtonsContent
         }
     </div>
-    @TabsContent
+    @if (TabsContent is not null)
+    {
+        <ul class="nav nav-tabs" style="margin-left: -1px; margin-bottom: -1px;">@TabsContent</ul>
+    }
 </header>
 
 @code {

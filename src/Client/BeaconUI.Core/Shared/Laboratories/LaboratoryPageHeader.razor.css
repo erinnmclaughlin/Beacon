@@ -1,0 +1,8 @@
+.nav {
+    margin-bottom: -1px;
+    margin-left: -1px;
+}
+
+    .nav-tabs ::deep .nav-link.active {
+        background-color: #f8fafc !important;
+    }

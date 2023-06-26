@@ -6,6 +6,14 @@
     <TitleContent>
         <h3 class="mb-0">@CurrentLab.Name</h3>
     </TitleContent>
+    <TabsContent>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
+        </li>
+    </TabsContent>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
