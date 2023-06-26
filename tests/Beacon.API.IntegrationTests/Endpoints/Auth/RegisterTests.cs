@@ -1,6 +1,4 @@
 ﻿using Beacon.Common.Requests.Auth;
-using Beacon.WebHost;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -9,7 +7,12 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 [Collection(AuthTests.Name)]
 public sealed class RegisterTests : TestBase
 {
-    public RegisterTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) { }
+    private readonly HttpClient _httpClient;
+
+    public RegisterTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) 
+    {
+        _httpClient = _factory.CreateClient();
+    }
 
     [Fact(DisplayName = "Register fails when required information is missing")]
     public async Task Register_FailsWhenRequiredInformationIsMissing()

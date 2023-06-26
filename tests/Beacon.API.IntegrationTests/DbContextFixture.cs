@@ -1,5 +1,4 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.WebHost;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using System.Data.Common;

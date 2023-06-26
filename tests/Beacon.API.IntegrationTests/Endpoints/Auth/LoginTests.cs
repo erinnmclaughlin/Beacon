@@ -1,6 +1,4 @@
 ﻿using Beacon.Common.Requests.Auth;
-using Beacon.WebHost;
-using Microsoft.AspNetCore.Mvc.Testing;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -9,13 +7,17 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 [Collection(AuthTests.Name)]
 public sealed class LoginTests : TestBase
 {
-    public LoginTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) { }
+    private readonly HttpClient _httpClient;
+
+    public LoginTests(DbContextFixture db, WebApplicationFactory<BeaconWebHost> factory) : base(db, factory) 
+    {
+        _httpClient = _factory.CreateClient();
+    }
 
     [Fact(DisplayName = "Login fails when required information is missing")]
     public async Task Login_FailsWhenRequiredInformationIsMissing()
     {
         var response = await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest());
-
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
