@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.App.Services;
-using Beacon.Common.Auth;
+using Beacon.Common.Requests.Auth;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
@@ -17,7 +17,7 @@ public sealed class Register : IBeaconEndpoint
         app.MapPost<RegisterRequest>("auth/register").WithTags(EndpointTags.Authentication);
     }
 
-    public class EmailAddressValidator : AbstractValidator<RegisterRequest>
+    public sealed class EmailAddressValidator : AbstractValidator<RegisterRequest>
     {
         private readonly BeaconDbContext _dbContext;
 
@@ -26,7 +26,8 @@ public sealed class Register : IBeaconEndpoint
             _dbContext = dbContext;
 
             RuleFor(r => r.EmailAddress)
-                .MustAsync(BeAUniqueEmailAddress);
+                .MustAsync(BeAUniqueEmailAddress)
+                .WithMessage("An account with the specified email address already exists.");
         }
 
         public async Task<bool> BeAUniqueEmailAddress(string email, CancellationToken ct)
@@ -36,7 +37,7 @@ public sealed class Register : IBeaconEndpoint
         }
     }
 
-    public sealed class Handler : IRequestHandler<RegisterRequest>
+    internal sealed class Handler : IRequestHandler<RegisterRequest>
     {
         private readonly BeaconDbContext _dbContext;
         private readonly IPasswordHasher _passwordHasher;

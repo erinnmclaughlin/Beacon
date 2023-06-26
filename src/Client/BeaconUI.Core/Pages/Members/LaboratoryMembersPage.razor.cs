@@ -1,5 +1,4 @@
-using Beacon.Common.Laboratories;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 using BeaconUI.Core.Shared.Laboratories;
 using Blazored.Modal;
 using Blazored.Modal.Services;

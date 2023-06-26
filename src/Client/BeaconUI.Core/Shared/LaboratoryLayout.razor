@@ -21,16 +21,15 @@
 
 @code {
 
-    [Inject]
-    private Services.CurrentLabService CurrentLabService { get; set; } = null!;
-
     private LaboratoryDto? CurrentLab { get; set; }
 
-    protected override async Task OnParametersSetAsync()
+    protected override async Task OnInitializedAsync()
     {
-        CurrentLab = await CurrentLabService.GetCurrentLaboratory();
+        var result = await ApiClient.GetCurrentLaboratory();
 
-        if (CurrentLab is null)
-            NavigationManager.NavigateTo("");
+        result.Switch(
+            value => CurrentLab = value,
+            error => NavigationManager.NavigateTo("")
+        );
     }
 }

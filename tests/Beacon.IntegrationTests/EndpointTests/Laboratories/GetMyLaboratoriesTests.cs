@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Laboratories;
+﻿using Beacon.Common.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +16,7 @@ public class GetMyLaboratoriesTests : EndpointTestBase
     [Fact]
     public async Task GetMyLaboratories_ReturnsOnlyCurrentUsersLabs()
     {
-        AddTestAuthorization(Common.Memberships.LaboratoryMembershipType.Admin);
+        AddTestAuthorization(LaboratoryMembershipType.Admin);
         
         var client = CreateClient(db =>
         {

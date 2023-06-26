@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 
 namespace Beacon.IntegrationTests;
 
@@ -40,5 +40,13 @@ public static class TestData
         }
 
         dbContext.SaveChanges();
+    }
+
+    public static HttpClient AddLabHeader(this HttpClient httpClient) => AddLabHeader(httpClient, DefaultLaboratory.Id);
+
+    public static HttpClient AddLabHeader(this HttpClient httpClient, Guid labId)
+    {
+        httpClient.DefaultRequestHeaders.Add("X-LaboratoryId", labId.ToString());
+        return httpClient;
     }
 }

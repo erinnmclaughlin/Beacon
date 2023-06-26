@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.App.ValueObjects;
-using Beacon.Common.Projects;
+using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -19,13 +19,15 @@ public sealed class GetProjectDetails : IBeaconEndpoint
         {
             if (Guid.TryParse(idOrCode, out var id))
             {
-                var projectOrNull = await m.Send(new ById(id), ct);
+                var request = new GetProjectByIdRequest { ProjectId = id };
+                var projectOrNull = await m.Send(request, ct);
                 return projectOrNull is null ? Results.NotFound() : Results.Ok(projectOrNull);
             }
 
             if (ProjectCode.FromString(idOrCode) is { } code)
             {
-                var projectOrNull = await m.Send(new ByCode(code), ct);
+                var request = new GetProjectByProjectCodeRequest { ProjectCode = code };
+                var projectOrNull = await m.Send(request, ct);
                 return projectOrNull is null ? Results.NotFound() : Results.Ok(projectOrNull);
             }
 
@@ -33,10 +35,7 @@ public sealed class GetProjectDetails : IBeaconEndpoint
         });
     }
 
-    public sealed record ById(Guid Id) : IRequest<ProjectDto?>;
-    public sealed record ByCode(ProjectCode ProjectCode) : IRequest<ProjectDto?>;
-
-    internal sealed class Handler : IRequestHandler<ById, ProjectDto?>, IRequestHandler<ByCode, ProjectDto?>
+    internal sealed class Handler : IRequestHandler<GetProjectByIdRequest, ProjectDto?>, IRequestHandler<GetProjectByProjectCodeRequest, ProjectDto?>
     {
         private readonly BeaconDbContext _dbContext;
 
@@ -45,12 +44,12 @@ public sealed class GetProjectDetails : IBeaconEndpoint
             _dbContext = dbContext;
         }
 
-        public async Task<ProjectDto?> Handle(ById request, CancellationToken ct)
+        public async Task<ProjectDto?> Handle(GetProjectByIdRequest request, CancellationToken ct)
         {
-            return await GetAsync(x => x.Id == request.Id, ct);
+            return await GetAsync(x => x.Id == request.ProjectId, ct);
         }
 
-        public async Task<ProjectDto?> Handle(ByCode request, CancellationToken ct)
+        public async Task<ProjectDto?> Handle(GetProjectByProjectCodeRequest request, CancellationToken ct)
         {
             return await GetAsync(x =>
                 x.ProjectCode.CustomerCode == request.ProjectCode.CustomerCode && 
@@ -59,9 +58,7 @@ public sealed class GetProjectDetails : IBeaconEndpoint
 
         private async Task<ProjectDto?> GetAsync(Expression<Func<Project, bool>> filter, CancellationToken ct)
         {
-            var project = await _dbContext.Projects
-                .AsNoTracking()
-                .SingleOrDefaultAsync(filter, ct);
+            var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(filter, ct);
 
             return project is null ? null : new ProjectDto
             {

@@ -1,7 +1,5 @@
 ﻿using Beacon.App.Entities;
-using Beacon.App.ValueObjects;
-using Beacon.Common.Memberships;
-using Beacon.Common.Projects;
+using Beacon.Common.Models;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
@@ -50,8 +48,7 @@ public class GetProjectsTests : EndpointTestBase
             db.SaveChanges();
         });
 
-        var uri = $"api/projects?laboratoryId={TestData.DefaultLaboratory.Id}";
-        var projects = await client.GetFromJsonAsync<ProjectDto[]>(uri, JsonSerializerOptions);
+        var projects = await client.AddLabHeader().GetFromJsonAsync<ProjectDto[]>("api/projects", JsonSerializerOptions);
         projects.Should().ContainSingle().Which.ProjectCode.Should().Be("ABC-001");
     }
 

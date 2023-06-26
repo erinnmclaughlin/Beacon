@@ -27,6 +27,15 @@ public static class EndpointRouteBuilderExtensions
         });
     }
 
+    public static RouteHandlerBuilder MapGet(this IEndpointRouteBuilder e, string uri, IRequest request)
+    {
+        return e.MapGet(uri, async (IMediator sender, CancellationToken ct) =>
+        {
+            await sender.Send(request, ct);
+            return Results.NoContent();
+        });
+    }
+
     public static RouteHandlerBuilder MapGet<TResponse>(this IEndpointRouteBuilder e, string uri, IRequest<TResponse> request)
     {
         return e.MapGet(uri, async (IMediator sender, CancellationToken ct) =>

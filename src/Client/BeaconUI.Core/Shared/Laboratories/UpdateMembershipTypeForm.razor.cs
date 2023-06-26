@@ -1,5 +1,5 @@
-using Beacon.Common.Laboratories;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
+using Beacon.Common.Requests.Memberships;
 using BeaconUI.Core.Clients;
 using BeaconUI.Core.Shared.Forms;
 using Blazored.Modal;
@@ -22,7 +22,6 @@ public partial class UpdateMembershipTypeForm
     private UpdateMembershipRequest? _model;
     private UpdateMembershipRequest Model => _model ??= new()
     {
-        LaboratoryId = CurrentLab.Id,
         MemberId = MemberToUpdate.Id,
         MembershipType = MemberToUpdate.MembershipType
     };

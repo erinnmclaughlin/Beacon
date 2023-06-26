@@ -1,5 +1,5 @@
-﻿using Beacon.Common.Memberships;
-using Beacon.Common.Projects.Requests;
+﻿using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects;
 
 namespace Beacon.IntegrationTests.EndpointTests.Projects;
 
@@ -16,7 +16,6 @@ public class CreateProjectTests : EndpointTestBase
         AddTestAuthorization(LaboratoryMembershipType.Member);
         var response = await CreateClient().PostAsJsonAsync("api/projects", new CreateProjectRequest
         {
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             CustomerCode = "ABC",
             CustomerName = "ABC Company"
         });
@@ -28,9 +27,8 @@ public class CreateProjectTests : EndpointTestBase
     public async Task CreateProject_SucceedsWhenRequestIsValid()
     {
         AddTestAuthorization(LaboratoryMembershipType.Admin);
-        var response = await CreateClient().PostAsJsonAsync("api/projects", new CreateProjectRequest
+        var response = await CreateClient().AddLabHeader().PostAsJsonAsync("api/projects", new CreateProjectRequest
         {
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             CustomerCode = "ABC",
             CustomerName = "ABC Company"
         });

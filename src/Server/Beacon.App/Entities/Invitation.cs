@@ -1,5 +1,5 @@
 ﻿using Beacon.App.Exceptions;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 
 namespace Beacon.App.Entities;
 

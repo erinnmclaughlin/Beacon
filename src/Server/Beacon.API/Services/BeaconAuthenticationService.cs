@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.App.Services;
-using Beacon.Common.Auth;
+using Beacon.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 

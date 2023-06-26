@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.WebHost;

@@ -1,5 +1,5 @@
-﻿using Beacon.Common.Auth;
-using Beacon.Common.Memberships;
+﻿using Beacon.Common;
+using Beacon.Common.Models;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;

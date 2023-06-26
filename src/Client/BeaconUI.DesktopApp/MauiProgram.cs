@@ -17,13 +17,8 @@ public static class MauiProgram
 
         builder.Services.AddMauiBlazorWebView();
 
-        builder.Services.AddHttpClient("BeaconApi", options =>
-        {
-            // TODO: pull this from config
-            options.BaseAddress = new Uri("http://localhost:5020");
-        });
-
-        builder.Services.AddBeaconUI();
+        // TODO: pull base uri from config
+        builder.Services.AddBeaconUI("http://localhost:5020");
 
 #if DEBUG
         builder.Services.AddBlazorWebViewDeveloperTools();

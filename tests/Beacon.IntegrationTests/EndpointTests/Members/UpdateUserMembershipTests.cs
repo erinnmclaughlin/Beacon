@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Services;
 using Beacon.App.Entities;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
+using Beacon.Common.Requests.Memberships;
 
 namespace Beacon.IntegrationTests.EndpointTests.Members;
 
@@ -38,12 +39,11 @@ public class UpdateUserMembershipTests : EndpointTestBase
             });
 
             await db.SaveChangesAsync();
-        });
+        }).AddLabHeader();
 
         var response = await client.PutAsJsonAsync("api/memberships", new UpdateMembershipRequest
         {
             MemberId = memberId,
-            LaboratoryId = TestData.DefaultLaboratory.Id,
             MembershipType = LaboratoryMembershipType.Manager
         }, JsonSerializerOptions);
 

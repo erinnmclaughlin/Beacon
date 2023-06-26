@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Memberships;
+﻿using Beacon.Common.Models;
 
 namespace Beacon.IntegrationTests.EndpointTests.Members;
 
@@ -14,8 +14,9 @@ public sealed class GetLaboratoryMembersTests : EndpointTestBase
     {
         AddTestAuthorization(LaboratoryMembershipType.Admin);
 
-        var uri = $"api/memberships?laboratoryId={TestData.DefaultLaboratory.Id}";
-        var members = await CreateClient().GetFromJsonAsync<LaboratoryMemberDto[]>(uri, JsonSerializerOptions);
+        var members = await CreateClient()
+            .AddLabHeader()
+            .GetFromJsonAsync<LaboratoryMemberDto[]>("api/memberships", JsonSerializerOptions);
 
         members.Should().ContainSingle().Which.Id.Should().Be(TestData.DefaultUser.Id);
 

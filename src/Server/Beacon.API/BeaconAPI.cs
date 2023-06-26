@@ -1,10 +1,12 @@
-﻿using Beacon.API.Endpoints;
+﻿using Beacon.API.Behaviors;
+using Beacon.API.Endpoints;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.App.Services;
 using Beacon.App.Settings;
-using Beacon.Common.Auth;
+using Beacon.Common.Requests.Auth;
+using Beacon.Common.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Builder;
@@ -24,13 +26,10 @@ public static class BeaconAPI
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
+            config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
-        services.AddValidatorsFromAssemblies(new[]
-        {
-            typeof(BeaconAPI).Assembly,
-            typeof(LoginRequest).Assembly
-        });
+        services.AddValidatorsFromAssemblies(new[] {typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
 
         // Api
         services.AddEndpointsApiExplorer();
@@ -56,17 +55,12 @@ public static class BeaconAPI
             };
         });
 
-        services.AddAuthorization(options =>
-        {
-            options.AddPolicy(AuthConstants.LabAuth, config =>
-            {
-                config.RequireClaim(BeaconClaimTypes.LabId);
-            });
-        });
+        services.AddAuthorization();
         services.AddScoped<BeaconAuthenticationService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ILabContext, LaboratoryContext>();
 
         // Data
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);

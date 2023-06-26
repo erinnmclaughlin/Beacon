@@ -140,7 +140,7 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects(CurrentLab.Id);
+        ProjectsOrError = await ApiClient.GetProjects();
     }
 
     private void NavigateToProjectDetails(ProjectDto project)
@@ -163,7 +163,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(project.Id);
+            await ApiClient.CancelProject(new() { ProjectId = project.Id });
             await LoadProjects();
         }
     }
@@ -177,7 +177,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(project.Id);
+            await ApiClient.CompleteProject(new() { ProjectId = project.Id });
             await LoadProjects();
         }
     }

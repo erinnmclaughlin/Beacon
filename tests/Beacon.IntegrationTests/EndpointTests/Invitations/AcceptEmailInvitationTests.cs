@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.Common.Memberships;
+using Beacon.Common.Models;
 
 namespace Beacon.IntegrationTests.EndpointTests.Invitations;
 
