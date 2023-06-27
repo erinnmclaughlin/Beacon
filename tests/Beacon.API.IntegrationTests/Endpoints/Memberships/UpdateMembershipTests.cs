@@ -1,7 +1,6 @@
 ﻿using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
-using System.Diagnostics;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -23,7 +22,7 @@ public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
 
         var request = new UpdateMembershipRequest
         {
-            MemberId = TestData.MemberUserAlt.Id,
+            MemberId = TestData.AnalystUser.Id,
             MembershipType = LaboratoryMembershipType.Analyst
         };
 
@@ -53,8 +52,8 @@ public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
 
         var request = new UpdateMembershipRequest
         {
-            MemberId = TestData.ManagerUserAlt.Id,
-            MembershipType = LaboratoryMembershipType.Member
+            MemberId = TestData.MemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Analyst
         };
 
         var response = await client.PutAsJsonAsync("api/memberships", request, JsonDefaults.JsonSerializerOptions);
@@ -83,7 +82,7 @@ public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
 
         var request = new UpdateMembershipRequest
         {
-            MemberId = TestData.ManagerUserAlt.Id,
+            MemberId = TestData.MemberUser.Id,
             MembershipType = LaboratoryMembershipType.Admin
         };
 
@@ -104,13 +103,4 @@ public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
         var response = await client.PutAsJsonAsync("api/memberships", request, JsonDefaults.JsonSerializerOptions);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
-
-    private static Guid GetAltUserId(LaboratoryMembershipType membershipType) => membershipType switch
-    {
-        LaboratoryMembershipType.Member => TestData.MemberUserAlt.Id,
-        LaboratoryMembershipType.Analyst => TestData.AnalystUserAlt.Id,
-        LaboratoryMembershipType.Manager => TestData.ManagerUserAlt.Id,
-        LaboratoryMembershipType.Admin => TestData.AdminUserAlt.Id,
-        _ => throw new UnreachableException()
-    };
 }

@@ -56,6 +56,7 @@ public static class BeaconAPI
         });
 
         services.AddAuthorization();
+        services.RegisterAuthorizers();
         services.AddScoped<BeaconAuthenticationService>();
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();

@@ -72,19 +72,7 @@ public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLif
         await Connection.OpenAsync();
 
         using var dbContext = CreateDbContext();
-        await dbContext.Database.EnsureCreatedAsync();
-        dbContext.Users.AddRange(
-            TestData.AdminUser, 
-            TestData.AdminUserAlt,
-            TestData.ManagerUser, 
-            TestData.ManagerUserAlt, 
-            TestData.AnalystUser, 
-            TestData.AnalystUserAlt, 
-            TestData.MemberUser, 
-            TestData.MemberUserAlt, 
-            TestData.NonMemberUser);
-        dbContext.Laboratories.Add(TestData.Lab);
-        await dbContext.SaveChangesAsync();
+        await dbContext.InitializeForTests();
     }
 
     async Task IAsyncLifetime.DisposeAsync()

@@ -10,6 +10,8 @@ public sealed class LaboratoryContext : ILabContext
 {
     private readonly BeaconDbContext _dbContext;
 
+    private readonly Dictionary<Guid, LaboratoryMembershipType?> _membershipTypeCache = new();
+
     public Guid LaboratoryId { get; }
 
     public LaboratoryContext(BeaconDbContext dbContext, IHttpContextAccessor httpContextAccessor)
@@ -25,11 +27,15 @@ public sealed class LaboratoryContext : ILabContext
         if (LaboratoryId == Guid.Empty)
             return null;
 
+        if (_membershipTypeCache.TryGetValue(userId, out var type))
+            return type;
+
         var m = await _dbContext.Memberships
             .Where(x => x.LaboratoryId == LaboratoryId && x.MemberId == userId)
             .Select(x => new { x.MembershipType })
             .FirstOrDefaultAsync(ct);
 
+        _membershipTypeCache.Add(userId, m?.MembershipType);
         return m?.MembershipType;
     }
 }
