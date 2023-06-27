@@ -4,11 +4,11 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class RegisterTests : IClassFixture<ApiFactory>
+public sealed class RegisterTests : TestBase
 {
     private readonly HttpClient _httpClient;
 
-    public RegisterTests(ApiFactory factory) 
+    public RegisterTests(ApiFactory factory) : base(factory)
     {
         _httpClient = factory.CreateClient();
     }

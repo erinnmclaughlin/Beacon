@@ -1,5 +1,4 @@
 ﻿using Beacon.API.Persistence;
-using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
@@ -11,28 +10,35 @@ using System.Net.Http.Headers;
 
 namespace Beacon.API.IntegrationTests;
 
-public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLifetime
+public abstract class TestBase : IAsyncLifetime, IClassFixture<ApiFactory>
 {
-    public DbConnection Connection { get; }
+    protected readonly ApiFactory _factory;
+
+    public TestBase(ApiFactory factory)
+    {
+        _factory = factory;
+    }
+
+    public async Task InitializeAsync()
+    {
+        using var scope = _factory.Services.CreateScope();
+        await scope.ServiceProvider.GetRequiredService<BeaconDbContext>().InitializeForTests();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
+    }
+}
+
+public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>
+{
+    private readonly DbConnection _dbConnection;
 
     public ApiFactory()
     {
-        Connection = new SqliteConnection($"DataSource={Guid.NewGuid()}.db");
-    }
-
-    // TODO: use these maybe
-    public async Task SendAsync(IRequest request)
-    {
-        using var scope = Services.CreateScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        await mediator.Send(request);
-    }
-
-    public async Task<T> SendAsync<T>(IRequest<T> request)
-    {
-        using var scope = Services.CreateScope();
-        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
-        return await mediator.Send(request);
+        _dbConnection = new SqliteConnection("DataSource=:memory:");
+        _dbConnection.Open();
     }
 
     public HttpClient CreateClient(Guid userId, Guid? labId = null)
@@ -63,34 +69,14 @@ public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLif
         {
             services.RemoveAll<DbContextOptions<BeaconDbContext>>();
             services.RemoveAll<BeaconDbContext>();
-            services.AddScoped(_ => CreateDbContext());
+            services.AddDbContext<BeaconDbContext>(o => o.UseSqlite(_dbConnection));
         });
     }
 
-    async Task IAsyncLifetime.InitializeAsync()
+    public override ValueTask DisposeAsync()
     {
-        await Connection.OpenAsync();
-
-        using var dbContext = CreateDbContext();
-        await dbContext.InitializeForTests();
-    }
-
-    async Task IAsyncLifetime.DisposeAsync()
-    {
-        await Connection.CloseAsync();
-
-        using (var dbContext = CreateDbContext())
-        {
-            await dbContext.Database.EnsureDeletedAsync();
-        }
-
-        await Connection.DisposeAsync();
-    }
-
-    private BeaconDbContext CreateDbContext()
-    {
-        var optionsBuilder = new DbContextOptionsBuilder<BeaconDbContext>();
-        optionsBuilder.UseSqlite(Connection);
-        return new(optionsBuilder.Options);
+        _dbConnection.Close();
+        _dbConnection.Dispose();
+        return base.DisposeAsync();
     }
 }

@@ -4,11 +4,11 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class LogoutTests : IClassFixture<ApiFactory>
+public sealed class LogoutTests : TestBase
 {
     private readonly HttpClient _httpClient;
 
-    public LogoutTests(ApiFactory factory)
+    public LogoutTests(ApiFactory factory) : base(factory)
     {
         _httpClient = factory.CreateClient();
     }

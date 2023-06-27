@@ -6,14 +6,9 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
+public sealed class UpdateMembershipTests : TestBase
 {
-    private readonly ApiFactory _factory;
-
-    public UpdateMembershipTests(ApiFactory factory)
-    {
-        _factory = factory;
-    }
+    public UpdateMembershipTests(ApiFactory factory) : base(factory) { }
 
     [Fact(DisplayName = "Basic members cannot update membership types.")]
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()

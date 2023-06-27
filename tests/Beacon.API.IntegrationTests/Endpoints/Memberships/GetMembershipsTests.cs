@@ -5,14 +5,9 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class GetMembershipsTests : IClassFixture<ApiFactory>
+public sealed class GetMembershipsTests : TestBase
 {
-    private readonly ApiFactory _factory;
-
-    public GetMembershipsTests(ApiFactory factory)
-    {
-        _factory = factory;
-    }
+    public GetMembershipsTests(ApiFactory factory) : base(factory) { }
 
     [Fact(DisplayName = "Unauthorized users cannot access laboratory membership list")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
