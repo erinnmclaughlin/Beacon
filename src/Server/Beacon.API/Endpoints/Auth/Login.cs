@@ -19,12 +19,12 @@ public sealed class Login : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<LoginRequest>
     {
         private readonly BeaconAuthenticationService _authService;
-        private readonly HttpContext _httpContext;
+        private readonly ISignInManager _signInManager;
 
-        public Handler(BeaconAuthenticationService authService, IHttpContextAccessor httpContextAccessor)
+        public Handler(BeaconAuthenticationService authService, ISignInManager signInManager)
         {
             _authService = authService;
-            _httpContext = httpContextAccessor.HttpContext!;
+            _signInManager = signInManager;
         }
 
         public async Task Handle(LoginRequest request, CancellationToken ct)
@@ -34,7 +34,7 @@ public sealed class Login : IBeaconEndpoint
             if (user.Identity?.IsAuthenticated is not true)
                 throw new BeaconValidationException(nameof(LoginRequest.EmailAddress), "Email address or password is invalid.");
 
-            await _httpContext.SignInAsync(user);
+            await _signInManager.SignInAsync(user);
         }
     }
 }

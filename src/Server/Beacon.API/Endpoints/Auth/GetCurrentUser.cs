@@ -3,7 +3,6 @@ using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
