@@ -11,12 +11,6 @@ using System.Net.Http.Headers;
 
 namespace Beacon.API.IntegrationTests;
 
-[CollectionDefinition(Name)]
-public sealed class ApiTest : ICollectionFixture<ApiFactory>
-{
-    public const string Name = "Api Test";
-}
-
 public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLifetime
 {
     public DbConnection Connection { get; }

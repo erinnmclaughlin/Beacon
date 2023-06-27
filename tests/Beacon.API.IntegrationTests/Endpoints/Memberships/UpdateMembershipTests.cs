@@ -7,8 +7,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-[Collection(ApiTest.Name)]
-public sealed class UpdateMembershipTests
+public sealed class UpdateMembershipTests : IClassFixture<ApiFactory>
 {
     private readonly ApiFactory _factory;
 
@@ -47,23 +46,49 @@ public sealed class UpdateMembershipTests
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    [Theory(DisplayName = "Laboratory managers can manage permissions for non-admin users.")]
-    [InlineData(LaboratoryMembershipType.Member, LaboratoryMembershipType.Analyst, HttpStatusCode.NoContent)]
-    [InlineData(LaboratoryMembershipType.Member, LaboratoryMembershipType.Manager, HttpStatusCode.NoContent)]
-    [InlineData(LaboratoryMembershipType.Member, LaboratoryMembershipType.Admin, HttpStatusCode.Forbidden)]
-    [InlineData(LaboratoryMembershipType.Admin, LaboratoryMembershipType.Manager, HttpStatusCode.Forbidden)]
-    public async Task UpdateMembership_ShouldReturnExpectedResult_WhenUserIsManager(LaboratoryMembershipType oldType, LaboratoryMembershipType newType, HttpStatusCode expected)
+    [Fact(DisplayName = "Laboratory managers can manage permissions for non-admin users.")]
+    public async Task UpdateMembership_ShouldReturnExpectedResult_WhenUserIsManager()
     {
         var client = _factory.CreateClient(TestData.ManagerUser.Id, TestData.Lab.Id);
 
         var request = new UpdateMembershipRequest
         {
-            MemberId = GetAltUserId(oldType),
-            MembershipType = newType
+            MemberId = TestData.ManagerUserAlt.Id,
+            MembershipType = LaboratoryMembershipType.Member
         };
 
         var response = await client.PutAsJsonAsync("api/memberships", request, JsonDefaults.JsonSerializerOptions);
-        Assert.Equal(expected, response.StatusCode);
+        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "Laboratory managers cannot manage permissions of admin users.")]
+    public async Task UpdateMembership_ShouldFail_WhenUserIsManagerAndRequestIsForAdmin()
+    {
+        var client = _factory.CreateClient(TestData.ManagerUser.Id, TestData.Lab.Id);
+
+        var request = new UpdateMembershipRequest
+        {
+            MemberId = TestData.AdminUser.Id,
+            MembershipType = LaboratoryMembershipType.Member
+        };
+
+        var response = await client.PutAsJsonAsync("api/memberships", request, JsonDefaults.JsonSerializerOptions);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "Laboratory managers cannot change membership type to admin.")]
+    public async Task UpdateMembership_ShouldFail_WhenUserIsManagerAndRequestIsForNewAdmin()
+    {
+        var client = _factory.CreateClient(TestData.ManagerUser.Id, TestData.Lab.Id);
+
+        var request = new UpdateMembershipRequest
+        {
+            MemberId = TestData.ManagerUserAlt.Id,
+            MembershipType = LaboratoryMembershipType.Admin
+        };
+
+        var response = await client.PutAsJsonAsync("api/memberships", request, JsonDefaults.JsonSerializerOptions);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact(DisplayName = "Users cannot update their own membership type.")]

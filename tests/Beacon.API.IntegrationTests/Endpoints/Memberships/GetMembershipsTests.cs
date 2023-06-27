@@ -5,8 +5,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-[Collection(ApiTest.Name)]
-public sealed class GetMembershipsTests
+public sealed class GetMembershipsTests : IClassFixture<ApiFactory>
 {
     private readonly ApiFactory _factory;
 
