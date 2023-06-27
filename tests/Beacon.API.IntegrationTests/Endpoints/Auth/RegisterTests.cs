@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.API.Persistence;
+using Beacon.Common.Requests.Auth;
 using System.Net;
 using System.Net.Http.Json;
 
@@ -6,11 +7,8 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 public sealed class RegisterTests : TestBase
 {
-    private readonly HttpClient _httpClient;
-
     public RegisterTests(ApiFactory factory) : base(factory)
     {
-        _httpClient = factory.CreateClient();
     }
 
     [Fact(DisplayName = "Register fails when required information is missing")]
@@ -44,5 +42,10 @@ public sealed class RegisterTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+    }
+
+    protected override void SeedDatabase(BeaconDbContext dbContext)
+    {
+        dbContext.Users.Add(TestData.AdminUser);
     }
 }

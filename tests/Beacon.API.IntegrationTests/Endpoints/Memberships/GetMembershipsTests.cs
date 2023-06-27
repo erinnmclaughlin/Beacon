@@ -1,4 +1,5 @@
-﻿using Beacon.Common;
+﻿using Beacon.API.Persistence;
+using Beacon.Common;
 using Beacon.Common.Models;
 using System.Net;
 using System.Net.Http.Json;
@@ -12,16 +13,16 @@ public sealed class GetMembershipsTests : TestBase
     [Fact(DisplayName = "Unauthorized users cannot access laboratory membership list")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
-        var client = _factory.CreateClient(TestData.NonMemberUser.Id, TestData.Lab.Id);
-        var response = await client.GetAsync("api/memberships");
+        SetCurrentUser(TestData.NonMemberUser);
+
+        var response = await _httpClient.GetAsync("api/memberships");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact(DisplayName = "Authorized users can access laboratory membership list")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
-        var client = _factory.CreateClient(TestData.AdminUser.Id, TestData.Lab.Id);
-        var response = await client.GetAsync("api/memberships");
+        var response = await _httpClient.GetAsync("api/memberships");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var memberships = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>(JsonDefaults.JsonSerializerOptions);
