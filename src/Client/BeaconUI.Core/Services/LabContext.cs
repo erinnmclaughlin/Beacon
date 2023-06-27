@@ -11,7 +11,6 @@ public sealed class LabContext : ILabContext, IDisposable
     private readonly ILocalStorageService _localStorage;
 
     public Guid LaboratoryId { get; private set; }
-    public LaboratoryMembershipType? MembershipType { get; private set; }
 
     public LabContext(ApiClient apiClient, ILocalStorageService localStorage)
     {
@@ -30,12 +29,6 @@ public sealed class LabContext : ILabContext, IDisposable
     private async void Initialize()
     {
         LaboratoryId = await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId");
-
-        if (LaboratoryId != Guid.Empty)
-        {
-            var lab = await _apiClient.GetCurrentLaboratory();
-            MembershipType = lab.IsError ? null : lab.Value.MyMembershipType;
-        }
     }
 
     private void HandleChange(object? o, ChangedEventArgs e)
@@ -44,5 +37,18 @@ public sealed class LabContext : ILabContext, IDisposable
             return;
 
         LaboratoryId = e.NewValue is Guid id ? id : Guid.Empty;
+    }
+
+    public async Task<LaboratoryMembershipType?> GetMembershipTypeAsync(Guid userId, CancellationToken ct = default)
+    {
+        if (LaboratoryId == Guid.Empty)
+            return null;
+
+        var membershipOrError = await _apiClient.GetLaboratoryMembers();
+
+        return membershipOrError.Match(
+            members => members.FirstOrDefault(m => m.Id == userId)?.MembershipType,
+            error => null
+        );
     }
 }

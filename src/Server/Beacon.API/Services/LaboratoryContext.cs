@@ -2,24 +2,34 @@
 using Beacon.Common.Models;
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Http;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Services;
 
 public sealed class LaboratoryContext : ILabContext
 {
-    public Guid LaboratoryId { get; }
-    public LaboratoryMembershipType? MembershipType { get; }
+    private readonly BeaconDbContext _dbContext;
 
-    public LaboratoryContext(ICurrentUser currentUser, BeaconDbContext dbContext, IHttpContextAccessor httpContextAccessor)
+    public Guid LaboratoryId { get; }
+
+    public LaboratoryContext(BeaconDbContext dbContext, IHttpContextAccessor httpContextAccessor)
     {
+        _dbContext = dbContext;
+
         var idValue = httpContextAccessor.HttpContext?.Request.Headers["X-LaboratoryId"];
         LaboratoryId = Guid.TryParse(idValue, out var id) ? id : Guid.Empty;
+    }
 
-        if (LaboratoryId != Guid.Empty)
-        {
-            MembershipType = dbContext.Memberships
-                .SingleOrDefault(x => x.LaboratoryId == LaboratoryId && x.MemberId == currentUser.UserId)?
-                .MembershipType;
-        }
+    public async Task<LaboratoryMembershipType?> GetMembershipTypeAsync(Guid userId, CancellationToken ct = default)
+    {
+        if (LaboratoryId == Guid.Empty)
+            return null;
+
+        var m = await _dbContext.Memberships
+            .Where(x => x.LaboratoryId == LaboratoryId && x.MemberId == userId)
+            .Select(x => new { x.MembershipType })
+            .FirstOrDefaultAsync(ct);
+
+        return m?.MembershipType;
     }
 }

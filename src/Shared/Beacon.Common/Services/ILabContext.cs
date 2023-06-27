@@ -5,5 +5,6 @@ namespace Beacon.Common.Services;
 public interface ILabContext
 {
     Guid LaboratoryId { get; }
-    LaboratoryMembershipType? MembershipType { get; }
+
+    Task<LaboratoryMembershipType?> GetMembershipTypeAsync(Guid userId, CancellationToken ct = default);
 }
