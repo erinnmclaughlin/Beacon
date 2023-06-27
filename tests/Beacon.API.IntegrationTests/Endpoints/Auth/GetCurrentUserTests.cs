@@ -4,7 +4,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-[Collection(AuthTests.Name)]
+[Collection(ApiTest.Name)]
 public sealed class GetCurrentUserTests
 {
     private readonly ApiFactory _factory;
@@ -14,7 +14,7 @@ public sealed class GetCurrentUserTests
         _factory = factory;
     }
 
-    [Fact]
+    [Fact(DisplayName = "Get current user returns unauthroized when user is not logged in")]
     public async Task GetCurrentUser_ReturnsUnauthorized_WhenUserIsNotLoggedIn()
     {
         var client = _factory.CreateClient();
@@ -22,7 +22,7 @@ public sealed class GetCurrentUserTests
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    [Fact]
+    [Fact(DisplayName = "Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {
         var client = _factory.CreateClient(TestData.AdminUser.Id);        

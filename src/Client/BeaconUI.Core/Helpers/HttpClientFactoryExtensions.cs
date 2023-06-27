@@ -1,4 +1,5 @@
-﻿using ErrorOr;
+﻿using Beacon.Common;
+using ErrorOr;
 using System.Net.Http.Json;
 
 namespace BeaconUI.Core.Helpers;

@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Validation;
+﻿using Beacon.Common;
+using Beacon.Common.Validation;
 using ErrorOr;
 using System.Net;
 using System.Net.Http.Json;

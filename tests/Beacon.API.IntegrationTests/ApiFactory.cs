@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using MediatR;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.TestHost;
 using Microsoft.Data.Sqlite;
@@ -10,6 +11,12 @@ using System.Net.Http.Headers;
 
 namespace Beacon.API.IntegrationTests;
 
+[CollectionDefinition(Name)]
+public sealed class ApiTest : ICollectionFixture<ApiFactory>
+{
+    public const string Name = "Api Test";
+}
+
 public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLifetime
 {
     public DbConnection Connection { get; }
@@ -17,6 +24,21 @@ public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLif
     public ApiFactory()
     {
         Connection = new SqliteConnection($"DataSource={Guid.NewGuid()}.db");
+    }
+
+    // TODO: use these maybe
+    public async Task SendAsync(IRequest request)
+    {
+        using var scope = Services.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        await mediator.Send(request);
+    }
+
+    public async Task<T> SendAsync<T>(IRequest<T> request)
+    {
+        using var scope = Services.CreateScope();
+        var mediator = scope.ServiceProvider.GetRequiredService<IMediator>();
+        return await mediator.Send(request);
     }
 
     public HttpClient CreateClient(Guid userId, Guid? labId = null)
@@ -57,7 +79,16 @@ public sealed class ApiFactory : WebApplicationFactory<BeaconWebHost>, IAsyncLif
 
         using var dbContext = CreateDbContext();
         await dbContext.Database.EnsureCreatedAsync();
-        dbContext.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser);
+        dbContext.Users.AddRange(
+            TestData.AdminUser, 
+            TestData.AdminUserAlt,
+            TestData.ManagerUser, 
+            TestData.ManagerUserAlt, 
+            TestData.AnalystUser, 
+            TestData.AnalystUserAlt, 
+            TestData.MemberUser, 
+            TestData.MemberUserAlt, 
+            TestData.NonMemberUser);
         dbContext.Laboratories.Add(TestData.Lab);
         await dbContext.SaveChangesAsync();
     }

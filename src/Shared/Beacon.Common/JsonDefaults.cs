@@ -1,7 +1,7 @@
 ﻿using System.Text.Json;
 using System.Text.Json.Serialization;
 
-namespace BeaconUI.Core;
+namespace Beacon.Common;
 
 public static class JsonDefaults
 {
