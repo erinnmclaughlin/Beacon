@@ -3,6 +3,11 @@
 namespace Beacon.Common;
 
 [AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
+public sealed class AllowAnonymousAttribute : Attribute
+{
+}
+
+[AttributeUsage(AttributeTargets.Class | AttributeTargets.Struct)]
 public sealed class RequireMinimumMembershipAttribute : Attribute
 {
     public LaboratoryMembershipType[] AllowedRoles { get; }

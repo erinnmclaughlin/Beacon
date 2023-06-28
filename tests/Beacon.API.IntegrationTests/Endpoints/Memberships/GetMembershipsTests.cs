@@ -6,6 +6,10 @@ namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
 public sealed class GetMembershipsTests : TestBase
 {
+    public GetMembershipsTests(TestFixture fixture) : base(fixture)
+    {
+    }
+
     [Fact(DisplayName = "Unauthorized users cannot access laboratory membership list")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {

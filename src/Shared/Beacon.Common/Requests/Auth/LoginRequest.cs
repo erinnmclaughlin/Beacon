@@ -3,6 +3,7 @@ using MediatR;
 
 namespace Beacon.Common.Requests.Auth;
 
+[AllowAnonymous]
 public sealed class LoginRequest : IRequest
 {
     public string EmailAddress { get; set; } = string.Empty;

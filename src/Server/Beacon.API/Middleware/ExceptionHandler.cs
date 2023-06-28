@@ -30,6 +30,12 @@ public static class ExceptionHandler
             return;
         }
 
+        if (ex is UnauthorizedAccessException)
+        {
+            await Results.Unauthorized().ExecuteAsync(context);
+            return;
+        }
+
         await Results.StatusCode(500).ExecuteAsync(context);
     }
 

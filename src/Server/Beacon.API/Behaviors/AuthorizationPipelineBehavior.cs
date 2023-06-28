@@ -25,6 +25,9 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
 
     public async Task Process(TRequest request, CancellationToken ct)
     {
+        if (_currentUser.UserId == Guid.Empty && !AllowsAnonymous())
+            throw new UnauthorizedAccessException();
+
         if (HasMembershipRequirement(out var allowedRoles) && !await CurrentUserIsMember(allowedRoles, ct))
             throw new UserNotAllowedException();
 
@@ -33,6 +36,11 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
             if (!await authorizer.IsAuthorizedAsync(request, ct))
                 throw new UserNotAllowedException();
         }
+    }
+
+    private static bool AllowsAnonymous()
+    {
+        return typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() is not null;
     }
 
     private static bool HasMembershipRequirement(out LaboratoryMembershipType[] types)

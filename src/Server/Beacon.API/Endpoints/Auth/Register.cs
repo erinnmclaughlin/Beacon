@@ -15,7 +15,7 @@ public sealed class Register : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapPost<RegisterRequest>("auth/register").AllowAnonymous().WithTags(EndpointTags.Authentication);
+        app.MapPost<RegisterRequest>("auth/register").WithTags(EndpointTags.Authentication);
     }
 
     public sealed class EmailAddressValidator : AbstractValidator<RegisterRequest>

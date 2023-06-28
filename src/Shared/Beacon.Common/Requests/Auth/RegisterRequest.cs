@@ -4,6 +4,7 @@ using MediatR;
 
 namespace Beacon.Common.Requests.Auth;
 
+[AllowAnonymous]
 public sealed class RegisterRequest : IRequest
 {
     public string DisplayName { get; set; } = string.Empty;

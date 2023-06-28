@@ -6,6 +6,10 @@ namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
 public sealed class UpdateMembershipTests : TestBase
 {
+    public UpdateMembershipTests(TestFixture fixture) : base(fixture)
+    {
+    }
+
     [Fact(DisplayName = "Basic members cannot update membership types.")]
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {
@@ -32,20 +36,6 @@ public sealed class UpdateMembershipTests : TestBase
         };
 
         await Assert.ThrowsAsync<UserNotAllowedException>(() => SendAsync(request));
-    }
-
-    [Fact(DisplayName = "Laboratory managers can manage permissions for non-admin users.")]
-    public async Task UpdateMembership_ShouldReturnExpectedResult_WhenUserIsManager()
-    {
-        SetCurrentUser(TestData.ManagerUser.Id);
-
-        var request = new UpdateMembershipRequest
-        {
-            MemberId = TestData.MemberUser.Id,
-            MembershipType = LaboratoryMembershipType.Analyst
-        };
-
-        await SendAsync(request);
     }
 
     [Fact(DisplayName = "Laboratory managers cannot manage permissions of admin users.")]
@@ -88,5 +78,20 @@ public sealed class UpdateMembershipTests : TestBase
         };
 
         await Assert.ThrowsAsync<UserNotAllowedException>(() => SendAsync(request));
+    }
+
+    [Fact(DisplayName = "Laboratory managers can manage permissions for non-admin users.")]
+    public async Task UpdateMembership_ShouldReturnExpectedResult_WhenUserIsManager()
+    {
+        SetCurrentUser(TestData.ManagerUser.Id);
+
+        var request = new UpdateMembershipRequest
+        {
+            MemberId = TestData.MemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Analyst
+        };
+
+        await SendAsync(request);
+        ResetDatabase();
     }
 }

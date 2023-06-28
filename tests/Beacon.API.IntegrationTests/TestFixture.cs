@@ -1,9 +1,10 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
 using Beacon.Common.Services;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using System.Data.Common;
 
@@ -12,46 +13,41 @@ namespace Beacon.API.IntegrationTests;
 [CollectionDefinition(nameof(TestFixture))]
 public class TestFixtureCollection : ICollectionFixture<TestFixture> { }
 
-public sealed class TestFixture
+public sealed class TestFixture : WebApplicationFactory<BeaconWebHost>
 {
-    public static IServiceScopeFactory BaseScopeFactory { get; private set; } = null!;
-
-    public TestFixture()
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        var services = new ServiceCollection();
-
-        // Create open SqliteConnection so EF won't automatically close it.
-        services.AddSingleton<DbConnection>(_ =>
+        builder.ConfigureServices(services =>
         {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
+            services.RemoveAll<DbContextOptions<BeaconDbContext>>();
+            services.RemoveAll<BeaconDbContext>();
 
-            return connection;
+            // Create open SqliteConnection so EF won't automatically close it.
+            services.AddSingleton<DbConnection>(_ =>
+            {
+                var connection = new SqliteConnection("DataSource=:memory:");
+                connection.Open();
+
+                return connection;
+            });
+
+            services.AddDbContext<BeaconDbContext>((container, options) =>
+            {
+                var connection = container.GetRequiredService<DbConnection>();
+                options.UseSqlite(connection);
+            });
+
+            services.RemoveAll<ICurrentUser>();
+            services.RemoveAll<ILabContext>();
+
+            services.AddSingleton<Mock<ICurrentUser>>();
+            services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
+            services.AddScoped<ILabContext, TestLabContext>();
         });
+    }
 
-        services.AddBeaconCore();
-        services.AddDbContext<BeaconDbContext>((container, options) =>
-        {
-            var connection = container.GetRequiredService<DbConnection>();
-            options.UseSqlite(connection);
-        });
-
-        services.AddSingleton(_ = Mock.Of<ISignInManager>());
-        services.AddSingleton<Mock<ICurrentUser>>();
-        services.AddSingleton(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
-        services.AddScoped<ILabContext, TestLabContext>();
-
-        var provider = services.BuildServiceProvider();
-
-        using (var scope = provider.CreateScope())
-        {
-            var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-            db.Database.EnsureCreated();
-            db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-            db.Laboratories.Add(TestData.Lab);
-            db.SaveChanges();
-        }
-
-        BaseScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
+    protected override void ConfigureClient(HttpClient client)
+    {
+        client.DefaultRequestHeaders.Add("X-LaboratoryId", TestData.Lab.Id.ToString());
     }
 }
