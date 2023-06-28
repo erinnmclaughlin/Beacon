@@ -1,13 +1,35 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.API.Persistence;
+using Beacon.Common.Requests.Auth;
+using Microsoft.Extensions.DependencyInjection;
 using System.Net;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class LoginTests : TestBase
+[Collection(nameof(AuthTestFixture))]
+public sealed class LoginTests : IAsyncLifetime
 {
-    public LoginTests(TestFixture fixture) : base(fixture)
+    private readonly AuthTestFixture _fixture;
+    private readonly HttpClient _httpClient;
+
+    public LoginTests(AuthTestFixture fixture)
     {
+        _fixture = fixture;
+        _httpClient = fixture.CreateClient();
+    }
+
+    public async Task InitializeAsync()
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+
+        if (await db.Database.EnsureCreatedAsync())
+            db.AddTestData();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     [Fact(DisplayName = "Login succeeds when request is valid")]

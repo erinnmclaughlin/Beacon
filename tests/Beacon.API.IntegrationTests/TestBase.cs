@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Services;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Moq;
 
@@ -22,31 +21,15 @@ public abstract class TestBase
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
         if (db.Database.EnsureCreated())
-            AddTestData(db);
+            db.AddTestData();
 
-    }
-
-    public static void AddTestData(BeaconDbContext db)
-    {
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        db.Laboratories.Add(TestData.Lab);
-        db.SaveChanges();
-    }
-
-    public static void DeleteTestData(BeaconDbContext db)
-    {
-        db.Memberships.ExecuteDelete();
-        db.Users.ExecuteDelete();
-        db.Laboratories.ExecuteDelete();
     }
 
     public void ResetDatabase()
     {
         using var scope = _fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
-        DeleteTestData(db);
-        AddTestData(db);
+        db.Reset();
     }
 
     public void SetCurrentUser(Guid userId)

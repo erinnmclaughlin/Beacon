@@ -12,6 +12,8 @@ public sealed class GetCurrentUserTests : TestBase
     [Fact(DisplayName = "Get current user returns 401 if user is not logged in")]
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {
+        SetCurrentUser(Guid.Empty);
+
         var response = await _httpClient.GetAsync("api/users/current");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
