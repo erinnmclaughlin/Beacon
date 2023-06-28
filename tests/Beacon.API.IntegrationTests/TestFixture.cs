@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Services;
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.Sqlite;
@@ -14,11 +15,11 @@ namespace Beacon.API.IntegrationTests;
 [CollectionDefinition(nameof(TestFixture))]
 public class TestFixtureCollection : ICollectionFixture<TestFixture> { }
 
-public class TestFixture
+public sealed class TestFixture
 {
-    public static IServiceScopeFactory BaseScopeFactory { get; private set; } = null!;
+    public IServiceScopeFactory BaseScopeFactory { get; }
 
-    static TestFixture()
+    public TestFixture()
     {
         var builder = WebApplication.CreateBuilder();
 
@@ -44,6 +45,9 @@ public class TestFixture
             var connection = container.GetRequiredService<DbConnection>();
             options.UseSqlite(connection);
         });
+
+        services.RemoveAll<ISignInManager>();
+        services.AddSingleton(_ = Mock.Of<ISignInManager>());
 
         services.RemoveAll<ICurrentUser>();
         services.AddSingleton<Mock<ICurrentUser>>();

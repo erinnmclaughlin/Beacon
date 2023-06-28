@@ -1,25 +1,21 @@
-﻿using Beacon.Common.Models;
-using Beacon.Common.Requests.Auth;
-using System.Net;
-using System.Net.Http.Json;
+﻿using Beacon.Common.Requests.Auth;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 public sealed class GetCurrentUserTests : TestBase
 {
-    public GetCurrentUserTests(ApiFactory factory) : base(factory)
+    public GetCurrentUserTests(TestFixture testFixture) : base(testFixture)
     {
     }
 
     [Fact(DisplayName = "Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {
-        var response = await _httpClient.GetAsync("api/users/current");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        SetCurrentUser(TestData.AdminUser.Id);
 
-        var userData = await response.Content.ReadFromJsonAsync<CurrentUserDto>();
+        var currentUser = await SendAsync(new GetCurrentUserRequest());
 
-        Assert.Equal(TestData.ManagerUser.Id, userData?.Id);
-        Assert.Equal(TestData.ManagerUser.DisplayName, userData?.DisplayName);
+        Assert.Equal(TestData.AdminUser.Id, currentUser.Id);
+        Assert.Equal(TestData.AdminUser.DisplayName, currentUser.DisplayName);
     }
 }

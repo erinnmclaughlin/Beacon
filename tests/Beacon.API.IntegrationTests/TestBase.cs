@@ -1,51 +1,33 @@
-﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
+﻿using Beacon.Common.Services;
+using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Headers;
+using Moq;
 
 namespace Beacon.API.IntegrationTests;
 
-public abstract class TestBase : IClassFixture<ApiFactory>
+[Collection(nameof(TestFixture))]
+public abstract class TestBase
 {
-    protected readonly ApiFactory _factory;
-    protected readonly HttpClient _httpClient;
+    private readonly IServiceScope _scope;
 
-    public TestBase(ApiFactory factory)
+    public TestBase(TestFixture testFixture)
     {
-        _factory = factory;
-
-        _httpClient = _factory.CreateClient();
-        _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Test");
-        _httpClient.DefaultRequestHeaders.Add("X-LaboratoryId", TestData.Lab.Id.ToString());
-
-        ResetState();
+        _scope = testFixture.BaseScopeFactory.CreateScope();
     }
 
-    protected void SetCurrentUser(User? user)
+    public void SetCurrentUser(Guid userId)
     {
-        if (user == null)
-            _httpClient.DefaultRequestHeaders.Remove(TestAuthHandler.UserId);
-        else
-            _httpClient.DefaultRequestHeaders.Add(TestAuthHandler.UserId, user.Id.ToString());
+        var currentUserMock = _scope.ServiceProvider.GetRequiredService<Mock<ICurrentUser>>();
+        currentUserMock.SetupGet(x => x.UserId).Returns(userId);
     }
 
-    protected void ResetState()
+    public async Task SendAsync(IRequest request)
     {
-        using var scope = _factory.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
-        if (dbContext.Database.EnsureCreated())
-        {
-            SeedDatabase(dbContext);
-            dbContext.SaveChanges();
-        }
-
-        dbContext.ChangeTracker.Clear();
+        await _scope.ServiceProvider.GetRequiredService<ISender>().Send(request);
     }
 
-    protected virtual void SeedDatabase(BeaconDbContext dbContext)
+    public async Task<T> SendAsync<T>(IRequest<T> request)
     {
-        dbContext.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        dbContext.Laboratories.Add(TestData.Lab);
+        return await _scope.ServiceProvider.GetRequiredService<ISender>().Send(request);
     }
 }
