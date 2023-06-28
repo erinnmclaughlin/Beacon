@@ -34,10 +34,4 @@
     <ProjectReference Include="..\..\src\Server\Beacon.WebHost\Beacon.WebHost.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <None Update="appsettings.json">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-  </ItemGroup>
-
 </Project>

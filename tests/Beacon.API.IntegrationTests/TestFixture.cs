@@ -1,12 +1,9 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Services;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
 using System.Data.Common;
 
@@ -21,17 +18,10 @@ public sealed class TestFixture
 
     public TestFixture()
     {
-        var builder = WebApplication.CreateBuilder();
-
-        builder.Configuration.AddConfiguration(new ConfigurationBuilder()
-            .SetBasePath(Directory.GetCurrentDirectory())
-            .AddJsonFile("appsettings.json")
-            .Build());
-
-        var services = builder.Services;
+        var services = new ServiceCollection();
 
         // Create open SqliteConnection so EF won't automatically close it.
-        services.AddSingleton<DbConnection>(container =>
+        services.AddSingleton<DbConnection>(_ =>
         {
             var connection = new SqliteConnection("DataSource=:memory:");
             connection.Open();
@@ -39,21 +29,16 @@ public sealed class TestFixture
             return connection;
         });
 
-        services.AddBeaconApi(builder.Configuration);
+        services.AddBeaconCore();
         services.AddDbContext<BeaconDbContext>((container, options) =>
         {
             var connection = container.GetRequiredService<DbConnection>();
             options.UseSqlite(connection);
         });
 
-        services.RemoveAll<ISignInManager>();
         services.AddSingleton(_ = Mock.Of<ISignInManager>());
-
-        services.RemoveAll<ICurrentUser>();
         services.AddSingleton<Mock<ICurrentUser>>();
         services.AddSingleton(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
-
-        services.RemoveAll<ILabContext>();
         services.AddScoped<ILabContext, TestLabContext>();
 
         var provider = services.BuildServiceProvider();
@@ -70,4 +55,3 @@ public sealed class TestFixture
         BaseScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
     }
 }
-
