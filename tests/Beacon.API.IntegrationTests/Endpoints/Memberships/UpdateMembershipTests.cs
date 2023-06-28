@@ -6,10 +6,6 @@ namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
 public sealed class UpdateMembershipTests : TestBase
 {
-    public UpdateMembershipTests(TestFixture testFixture) : base(testFixture)
-    {
-    }
-
     [Fact(DisplayName = "Basic members cannot update membership types.")]
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {

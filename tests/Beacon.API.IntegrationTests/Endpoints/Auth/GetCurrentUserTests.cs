@@ -4,10 +4,6 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 public sealed class GetCurrentUserTests : TestBase
 {
-    public GetCurrentUserTests(TestFixture testFixture) : base(testFixture)
-    {
-    }
-
     [Fact(DisplayName = "Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {

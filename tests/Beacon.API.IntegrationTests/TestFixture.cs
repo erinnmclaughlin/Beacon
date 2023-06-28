@@ -17,7 +17,7 @@ public class TestFixtureCollection : ICollectionFixture<TestFixture> { }
 
 public sealed class TestFixture
 {
-    public IServiceScopeFactory BaseScopeFactory { get; }
+    public static IServiceScopeFactory BaseScopeFactory { get; private set; } = null!;
 
     public TestFixture()
     {
@@ -40,7 +40,7 @@ public sealed class TestFixture
         });
 
         services.AddBeaconApi(builder.Configuration);
-        services.AddDbContext<BeaconDbContext, TestDbContext>((container, options) =>
+        services.AddDbContext<BeaconDbContext>((container, options) =>
         {
             var connection = container.GetRequiredService<DbConnection>();
             options.UseSqlite(connection);
@@ -62,6 +62,9 @@ public sealed class TestFixture
         {
             var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
             db.Database.EnsureCreated();
+            db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
+            db.Laboratories.Add(TestData.Lab);
+            db.SaveChanges();
         }
 
         BaseScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();

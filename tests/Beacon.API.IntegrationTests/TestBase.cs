@@ -6,13 +6,18 @@ using Moq;
 namespace Beacon.API.IntegrationTests;
 
 [Collection(nameof(TestFixture))]
-public abstract class TestBase
+public abstract class TestBase : IDisposable
 {
     private readonly IServiceScope _scope;
 
-    public TestBase(TestFixture testFixture)
+    public TestBase()
     {
-        _scope = testFixture.BaseScopeFactory.CreateScope();
+        _scope = TestFixture.BaseScopeFactory.CreateScope();
+    }
+
+    public void Dispose()
+    {
+        _scope.Dispose();
     }
 
     public void SetCurrentUser(Guid userId)

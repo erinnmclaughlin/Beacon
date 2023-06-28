@@ -5,10 +5,6 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 public sealed class LoginTests : TestBase
 {
-    public LoginTests(TestFixture testFixture) : base(testFixture)
-    {
-    }
-
     [Fact(DisplayName = "Login fails when required information is missing")]
     public async Task Login_FailsWhenRequiredInformationIsMissing()
     {

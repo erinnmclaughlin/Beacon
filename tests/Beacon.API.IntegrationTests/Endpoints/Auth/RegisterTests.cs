@@ -5,10 +5,6 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 public sealed class RegisterTests : TestBase
 {
-    public RegisterTests(TestFixture testFixture) : base(testFixture)
-    {
-    }
-
     [Fact(DisplayName = "Register fails when required information is missing")]
     public async Task Register_FailsWhenRequiredInformationIsMissing()
     {
