@@ -1,5 +1,4 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
 using Beacon.App.Services;
 using Beacon.Common;
 using Microsoft.EntityFrameworkCore;
@@ -18,21 +17,15 @@ public sealed class BeaconAuthenticationService
         _passwordHasher = passwordHasher;
     }
 
-    public async Task<ClaimsPrincipal> AuthenticateAsync(string email, string password, CancellationToken ct)
+    public async Task<ClaimsIdentity> AuthenticateAsync(string email, string password, CancellationToken ct)
     {
         var user = await _dbContext.Users.AsNoTracking().SingleOrDefaultAsync(u => u.EmailAddress == email, ct);
 
         if (user is null || !_passwordHasher.Verify(password, user.HashedPassword, user.HashedPasswordSalt))
-            return new ClaimsPrincipal(new ClaimsIdentity()); // anonymous (unauthenticated) user
+            return new ClaimsIdentity(); // anonymous identity
 
-        return CreateClaimsPrincipal(user);
-    }
-
-    private static ClaimsPrincipal CreateClaimsPrincipal(User user)
-    {
         var identity = new ClaimsIdentity("AuthCookie");
         identity.AddClaim(BeaconClaimTypes.UserId, user.Id.ToString());
-
-        return new ClaimsPrincipal(identity);
+        return identity;
     }
 }

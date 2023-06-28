@@ -2,7 +2,6 @@
 using Beacon.App.Exceptions;
 using Beacon.Common.Requests.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -29,12 +28,12 @@ public sealed class Login : IBeaconEndpoint
 
         public async Task Handle(LoginRequest request, CancellationToken ct)
         {
-            var user = await _authService.AuthenticateAsync(request.EmailAddress, request.Password, ct);
+            var identity = await _authService.AuthenticateAsync(request.EmailAddress, request.Password, ct);
 
-            if (user.Identity?.IsAuthenticated is not true)
+            if (!identity.IsAuthenticated)
                 throw new BeaconValidationException(nameof(LoginRequest.EmailAddress), "Email address or password is invalid.");
 
-            await _signInManager.SignInAsync(user);
+            await _signInManager.SignInAsync(new(identity));
         }
     }
 }
