@@ -20,7 +20,19 @@ namespace Beacon.API;
 
 public static class BeaconAPI
 { 
+    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<IServiceProvider, DbContextOptionsBuilder> dbOptionsAction)
+    {
+        services.AddDbContext<BeaconDbContext>(dbOptionsAction);
+        return services.AddBeaconApi(config);
+    }
+
     public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
+    {
+        services.AddDbContext<BeaconDbContext>(dbOptionsAction);
+        return services.AddBeaconApi(config);
+    }
+
+    private static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config)
     {
         // Framework:
         services.AddMediatR(config =>
@@ -29,7 +41,7 @@ public static class BeaconAPI
             config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
-        services.AddValidatorsFromAssemblies(new[] {typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
+        services.AddValidatorsFromAssemblies(new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
 
         // Api
         services.AddEndpointsApiExplorer();
@@ -63,9 +75,6 @@ public static class BeaconAPI
         services.AddScoped<ISignInManager, SignInManager>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         services.AddScoped<ILabContext, LaboratoryContext>();
-
-        // Data
-        services.AddDbContext<BeaconDbContext>(dbOptionsAction);
 
         // Email
         services.AddScoped<IEmailService, EmailService>();

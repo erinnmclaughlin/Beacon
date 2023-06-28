@@ -1,32 +1,25 @@
-﻿using Beacon.Common;
+﻿using Beacon.App.Exceptions;
 using Beacon.Common.Models;
-using System.Net;
-using System.Net.Http.Json;
+using Beacon.Common.Requests.Memberships;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class GetMembershipsTests : TestBase
+public sealed class GetMembershipsTests2 : TestBase2
 {
-    public GetMembershipsTests(ApiFactory factory) : base(factory) { }
-
     [Fact(DisplayName = "Unauthorized users cannot access laboratory membership list")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
-        SetCurrentUser(TestData.NonMemberUser);
-
-        var response = await _httpClient.GetAsync("api/memberships");
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        SetCurrentUser(TestData.NonMemberUser.Id);
+        await Assert.ThrowsAsync<UserNotAllowedException>(() => SendAsync(new GetMembershipsRequest()));
     }
 
     [Fact(DisplayName = "Authorized users can access laboratory membership list")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
-        var response = await _httpClient.GetAsync("api/memberships");
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+        SetCurrentUser(TestData.MemberUser.Id);
 
-        var memberships = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>(JsonDefaults.JsonSerializerOptions);
+        var memberships = await SendAsync(new GetMembershipsRequest());
 
-        Assert.NotNull(memberships);
         Assert.NotEmpty(memberships);
         Assert.Contains(memberships, m => m.Id == TestData.AdminUser.Id && m.MembershipType == LaboratoryMembershipType.Admin);
         Assert.Contains(memberships, m => m.Id == TestData.ManagerUser.Id && m.MembershipType == LaboratoryMembershipType.Manager);
