@@ -19,20 +19,14 @@ using System.Text.Json.Serialization;
 namespace Beacon.API;
 
 public static class BeaconAPI
-{ 
-    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<IServiceProvider, DbContextOptionsBuilder> dbOptionsAction)
-    {
-        services.AddDbContext<BeaconDbContext>(dbOptionsAction);
-        return services.AddBeaconApi(config);
-    }
-
+{
     public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
     {
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
         return services.AddBeaconApi(config);
     }
 
-    private static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config)
+    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config)
     {
         // Framework:
         services.AddMediatR(config =>

@@ -38,7 +38,8 @@ public class TestFixture
             return connection;
         });
 
-        services.AddBeaconApi(builder.Configuration, (container, options) =>
+        services.AddBeaconApi(builder.Configuration);
+        services.AddDbContext<BeaconDbContext, TestDbContext>((container, options) =>
         {
             var connection = container.GetRequiredService<DbConnection>();
             options.UseSqlite(connection);
@@ -56,11 +57,7 @@ public class TestFixture
         using (var scope = provider.CreateScope())
         {
             var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
             db.Database.EnsureCreated();
-            db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-            db.Laboratories.Add(TestData.Lab);
-            db.SaveChanges();
         }
 
         BaseScopeFactory = provider.GetRequiredService<IServiceScopeFactory>();
