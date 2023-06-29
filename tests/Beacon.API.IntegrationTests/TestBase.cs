@@ -21,27 +21,33 @@ public abstract class TestBase
         using var scope = _fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
-        if (db.Database.EnsureCreated())
-            AddTestData(db);
+        ResetDatabase();
     }
 
     protected virtual void AddTestData(BeaconDbContext db)
     {
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        db.Laboratories.Add(TestData.Lab);
+        AddDefaultTestData(db);
         db.SaveChanges();
     }
     
-    protected void ResetDatabase()
+    protected void AddDefaultTestData(BeaconDbContext db)
+    {
+        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
+        db.Laboratories.Add(TestData.Lab);
+    }
+
+    protected void ExecuteDbContext(Action<BeaconDbContext> action)
     {
         using var scope = _fixture.Services.CreateScope();
-        var dbConnection = scope.ServiceProvider.GetRequiredService<DbConnection>();
-        dbConnection.Close();
-
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        dbContext.Database.EnsureDeleted();
+        action.Invoke(dbContext);
+    }
 
-        dbConnection.Open();
+    protected T ExecuteDbContext<T>(Func<BeaconDbContext, T> action)
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        return action.Invoke(dbContext);
     }
 
     protected void SetCurrentUser(Guid userId)
@@ -70,4 +76,21 @@ public abstract class TestBase
     {
         return await response.Content.ReadFromJsonAsync<T>(JsonDefaults.JsonSerializerOptions);
     }
+
+    private void ResetDatabase()
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var dbConnection = scope.ServiceProvider.GetRequiredService<DbConnection>();
+        dbConnection.Close();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        dbContext.Database.EnsureDeleted();
+
+        dbConnection.Open();
+        dbContext.Database.EnsureCreated();
+        AddTestData(dbContext);
+
+        dbContext.ChangeTracker.Clear();
+    }
+
 }

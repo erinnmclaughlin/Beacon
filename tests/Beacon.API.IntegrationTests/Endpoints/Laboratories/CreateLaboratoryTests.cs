@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Requests.Laboratories;
+﻿using Beacon.API.Persistence;
+using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
@@ -15,12 +16,13 @@ public sealed class CreateLaboratoryTests : TestBase
 
         var response = await PostAsync("api/laboratories", new CreateLaboratoryRequest
         {
-            LaboratoryName = "Test Lab"
+            LaboratoryName = "Create Lab Test Name"
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        ResetDatabase();
+        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "Create Lab Test Name"));
+        Assert.NotNull(createdLab);
     }
 
     [Fact(DisplayName = "Create lab fails when request is invalid")]
@@ -33,6 +35,15 @@ public sealed class CreateLaboratoryTests : TestBase
             LaboratoryName = "no" // must be at least 3 characters
         });
 
+        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "Create Lab Test Name"));
+        Assert.Null(createdLab);
+
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+
+    protected override void AddTestData(BeaconDbContext db)
+    {
+        db.Users.Add(TestData.AdminUser);
+        db.SaveChanges();
     }
 }

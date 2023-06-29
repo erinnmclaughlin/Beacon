@@ -2,7 +2,6 @@
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
@@ -22,21 +21,11 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        using var scope = _fixture.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        var invitation = await db.InvitationEmails
-            .Include(e => e.LaboratoryInvitation)
-            .SingleAsync(e => e.Id == EmailInvitationId);
-
+        var invitation = ExecuteDbContext(db => db.InvitationEmails.Include(x => x.LaboratoryInvitation).Single());
         Assert.Equal(TestData.NonMemberUser.Id, invitation.LaboratoryInvitation.AcceptedById);
 
-        var membership = await db.Memberships
-            .SingleOrDefaultAsync(m => m.LaboratoryId == TestData.Lab.Id && m.MemberId == TestData.NonMemberUser.Id);
-
-        Assert.NotNull(membership);
+        var membership = ExecuteDbContext(db => db.Memberships.Single(m => m.MemberId == TestData.NonMemberUser.Id));
         Assert.Equal(LaboratoryMembershipType.Analyst, membership.MembershipType);
-
-        ResetDatabase();
     }
 
     [Fact]
@@ -46,28 +35,26 @@ public sealed class AcceptEmailInvitationTests : TestBase
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-
-        ResetDatabase();
     }
 
     [Fact]
     public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
     {
-        using (var scope = _fixture.Services.CreateScope())
+        // update invite to be expired
+        ExecuteDbContext(db =>
         {
-            // update invite to be expired
-            var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-            var invite = await db.InvitationEmails.SingleAsync();
+            var invite = db.InvitationEmails.Single();
             invite.ExpiresOn = DateTime.UtcNow.AddDays(-1);
-            await db.SaveChangesAsync();
-        }
+            db.SaveChanges();
+        });
 
         SetCurrentUser(TestData.NonMemberUser.Id);
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        ResetDatabase();
+        var membership = ExecuteDbContext(db => db.Memberships.SingleOrDefault(m => m.MemberId == TestData.NonMemberUser.Id));
+        Assert.Null(membership);
     }
 
     protected override void AddTestData(BeaconDbContext dbContext)

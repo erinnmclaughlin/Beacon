@@ -32,8 +32,6 @@ public sealed class UpdateMembershipTests : TestBase
             .SingleOrDefaultAsync(m => m.MemberId == TestData.MemberUser.Id && m.LaboratoryId == TestData.Lab.Id);
 
         Assert.Equal(LaboratoryMembershipType.Analyst, membership?.MembershipType);
-
-        ResetDatabase();
     }
 
     [Fact(DisplayName = "Update membership type returns 403 when user is not authorized")]
