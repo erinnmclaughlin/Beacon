@@ -51,19 +51,6 @@ steps:
       codeCoverageTool: 'Cobertura'
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
 
-  - task: VSTest@2
-    inputs:
-      testSelector: 'testAssemblies'
-      testAssemblyVer2: |
-        **\bin\$(BuildConfiguration)\**\*Test*.dll
-        !**\obj\**
-        !**\ref\**
-        !**\xunit.runner.visualstudio.testadapter.dll
-        !**\xunit.runner.visualstudio.dotnetcore.testadapter.dll
-      searchFolder: '$(System.DefaultWorkingDirectory)'
-      runTestsInIsolation: true
-      codeCoverageEnabled: true
-
   - task: DotNetCoreCLI@2
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Install EF Core Tools'
@@ -86,9 +73,24 @@ steps:
     inputs:
       command: 'publish'
       publishWebProjects: false
-      projects: '**/Beacon.WebHost.csproj'
+      projects: |
+        **/Beacon.WebHost.csproj
+        **/*Tests.csproj
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
       zipAfterPublish: false
+
+  - task: VSTest@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
+    displayName: 'VS Test'
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\bin\$(BuildConfiguration)\**\*Tests.dll
+        !**\obj\**
+        !**\ref\**
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      runTestsInIsolation: true
+      codeCoverageEnabled: true
 
   - task: PublishBuildArtifacts@1
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
