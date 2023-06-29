@@ -22,7 +22,14 @@ public abstract class TestBase
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
         if (db.Database.EnsureCreated())
-            db.AddTestData();
+            AddTestData(db);
+    }
+
+    protected virtual void AddTestData(BeaconDbContext db)
+    {
+        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
+        db.Laboratories.Add(TestData.Lab);
+        db.SaveChanges();
     }
     
     protected void ResetDatabase()

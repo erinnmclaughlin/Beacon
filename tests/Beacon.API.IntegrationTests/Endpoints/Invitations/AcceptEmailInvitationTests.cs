@@ -17,7 +17,6 @@ public sealed class AcceptEmailInvitationTests : TestBase
     [Fact]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
-        AddAdditionalTestData();
         SetCurrentUser(TestData.NonMemberUser.Id);
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
@@ -43,7 +42,6 @@ public sealed class AcceptEmailInvitationTests : TestBase
     [Fact]
     public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
     {
-        AddAdditionalTestData();
         SetCurrentUser(TestData.MemberUser.Id); // try to accept as a different user
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
@@ -55,7 +53,15 @@ public sealed class AcceptEmailInvitationTests : TestBase
     [Fact]
     public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
     {
-        AddAdditionalTestData(isExpired: true);
+        using (var scope = _fixture.Services.CreateScope())
+        {
+            // update invite to be expired
+            var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+            var invite = await db.InvitationEmails.SingleAsync();
+            invite.ExpiresOn = DateTime.UtcNow.AddDays(-1);
+            await db.SaveChangesAsync();
+        }
+
         SetCurrentUser(TestData.NonMemberUser.Id);
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
@@ -64,11 +70,8 @@ public sealed class AcceptEmailInvitationTests : TestBase
         ResetDatabase();
     }
 
-    private void AddAdditionalTestData(bool isExpired = false)
+    protected override void AddTestData(BeaconDbContext dbContext)
     {
-        using var scope = _fixture.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
         var invitation = new Invitation
         {
             Id = Guid.NewGuid(),
@@ -83,14 +86,14 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var emailInvitation = new InvitationEmail
         {
             Id = EmailInvitationId,
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(isExpired ? -1 : 10),
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(10),
             LaboratoryId = TestData.Lab.Id,
             SentOn = DateTimeOffset.UtcNow,
             LaboratoryInvitationId = invitation.Id
         };
 
-        db.Invitations.Add(invitation);
-        db.InvitationEmails.Add(emailInvitation);
-        db.SaveChanges();
+        dbContext.Invitations.Add(invitation);
+        dbContext.InvitationEmails.Add(emailInvitation);
+        base.AddTestData(dbContext);
     }
 }

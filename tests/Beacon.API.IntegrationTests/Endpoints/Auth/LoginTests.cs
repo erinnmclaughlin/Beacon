@@ -6,7 +6,7 @@ using System.Net.Http.Json;
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Collection(nameof(AuthTestFixture))]
-public sealed class LoginTests : IAsyncLifetime
+public sealed class LoginTests
 {
     private readonly AuthTestFixture _fixture;
     private readonly HttpClient _httpClient;
@@ -15,20 +15,15 @@ public sealed class LoginTests : IAsyncLifetime
     {
         _fixture = fixture;
         _httpClient = fixture.CreateClient();
-    }
 
-    public async Task InitializeAsync()
-    {
         using var scope = _fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
-        if (await db.Database.EnsureCreatedAsync())
-            db.AddTestData();
-    }
-
-    public Task DisposeAsync()
-    {
-        return Task.CompletedTask;
+        
+        if (db.Database.EnsureCreated())
+        {
+            db.Users.Add(TestData.AdminUser);
+            db.SaveChanges();
+        }
     }
 
     [Fact(DisplayName = "Login succeeds when request is valid")]
