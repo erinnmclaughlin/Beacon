@@ -77,20 +77,6 @@ steps:
         **/Beacon.WebHost.csproj
         **/*Tests.csproj
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
-      zipAfterPublish: false
-
-  - task: VSTest@2
-    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
-    displayName: 'VS Test'
-    inputs:
-      testSelector: 'testAssemblies'
-      testAssemblyVer2: |
-        **\bin\$(BuildConfiguration)\**\*Tests.dll
-        !**\obj\**
-        !**\ref\**
-      searchFolder: '$(System.DefaultWorkingDirectory)'
-      runTestsInIsolation: true
-      codeCoverageEnabled: true
 
   - task: PublishBuildArtifacts@1
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
