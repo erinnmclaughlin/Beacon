@@ -75,6 +75,7 @@ steps:
       publishWebProjects: false
       projects: '**/Beacon.WebHost.csproj'
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: false
 
   - task: PublishBuildArtifacts@1
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
