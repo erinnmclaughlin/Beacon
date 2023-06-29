@@ -19,6 +19,8 @@ public sealed class CreateLaboratoryTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+        ResetDatabase();
     }
 
     [Fact(DisplayName = "Create lab fails when request is invalid")]

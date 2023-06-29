@@ -19,6 +19,8 @@ public sealed class RegisterTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+
+        ResetDatabase();
     }
 
     [Fact(DisplayName = "Register fails when required information is missing")]

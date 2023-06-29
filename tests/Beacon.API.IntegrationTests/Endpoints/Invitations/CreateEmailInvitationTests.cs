@@ -40,6 +40,11 @@ public sealed class CreateEmailInvitationTests : TestBase
         Assert.Equal(TestData.AdminUser.Id, emailInvitation.LaboratoryInvitation.CreatedById);
         Assert.Equal(request.MembershipType, emailInvitation.LaboratoryInvitation.MembershipType);
         Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
+
+        db.InvitationEmails.Remove(emailInvitation);
+        db.SaveChanges();
+
+        ResetDatabase();
     }
 
     [Fact(DisplayName = "Inviting user fails when request is not valid")]

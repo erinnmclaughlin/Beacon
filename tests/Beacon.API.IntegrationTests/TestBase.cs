@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common;
 using Beacon.Common.Services;
-using MediatR;
 using Microsoft.Extensions.DependencyInjection;
+using System.Data.Common;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
@@ -24,12 +24,17 @@ public abstract class TestBase
         if (db.Database.EnsureCreated())
             db.AddTestData();
     }
-
+    
     protected void ResetDatabase()
     {
         using var scope = _fixture.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        db.Reset();
+        var dbConnection = scope.ServiceProvider.GetRequiredService<DbConnection>();
+        dbConnection.Close();
+
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        dbContext.Database.EnsureDeleted();
+
+        dbConnection.Open();
     }
 
     protected void SetCurrentUser(Guid userId)
@@ -37,18 +42,6 @@ public abstract class TestBase
         using var scope = _fixture.Services.CreateScope();
         var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ICurrentUser>>();
         currentUserMock.SetupGet(x => x.UserId).Returns(userId);
-    }
-
-    protected async Task SendAsync(IRequest request)
-    {
-        using var scope = _fixture.Services.CreateScope();
-        await scope.ServiceProvider.GetRequiredService<ISender>().Send(request);
-    }
-
-    protected async Task<T> SendAsync<T>(IRequest<T> request)
-    {
-        using var scope = _fixture.Services.CreateScope();
-        return await scope.ServiceProvider.GetRequiredService<ISender>().Send(request);
     }
 
     protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)
