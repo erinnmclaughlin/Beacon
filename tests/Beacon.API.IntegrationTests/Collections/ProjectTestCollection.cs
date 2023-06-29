@@ -2,7 +2,7 @@
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 
-namespace Beacon.API.IntegrationTests;
+namespace Beacon.API.IntegrationTests.Collections;
 
 [CollectionDefinition(nameof(ProjectTestCollection))]
 public sealed class ProjectTestCollection : ICollectionFixture<TestFixture> { }

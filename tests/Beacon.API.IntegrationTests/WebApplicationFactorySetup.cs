@@ -1,7 +1,6 @@
 ﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence;
 using Beacon.App.Services;
-using Beacon.App.Settings;
 using Beacon.Common.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;

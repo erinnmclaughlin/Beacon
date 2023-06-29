@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.API.IntegrationTests.Collections;
+using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 

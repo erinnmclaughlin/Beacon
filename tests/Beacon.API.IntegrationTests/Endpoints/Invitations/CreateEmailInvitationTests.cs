@@ -1,4 +1,5 @@
-﻿using Beacon.API.IntegrationTests.Fakes;
+﻿using Beacon.API.IntegrationTests.Collections;
+using Beacon.API.IntegrationTests.Fakes;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 using Microsoft.EntityFrameworkCore;

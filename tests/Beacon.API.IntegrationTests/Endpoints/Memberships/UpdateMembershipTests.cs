@@ -1,4 +1,5 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.IntegrationTests.Collections;
+using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 using Microsoft.EntityFrameworkCore;

@@ -1,4 +1,4 @@
-﻿namespace Beacon.API.IntegrationTests;
+﻿namespace Beacon.API.IntegrationTests.Collections;
 
 [CollectionDefinition(nameof(CoreTestCollection))]
 public class CoreTestCollection : ICollectionFixture<TestFixture> { }
