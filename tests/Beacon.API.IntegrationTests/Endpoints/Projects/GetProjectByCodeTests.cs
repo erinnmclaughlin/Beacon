@@ -13,13 +13,13 @@ public sealed class GetProjectByCodeTests : ProjectTestBase
     {
         SetCurrentUser(TestData.AdminUser.Id);
 
-        var response = await GetAsync($"api/projects/{Project.ProjectCode}");
+        var response = await GetAsync($"api/projects/{ProjectCode}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var project = await DeserializeAsync<ProjectDto>(response);
         Assert.NotNull(project);
-        Assert.Equal(Project.Id, project.Id);
-        Assert.Equal(Project.ProjectCode.ToString(), project.ProjectCode);
+        Assert.Equal(ProjectId, project.Id);
+        Assert.Equal(ProjectCode.ToString(), project.ProjectCode);
     }
 
     [Fact(DisplayName = "Get project returns bad request when project code is in invalid format")]

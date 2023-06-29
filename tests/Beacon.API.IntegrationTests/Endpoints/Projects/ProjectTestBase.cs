@@ -6,14 +6,8 @@ namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
 public abstract class ProjectTestBase : TestBase
 {
-    public static Project Project => new()
-    {
-        Id = Guid.NewGuid(),
-        CustomerName = "Test Customer",
-        ProjectCode = new ProjectCode("TST", 1),
-        CreatedById = TestData.AdminUser.Id,
-        LaboratoryId = TestData.Lab.Id
-    };
+    public static Guid ProjectId { get; } = Guid.NewGuid();
+    public static ProjectCode ProjectCode { get; } = new("TST", 1);
 
     protected ProjectTestBase(TestFixture fixture) : base(fixture)
     {
@@ -21,8 +15,15 @@ public abstract class ProjectTestBase : TestBase
 
     protected override void AddTestData(BeaconDbContext db)
     {
-        db.Projects.Add(Project);
+        db.Projects.Add(new Project
+        {
+            Id = ProjectId,
+            ProjectCode = ProjectCode,
+            CustomerName = "Test Customer",
+            CreatedById = TestData.AdminUser.Id,
+            LaboratoryId = TestData.Lab.Id
+        });
+
         base.AddTestData(db);
-        db.ChangeTracker.Clear();
     }
 }

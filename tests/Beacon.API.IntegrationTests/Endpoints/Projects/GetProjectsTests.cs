@@ -22,7 +22,7 @@ public sealed class GetProjectsTests : ProjectTestBase
 
         Assert.NotNull(projects);
         Assert.Single(projects);
-        Assert.Equal(Project.Id, projects[0].Id);        
+        Assert.Equal(ProjectId, projects[0].Id);        
     }
 
     [Fact(DisplayName = "Get projects fails when user is not authorized")]
