@@ -3,15 +3,15 @@ using Beacon.Common.Models;
 using Beacon.Common.Services;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.API.IntegrationTests;
+namespace Beacon.API.IntegrationTests.Fakes;
 
-public sealed class TestLabContext : ILabContext
+public sealed class FakeLabContext : ILabContext
 {
     private readonly BeaconDbContext _dbContext;
 
     public Guid LaboratoryId { get; } = TestData.Lab.Id;
 
-    public TestLabContext(BeaconDbContext dbContext)
+    public FakeLabContext(BeaconDbContext dbContext)
     {
         _dbContext = dbContext;
     }

@@ -1,6 +1,4 @@
-﻿using Beacon.Common.Requests.Auth;
-using Beacon.Common.Requests.Laboratories;
-using System.Net;
+﻿using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 

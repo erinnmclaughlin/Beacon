@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Auth;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;

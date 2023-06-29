@@ -13,7 +13,8 @@ public sealed class TestFixture : WebApplicationFactory<BeaconWebHost>
         {
             services.ReplaceWithTestDatabase();
             services.UseMockedCurrentUser();
-            services.UseMockedLabContext();
+            services.UseFakeLabContext();
+            services.UseFakeEmailService();
         });
     }
 }

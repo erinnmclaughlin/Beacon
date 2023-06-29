@@ -1,5 +1,4 @@
 ﻿using Beacon.Common.Models;
-using System.Net;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 

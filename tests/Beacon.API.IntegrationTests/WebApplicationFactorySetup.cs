@@ -1,10 +1,12 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.IntegrationTests.Fakes;
+using Beacon.API.Persistence;
+using Beacon.App.Services;
+using Beacon.App.Settings;
 using Beacon.Common.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Moq;
 using System.Data.Common;
 
 namespace Beacon.API.IntegrationTests;
@@ -39,9 +41,15 @@ public static class WebApplicationFactorySetup
         services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
     }
 
-    public static void UseMockedLabContext(this IServiceCollection services)
+    public static void UseFakeLabContext(this IServiceCollection services)
     {
         services.RemoveAll<ILabContext>();
-        services.AddScoped<ILabContext, TestLabContext>();
+        services.AddScoped<ILabContext, FakeLabContext>();
+    }
+
+    public static void UseFakeEmailService(this IServiceCollection services)
+    {
+        services.RemoveAll<IEmailService>();
+        services.AddSingleton<IEmailService, FakeEmailService>();
     }
 }

@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Auth;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
@@ -9,7 +8,6 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 [Collection(nameof(AuthTestFixture))]
 public sealed class LogoutTests : IAsyncLifetime
 {
-
     private readonly AuthTestFixture _fixture;
     private readonly HttpClient _httpClient;
 

@@ -3,7 +3,6 @@ using Beacon.Common;
 using Beacon.Common.Services;
 using MediatR;
 using Microsoft.Extensions.DependencyInjection;
-using Moq;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
