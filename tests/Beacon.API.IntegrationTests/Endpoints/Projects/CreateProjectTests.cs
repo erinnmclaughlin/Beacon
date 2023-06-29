@@ -3,7 +3,7 @@ using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
-public sealed class CreateProjectTests : TestBase
+public sealed class CreateProjectTests : ProjectTestBase
 {
     private static CreateProjectRequest SomeValidRequest { get; } = new()
     {

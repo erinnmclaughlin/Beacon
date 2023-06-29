@@ -5,7 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
-public sealed class CreateEmailInvitationTests : TestBase
+public sealed class CreateEmailInvitationTests : CoreTestBase
 {
     public CreateEmailInvitationTests(TestFixture fixture) : base(fixture)
     {

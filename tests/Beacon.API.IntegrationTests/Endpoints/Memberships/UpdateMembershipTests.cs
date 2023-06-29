@@ -6,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class UpdateMembershipTests : TestBase
+public sealed class UpdateMembershipTests : CoreTestBase
 {
     public UpdateMembershipTests(TestFixture fixture) : base(fixture)
     {

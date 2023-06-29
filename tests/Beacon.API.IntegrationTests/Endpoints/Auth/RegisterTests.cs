@@ -4,7 +4,7 @@ using Beacon.Common.Requests.Auth;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class RegisterTests : TestBase
+public sealed class RegisterTests : CoreTestBase
 {
     public RegisterTests(TestFixture fixture) : base(fixture)
     {

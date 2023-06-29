@@ -2,7 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class GetMembershipsTests : TestBase
+public sealed class GetMembershipsTests : CoreTestBase
 {
     public GetMembershipsTests(TestFixture fixture) : base(fixture)
     {

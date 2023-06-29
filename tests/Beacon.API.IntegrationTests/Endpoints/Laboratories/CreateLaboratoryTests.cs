@@ -3,7 +3,7 @@ using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-public sealed class CreateLaboratoryTests : TestBase
+public sealed class CreateLaboratoryTests : CoreTestBase
 {
     public CreateLaboratoryTests(TestFixture fixture) : base(fixture)
     {

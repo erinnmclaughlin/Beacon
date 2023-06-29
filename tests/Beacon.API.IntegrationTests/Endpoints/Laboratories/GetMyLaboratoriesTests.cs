@@ -4,7 +4,7 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-public sealed class GetMyLaboratoriesTests : TestBase
+public sealed class GetMyLaboratoriesTests : CoreTestBase
 {
     public static Guid OtherLabId { get; } = Guid.NewGuid();
 
