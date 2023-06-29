@@ -37,7 +37,7 @@ public sealed class UpdateMembershipRequestAuthorizerTests
     {
         _labContextMock
             .Setup(x => x.GetMembershipTypeAsync(_currentUser.UserId, It.IsAny<CancellationToken>()))
-            .ReturnsAsync((LaboratoryMembershipType?)null);
+            .ReturnsAsync(type);
 
         var request = new UpdateMembershipRequest { MemberId = Guid.NewGuid() };
 
