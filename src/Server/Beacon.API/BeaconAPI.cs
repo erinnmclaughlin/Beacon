@@ -19,25 +19,25 @@ using System.Text.Json.Serialization;
 namespace Beacon.API;
 
 public static class BeaconAPI
-{ 
-    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
+{
+    public static IServiceCollection AddBeaconCore(this IServiceCollection services)
     {
-        // Framework:
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
             config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
-        services.AddValidatorsFromAssemblies(new[] {typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
+        services.AddValidatorsFromAssemblies(new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
+        services.RegisterAuthorizers();
+        services.AddScoped<BeaconAuthenticationService>();
+        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        return services;
+    }
 
-        // Api
-        services.AddEndpointsApiExplorer();
-        services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
-        services.ConfigureHttpJsonOptions(options => {
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
-        });
-
+    public static IServiceCollection AddBeaconApi(this IServiceCollection services, IConfiguration config, Action<DbContextOptionsBuilder> dbOptionsAction)
+    {
+        services.AddBeaconCore();
 
         // Auth
         services.AddAuthentication().AddCookie(CookieAuthenticationDefaults.AuthenticationScheme, options =>
@@ -54,15 +54,20 @@ public static class BeaconAPI
                 return Task.CompletedTask;
             };
         });
-
         services.AddAuthorization();
-        services.AddScoped<BeaconAuthenticationService>();
+
+        // Api
+        services.AddEndpointsApiExplorer();
+        services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
+        services.ConfigureHttpJsonOptions(options => {
+            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        });
         services.AddHttpContextAccessor();
         services.AddScoped<ICurrentUser, CurrentUser>();
-        services.AddSingleton<IPasswordHasher, PasswordHasher>();
+        services.AddScoped<ISignInManager, SignInManager>();
         services.AddScoped<ILabContext, LaboratoryContext>();
 
-        // Data
+        // Database
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);
 
         // Email

@@ -3,6 +3,7 @@ using MediatR;
 
 namespace Beacon.Common.Requests.Auth;
 
+[AllowAnonymous]
 public sealed class LoginRequest : IRequest
 {
     public string EmailAddress { get; set; } = string.Empty;
@@ -12,7 +13,6 @@ public sealed class LoginRequest : IRequest
     {
         public Validator()
         {
-
             RuleFor(r => r.EmailAddress)
                 .EmailAddress().WithMessage("Valid email address is required.");
 

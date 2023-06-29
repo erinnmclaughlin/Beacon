@@ -3,7 +3,6 @@ using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -14,7 +13,7 @@ public sealed class GetCurrentUser : IBeaconEndpoint
 {
     public static void Map(IEndpointRouteBuilder app)
     {
-        app.MapGet("users/current", new GetCurrentUserRequest()).RequireAuthorization().WithTags(EndpointTags.Authentication);
+        app.MapGet("users/current", new GetCurrentUserRequest()).WithTags(EndpointTags.Authentication);
     }
 
     internal sealed class Handler : IRequestHandler<GetCurrentUserRequest, CurrentUserDto>

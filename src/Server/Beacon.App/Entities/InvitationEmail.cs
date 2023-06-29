@@ -4,7 +4,7 @@ public class InvitationEmail : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset SentOn { get; init; }
-    public required DateTimeOffset ExpiresOn { get; init; }
+    public required DateTimeOffset ExpiresOn { get; set; }
 
     public string? OperationId { get; set; }
 

@@ -18,24 +18,28 @@ public sealed class GetCurrentLaboratory : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<GetCurrentLaboratoryRequest, LaboratoryDto>
     {
+        private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
         private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext, ILabContext labContext)
+        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
         {
+            _currentUser = currentUser;
             _dbContext = dbContext;
             _labContext = labContext;
         }
 
-        public Task<LaboratoryDto> Handle(GetCurrentLaboratoryRequest request, CancellationToken ct)
+        public async Task<LaboratoryDto> Handle(GetCurrentLaboratoryRequest request, CancellationToken ct)
         {
-            return _dbContext.Laboratories
+            var m = await _labContext.GetMembershipTypeAsync(_currentUser.UserId, ct);
+
+            return await _dbContext.Laboratories
                 .Where(x => x.Id == _labContext.LaboratoryId)
                 .Select(x => new LaboratoryDto
                 {
                     Id = x.Id,
                     Name = x.Name,
-                    MyMembershipType = _labContext.MembershipType,
+                    MyMembershipType = m,
                     MemberCount = x.Memberships.Count()
                 })
                 .SingleAsync(ct);

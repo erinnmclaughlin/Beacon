@@ -14,7 +14,7 @@ public class BeaconDbContext : DbContext
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
     public DbSet<User> Users => Set<User>();
 
-    public BeaconDbContext(DbContextOptions<BeaconDbContext> options) : base(options)
+    public BeaconDbContext(DbContextOptions options) : base(options)
     {
     }
 

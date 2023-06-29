@@ -1,6 +1,6 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.API.Services;
+using Beacon.Common.Requests.Auth;
 using MediatR;
-using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
@@ -15,16 +15,16 @@ public sealed class Logout : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<LogoutRequest>
     {
-        private readonly HttpContext _httpContext;
+        private readonly ISignInManager _signInManager;
 
-        public Handler(IHttpContextAccessor httpContextAccessor)
+        public Handler(ISignInManager signInManager)
         {
-            _httpContext = httpContextAccessor.HttpContext!;
+            _signInManager = signInManager;
         }
 
         public async Task Handle(LogoutRequest request, CancellationToken ct)
         {
-            await _httpContext.SignOutAsync();
+            await _signInManager.SignOutAsync();
         }
     }
 }

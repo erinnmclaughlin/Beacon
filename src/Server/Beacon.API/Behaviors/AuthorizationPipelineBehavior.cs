@@ -1,5 +1,4 @@
-﻿using Beacon.API.Persistence;
-using Beacon.App.Exceptions;
+﻿using Beacon.App.Exceptions;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
@@ -12,20 +11,36 @@ namespace Beacon.API.Behaviors;
 public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
     private readonly ICurrentUser _currentUser;
-    private readonly BeaconDbContext _dbContext;
     private readonly ILabContext _labContext;
 
-    public AuthorizationPipelineBehavior(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
+    private readonly IEnumerable<IAuthorizer<TRequest>> _authorizers;
+
+    public AuthorizationPipelineBehavior(IEnumerable<IAuthorizer<TRequest>> authorizers, ICurrentUser currentUser, ILabContext labContext)
     {
+        _authorizers = authorizers;
+
         _currentUser = currentUser;
-        _dbContext = dbContext;
         _labContext = labContext;
     }
 
     public async Task Process(TRequest request, CancellationToken ct)
     {
+        if (_currentUser.UserId == Guid.Empty && !AllowsAnonymous())
+            throw new UnauthorizedAccessException();
+
         if (HasMembershipRequirement(out var allowedRoles) && !await CurrentUserIsMember(allowedRoles, ct))
             throw new UserNotAllowedException();
+
+        foreach (var authorizer in _authorizers)
+        {
+            if (!await authorizer.IsAuthorizedAsync(request, ct))
+                throw new UserNotAllowedException();
+        }
+    }
+
+    private static bool AllowsAnonymous()
+    {
+        return typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() is not null;
     }
 
     private static bool HasMembershipRequirement(out LaboratoryMembershipType[] types)
@@ -37,13 +52,7 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
 
     private async Task<bool> CurrentUserIsMember(LaboratoryMembershipType[] types, CancellationToken ct)
     {
-        var userId = _currentUser.UserId;
-
-        var m = await _dbContext.Memberships
-            .Where(x => x.LaboratoryId == _labContext.LaboratoryId && x.MemberId == userId)
-            .Select(x => new { x.MembershipType })
-            .SingleOrDefaultAsync(ct);
-
-        return m != null && types.Contains(m.MembershipType);
+        var type = await _labContext.GetMembershipTypeAsync(_currentUser.UserId, ct);
+        return type is not null && types.Contains(type.Value);
     }
 }

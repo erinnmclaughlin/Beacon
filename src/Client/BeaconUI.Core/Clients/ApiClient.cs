@@ -64,9 +64,9 @@ public sealed class ApiClient
         return await _httpClientFactory.GetAsync<LaboratoryDto>($"api/laboratories/current");
     }
 
-    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers(Guid labId)
+    public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
     {
-        return await _httpClientFactory.GetAsync<LaboratoryMemberDto[]>($"api/memberships?laboratoryId={labId}");
+        return await _httpClientFactory.GetAsync<LaboratoryMemberDto[]>($"api/memberships");
     }
 
     public async Task<ErrorOr<Success>> UpdateMembershipType(UpdateMembershipRequest request)

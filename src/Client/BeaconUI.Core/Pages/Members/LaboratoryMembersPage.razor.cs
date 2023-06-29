@@ -23,7 +23,7 @@ public partial class LaboratoryMembersPage
 
     protected override async Task OnInitializedAsync()
     {
-        ErrorOrMembers = await ApiClient.GetLaboratoryMembers(CurrentLab.Id);
+        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
     }
 
     private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)

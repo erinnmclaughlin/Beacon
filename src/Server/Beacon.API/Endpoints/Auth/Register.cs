@@ -4,6 +4,7 @@ using Beacon.App.Services;
 using Beacon.Common.Requests.Auth;
 using FluentValidation;
 using MediatR;
+using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
