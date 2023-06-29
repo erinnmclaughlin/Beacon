@@ -2,6 +2,7 @@
 using Beacon.API.Persistence;
 using Beacon.App.Services;
 using Beacon.Common.Services;
+using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -40,10 +41,15 @@ public static class WebApplicationFactorySetup
         services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
     }
 
-    public static void UseFakeLabContext(this IServiceCollection services)
+    public static void UseMockedHttpContextAccessor(this IServiceCollection services)
     {
-        services.RemoveAll<ILabContext>();
-        services.AddScoped<ILabContext, FakeLabContext>();
+        services.RemoveAll<IHttpContextAccessor>();
+
+        var mock = new Mock<IHttpContextAccessor>();
+        mock.Setup(x => x.HttpContext!.Request.Headers["X-LaboratoryId"])
+            .Returns(TestData.Lab.Id.ToString());
+
+        services.AddSingleton(_ => mock.Object);
     }
 
     public static void UseFakeEmailService(this IServiceCollection services)
