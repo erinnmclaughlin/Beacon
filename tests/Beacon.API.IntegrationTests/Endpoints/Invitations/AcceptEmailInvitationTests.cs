@@ -40,7 +40,31 @@ public sealed class AcceptEmailInvitationTests : TestBase
         ResetDatabase();
     }
 
-    private void AddAdditionalTestData()
+    [Fact]
+    public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
+    {
+        AddAdditionalTestData();
+        SetCurrentUser(TestData.MemberUser.Id); // try to accept as a different user
+
+        var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+
+        ResetDatabase();
+    }
+
+    [Fact]
+    public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
+    {
+        AddAdditionalTestData(isExpired: true);
+        SetCurrentUser(TestData.NonMemberUser.Id);
+
+        var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+
+        ResetDatabase();
+    }
+
+    private void AddAdditionalTestData(bool isExpired = false)
     {
         using var scope = _fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
@@ -59,7 +83,7 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var emailInvitation = new InvitationEmail
         {
             Id = EmailInvitationId,
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(10),
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(isExpired ? -1 : 10),
             LaboratoryId = TestData.Lab.Id,
             SentOn = DateTimeOffset.UtcNow,
             LaboratoryInvitationId = invitation.Id
