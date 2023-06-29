@@ -51,6 +51,19 @@ steps:
       codeCoverageTool: 'Cobertura'
       summaryFileLocation: '$(Build.SourcesDirectory)/CodeCoverage/Cobertura.xml'
 
+  - task: VSTest@2
+    inputs:
+      testSelector: 'testAssemblies'
+      testAssemblyVer2: |
+        **\bin\$(BuildConfiguration)\**\*Test*.dll
+        !**\obj\**
+        !**\ref\**
+        !**\xunit.runner.visualstudio.testadapter.dll
+        !**\xunit.runner.visualstudio.dotnetcore.testadapter.dll
+      searchFolder: '$(System.DefaultWorkingDirectory)'
+      runTestsInIsolation: true
+      codeCoverageEnabled: true
+
   - task: DotNetCoreCLI@2
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
     displayName: 'Install EF Core Tools'
