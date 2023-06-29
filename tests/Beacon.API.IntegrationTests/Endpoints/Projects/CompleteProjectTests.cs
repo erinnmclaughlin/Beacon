@@ -16,12 +16,12 @@ public sealed class CompleteProjectTests : ProjectTestBase
 
         var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
         {
-            ProjectId = ProjectId
+            ProjectId = Project.Id
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
+        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == Project.Id));
         Assert.Equal(ProjectStatus.Completed, project.ProjectStatus);
     }
 
@@ -32,12 +32,12 @@ public sealed class CompleteProjectTests : ProjectTestBase
 
         var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
         {
-            ProjectId = ProjectId
+            ProjectId = Project.Id
         });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
+        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == Project.Id));
         Assert.Equal(ProjectStatus.Active, project.ProjectStatus);
     }
 }
