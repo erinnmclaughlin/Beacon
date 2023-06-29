@@ -21,11 +21,8 @@ public sealed class CancelProjectTests : ProjectTestBase
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        ExecuteDbContext(db =>
-        {
-            var project = db.Projects.Single(x => x.Id == ProjectId);
-            Assert.Equivalent(ProjectStatus.Canceled, project.ProjectStatus);
-        });
+        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
+        Assert.Equal(ProjectStatus.Canceled, project.ProjectStatus);
     }
 
     [Fact(DisplayName = "Cancel project fails when request is invalid")]
@@ -40,10 +37,7 @@ public sealed class CancelProjectTests : ProjectTestBase
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        ExecuteDbContext(db =>
-        {
-            var project = db.Projects.Single(x => x.Id == ProjectId);
-            Assert.Equivalent(ProjectStatus.Active, project.ProjectStatus);
-        });
+        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
+        Assert.Equal(ProjectStatus.Active, project.ProjectStatus);
     }
 }
