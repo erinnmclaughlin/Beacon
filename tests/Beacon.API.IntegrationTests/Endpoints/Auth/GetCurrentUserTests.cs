@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.Common.Models;
 using System.Net;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
@@ -14,7 +14,7 @@ public sealed class GetCurrentUserTests : TestBase
     {
         SetCurrentUser(Guid.Empty);
 
-        var response = await _httpClient.GetAsync("api/users/current");
+        var response = await GetAsync("api/users/current");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
@@ -23,8 +23,13 @@ public sealed class GetCurrentUserTests : TestBase
     {
         SetCurrentUser(TestData.AdminUser.Id);
 
-        var currentUser = await SendAsync(new GetCurrentUserRequest());
+        var response = await GetAsync("api/users/current");
 
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var currentUser = await DeserializeAsync<CurrentUserDto>(response);
+
+        Assert.NotNull(currentUser);
         Assert.Equal(TestData.AdminUser.Id, currentUser.Id);
         Assert.Equal(TestData.AdminUser.DisplayName, currentUser.DisplayName);
     }
