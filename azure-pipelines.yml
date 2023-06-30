@@ -75,8 +75,17 @@ steps:
       publishWebProjects: false
       projects: |
         **/Beacon.WebHost.csproj
-        **/*Tests.csproj
       arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+
+  - task: DotNetCoreCLI@2
+    condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
+    displayName: 'Publish web app'
+    inputs:
+      command: 'publish'
+      publishWebProjects: false
+      projects: '**/*Tests.csproj'
+      arguments: '--configuration $(buildConfiguration) --output $(Build.ArtifactStagingDirectory)'
+      zipAfterPublish: false
 
   - task: PublishBuildArtifacts@1
     condition: and(succeeded(), eq(variables['Build.Reason'], 'IndividualCI'))
