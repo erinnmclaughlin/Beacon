@@ -13,4 +13,5 @@ public class Project : LaboratoryScopedEntityBase
     public User CreatedBy { get; init; } = null!;
 
     public List<ProjectContact> Contacts { get; set; } = new();
+    public List<SampleGroup> SampleGroups { get; set; } = new();
 }

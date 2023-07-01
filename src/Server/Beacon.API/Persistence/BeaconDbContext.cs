@@ -12,6 +12,7 @@ public class BeaconDbContext : DbContext
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
+    public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
     public DbSet<User> Users => Set<User>();
 
     public BeaconDbContext(DbContextOptions options) : base(options)
