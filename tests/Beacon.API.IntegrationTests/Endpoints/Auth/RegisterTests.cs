@@ -11,7 +11,7 @@ public sealed class RegisterTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Register succeeds when request is valid")]
+    [Fact(DisplayName = "Creating a new account succeeds when request is valid")]
     public async Task Register_SucceedsWhenRequestIsValid()
     {
         var request = new RegisterRequest
@@ -29,14 +29,14 @@ public sealed class RegisterTests : CoreTestBase
         Assert.True(new PasswordHasher().Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt));
     }
 
-    [Fact(DisplayName = "Register fails when required information is missing")]
+    [Fact(DisplayName = "Creating a new account fails when required info isn't entered")]
     public async Task Register_FailsWhenRequiredInformationIsMissing()
     {
         var response = await PostAsync("api/auth/register", new RegisterRequest());
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-    [Fact(DisplayName = "Register fails when email is already associated with an account")]
+    [Fact(DisplayName = "Creating a new account fails when email is already in use")]
     public async Task Register_FailsWhenEmailExists()
     {
         var response = await PostAsync("api/auth/register", new RegisterRequest
