@@ -36,12 +36,6 @@ else
 
 @code {
 
-    private LaboratoryDto[]? Laboratories { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        var errorOrLaboratories = await ApiClient.GetMyLaboratories();
-        Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;
-    }
-
+    [Parameter, EditorRequired]
+    public required LaboratoryDto[]? Laboratories { get; set; }
 }
