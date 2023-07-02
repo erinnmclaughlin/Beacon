@@ -3,18 +3,33 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
-public sealed class GetProjectByCodeTests : ProjectTestBase
+public sealed class GetProjectDetailsTests : ProjectTestBase
 {
-    public GetProjectByCodeTests(TestFixture fixture) : base(fixture)
+    public GetProjectDetailsTests(TestFixture fixture) : base(fixture)
     {
     }
 
-    [Fact(DisplayName = "Get project succeeds when request is valid")]
-    public async Task GetProject_Succeeds_WhenRequestIsValid()
+    [Fact(DisplayName = "Get project succeeds when project code is valid")]
+    public async Task GetProject_Succeeds_WhenProjectCodeIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
 
         var response = await GetAsync($"api/projects/{ProjectCode}");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var project = await DeserializeAsync<ProjectDto>(response);
+        Assert.NotNull(project);
+        Assert.Equal(ProjectId, project.Id);
+        Assert.Equal(ProjectCode.ToString(), project.ProjectCode);
+    }
+
+
+    [Fact(DisplayName = "Get project succeeds when project id is valid")]
+    public async Task GetProject_Succeeds_WhenProjectIdIsValid()
+    {
+        SetCurrentUser(TestData.AdminUser.Id);
+
+        var response = await GetAsync($"api/projects/{ProjectId}");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var project = await DeserializeAsync<ProjectDto>(response);
@@ -31,4 +46,5 @@ public sealed class GetProjectByCodeTests : ProjectTestBase
         var response = await GetAsync("api/projects/invalid");
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
     }
+
 }
