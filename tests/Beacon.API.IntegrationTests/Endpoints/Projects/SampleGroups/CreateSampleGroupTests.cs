@@ -1,6 +1,4 @@
 ﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
-using Beacon.App.Entities;
 using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
@@ -58,18 +56,5 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
 
         var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.SingleOrDefault());
         Assert.Null(createdSampleGroup);
-    }
-
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        db.SampleGroups.Add(new SampleGroup
-        {
-            Id = Guid.NewGuid(),
-            ProjectId = ProjectId,
-            SampleName = "My Sample Group",
-            LaboratoryId = TestData.Lab.Id
-        });
-
-        base.AddTestData(db);
     }
 }
