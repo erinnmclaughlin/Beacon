@@ -11,7 +11,7 @@ public sealed class GetSampleGroupsTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Get project sample groups returns sample groups associated with project")]
+    [Fact(DisplayName = "Get project sample groups returns sample groups associated with the specified project")]
     public async Task GetProjectSampleGroups_ReturnsExpectedResults()
     {
         SetCurrentUser(TestData.AdminUser.Id);
