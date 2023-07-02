@@ -18,11 +18,11 @@ public sealed class CreateProject : IBeaconEndpoint
         app.MapPost<CreateProjectRequest>("projects").WithTags(EndpointTags.Projects);
     }
 
-    public sealed class CreateProjectAuthorizer : AbstractValidator<CreateProjectRequest>
+    public sealed class Validator : AbstractValidator<CreateProjectRequest>
     {
         private readonly ILabContext _labContext;
 
-        public CreateProjectAuthorizer(ILabContext labContext)
+        public Validator(ILabContext labContext)
         {
             _labContext = labContext;
 

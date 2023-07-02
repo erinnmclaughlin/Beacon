@@ -1,4 +1,5 @@
 ﻿@page "/l/projects/{Code}/{Tab?}"
+@using Beacon.Common.Requests.Projects;
 @attribute [Authorize]
 @layout LaboratoryLayout
 
@@ -40,6 +41,25 @@
         else
         {
             <p>This is the project details page for project @Code.</p>
+
+            <div class="field" style="max-width: 300px">
+                <label class="form-label" for="analyst">Lead Analyst</label>
+                <select @onchange="(e) => HandleLeadAnalystChanged(p.Value.Id, e)" disabled="@(LabMembers == null || LabMembers.Value.IsError)" class="form-select">
+                    @if (LabMembers == null || LabMembers.Value.IsError) @* TODO: display error *@
+                    {
+                        <option value="@Guid.Empty">Loading...</option>
+                    }
+                    else
+                    {
+                        <option selected="@(p.Value.LeadAnalyst == null)">None</option>
+                        @foreach (var a in LabMembers.Value.Value)
+                        {
+                            <option value="@a.Id" selected="@(p.Value.LeadAnalyst?.Id == a.Id)">@a.DisplayName</option>
+                        }
+                    }
+
+                </select>
+            </div>
         }
     </div>
 </div>
@@ -57,9 +77,16 @@
 
     private ErrorOr<ProjectDto>? Project { get; set; }
 
+    private ErrorOr<LaboratoryMemberDto[]>? LabMembers { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        await LoadProject();
+        await Task.WhenAll(LoadProject(), LoadMembers());
+    }
+
+    private async Task LoadMembers()
+    {
+        LabMembers = await ApiClient.GetLaboratoryMembers();
     }
 
     private async Task LoadProject()
@@ -71,6 +98,18 @@
         }
 
         Project = await ApiClient.GetProject(code);
+    }
+
+    private async Task HandleLeadAnalystChanged(Guid projectId, ChangeEventArgs e)
+    {
+        var request = new UpdateLeadAnalystRequest 
+        { 
+            ProjectId = projectId, 
+            AnalystId = Guid.TryParse(e.Value?.ToString(), out var id) ? id : null
+        };
+
+        await ApiClient.UpdateLeadAnalyst(request);
+        await LoadProject();
     }
 
 }

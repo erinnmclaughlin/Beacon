@@ -129,4 +129,9 @@ public sealed class ApiClient
     {
         return await _httpClientFactory.GetAsync<SampleGroupDto[]>($"api/projects/{projectId}/sample-groups");
     }
+
+    public async Task<ErrorOr<Success>> UpdateLeadAnalyst(UpdateLeadAnalystRequest request)
+    {
+        return await _httpClientFactory.PutAsync($"api/projects/{request.ProjectId}/analyst", request);
+    }
 }
