@@ -26,7 +26,7 @@ public sealed class CancelProjectTests : ProjectTestBase
         Assert.Equal(ProjectStatus.Canceled, project.ProjectStatus);
     }
 
-    [Fact(DisplayName = "[005] Cancel project fails when request is invalid")]
+    [Fact(DisplayName = "[005] Cancel project fails when user is unauthorized")]
     public async Task CancelProject_FailsWhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.MemberUser.Id);
