@@ -23,7 +23,7 @@ public partial class LaboratoryMembersPage
 
     protected override async Task OnInitializedAsync()
     {
-        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
+        await LoadMemberships();
     }
 
     private bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
@@ -43,6 +43,11 @@ public partial class LaboratoryMembersPage
         return memberToUpdate.MembershipType is not LaboratoryMembershipType.Admin;
     }
 
+    private async Task LoadMemberships()
+    {
+        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
+    }
+
     private async Task ShowInviteMemberModal()
     {
         await ModalService.Show<InviteMemberModal>("Invite Lab Member").Result;
@@ -54,6 +59,9 @@ public partial class LaboratoryMembersPage
             .Add(nameof(UpdateMembershipTypeModal.CurrentLab), CurrentLab)
             .Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
 
-        await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
+        var result = await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
+
+        if (result.Confirmed)
+            await LoadMemberships();
     }
 }
