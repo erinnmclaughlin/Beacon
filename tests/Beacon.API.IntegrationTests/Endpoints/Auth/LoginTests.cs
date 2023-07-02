@@ -26,7 +26,7 @@ public sealed class LoginTests
         }
     }
 
-    [Fact(DisplayName = "Login succeeds when request is valid")]
+    [Fact(DisplayName = "[008] Login succeeds when request is valid")]
     public async Task Login_SucceedsWhenRequestIsValid()
     {
         var response = await LoginAsync(new LoginRequest
@@ -39,14 +39,14 @@ public sealed class LoginTests
         Assert.True(response.Headers.Contains("Set-Cookie"));
     }
 
-    [Fact(DisplayName = "Login fails when required information is missing")]
+    [Fact(DisplayName = "[008] Login fails when required information is missing")]
     public async Task Login_FailsWhenRequiredInformationIsMissing()
     {
         var response = await LoginAsync(new LoginRequest());
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-    [Fact(DisplayName = "Login fails when user does not exist")]
+    [Fact(DisplayName = "[008] Login fails when user does not exist")]
     public async Task Login_FailsWhenUserDoesNotExist()
     {
         var response = await LoginAsync(new LoginRequest
@@ -58,7 +58,7 @@ public sealed class LoginTests
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
-    [Fact(DisplayName = "Login fails when password is incorrect")]
+    [Fact(DisplayName = "[008] Login fails when password is incorrect")]
     public async Task Login_FailsWhenPasswordIsIncorrect()
     {
         var response = await LoginAsync(new LoginRequest

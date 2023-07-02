@@ -21,7 +21,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Create project sample group succeeds when request is valid")]
+    [Fact(DisplayName = "[016] Create project sample group succeeds when request is valid")]
     public async Task CreateSampleGroup_SucceedsWhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -34,7 +34,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
         Assert.Equal(SomeValidRequest.SampleName, createdSampleGroup.SampleName);
     }
 
-    [Fact(DisplayName = "Create project sample group fails when request is invalid")]
+    [Fact(DisplayName = "[016] Create project sample group fails when request is invalid")]
     public async Task CreateSampleGroup_FailsWhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -46,7 +46,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
         Assert.Null(createdSampleGroup);
     }
 
-    [Fact(DisplayName = "Create project sample group fails when user is not authorized")]
+    [Fact(DisplayName = "[016] Create project sample group fails when user is not authorized")]
     public async Task CreateSampleGroup_FailsWhenUserIsUnauthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);

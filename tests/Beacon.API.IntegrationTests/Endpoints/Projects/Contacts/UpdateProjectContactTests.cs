@@ -16,7 +16,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Update contact succeeds when request is valid")]
+    [Fact(DisplayName = "[013] Update contact succeeds when request is valid")]
     public async Task UpdateContact_Succeeds_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -40,7 +40,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
         Assert.Equal(request.PhoneNumber, updatedContact.PhoneNumber);
     }
 
-    [Fact(DisplayName = "Update contact fails when request is invalid")]
+    [Fact(DisplayName = "[013] Update contact endpoint returns 422 when request is invalid")]
     public async Task UpdateContact_Fails_WhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -64,7 +64,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
         Assert.Equal(OriginalPhone, updatedContact.PhoneNumber);
     }
 
-    [Fact(DisplayName = "Update contact fails when user is unauthorized")]
+    [Fact(DisplayName = "[013] Update contact endpoint returns 403 when user is unauthorized")]
     public async Task UpdateContact_Fails_WhenUserIsUnauthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);

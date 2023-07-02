@@ -10,7 +10,7 @@ public sealed class CreateLaboratoryTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Create lab succeeds when request is valid")]
+    [Fact(DisplayName = "[002] Create lab succeeds when request is valid")]
     public async Task CreateLab_ShouldSucceed_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -26,7 +26,7 @@ public sealed class CreateLaboratoryTests : CoreTestBase
         Assert.NotNull(createdLab);
     }
 
-    [Fact(DisplayName = "Create lab fails when request is invalid")]
+    [Fact(DisplayName = "[002] Create lab fails when request is invalid")]
     public async Task CreateLab_ShouldFail_WhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.AdminUser.Id);

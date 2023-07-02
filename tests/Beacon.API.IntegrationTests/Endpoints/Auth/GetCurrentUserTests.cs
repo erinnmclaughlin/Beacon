@@ -10,7 +10,7 @@ public sealed class GetCurrentUserTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Get current user returns 401 if user is not logged in")]
+    [Fact(DisplayName = "[008] Get current user returns 401 if user is not logged in")]
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {
         SetCurrentUser(Guid.Empty);
@@ -19,7 +19,7 @@ public sealed class GetCurrentUserTests : CoreTestBase
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
-    [Fact(DisplayName = "Get current user returns logged in user")]
+    [Fact(DisplayName = "[008] Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {
         SetCurrentUser(TestData.AdminUser.Id);

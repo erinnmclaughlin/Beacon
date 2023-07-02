@@ -14,7 +14,7 @@ public sealed class AcceptEmailInvitationTests : CoreTestBase
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[003] Accept invitation succeeds when request is valid")]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.NonMemberUser.Id);
@@ -29,7 +29,7 @@ public sealed class AcceptEmailInvitationTests : CoreTestBase
         Assert.Equal(LaboratoryMembershipType.Analyst, membership.MembershipType);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[003] Accept invitation endpoint returns 403 when current user email does not match email invitation")]
     public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id); // try to accept as a different user
@@ -38,7 +38,7 @@ public sealed class AcceptEmailInvitationTests : CoreTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[003] Accept invitation endpoint returns 422 when invitation has expired")]
     public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
     {
         // update invite to be expired

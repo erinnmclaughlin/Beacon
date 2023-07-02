@@ -11,7 +11,7 @@ public sealed class GetProjectContactsTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Get project contacts returns contacts associated with project")]
+    [Fact(DisplayName = "[013] Get contacts endpoint returns list of contacts associated with project")]
     public async Task GetProjectContacts_ReturnsExpectedResult()
     {
         SetCurrentUser(TestData.AdminUser.Id);

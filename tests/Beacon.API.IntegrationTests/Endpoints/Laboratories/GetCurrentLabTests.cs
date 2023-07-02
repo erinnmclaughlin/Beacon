@@ -10,7 +10,7 @@ public sealed class GetCurrentLabTests : CoreTestBase
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[185] Get current lab endpoint returns lab info if current user is a member")]
     public async Task GetCurrentLab_ReturnsExpectedResult()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -23,6 +23,15 @@ public sealed class GetCurrentLabTests : CoreTestBase
         Assert.NotNull(lab);
         Assert.Equal(TestData.Lab.Id, lab.Id);
         Assert.Equal(TestData.Lab.Name, lab.Name);
+    }
+
+    [Fact(DisplayName = "[185] Get current lab endpoint does not return lab info if current user is not a member")]
+    public async Task GetCurrentLab_ReturnsForbidden_IfCurrentUserIsNotAuthorized()
+    {
+        SetCurrentUser(TestData.NonMemberUser.Id);
+
+        var response = await GetAsync("api/laboratories/current");
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     protected override void AddTestData(BeaconDbContext db)
