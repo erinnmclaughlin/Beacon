@@ -18,7 +18,7 @@
                 </div>
             </div>
 
-            <MyLaboratoriesTable />
+            <MyLaboratoriesTable Laboratories="Laboratories" />
         </div>
     </div>
 </div>
@@ -28,8 +28,24 @@
     [CascadingParameter]
     private IModalService ModalService { get; set; } = null!;
 
+    private LaboratoryDto[]? Laboratories { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMyLaboratories();
+    }
+
+    private async Task LoadMyLaboratories()
+    {
+        var errorOrLaboratories = await ApiClient.GetMyLaboratories();
+        Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;        
+    }
+
     private async Task ShowCreateLabModal()
     {
-        await ModalService.Show<CreateLaboratoryModal>("Create New Lab").Result;
+        var result = await ModalService.Show<CreateLaboratoryModal>("Create New Lab").Result;
+
+        if (result.Confirmed)
+            await LoadMyLaboratories();
     }
 }
