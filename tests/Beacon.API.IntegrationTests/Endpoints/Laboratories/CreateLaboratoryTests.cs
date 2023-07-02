@@ -1,5 +1,4 @@
 ﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
 using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
@@ -17,34 +16,27 @@ public sealed class CreateLaboratoryTests : CoreTestBase
 
         var response = await PostAsync("api/laboratories", new CreateLaboratoryRequest
         {
-            LaboratoryName = "Create Lab Test Name"
+            LaboratoryName = "My New Lab"
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "Create Lab Test Name"));
+        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "My New Lab"));
         Assert.NotNull(createdLab);
     }
 
     [Fact(DisplayName = "[002] Create lab fails when request is invalid")]
     public async Task CreateLab_ShouldFail_WhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
 
         var response = await PostAsync("api/laboratories", new CreateLaboratoryRequest
         {
             LaboratoryName = "no" // must be at least 3 characters
         });
 
-        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "Create Lab Test Name"));
-        Assert.Null(createdLab);
-
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-    }
 
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        db.Users.Add(TestData.AdminUser);
-        db.SaveChanges();
+        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "no"));
+        Assert.Null(createdLab);
     }
 }

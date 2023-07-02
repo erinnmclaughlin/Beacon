@@ -49,8 +49,7 @@ public sealed class CreateEmailInvitationTests : CoreTestBase
         var response = await PostAsync("api/invitations", request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var emailInvitation = ExecuteDbContext(db => db.InvitationEmails.Include(x => x.LaboratoryInvitation).SingleOrDefault());
-        Assert.Null(emailInvitation);
+        Assert.False(await ExecuteDbContext(db => db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));
     }
 
     [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
@@ -66,5 +65,7 @@ public sealed class CreateEmailInvitationTests : CoreTestBase
 
         var response = await PostAsync("api/invitations", request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+
+        Assert.False(await ExecuteDbContext(db => db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));
     }
 }

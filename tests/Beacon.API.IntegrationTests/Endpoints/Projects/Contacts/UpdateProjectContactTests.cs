@@ -7,7 +7,7 @@ namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 public sealed class UpdateProjectContactTests : ProjectTestBase
 {
-    private static Guid ContactId { get; } = Guid.NewGuid();
+    private static Guid ContactId { get; } = new Guid("7d6da369-c88b-4ad8-995f-2c6051f6912b");
     private static string OriginalName { get; } = "Old name";
     private static string? OriginalEmail { get; } = "someone@place.com";
     private static string? OriginalPhone { get; } = null;
