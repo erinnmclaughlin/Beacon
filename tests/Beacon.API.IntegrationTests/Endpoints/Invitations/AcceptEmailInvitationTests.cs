@@ -8,7 +8,7 @@ namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
 public sealed class AcceptEmailInvitationTests : CoreTestBase
 {
-    private static Guid EmailInvitationId { get; } = Guid.NewGuid();
+    private static Guid EmailInvitationId { get; } = new Guid("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
 
     public AcceptEmailInvitationTests(TestFixture fixture) : base(fixture)
     {
