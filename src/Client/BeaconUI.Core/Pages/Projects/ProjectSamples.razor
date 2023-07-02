@@ -1,0 +1,103 @@
+﻿<h5>Project Samples</h5>
+
+<table class="table align-middle">
+    <thead>
+        <tr>
+            <th>Sample Name</th>
+            <th>Quantity</th>
+            <th>Container Type</th>
+            <th>Notes</th>
+        </tr>
+    </thead>
+    <tbody>
+        @if (SampleGroups is not { } s)
+        {
+            <tr>
+                <td colspan="100">Loading...</td>
+            </tr>
+        }
+        else if (s.IsError)
+        {
+            <tr>
+                <td colspan="100">
+                    <p class="text-danger mb-0">There was an error loading project sample groups.</p>
+                </td>
+            </tr>
+        }
+        else
+        {
+            if (!s.Value.Any())
+            {
+                <tr>
+                    <td colspan="100">
+                        <p class="text-muted mb-0">No sample groups have been added.</p>
+                    </td>
+                </tr>
+            }
+
+            foreach (var sample in s.Value)
+            {
+                <tr>
+                    <td>@sample.SampleName</td>
+                    <td>
+                        @if (sample.Quantity > 0)
+                        {
+                            <text>@sample.Quantity</text>
+                        }
+                    </td>
+                    <td>
+                        @if (!string.IsNullOrWhiteSpace(sample.ContainerType))
+                        {
+                            <text>@sample.ContainerType</text>
+                        }
+                        else
+                        {
+                            <span class="text-muted">Not set</span>
+                        }
+                    </td>
+                    <td>
+                        @sample.Notes
+                    </td>
+                </tr>
+            }
+        }
+    </tbody>
+</table>
+
+<button class="btn btn-sm btn-primary" type="button" disabled="@(SampleGroups is null)" @onclick="ShowAddSampleGroupModal">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Add Sample Group</span>
+</button>
+
+@code {
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
+
+    [Parameter, EditorRequired] 
+    public required Guid ProjectId { get; set; }
+
+    private ErrorOr<SampleGroupDto[]>? SampleGroups { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadSampleGroups();
+    }
+
+    private async Task LoadSampleGroups()
+    {
+        SampleGroups = await ApiClient.GetProjectSampleGroups(ProjectId);
+    }
+
+    private async Task ShowAddSampleGroupModal()
+    {
+        var parameters = new ModalParameters().Add(nameof(AddContactModal.ProjectId), ProjectId);
+        var result = await ModalService.Show<AddSampleGroupModal>("Add Sample Group", parameters).Result;
+
+        if (result.Confirmed)
+            await LoadSampleGroups();
+    }
+
+}

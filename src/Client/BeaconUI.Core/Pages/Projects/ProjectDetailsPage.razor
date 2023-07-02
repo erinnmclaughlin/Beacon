@@ -11,7 +11,10 @@
             <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
         </li>
         <li class="nav-item">
-            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
+            <NavLink class="nav-link" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
         </li>
     </TabsContent>
 </LaboratoryPageHeader>
@@ -25,6 +28,10 @@
         else if (p.IsError)
         {
             <p class="text-danger">There was an error loading project details.</p>
+        }
+        else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+        {
+            <ProjectSamples ProjectId="p.Value.Id" />
         }
         else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
         {

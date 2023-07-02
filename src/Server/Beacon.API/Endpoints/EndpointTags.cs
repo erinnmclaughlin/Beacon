@@ -7,4 +7,5 @@ internal static class EndpointTags
     public const string Laboratories = "Laboratories";
     public const string Memberships = "Memberships";
     public const string Projects = "Projects";
+    public const string SampleGroups = "Sample Groups";
 }

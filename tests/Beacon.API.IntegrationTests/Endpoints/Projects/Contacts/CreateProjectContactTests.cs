@@ -23,7 +23,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Create project contact suceeds when request is valid")]
+    [Fact(DisplayName = "Create project contact succeeds when request is valid")]
     public async Task CreateContact_SucceedsWhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);

@@ -4,6 +4,7 @@ using Beacon.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Beacon.API.Persistence.Migrations
 {
     [DbContext(typeof(BeaconDbContext))]
-    partial class BeaconDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230701235640_AddSampleGroups")]
+    partial class AddSampleGroups
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -203,12 +206,13 @@ namespace Beacon.API.Persistence.Migrations
                         .HasColumnType("uniqueidentifier");
 
                     b.Property<string>("ContainerType")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<bool?>("IsHazardous")
+                    b.Property<bool>("IsHazardous")
                         .HasColumnType("bit");
 
-                    b.Property<bool?>("IsLightSensitive")
+                    b.Property<bool>("IsLightSensitive")
                         .HasColumnType("bit");
 
                     b.Property<Guid>("LaboratoryId")
@@ -220,7 +224,7 @@ namespace Beacon.API.Persistence.Migrations
                     b.Property<Guid>("ProjectId")
                         .HasColumnType("uniqueidentifier");
 
-                    b.Property<int?>("Quantity")
+                    b.Property<int>("Quantity")
                         .HasColumnType("int");
 
                     b.Property<string>("SampleName")
@@ -233,7 +237,7 @@ namespace Beacon.API.Persistence.Migrations
                     b.Property<double?>("TargetStorageTemperature")
                         .HasColumnType("float");
 
-                    b.Property<double?>("Volume")
+                    b.Property<double>("Volume")
                         .HasColumnType("float");
 
                     b.HasKey("Id");
