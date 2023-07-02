@@ -38,7 +38,8 @@ public sealed class CreateProject : IBeaconEndpoint
                 ProjectCode = await GenerateProjectCode(request, ct),
                 CustomerName = request.CustomerName,
                 CreatedById = _currentUser.UserId,
-                LaboratoryId = _labContext.LaboratoryId
+                LaboratoryId = _labContext.LaboratoryId,
+                LeadAnalystId = request.LeadAnalystId
             });
 
             await _dbContext.SaveChangesAsync(ct);

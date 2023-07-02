@@ -14,6 +14,32 @@
                     <InputText @bind-Value="Model.CustomerCode" class="form-control" id="customerCode" placeholder="e.g., ACM" />
                     <ValidationMessage For="() => Model.CustomerCode" />
                 </div>
+                <div class="field">
+                    <label class="form-label" for="member">Lead Analyst</label>
+                    <InputSelect @bind-Value="Model.LeadAnalystId" class="form-control" id="member">
+                        <option>None</option>
+                        @if (ErrorOrMembers == null)
+                        {
+                            <option disabled>Loading...</option>
+                        }
+                        else if (ErrorOrMembers.Value.IsError)
+                        {
+                            <option disabled class="text-danger">There was an error loading laboratory members</option>
+                        }
+                        else if (GetPotentialLeads(ErrorOrMembers.Value.Value) is not { Count: > 0} analysts)
+                        {
+                            <option disabled>There are no available analysts to assign to this project.</option>
+                        }
+                        else
+                        {
+                            foreach (var a in analysts)
+                            {
+                                <option value="@a.Id">@a.DisplayName</option>
+                            }
+                        }
+                    </InputSelect>
+                    <ValidationMessage For="() => Model.LeadAnalystId" />
+                </div>
             </div>
         </div>
         <footer class="modal-footer">
@@ -30,6 +56,13 @@
 
     private CreateProjectRequest Model { get; } = new();
 
+    private ErrorOr<LaboratoryMemberDto[]>? ErrorOrMembers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
+    }
+
     private async Task Submit(BeaconForm formContext)
     {
         var result = await ApiClient.CreateProject(Model);
@@ -44,4 +77,9 @@
     }
 
     private async Task Cancel() => await Modal.CancelAsync();
+
+    private List<LaboratoryMemberDto> GetPotentialLeads(LaboratoryMemberDto[] list)
+    {
+        return list.Where(x => x.MembershipType >= LaboratoryMembershipType.Analyst).OrderBy(x => x.DisplayName).ToList();
+    }
 }

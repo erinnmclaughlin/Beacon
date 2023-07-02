@@ -58,14 +58,19 @@ public sealed class GetProjectDetails : IBeaconEndpoint
 
         private async Task<ProjectDto?> GetAsync(Expression<Func<Project, bool>> filter, CancellationToken ct)
         {
-            var project = await _dbContext.Projects.AsNoTracking().SingleOrDefaultAsync(filter, ct);
+            var project = await _dbContext.Projects.Include(x => x.LeadAnalyst).AsNoTracking().SingleOrDefaultAsync(filter, ct);
 
             return project is null ? null : new ProjectDto
             {
                 Id = project.Id,
                 CustomerName = project.CustomerName,
                 ProjectStatus = project.ProjectStatus,
-                ProjectCode = project.ProjectCode.ToString()
+                ProjectCode = project.ProjectCode.ToString(),
+                LeadAnalyst = project.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
+                {
+                    Id = project.LeadAnalyst.Id,
+                    DisplayName = project.LeadAnalyst.DisplayName
+                }
             };
         }
     }

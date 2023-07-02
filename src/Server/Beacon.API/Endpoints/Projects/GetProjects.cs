@@ -38,6 +38,7 @@ public sealed class GetProjects : IBeaconEndpoint
             var labId = _labContext.LaboratoryId;
 
             var projects = await _dbContext.Projects
+                .Include(x => x.LeadAnalyst)
                 .Where(x => x.LaboratoryId == labId)
                 .AsNoTracking()
                 .ToArrayAsync(ct);
@@ -47,7 +48,12 @@ public sealed class GetProjects : IBeaconEndpoint
                 Id = x.Id,
                 CustomerName = x.CustomerName,
                 ProjectStatus = x.ProjectStatus,
-                ProjectCode = x.ProjectCode.ToString()
+                ProjectCode = x.ProjectCode.ToString(),
+                LeadAnalyst = x.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
+                {
+                    Id = x.LeadAnalyst.Id,
+                    DisplayName = x.LeadAnalyst.DisplayName
+                }
             }).ToArray();
         }
     }

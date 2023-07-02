@@ -10,6 +10,7 @@ public sealed class CreateProjectRequest : IRequest
 {
     public string CustomerCode { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
+    public Guid? LeadAnalystId { get; set; }
 
     public class Validator : AbstractValidator<CreateProjectRequest>
     {
