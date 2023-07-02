@@ -10,7 +10,7 @@ public sealed class ProjectTestCollection : ICollectionFixture<TestFixture> { }
 [Collection(nameof(ProjectTestCollection))]
 public abstract class ProjectTestBase : TestBase
 {
-    public static Guid ProjectId { get; } = Guid.NewGuid();
+    public static Guid ProjectId { get; } = new Guid("a2871dc3-8746-45ad-bfd8-87e503d397cd");
     public static ProjectCode ProjectCode { get; } = new("TST", 1);
 
     protected ProjectTestBase(TestFixture fixture) : base(fixture)
