@@ -26,7 +26,7 @@ public sealed class LogoutTests
         }
     }
 
-    [Fact(DisplayName = "Logged in user can sucessfully log out")]
+    [Fact(DisplayName = "[008] Logged in user can sucessfully log out")]
     public async Task LoggedInUserCanSuccessfullyLogOut()
     {
         await _httpClient.PostAsJsonAsync("api/auth/login", new LoginRequest()

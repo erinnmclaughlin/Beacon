@@ -11,7 +11,7 @@ public sealed class GetProjectsTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Get projects returns only projects associated with current lab")]
+    [Fact(DisplayName = "[193] Get lab projects endpoint returns list of lab projects when current user is authorized")]
     public async Task GetProjects_ReturnsOnlyProjectsAssociatedWithCurrentLab()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -26,7 +26,7 @@ public sealed class GetProjectsTests : ProjectTestBase
         Assert.Equal(ProjectId, projects[0].Id);        
     }
 
-    [Fact(DisplayName = "Get projects fails when user is not authorized")]
+    [Fact(DisplayName = "[193] Get lab projects endpoint returns 403 when user is not authorized")]
     public async Task GetProjects_FailsWhenUserIsUnauthorized()
     {
         SetCurrentUser(TestData.NonMemberUser.Id);

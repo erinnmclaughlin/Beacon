@@ -9,7 +9,7 @@ public sealed class GetMembershipsTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Unauthorized users cannot access laboratory membership list")]
+    [Fact(DisplayName = "[170] Get memberships endpoint returns 403 when user is not authorized")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
         SetCurrentUser(TestData.NonMemberUser.Id);
@@ -19,7 +19,7 @@ public sealed class GetMembershipsTests : CoreTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    [Fact(DisplayName = "Authorized users can access laboratory membership list")]
+    [Fact(DisplayName = "[170] Get memberships endpoint returns list of lab members when user is authorized")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
         SetCurrentUser(TestData.MemberUser.Id);

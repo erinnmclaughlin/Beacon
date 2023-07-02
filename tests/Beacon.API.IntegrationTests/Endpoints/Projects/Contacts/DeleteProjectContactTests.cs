@@ -12,7 +12,7 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Delete contact succeeds when request is valid")]
+    [Fact(DisplayName = "[013] Delete contact succeeds when request is valid")]
     public async Task DeleteContact_Succeeds_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -23,7 +23,7 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
         Assert.False(ExecuteDbContext(db => db.ProjectContacts.Any(c => c.Id == ContactId)));
     }
 
-    [Fact(DisplayName = "Delete contact fails when user is not authorized")]
+    [Fact(DisplayName = "[013] Delete contact endpoint returns 403 when user is not authorized")]
     public async Task DeleteContact_FailsWhenUserIsNotAuthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);

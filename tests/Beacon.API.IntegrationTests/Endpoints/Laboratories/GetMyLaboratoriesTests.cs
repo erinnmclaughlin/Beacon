@@ -13,7 +13,7 @@ public sealed class GetMyLaboratoriesTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Get my labs returns current user's labs only")]
+    [Fact(DisplayName = "[185] Get my labs returns current user's labs only")]
     public async Task GetMyLaboratories_ReturnsOnlyCurrentUsersLabs()
     {
         SetCurrentUser(TestData.ManagerUser.Id);

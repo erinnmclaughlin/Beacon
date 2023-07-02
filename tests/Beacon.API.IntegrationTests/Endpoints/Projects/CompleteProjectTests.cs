@@ -10,7 +10,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Complete project succeeds when request is valid")]
+    [Fact(DisplayName = "[005] Complete project succeeds when request is valid")]
     public async Task CompleteProject_SucceedsWhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -26,7 +26,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
         Assert.Equal(ProjectStatus.Completed, project.ProjectStatus);
     }
 
-    [Fact(DisplayName = "Complete project fails when request is invalid")]
+    [Fact(DisplayName = "[005] Complete project fails when request is invalid")]
     public async Task CompleteProject_FailsWhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.MemberUser.Id);

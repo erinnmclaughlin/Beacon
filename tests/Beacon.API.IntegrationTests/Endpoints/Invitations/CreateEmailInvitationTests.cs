@@ -12,7 +12,7 @@ public sealed class CreateEmailInvitationTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Inviting user succeeds when request is valid")]
+    [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
     public async Task InvitingUserSucceedsWhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -35,7 +35,7 @@ public sealed class CreateEmailInvitationTests : CoreTestBase
         Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
     }
 
-    [Fact(DisplayName = "Inviting user fails when request is not valid")]
+    [Fact(DisplayName = "[003] Invite new user endpoint returns 422 when request is not valid")]
     public async Task InvitingUserFailsWhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -53,7 +53,7 @@ public sealed class CreateEmailInvitationTests : CoreTestBase
         Assert.Null(emailInvitation);
     }
 
-    [Fact(DisplayName = "Inviting user fails when user is unauthorized")]
+    [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
     public async Task InvitingUserFailsWhenRequestIsUnauthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);

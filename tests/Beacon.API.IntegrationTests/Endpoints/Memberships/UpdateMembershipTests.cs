@@ -13,7 +13,7 @@ public sealed class UpdateMembershipTests : CoreTestBase
     {
     }
 
-    [Fact(DisplayName = "Update membership type succeeds when user is authorized")]
+    [Fact(DisplayName = "[170] Update membership type succeeds when user is authorized")]
     public async Task UpdateMembershipType_Succeeds_WhenUserIsAuthorized()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -35,7 +35,7 @@ public sealed class UpdateMembershipTests : CoreTestBase
         Assert.Equal(LaboratoryMembershipType.Analyst, membership?.MembershipType);
     }
 
-    [Fact(DisplayName = "Update membership type returns 403 when user is not authorized")]
+    [Fact(DisplayName = "[170] Update membership type endpoint returns 403 when user is not authorized")]
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {
         SetCurrentUser(TestData.AdminUser.Id);

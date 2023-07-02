@@ -22,7 +22,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Create project suceeds when request is valid")]
+    [Fact(DisplayName = "[004] Create project suceeds when request is valid")]
     public async Task CreateProject_Succeeds_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -37,7 +37,7 @@ public sealed class CreateProjectTests : ProjectTestBase
         Assert.Equal(ProjectStatus.Active, createdProject.ProjectStatus);
     }
 
-    [Fact(DisplayName = "Create project fails when request is invalid")]
+    [Fact(DisplayName = "[004] Create project fails when request is invalid")]
     public async Task CreateProject_Fails_WhenRequestIsInvalid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -49,7 +49,7 @@ public sealed class CreateProjectTests : ProjectTestBase
         Assert.Null(createdProject);
     }
 
-    [Fact(DisplayName = "Create project fails when user is not authorized")]
+    [Fact(DisplayName = "[004] Create project fails when user is not authorized")]
     public async Task CreateProject_Fails_WhenUserIsNotAuthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);
