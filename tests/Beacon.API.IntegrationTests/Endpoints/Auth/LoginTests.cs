@@ -5,8 +5,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-[Collection(nameof(AuthTestFixture))]
-public sealed class LoginTests
+public sealed class LoginTests : IClassFixture<AuthTestFixture>
 {
     private readonly AuthTestFixture _fixture;
     private readonly HttpClient _httpClient;

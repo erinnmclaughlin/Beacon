@@ -1,10 +1,9 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class GetCurrentUserTests : CoreTestBase
+public sealed class GetCurrentUserTests : TestBase
 {
     public GetCurrentUserTests(TestFixture fixture) : base(fixture)
     {

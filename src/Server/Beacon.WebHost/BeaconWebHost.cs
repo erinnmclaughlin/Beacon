@@ -3,20 +3,21 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.WebHost;
 
-public class BeaconWebHost 
-{ 
-    public static void ConfigureServices(IServiceCollection services, IConfiguration config)
+public static class BeaconWebHost
+{
+    public static WebApplication BuildBeaconApplication(this WebApplicationBuilder builder)
     {
-        services.AddBeaconApi(config, options =>
+        builder.Services.AddBeaconApi(builder.Configuration, o =>
         {
-            var connectionString = config.GetConnectionString("SqlServerDb");
-            options.UseSqlServer(connectionString);
+            o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerDb"));
         });
 
-        services.AddSwaggerGen();
+        builder.Services.AddSwaggerGen();
+
+        return builder.Build();
     }
 
-    public static WebApplication Configure(WebApplication app)
+    public static WebApplication ConfigurePipeline(this WebApplication app)
     {
         if (app.Environment.IsDevelopment())
         {

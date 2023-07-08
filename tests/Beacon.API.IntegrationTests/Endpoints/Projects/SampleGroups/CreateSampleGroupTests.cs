@@ -1,5 +1,4 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Requests.Projects.SampleGroups;
+﻿using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 

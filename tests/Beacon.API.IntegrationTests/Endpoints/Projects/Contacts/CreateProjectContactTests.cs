@@ -1,5 +1,4 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Requests.Projects.Contacts;
+﻿using Beacon.Common.Requests.Projects.Contacts;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 

@@ -1,5 +1,4 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 using Microsoft.EntityFrameworkCore;
@@ -7,7 +6,7 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class UpdateMembershipTests : CoreTestBase
+public sealed class UpdateMembershipTests : TestBase
 {
     public UpdateMembershipTests(TestFixture fixture) : base(fixture)
     {

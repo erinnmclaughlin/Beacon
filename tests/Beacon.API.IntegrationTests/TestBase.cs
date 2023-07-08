@@ -7,7 +7,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
 
-public abstract class TestBase
+public abstract class TestBase : IClassFixture<TestFixture>
 {
     protected readonly TestFixture _fixture;
     protected readonly HttpClient _httpClient;

@@ -1,5 +1,4 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 

@@ -1,11 +1,10 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-public sealed class GetMyLaboratoriesTests : CoreTestBase
+public sealed class GetMyLaboratoriesTests : TestBase
 {
     public static Guid OtherLabId { get; } = Guid.NewGuid();
 

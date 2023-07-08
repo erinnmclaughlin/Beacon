@@ -1,9 +1,8 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Requests.Laboratories;
+﻿using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-public sealed class CreateLaboratoryTests : CoreTestBase
+public sealed class CreateLaboratoryTests : TestBase
 {
     public CreateLaboratoryTests(TestFixture fixture) : base(fixture)
     {
