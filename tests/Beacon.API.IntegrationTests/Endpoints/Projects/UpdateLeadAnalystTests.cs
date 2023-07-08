@@ -9,7 +9,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "Assigning lead analyst fails when analyst is not in valid role")]
+    [Fact(DisplayName = "[014] Assigning lead analyst fails when analyst is not in valid role")]
     public async Task AssigningLeadAnalyst_ShouldFail_WhenAnalystIsNotValid()
     {
         SetCurrentUser(TestData.AdminUser.Id);
@@ -26,7 +26,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         EnsureLeadAnalystIs(null);
     }
 
-    [Fact(DisplayName = "Assigning lead analyst fails when user is not authorized")]
+    [Fact(DisplayName = "[014] Assigning lead analyst fails when user is not authorized")]
     public async Task AssigningLeadAnalyst_ShouldFail_WhenUserIsNotAuthorized()
     {
         SetCurrentUser(TestData.MemberUser.Id);
@@ -43,7 +43,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         EnsureLeadAnalystIs(null);
     }
 
-    [Fact(DisplayName = "Assigning lead analyst succeeds when request is valid")]
+    [Fact(DisplayName = "[014] Assigning lead analyst succeeds when request is valid")]
     public async Task AssigningLeadAnalyst_ShouldSucceed_WhenRequestIsValid()
     {
         SetCurrentUser(TestData.AnalystUser.Id);
@@ -59,7 +59,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         EnsureLeadAnalystIs(TestData.AnalystUser.Id);
     }
 
-    [Fact(DisplayName = "Unassigning lead analyst succeeds when request is valid")]
+    [Fact(DisplayName = "[014] Unassigning lead analyst succeeds when request is valid")]
     public async Task UnassigningLeadAnalyst_ShouldSucceed_WhenRequestIsValid()
     {
         ExecuteDbContext(db =>
