@@ -27,7 +27,8 @@ public sealed class CreateProject : IBeaconEndpoint
             _labContext = labContext;
 
             RuleFor(x => x.LeadAnalystId)
-                .MustAsync(BeAuthorized).When(x => x.LeadAnalystId != null).WithMessage("Lead analyst must have at least an analyst role.");
+                .MustAsync(BeAuthorized)
+                .WithMessage("Lead analyst must have at least an analyst role.");
         }
 
         private async Task<bool> BeAuthorized(Guid? analystId, CancellationToken ct)
