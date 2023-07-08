@@ -2,6 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
+[Trait("Feature", "Project Management")]
 public sealed class CreateProjectContactTests : ProjectTestBase
 {
     private static CreateProjectContactRequest SomeValidRequest => new()

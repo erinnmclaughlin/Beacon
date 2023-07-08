@@ -4,6 +4,7 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
+[Trait("Feature", "Laboratory Management")]
 public sealed class GetMyLaboratoriesTests : TestBase
 {
     public static Guid OtherLabId { get; } = Guid.NewGuid();

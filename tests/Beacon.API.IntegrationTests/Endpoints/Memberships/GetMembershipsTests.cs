@@ -2,6 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
+[Trait("Feature", "User Management")]
 public sealed class GetMembershipsTests : TestBase
 {
     public GetMembershipsTests(TestFixture fixture) : base(fixture)

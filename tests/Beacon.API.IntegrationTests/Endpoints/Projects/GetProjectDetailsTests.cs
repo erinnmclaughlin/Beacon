@@ -2,6 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
+[Trait("Feature", "Project Management")]
 public sealed class GetProjectDetailsTests : ProjectTestBase
 {
     public GetProjectDetailsTests(TestFixture fixture) : base(fixture)

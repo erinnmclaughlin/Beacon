@@ -3,6 +3,7 @@ using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
+[Trait("Feature", "Project Management")]
 public sealed class CompleteProjectTests : ProjectTestBase
 {
     public CompleteProjectTests(TestFixture fixture) : base(fixture)

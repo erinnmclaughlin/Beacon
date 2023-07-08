@@ -3,6 +3,7 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
+[Trait("Feature", "Laboratory Management")]
 public sealed class GetCurrentLabTests : TestBase
 {
     public GetCurrentLabTests(TestFixture fixture) : base(fixture)

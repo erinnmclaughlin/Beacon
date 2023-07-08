@@ -3,6 +3,7 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
+[Trait("Feature", "User Registration & Login")]
 public sealed class GetCurrentUserTests : TestBase
 {
     public GetCurrentUserTests(TestFixture fixture) : base(fixture)

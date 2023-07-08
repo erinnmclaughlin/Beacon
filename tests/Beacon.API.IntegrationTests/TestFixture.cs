@@ -9,6 +9,7 @@ public sealed class TestFixture : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             services.ReplaceWithTestDatabase();
+            services.SuppressLogging();
             services.UseMockedCurrentUser();
             services.UseMockedHttpContextAccessor();
             services.UseFakeEmailService();

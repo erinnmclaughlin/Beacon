@@ -5,6 +5,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
+[Trait("Feature", "User Registration & Login")]
 public sealed class LogoutTests : IClassFixture<AuthTestFixture>
 {
     private readonly AuthTestFixture _fixture;

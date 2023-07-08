@@ -4,6 +4,7 @@ using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
+[Trait("Feature", "Sample Management")]
 public sealed class GetSampleGroupsTests : ProjectTestBase
 {
     public GetSampleGroupsTests(TestFixture fixture) : base(fixture)

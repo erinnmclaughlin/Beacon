@@ -4,6 +4,7 @@ using Beacon.Common.Requests.Auth;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
+[Trait("Feature", "User Registration & Login")]
 public sealed class RegisterTests : TestBase
 {
     public RegisterTests(TestFixture fixture) : base(fixture)

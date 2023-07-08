@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Beacon.Common.UnitTests.Requests.Memberships;
 
+[Trait("Feature", "User Management")]
 public sealed class UpdateMembershipRequestAuthorizerTests
 {
     private readonly ICurrentUser _currentUser;

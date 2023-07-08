@@ -9,6 +9,7 @@ public sealed class AuthTestFixture : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             services.ReplaceWithTestDatabase();
+            services.SuppressLogging();
         });
     }
 }

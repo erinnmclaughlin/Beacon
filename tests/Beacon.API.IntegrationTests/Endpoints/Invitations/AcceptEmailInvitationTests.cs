@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
+[Trait("Feature", "User Management")]
 public sealed class AcceptEmailInvitationTests : TestBase
 {
     private static Guid EmailInvitationId { get; } = new Guid("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
