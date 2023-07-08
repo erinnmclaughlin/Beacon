@@ -37,7 +37,6 @@ public sealed class UpdateLeadAnalyst : IBeaconEndpoint
 
             RuleFor(x => x.AnalystId)
                 .MustAsync(BeAuthorized)
-                .When(x => x.AnalystId != null)
                 .WithMessage("Lead analyst must have at least an analyst role.");
         }
 
@@ -64,7 +63,7 @@ public sealed class UpdateLeadAnalyst : IBeaconEndpoint
             var project = await _dbContext.Projects.SingleAsync(x => x.Id == request.ProjectId, ct);
 
             project.LeadAnalystId = request.AnalystId;
-            await _dbContext.SaveChangesAsync(ct);                
+            await _dbContext.SaveChangesAsync(ct);
         }
     }
 }
