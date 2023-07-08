@@ -120,7 +120,7 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
 
         private static string GetAcceptUrl(string baseUrl, InvitationEmail invitation)
         {
-            return $"{baseUrl}/invitations/{invitation.LaboratoryInvitationId}/accept?emailId={invitation.Id}";
+            return $"{baseUrl}/invitations/{invitation.Id}/accept";
         }
 
         private static string GetBody(string baseUrl, InvitationEmail emailInvitation)
