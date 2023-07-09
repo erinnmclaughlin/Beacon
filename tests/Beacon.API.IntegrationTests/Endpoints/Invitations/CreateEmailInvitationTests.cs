@@ -1,12 +1,12 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.IntegrationTests.Fakes;
+﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
-public sealed class CreateEmailInvitationTests : CoreTestBase
+[Trait("Feature", "User Management")]
+public sealed class CreateEmailInvitationTests : TestBase
 {
     public CreateEmailInvitationTests(TestFixture fixture) : base(fixture)
     {

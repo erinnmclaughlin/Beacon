@@ -1,8 +1,8 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Requests.Projects.SampleGroups;
+﻿using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
+[Trait("Feature", "Sample Management")]
 public sealed class CreateSampleGroupTests : ProjectTestBase
 {
     private static CreateSampleGroupRequest SomeValidRequest => new()

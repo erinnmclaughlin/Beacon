@@ -1,11 +1,11 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
-public sealed class RegisterTests : CoreTestBase
+[Trait("Feature", "User Registration & Login")]
+public sealed class RegisterTests : TestBase
 {
     public RegisterTests(TestFixture fixture) : base(fixture)
     {

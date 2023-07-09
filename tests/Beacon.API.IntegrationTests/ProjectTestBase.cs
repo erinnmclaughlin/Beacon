@@ -2,12 +2,8 @@
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 
-namespace Beacon.API.IntegrationTests.Collections;
+namespace Beacon.API.IntegrationTests;
 
-[CollectionDefinition(nameof(ProjectTestCollection))]
-public sealed class ProjectTestCollection : ICollectionFixture<TestFixture> { }
-
-[Collection(nameof(ProjectTestCollection))]
 public abstract class ProjectTestBase : TestBase
 {
     public static Guid ProjectId { get; } = new Guid("a2871dc3-8746-45ad-bfd8-87e503d397cd");

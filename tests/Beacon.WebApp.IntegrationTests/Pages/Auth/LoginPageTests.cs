@@ -7,6 +7,7 @@ using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests.Pages.Auth;
 
+[Trait("Feature", "User Registration & Login")]
 public class LoginPageTests : BeaconTestContext
 {
     [Fact]

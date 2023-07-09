@@ -6,10 +6,9 @@ using Beacon.Common.Requests.Memberships;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Requests.Projects.Contacts;
 using Beacon.Common.Requests.Projects.SampleGroups;
-using BeaconUI.Core.Helpers;
 using ErrorOr;
 
-namespace BeaconUI.Core.Clients;
+namespace BeaconUI.Core.Services;
 
 public sealed class ApiClient
 {
@@ -128,5 +127,10 @@ public sealed class ApiClient
     public async Task<ErrorOr<SampleGroupDto[]>> GetProjectSampleGroups(Guid projectId)
     {
         return await _httpClientFactory.GetAsync<SampleGroupDto[]>($"api/projects/{projectId}/sample-groups");
+    }
+
+    public async Task<ErrorOr<Success>> UpdateLeadAnalyst(UpdateLeadAnalystRequest request)
+    {
+        return await _httpClientFactory.PutAsync($"api/projects/{request.ProjectId}/analyst", request);
     }
 }

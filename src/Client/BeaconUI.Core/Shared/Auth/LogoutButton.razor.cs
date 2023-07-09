@@ -1,4 +1,3 @@
-using BeaconUI.Core.Clients;
 using Microsoft.AspNetCore.Components;
 using Microsoft.AspNetCore.Components.WebAssembly.Authentication;
 

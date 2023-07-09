@@ -1,9 +1,9 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Models;
+﻿using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class GetMembershipsTests : CoreTestBase
+[Trait("Feature", "User Management")]
+public sealed class GetMembershipsTests : TestBase
 {
     public GetMembershipsTests(TestFixture fixture) : base(fixture)
     {

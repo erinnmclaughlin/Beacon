@@ -1,5 +1,4 @@
 ﻿using Beacon.Common.Requests.Auth;
-using BeaconUI.Core.Clients;
 using ErrorOr;
 
 namespace BeaconUI.Core.Services;

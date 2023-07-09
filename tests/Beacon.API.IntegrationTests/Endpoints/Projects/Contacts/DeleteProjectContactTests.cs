@@ -1,9 +1,9 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
+[Trait("Feature", "Project Management")]
 public sealed class DeleteProjectContactTests : ProjectTestBase
 {
     private static Guid ContactId { get; } = new Guid("7d6da369-c88b-4ad8-995f-2c6051f6912b");

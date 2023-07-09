@@ -1,6 +1,6 @@
 ﻿using Blazored.LocalStorage;
 
-namespace BeaconUI.Core.Clients;
+namespace BeaconUI.Core.Services;
 
 public class BeaconHttpHeaderHandler : DelegatingHandler
 {
@@ -14,7 +14,7 @@ public class BeaconHttpHeaderHandler : DelegatingHandler
     protected override async Task<HttpResponseMessage> SendAsync(HttpRequestMessage request, CancellationToken ct)
     {
         var labId = await _localStorage.GetItemAsync<Guid>("CurrentLaboratoryId", ct);
-       
+
         if (labId != Guid.Empty)
             request.Headers.Add("X-LaboratoryId", labId.ToString());
 

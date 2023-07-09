@@ -1,10 +1,10 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
+[Trait("Feature", "Project Management")]
 public sealed class GetProjectContactsTests : ProjectTestBase
 {
     public GetProjectContactsTests(TestFixture fixture) : base(fixture)

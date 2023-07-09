@@ -1,9 +1,9 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Models;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
+[Trait("Feature", "Project Management")]
 public sealed class CreateProjectTests : ProjectTestBase
 {
     private static CreateProjectRequest SomeValidRequest { get; } = new()

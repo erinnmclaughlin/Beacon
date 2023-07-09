@@ -1,6 +1,5 @@
 ﻿using Beacon.Common;
 using Beacon.Common.Services;
-using BeaconUI.Core.Clients;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 

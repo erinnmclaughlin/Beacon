@@ -2,7 +2,7 @@
 
 namespace Beacon.API.IntegrationTests;
 
-public sealed class TestFixture : WebApplicationFactory<Program>
+public sealed class AuthTestFixture : WebApplicationFactory<Program>
 {
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -10,9 +10,6 @@ public sealed class TestFixture : WebApplicationFactory<Program>
         {
             services.ReplaceWithTestDatabase();
             services.SuppressLogging();
-            services.UseMockedCurrentUser();
-            services.UseMockedHttpContextAccessor();
-            services.UseFakeEmailService();
         });
     }
 }

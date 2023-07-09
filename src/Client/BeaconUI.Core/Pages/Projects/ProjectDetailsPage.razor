@@ -3,9 +3,9 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent>
-        <h3 class="mb-0">@CurrentLab.Name</h3>
-    </TitleContent>
+    <ChildContent>
+        <h4>Project Details</h4>
+    </ChildContent>
     <TabsContent>
         <li class="nav-item">
             <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
@@ -39,7 +39,7 @@
         }
         else
         {
-            <p>This is the project details page for project @Code.</p>
+            <ProjectOverview Project="p.Value" ProjectChanged="(p) => Project = p" />
         }
     </div>
 </div>
@@ -57,9 +57,16 @@
 
     private ErrorOr<ProjectDto>? Project { get; set; }
 
+    private ErrorOr<LaboratoryMemberDto[]>? LabMembers { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
-        await LoadProject();
+        await Task.WhenAll(LoadProject(), LoadMembers());
+    }
+
+    private async Task LoadMembers()
+    {
+        LabMembers = await ApiClient.GetLaboratoryMembers();
     }
 
     private async Task LoadProject()
@@ -71,6 +78,18 @@
         }
 
         Project = await ApiClient.GetProject(code);
+    }
+
+    private async Task HandleLeadAnalystChanged(Guid projectId, ChangeEventArgs e)
+    {
+        var request = new UpdateLeadAnalystRequest 
+        { 
+            ProjectId = projectId, 
+            AnalystId = Guid.TryParse(e.Value?.ToString(), out var id) ? id : null
+        };
+
+        await ApiClient.UpdateLeadAnalyst(request);
+        await LoadProject();
     }
 
 }

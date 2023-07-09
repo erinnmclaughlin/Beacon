@@ -1,8 +1,8 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.Common.Models;
+﻿using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
+[Trait("Feature", "Project Management")]
 public sealed class GetProjectDetailsTests : ProjectTestBase
 {
     public GetProjectDetailsTests(TestFixture fixture) : base(fixture)

@@ -1,6 +1,4 @@
-﻿@using Beacon.Common.Requests.Projects
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="row">
@@ -13,6 +11,16 @@
                     <label class="form-label" for="customerCode">Customer Code</label>
                     <InputText @bind-Value="Model.CustomerCode" class="form-control" id="customerCode" placeholder="e.g., ACM" />
                     <ValidationMessage For="() => Model.CustomerCode" />
+                </div>
+                <div class="field">
+                    <label class="form-label" for="member">Lead Analyst</label>
+                    <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
+                        <option>None</option>
+                        <LaboratoryMemberListGroup Context="member" Filter="m => m.MembershipType != LaboratoryMembershipType.Member">
+                            <option value="@member.Id">@member.DisplayName</option>
+                        </LaboratoryMemberListGroup>
+                    </InputSelect>
+                    <ValidationMessage For="() => Model.LeadAnalystId" />
                 </div>
             </div>
         </div>
@@ -44,4 +52,9 @@
     }
 
     private async Task Cancel() => await Modal.CancelAsync();
+
+    private List<LaboratoryMemberDto> GetPotentialLeads(LaboratoryMemberDto[] list)
+    {
+        return list.Where(x => x.MembershipType >= LaboratoryMembershipType.Analyst).OrderBy(x => x.DisplayName).ToList();
+    }
 }

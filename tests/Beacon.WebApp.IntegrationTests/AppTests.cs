@@ -8,6 +8,7 @@ using RichardSzalay.MockHttp;
 
 namespace Beacon.WebApp.IntegrationTests;
 
+[Trait("Feature", "User Registration & Login")]
 public class AppTests : BeaconTestContext
 {
     [Fact]

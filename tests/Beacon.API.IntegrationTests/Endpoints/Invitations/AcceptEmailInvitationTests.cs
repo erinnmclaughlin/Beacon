@@ -1,12 +1,12 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 
-public sealed class AcceptEmailInvitationTests : CoreTestBase
+[Trait("Feature", "User Management")]
+public sealed class AcceptEmailInvitationTests : TestBase
 {
     private static Guid EmailInvitationId { get; } = new Guid("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
 

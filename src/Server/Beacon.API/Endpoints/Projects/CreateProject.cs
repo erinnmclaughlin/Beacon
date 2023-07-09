@@ -3,6 +3,7 @@ using Beacon.App.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Services;
+using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -15,6 +16,28 @@ public sealed class CreateProject : IBeaconEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost<CreateProjectRequest>("projects").WithTags(EndpointTags.Projects);
+    }
+
+    public sealed class Validator : AbstractValidator<CreateProjectRequest>
+    {
+        private readonly ILabContext _labContext;
+
+        public Validator(ILabContext labContext)
+        {
+            _labContext = labContext;
+
+            RuleFor(x => x.LeadAnalystId)
+                .MustAsync(BeAuthorized)
+                .WithMessage("Lead analyst must have at least an analyst role.");
+        }
+
+        private async Task<bool> BeAuthorized(Guid? analystId, CancellationToken ct)
+        {
+            if (analystId == null)
+                return true;
+
+            return await _labContext.GetMembershipTypeAsync(analystId.Value, ct) >= LaboratoryMembershipType.Analyst;
+        }
     }
 
     internal sealed class Handler : IRequestHandler<CreateProjectRequest>
@@ -38,7 +61,8 @@ public sealed class CreateProject : IBeaconEndpoint
                 ProjectCode = await GenerateProjectCode(request, ct),
                 CustomerName = request.CustomerName,
                 CreatedById = _currentUser.UserId,
-                LaboratoryId = _labContext.LaboratoryId
+                LaboratoryId = _labContext.LaboratoryId,
+                LeadAnalystId = request.LeadAnalystId
             });
 
             await _dbContext.SaveChangesAsync(ct);

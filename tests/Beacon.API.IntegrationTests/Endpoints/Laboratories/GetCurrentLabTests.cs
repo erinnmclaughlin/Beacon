@@ -1,10 +1,10 @@
-﻿using Beacon.API.IntegrationTests.Collections;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-public sealed class GetCurrentLabTests : CoreTestBase
+[Trait("Feature", "Laboratory Management")]
+public sealed class GetCurrentLabTests : TestBase
 {
     public GetCurrentLabTests(TestFixture fixture) : base(fixture)
     {

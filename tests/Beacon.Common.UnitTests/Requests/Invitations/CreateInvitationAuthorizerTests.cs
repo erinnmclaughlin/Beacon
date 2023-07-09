@@ -6,6 +6,7 @@ using Xunit;
 
 namespace Beacon.Common.UnitTests.Requests.Invitations;
 
+[Trait("Feature", "User Management")]
 public sealed class CreateInvitationAuthorizerTests
 {
     [Theory]
