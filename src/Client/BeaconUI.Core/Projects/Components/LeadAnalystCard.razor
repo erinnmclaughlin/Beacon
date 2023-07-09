@@ -3,7 +3,7 @@
 <ul class="list-group">
     <li class="list-group-item">
         <div class="dropdown" style="@(IsBusy ? "cursor: wait" : "")">
-            @if (CurrentLab.MyMembershipType > LaboratoryMembershipType.Member)
+            @if (CurrentUser.MembershipType is >= LaboratoryMembershipType.Analyst)
             {
                 <button class="btn btn-link w-100 p-0 text-decoration-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
                     <div class="d-flex justify-content-between align-items-end">
@@ -75,8 +75,8 @@
 
 @code {
 
-    [CascadingParameter]
-    public required LaboratoryDto CurrentLab { get; set; }
+    [Inject]
+    private ICurrentUser CurrentUser { get; set; } = default!;
 
     [Parameter]
     public ProjectDto.LeadAnalystDto? LeadAnalyst { get; set; }

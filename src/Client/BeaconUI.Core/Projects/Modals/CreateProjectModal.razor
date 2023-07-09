@@ -60,9 +60,4 @@
     }
 
     private async Task Cancel() => await Modal.CancelAsync();
-
-    private List<LaboratoryMemberDto> GetPotentialLeads(LaboratoryMemberDto[] list)
-    {
-        return list.Where(x => x.MembershipType >= LaboratoryMembershipType.Analyst).OrderBy(x => x.DisplayName).ToList();
-    }
 }
