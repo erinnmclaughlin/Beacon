@@ -10,16 +10,14 @@ namespace Beacon.API.Behaviors;
 
 public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
-    private readonly IEnumerable<IAuthorizer<TRequest>> _authorizers;
     private readonly ICurrentUser _currentUser;
 
-    public AuthorizationPipelineBehavior(IEnumerable<IAuthorizer<TRequest>> authorizers, ICurrentUser currentUser, ILabContext labContext)
+    public AuthorizationPipelineBehavior(ICurrentUser currentUser)
     {
-        _authorizers = authorizers;
         _currentUser = currentUser;
     }
 
-    public async Task Process(TRequest request, CancellationToken ct)
+    public Task Process(TRequest request, CancellationToken ct)
     {
         if (_currentUser.UserId == Guid.Empty && !AllowsAnonymous())
             throw new UnauthorizedAccessException();
@@ -27,11 +25,7 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
         if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
             throw new UserNotAllowedException();
 
-        foreach (var authorizer in _authorizers)
-        {
-            if (!await authorizer.IsAuthorizedAsync(request, ct))
-                throw new UserNotAllowedException();
-        }
+        return Task.CompletedTask;
     }
 
     private static bool AllowsAnonymous()

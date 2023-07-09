@@ -29,7 +29,6 @@ public static class BeaconAPI
         });
 
         services.AddValidatorsFromAssemblies(new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
-        services.RegisterAuthorizers();
         services.AddScoped<BeaconAuthenticationService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         return services;
