@@ -18,9 +18,15 @@
                     <label class="form-label" for="member">Lead Analyst</label>
                     <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
                         <option>None</option>
-                        <LaboratoryMemberListGroup Context="member" Filter="m => m.MembershipType != LaboratoryMembershipType.Member">
-                            <option value="@member.Id">@member.DisplayName</option>
-                        </LaboratoryMemberListGroup>
+                        <MembershipContext>
+                            @if (context.Result is { IsError: false } result)
+                            {
+                                foreach (var member in result.Value.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
+                                {
+                                    <option value="@member.Id">@member.DisplayName</option>
+                                }
+                            }
+                        </MembershipContext>
                     </InputSelect>
                     <ValidationMessage For="() => Model.LeadAnalystId" />
                 </div>

@@ -3,17 +3,8 @@
 @import url('variables.css');
 @import url('utils.css');
 
-html, body {
+html, body, #app {
     height: 100%;
-    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-}
-
-#app {
-    height: 100%;
-}
-
-#topnav {
-    height: var(--topnav-height);
 }
 
 h1:focus {
@@ -32,12 +23,6 @@ a, .btn-link {
 
 .content {
     padding-top: 1.1rem;
-}
-
-.page-container {
-    height: 100%;
-    width: 100%;
-    display: flex;
 }
 
 .icon:not(:last-child) {
