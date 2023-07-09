@@ -14,6 +14,8 @@ public sealed class RegisterTests : TestBase
     [Fact(DisplayName = "[001] Creating a new account succeeds when request is valid")]
     public async Task Register_SucceedsWhenRequestIsValid()
     {
+        RunAsAnonymous();
+
         var request = new RegisterRequest
         {
             EmailAddress = "newuser@website.com",
@@ -32,6 +34,8 @@ public sealed class RegisterTests : TestBase
     [Fact(DisplayName = "[001] Creating a new account fails when required info isn't entered")]
     public async Task Register_FailsWhenRequiredInformationIsMissing()
     {
+        RunAsAnonymous();
+
         var response = await PostAsync("api/auth/register", new RegisterRequest());
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
@@ -39,6 +43,8 @@ public sealed class RegisterTests : TestBase
     [Fact(DisplayName = "[001] Creating a new account fails when email is already in use")]
     public async Task Register_FailsWhenEmailExists()
     {
+        RunAsAnonymous();
+
         var response = await PostAsync("api/auth/register", new RegisterRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,

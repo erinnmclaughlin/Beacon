@@ -13,7 +13,7 @@ public sealed class CancelProjectTests : ProjectTestBase
     [Fact(DisplayName = "[005] Cancel project succeeds when request is valid")]
     public async Task CancelProject_SucceedsWhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync("api/projects/cancel", new CancelProjectRequest
         {
@@ -29,7 +29,7 @@ public sealed class CancelProjectTests : ProjectTestBase
     [Fact(DisplayName = "[005] Cancel project fails when user is unauthorized")]
     public async Task CancelProject_FailsWhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await PostAsync("api/projects/cancel", new CancelProjectRequest
         {

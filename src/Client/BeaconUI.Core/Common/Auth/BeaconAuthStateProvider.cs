@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Services;
 using BeaconUI.Core.Common.Http;
 using Microsoft.AspNetCore.Components.Authorization;

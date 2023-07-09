@@ -11,7 +11,7 @@ public sealed class TestFixture : WebApplicationFactory<Program>
             services.ReplaceWithTestDatabase();
             services.SuppressLogging();
             services.UseMockedCurrentUser();
-            services.UseMockedHttpContextAccessor();
+            services.UseMockedLabContext();
             services.UseFakeEmailService();
         });
     }

@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
@@ -49,11 +50,19 @@ public abstract class TestBase : IClassFixture<TestFixture>
         return action.Invoke(dbContext);
     }
 
-    protected void SetCurrentUser(Guid userId)
+    protected void RunAsAdmin() => SetCurrentUser(TestData.AdminUser.Id, LaboratoryMembershipType.Admin);
+    protected void RunAsManager() => SetCurrentUser(TestData.ManagerUser.Id, LaboratoryMembershipType.Manager);
+    protected void RunAsAnalyst() => SetCurrentUser(TestData.AnalystUser.Id, LaboratoryMembershipType.Analyst);
+    protected void RunAsMember() => SetCurrentUser(TestData.MemberUser.Id, LaboratoryMembershipType.Member);
+    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser.Id, null);
+    protected void RunAsAnonymous() => SetCurrentUser(Guid.Empty, null);
+
+    protected void SetCurrentUser(Guid userId, LaboratoryMembershipType? membershipType)
     {
         using var scope = _fixture.Services.CreateScope();
         var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ICurrentUser>>();
         currentUserMock.SetupGet(x => x.UserId).Returns(userId);
+        currentUserMock.SetupGet(x => x.MembershipType).Returns(membershipType);
     }
 
     protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)

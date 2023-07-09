@@ -1,4 +1,4 @@
-﻿namespace Beacon.Common.Services;
+﻿namespace Beacon.App.Services;
 
 public interface ILabContext
 {

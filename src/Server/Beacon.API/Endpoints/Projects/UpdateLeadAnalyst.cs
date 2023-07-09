@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.App.Services;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using Beacon.Common.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;

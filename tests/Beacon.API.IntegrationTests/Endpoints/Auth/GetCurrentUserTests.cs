@@ -13,7 +13,7 @@ public sealed class GetCurrentUserTests : TestBase
     [Fact(DisplayName = "[008] Get current user returns 401 if user is not logged in")]
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {
-        SetCurrentUser(Guid.Empty);
+        RunAsAnonymous();
 
         var response = await GetAsync("api/users/current");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -22,7 +22,7 @@ public sealed class GetCurrentUserTests : TestBase
     [Fact(DisplayName = "[008] Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await GetAsync("api/users/current");
 

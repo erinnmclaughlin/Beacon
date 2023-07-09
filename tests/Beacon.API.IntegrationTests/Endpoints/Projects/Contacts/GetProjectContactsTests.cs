@@ -14,7 +14,7 @@ public sealed class GetProjectContactsTests : ProjectTestBase
     [Fact(DisplayName = "[013] Get contacts endpoint returns list of contacts associated with project")]
     public async Task GetProjectContacts_ReturnsExpectedResult()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await GetAsync($"api/projects/{ProjectId}/contacts");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

@@ -24,7 +24,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     [Fact(DisplayName = "[016] Create project sample group succeeds when request is valid")]
     public async Task CreateSampleGroup_SucceedsWhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -37,7 +37,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     [Fact(DisplayName = "[016] Create project sample group fails when request is invalid")]
     public async Task CreateSampleGroup_FailsWhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -49,7 +49,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     [Fact(DisplayName = "[016] Create project sample group fails when user is not authorized")]
     public async Task CreateSampleGroup_FailsWhenUserIsUnauthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

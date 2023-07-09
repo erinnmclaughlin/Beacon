@@ -43,14 +43,11 @@ public static class WebApplicationFactorySetup
         services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
     }
 
-    public static void UseMockedHttpContextAccessor(this IServiceCollection services)
+    public static void UseMockedLabContext(this IServiceCollection services)
     {
-        services.RemoveAll<IHttpContextAccessor>();
-
-        var mock = new Mock<IHttpContextAccessor>();
-        mock.Setup(x => x.HttpContext!.Request.Headers["X-LaboratoryId"])
-            .Returns(TestData.Lab.Id.ToString());
-
+        services.RemoveAll<ILabContext>();
+        var mock = new Mock<ILabContext>();
+        mock.SetupGet(x => x.LaboratoryId).Returns(TestData.Lab.Id);
         services.AddSingleton(_ => mock.Object);
     }
 

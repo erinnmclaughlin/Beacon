@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
+using Beacon.App.Services;
 using Beacon.Common.Requests.Projects.SampleGroups;
-using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
