@@ -5,9 +5,9 @@
         <li class="nav-item">
             <div class="d-flex align-items-center justify-content-center px-2">
                 <span class="nav-icon">
-                    <AvatarSquare Value="@CurrentLab.Name.ToUpper()[0]" FontSize="1rem" Size="1.5rem" />
+                    <AvatarSquare Value="@LabName.ToUpper()[0]" FontSize="1rem" Size="1.5rem" />
                 </span>
-                <span class="nav-text flex-grow-1 fw-bolder">@CurrentLab.Name</span>
+                <span class="nav-text flex-grow-1 fw-bolder">@LabName</span>
             </div>
         </li>
         <li class="nav-item">
@@ -39,5 +39,5 @@
 
 @code {
     [Parameter]
-    public required LaboratoryDto CurrentLab { get; set; }
+    public required string LabName { get; set; }
 }

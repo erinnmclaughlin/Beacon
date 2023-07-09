@@ -28,11 +28,11 @@ public sealed class GetCurrentUserTests : TestBase
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var currentUser = await DeserializeAsync<CurrentUserDto>(response);
+        var session = await DeserializeAsync<SessionContext>(response);
 
-        Assert.NotNull(currentUser);
-        Assert.Equal(TestData.AdminUser.Id, currentUser.Id);
-        Assert.Equal(TestData.AdminUser.DisplayName, currentUser.DisplayName);
+        Assert.NotNull(session);
+        Assert.Equal(TestData.AdminUser.Id, session.CurrentUser.Id);
+        Assert.Equal(TestData.AdminUser.DisplayName, session.CurrentUser.DisplayName);
     }
 
     protected override void AddTestData(BeaconDbContext db)

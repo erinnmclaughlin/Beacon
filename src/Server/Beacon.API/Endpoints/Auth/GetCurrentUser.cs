@@ -17,7 +17,7 @@ public sealed class GetCurrentUser : IBeaconEndpoint
         app.MapGet("users/current", new GetCurrentUserRequest()).WithTags(EndpointTags.Authentication);
     }
 
-    internal sealed class Handler : IRequestHandler<GetCurrentUserRequest, CurrentUserDto>
+    internal sealed class Handler : IRequestHandler<GetCurrentUserRequest, SessionContext>
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
@@ -30,17 +30,30 @@ public sealed class GetCurrentUser : IBeaconEndpoint
             _labContext = labContext;
         }
 
-        public async Task<CurrentUserDto> Handle(GetCurrentUserRequest request, CancellationToken ct)
+        public async Task<SessionContext> Handle(GetCurrentUserRequest request, CancellationToken ct)
         {
-            var membership = _labContext.LaboratoryId == Guid.Empty ? null : await _dbContext.Memberships
+            var currentLab = _labContext.LaboratoryId == Guid.Empty ? null : await _dbContext.Memberships
+                .Where(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == _currentUser.UserId)
                 .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == _currentUser.UserId, ct);
-
-            var membershipType = membership?.MembershipType;
+                .Select(m => new CurrentLabDto
+                {
+                    Id = m.Laboratory.Id,
+                    Name = m.Laboratory.Name,
+                    MembershipType = m.MembershipType
+                })
+                .SingleOrDefaultAsync(ct);
 
             return await _dbContext.Users
                 .Where(u => u.Id == _currentUser.UserId)
-                .Select(u => new CurrentUserDto(u.Id, u.DisplayName, membershipType))
+                .Select(u => new SessionContext
+                {
+                    CurrentUser = new CurrentUserDto
+                    {
+                        Id = u.Id,
+                        DisplayName = u.DisplayName
+                    },
+                    CurrentLab = currentLab
+                })
                 .SingleAsync(ct);
         }
     }

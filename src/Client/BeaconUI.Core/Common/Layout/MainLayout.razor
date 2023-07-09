@@ -4,9 +4,15 @@
     <AuthorizeView>
         <Authorized>
             <TopNav />
-                <main class="d-flex flex-row flex-grow-1">
+            <main class="d-flex flex-row flex-grow-1">
+                @if (context.User.GetLabName() is { Length: > 0 } labName)
+                {
+                    <LaboratorySideNav LabName="@labName" />
+                }
+                <div class="d-flex flex-column flex-grow-1">
                     @Body
-                </main>
+                </div>
+            </main>
         </Authorized>
         <NotAuthorized>@Body</NotAuthorized>
         <Authorizing>@Body</Authorizing>

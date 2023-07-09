@@ -3,4 +3,4 @@ using MediatR;
 
 namespace Beacon.Common.Requests.Auth;
 
-public sealed record GetCurrentUserRequest : IRequest<CurrentUserDto>;
+public sealed record GetCurrentUserRequest : IRequest<SessionContext>;

@@ -1,6 +1,11 @@
 ﻿<PageHeader>
     <PageHeaderContent>
-        @ChildContent
+        <AuthorizeView>
+            @if (context.User.GetCurrentLab() is { } currentLab)
+            {
+                @ChildContent?.Invoke(currentLab)
+            }
+        </AuthorizeView>
     </PageHeaderContent>
     @if (TabsContent is not null)
     {
@@ -11,7 +16,7 @@
 @code {
 
     [Parameter]
-    public RenderFragment? ChildContent { get; set; }
+    public RenderFragment<CurrentLabDto>? ChildContent { get; set; }
 
     [Parameter]
     public RenderFragment? TabsContent { get; set; }
