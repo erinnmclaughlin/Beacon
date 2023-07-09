@@ -1,4 +1,6 @@
-﻿<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+﻿@inject ICurrentUser CurrentUser
+
+<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
     <span class="icon">
         <i class="fa-solid fa-plus"></i>
     </span>
@@ -12,9 +14,6 @@
 
     [Parameter]
     public EventCallback OnProjectCreated { get; set; }
-
-    [Inject]
-    private ICurrentUser CurrentUser { get; set; } = default!;
 
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;

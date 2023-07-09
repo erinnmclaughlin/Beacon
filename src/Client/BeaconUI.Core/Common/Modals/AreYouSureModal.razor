@@ -16,11 +16,11 @@
     public required string Content { get; set; }
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private BlazoredModalInstance Modal { get; set; } = default!;
 
     private async Task Submit()
     {
-        await Modal.CloseAsync(ModalResult.Ok());
+        await Modal.CloseAsync(ModalResult.Ok(true));
     }
 
     private async Task Cancel() => await Modal.CancelAsync();

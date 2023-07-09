@@ -1,11 +1,13 @@
 ﻿@inherits LayoutComponentBase
+@inject ApiClient ApiClient
+@inject NavigationManager NavigationManager
 
 <MainLayout>
     <Body>
         @if (CurrentLab is not null)
         {
             <CascadingValue Value="CurrentLab">
-                <LaboratorySideNav />
+                <LaboratorySideNav CurrentLab="CurrentLab" />
                 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
                     @Body
                 </div>

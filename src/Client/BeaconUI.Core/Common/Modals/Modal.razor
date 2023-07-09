@@ -4,7 +4,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <h5 class="modal-title">@BlazoredModal.Title</h5>
-                <button type="button" class="btn-close" aria-label="Close" @onclick="Close"></button>
+                <button type="button" class="btn-close" @onclick="Cancel"></button>
             </div>
             @ChildContent
         </div>
@@ -14,11 +14,10 @@
 @code {
 
     [CascadingParameter] 
-    private BlazoredModalInstance BlazoredModal { get; set; } = null!;
+    private BlazoredModalInstance BlazoredModal { get; set; } = default!;
 
     [Parameter] 
     public RenderFragment? ChildContent { get; set; }
 
-    private async Task Close() => await BlazoredModal.CloseAsync(ModalResult.Ok(true));
     private async Task Cancel() => await BlazoredModal.CancelAsync();
 }

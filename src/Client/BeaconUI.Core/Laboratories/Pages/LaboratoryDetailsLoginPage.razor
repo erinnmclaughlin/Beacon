@@ -1,13 +1,11 @@
 ﻿@page "/laboratories/{Id:guid}"
 @using Blazored.LocalStorage
 @attribute [Authorize]
+@inject ILabContext LabContext
+@inject ILocalStorageService LocalStorage
+@inject NavigationManager NavigationManager
 
 @code {
-    [Inject]
-    private ILabContext LabContext { get; set; } = null!;
-
-    [Inject]
-    private ILocalStorageService LocalStorage { get; set; } = null!;
 
     [Parameter] 
     public Guid Id { get; set; }

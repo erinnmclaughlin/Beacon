@@ -1,10 +1,14 @@
-﻿<table class="table align-middle">
+﻿@inject ApiClient ApiClient
+@inject ICurrentUser CurrentUser
+@inject IModalService ModalService
+
+<table class="table align-middle">
     <thead>
         <tr>
             <th>Name</th>
             <th>Email Address</th>
             <th>Phone Number</th>
-            @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+            @if (CurrentUser.MembershipType >= LaboratoryMembershipType.Analyst)
             {
                 <th style="width: 0%"></th>
             }
@@ -60,7 +64,7 @@
                             <text>@contact.PhoneNumber</text>
                         }
                     </td>
-                    @if (CurrentLab.MyMembershipType >= LaboratoryMembershipType.Analyst)
+                    @if (CurrentUser.MembershipType >= LaboratoryMembershipType.Analyst)
                     {
                         <td>
                             <div class="dropdown">
@@ -104,12 +108,6 @@
 </button>
 
 @code {
-
-    [CascadingParameter]
-    public required LaboratoryDto CurrentLab { get; set; }
-
-    [CascadingParameter]
-    private IModalService ModalService { get; set; } = null!;
 
     [Parameter, EditorRequired] 
     public required ProjectDto Project { get; set; }

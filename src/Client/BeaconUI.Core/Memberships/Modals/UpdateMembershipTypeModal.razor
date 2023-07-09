@@ -1,4 +1,7 @@
-﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿@inject ApiClient ApiClient
+@inject ICurrentUser CurrentUser
+
+<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             @if (CurrentUser.MembershipType < LaboratoryMembershipType.Manager)
@@ -30,3 +33,38 @@
         </footer>
     </Modal>
 </BeaconForm>
+
+@code {
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    [Parameter]
+    public required LaboratoryMemberDto MemberToUpdate { get; set; }
+
+    private UpdateMembershipRequest? _model;
+    private UpdateMembershipRequest Model => _model ??= new()
+        {
+            MemberId = MemberToUpdate.Id,
+            MembershipType = MemberToUpdate.MembershipType
+        };
+
+    private async Task Submit(BeaconForm form)
+    {
+        var result = await ApiClient.UpdateMembershipType(Model);
+
+        if (result.IsError)
+        {
+            form.AddErrors(result.Errors);
+            return;
+        }
+
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+
+    private bool IsDisabled(LaboratoryMembershipType targetType)
+    {
+        return CurrentUser.MembershipType is null or < LaboratoryMembershipType.Manager
+            || CurrentUser.MembershipType <= targetType;
+    }
+}

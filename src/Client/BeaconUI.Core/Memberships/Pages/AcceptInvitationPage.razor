@@ -1,5 +1,7 @@
 ﻿@page "/invitations/{EmailId:guid}/accept"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject ApiClient ApiClient
+@inject NavigationManager NavigationManager
 
 @code {
 

@@ -1,14 +1,12 @@
-﻿<CascadingValue Value="this">
+﻿@inject ApiClient ApiClient
+@inject ICurrentUser CurrentUser
+@inject IModalService ModalService
+
+<CascadingValue Value="this">
     @ChildContent?.Invoke(this)
 </CascadingValue>
 
 @code {
-
-    [Inject]
-    private ICurrentUser CurrentUser { get; set; } = default!;
-
-    [CascadingParameter]
-    public required IModalService ModalService { get; set; }
 
     [Parameter]
     public RenderFragment<MembershipContext>? ChildContent { get; set; }

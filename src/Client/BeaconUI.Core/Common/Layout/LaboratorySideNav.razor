@@ -38,6 +38,6 @@
 </SideNav>
 
 @code {
-    [CascadingParameter]
-    private LaboratoryDto CurrentLab { get; set; } = null!;
+    [Parameter]
+    public required LaboratoryDto CurrentLab { get; set; }
 }
