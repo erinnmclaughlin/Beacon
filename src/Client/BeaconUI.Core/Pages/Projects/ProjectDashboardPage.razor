@@ -3,17 +3,17 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent>
-        <h3 class="mb-0">@CurrentLab.Name</h3>
-    </TitleContent>
-    <ButtonsContent>
+    <div class="flex-grow-1">
+        <h4>Projects</h4>
+    </div>
+    <div>
         <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(CurrentLab.MyMembershipType is LaboratoryMembershipType.Member)">
             <span class="icon">
                 <i class="fa-solid fa-plus"></i>
             </span>
             <span>Create project</span>
         </button>
-    </ButtonsContent>
+    </div>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">

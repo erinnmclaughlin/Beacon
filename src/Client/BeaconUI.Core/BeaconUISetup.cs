@@ -1,5 +1,4 @@
 ﻿using Beacon.Common.Services;
-using BeaconUI.Core.Clients;
 using BeaconUI.Core.Services;
 using Blazored.LocalStorage;
 using Blazored.Modal;

@@ -6,10 +6,9 @@ using Beacon.Common.Requests.Memberships;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Requests.Projects.Contacts;
 using Beacon.Common.Requests.Projects.SampleGroups;
-using BeaconUI.Core.Helpers;
 using ErrorOr;
 
-namespace BeaconUI.Core.Clients;
+namespace BeaconUI.Core.Services;
 
 public sealed class ApiClient
 {

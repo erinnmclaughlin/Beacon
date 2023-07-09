@@ -1,6 +1,4 @@
-﻿@using Beacon.Common.Requests.Projects
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="row">
@@ -16,27 +14,11 @@
                 </div>
                 <div class="field">
                     <label class="form-label" for="member">Lead Analyst</label>
-                    <InputSelect @bind-Value="Model.LeadAnalystId" class="form-control" id="member">
+                    <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
                         <option>None</option>
-                        @if (ErrorOrMembers == null)
-                        {
-                            <option disabled>Loading...</option>
-                        }
-                        else if (ErrorOrMembers.Value.IsError)
-                        {
-                            <option disabled class="text-danger">There was an error loading laboratory members</option>
-                        }
-                        else if (GetPotentialLeads(ErrorOrMembers.Value.Value) is not { Count: > 0} analysts)
-                        {
-                            <option disabled>There are no available analysts to assign to this project.</option>
-                        }
-                        else
-                        {
-                            foreach (var a in analysts)
-                            {
-                                <option value="@a.Id">@a.DisplayName</option>
-                            }
-                        }
+                        <LaboratoryMemberListGroup Context="member" Filter="m => m.MembershipType != LaboratoryMembershipType.Member">
+                            <option value="@member.Id">@member.DisplayName</option>
+                        </LaboratoryMemberListGroup>
                     </InputSelect>
                     <ValidationMessage For="() => Model.LeadAnalystId" />
                 </div>
@@ -55,13 +37,6 @@
     private BlazoredModalInstance Modal { get; set; } = null!;
 
     private CreateProjectRequest Model { get; } = new();
-
-    private ErrorOr<LaboratoryMemberDto[]>? ErrorOrMembers { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        ErrorOrMembers = await ApiClient.GetLaboratoryMembers();
-    }
 
     private async Task Submit(BeaconForm formContext)
     {

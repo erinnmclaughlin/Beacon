@@ -1,12 +1,11 @@
 ﻿@page "/l/projects/{Code}/{Tab?}"
-@using Beacon.Common.Requests.Projects;
 @attribute [Authorize]
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent>
-        <h3 class="mb-0">@CurrentLab.Name</h3>
-    </TitleContent>
+    <ChildContent>
+        <h4>Project Details</h4>
+    </ChildContent>
     <TabsContent>
         <li class="nav-item">
             <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
@@ -40,26 +39,7 @@
         }
         else
         {
-            <p>This is the project details page for project @Code.</p>
-
-            <div class="field" style="max-width: 300px">
-                <label class="form-label" for="analyst">Lead Analyst</label>
-                <select @onchange="(e) => HandleLeadAnalystChanged(p.Value.Id, e)" disabled="@(LabMembers == null || LabMembers.Value.IsError)" class="form-select">
-                    @if (LabMembers == null || LabMembers.Value.IsError) @* TODO: display error *@
-                    {
-                        <option value="@Guid.Empty">Loading...</option>
-                    }
-                    else
-                    {
-                        <option selected="@(p.Value.LeadAnalyst == null)">None</option>
-                        @foreach (var a in LabMembers.Value.Value)
-                        {
-                            <option value="@a.Id" selected="@(p.Value.LeadAnalyst?.Id == a.Id)">@a.DisplayName</option>
-                        }
-                    }
-
-                </select>
-            </div>
+            <ProjectOverview Project="p.Value" ProjectChanged="(p) => Project = p" />
         }
     </div>
 </div>

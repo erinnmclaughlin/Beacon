@@ -2,7 +2,7 @@
 using ErrorOr;
 using System.Net.Http.Json;
 
-namespace BeaconUI.Core.Helpers;
+namespace BeaconUI.Core.Services;
 
 public static class HttpClientFactoryExtensions
 {

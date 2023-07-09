@@ -1,6 +1,5 @@
 ﻿using Beacon.Common.Models;
 using Beacon.Common.Services;
-using BeaconUI.Core.Clients;
 using Blazored.LocalStorage;
 
 namespace BeaconUI.Core.Services;

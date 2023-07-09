@@ -4,7 +4,7 @@ using ErrorOr;
 using System.Net;
 using System.Net.Http.Json;
 
-namespace BeaconUI.Core.Helpers;
+namespace BeaconUI.Core.Services;
 
 public static class HttpResponseMessageExtensions
 {
@@ -24,7 +24,7 @@ public static class HttpResponseMessageExtensions
             return result is null ? Error.Unexpected() : result;
         }
 
-        return await GetErrorResult<T>(response, ct);        
+        return await response.GetErrorResult<T>(ct);
     }
 
     private static async Task<ErrorOr<T>> GetErrorResult<T>(this HttpResponseMessage response, CancellationToken ct = default)

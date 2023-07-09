@@ -3,17 +3,17 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <TitleContent>
-        <h3 class="mb-0">@CurrentLab.Name</h3>
-    </TitleContent>   
-    <ButtonsContent>
+    <div class="flex-grow-1">
+        <h4>Members</h4>
+    </div>
+    <div>
         <button type="button" class="btn btn-primary" disabled="@(CurrentLab.MyMembershipType is not LaboratoryMembershipType.Admin and not LaboratoryMembershipType.Manager)" @onclick="ShowInviteMemberModal">
             <span class="icon">
                 <i class="fa-solid fa-user-plus"></i>
             </span>
             <span>Invite member</span>
         </button>
-    </ButtonsContent>
+    </div>
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
