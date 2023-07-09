@@ -20,18 +20,26 @@ public sealed class GetCurrentUser : IBeaconEndpoint
     {
         private readonly ICurrentUser _currentUser;
         private readonly BeaconDbContext _dbContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext)
+        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;
+            _labContext = labContext;
         }
 
         public async Task<CurrentUserDto> Handle(GetCurrentUserRequest request, CancellationToken ct)
         {
+            var membership = _labContext.LaboratoryId == Guid.Empty ? null : await _dbContext.Memberships
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == _currentUser.UserId, ct);
+
+            var membershipType = membership?.MembershipType;
+
             return await _dbContext.Users
                 .Where(u => u.Id == _currentUser.UserId)
-                .Select(u => new CurrentUserDto(u.Id, u.DisplayName))
+                .Select(u => new CurrentUserDto(u.Id, u.DisplayName, membershipType))
                 .SingleAsync(ct);
         }
     }

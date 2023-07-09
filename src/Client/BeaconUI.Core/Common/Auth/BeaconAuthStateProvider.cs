@@ -1,4 +1,4 @@
-﻿using Beacon.Common;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Services;
 using BeaconUI.Core.Common.Http;
 using Microsoft.AspNetCore.Components.Authorization;
@@ -12,14 +12,8 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
 
     private ClaimsPrincipal? ClaimsPrincipal { get; set; }
 
-    public Guid UserId
-    {
-        get
-        {
-            var idValue = ClaimsPrincipal?.FindFirst(BeaconClaimTypes.UserId)?.Value;
-            return Guid.TryParse(idValue, out var id) ? id : Guid.Empty;
-        }
-    }
+    public Guid UserId => ClaimsPrincipal?.GetUserId() ?? Guid.Empty;
+    public LaboratoryMembershipType? MembershipType => ClaimsPrincipal?.GetMembershipType();
 
     public BeaconAuthStateProvider(ApiClient apiClient)
     {

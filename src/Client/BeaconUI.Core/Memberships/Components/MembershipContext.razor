@@ -5,10 +5,7 @@
 @code {
 
     [Inject]
-    private ICurrentUser CurrentUser { get; set; } = null!;
-
-    [CascadingParameter]
-    public required LaboratoryDto CurrentLab { get; set; }
+    private ICurrentUser CurrentUser { get; set; } = default!;
 
     [CascadingParameter]
     public required IModalService ModalService { get; set; }
@@ -25,20 +22,20 @@
 
     public bool CanManagePermissions()
     {
-        return CurrentLab.MyMembershipType is { } and >= LaboratoryMembershipType.Manager;
+        return CurrentUser.MembershipType is { } and >= LaboratoryMembershipType.Manager;
     }
 
     public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
         return CanManagePermissions()
             && memberToUpdate.Id != CurrentUser.UserId
-            && CurrentLab.MyMembershipType >= memberToUpdate.MembershipType;
+            && CurrentUser.MembershipType is not null 
+            && CurrentUser.MembershipType >= memberToUpdate.MembershipType;
     }
 
     public async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)
     {
         var modalParameters = new ModalParameters()
-            .Add(nameof(UpdateMembershipTypeModal.CurrentLab), CurrentLab)
             .Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
 
         var result = await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;

@@ -1,5 +1,6 @@
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
+using Beacon.Common.Services;
 using BeaconUI.Core.Common.Forms;
 using Blazored.Modal;
 using Blazored.Modal.Services;
@@ -9,11 +10,11 @@ namespace BeaconUI.Core.Memberships.Modals;
 
 public partial class UpdateMembershipTypeModal
 {
+    [Inject]
+    private ICurrentUser CurrentUser { get; set; } = null!;
+
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = null!;
-
-    [Parameter]
-    public required LaboratoryDto CurrentLab { get; set; }
 
     [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }
@@ -40,12 +41,7 @@ public partial class UpdateMembershipTypeModal
 
     private bool IsDisabled(LaboratoryMembershipType targetType)
     {
-        if (CurrentLab.MyMembershipType is LaboratoryMembershipType.Admin)
-            return false;
-
-        if (CurrentLab.MyMembershipType is not LaboratoryMembershipType.Manager)
-            return true;
-
-        return MemberToUpdate.MembershipType is LaboratoryMembershipType.Admin || targetType is LaboratoryMembershipType.Admin;
+        return CurrentUser.MembershipType is null or < LaboratoryMembershipType.Manager
+            || CurrentUser.MembershipType <= targetType;
     }
 }

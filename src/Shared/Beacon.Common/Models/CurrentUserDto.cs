@@ -2,7 +2,7 @@
 
 namespace Beacon.Common.Models;
 
-public sealed record CurrentUserDto(Guid Id, string DisplayName)
+public sealed record CurrentUserDto(Guid Id, string DisplayName, LaboratoryMembershipType? MembershipType)
 {
     public ClaimsPrincipal ToClaimsPrincipal()
     {
@@ -13,6 +13,9 @@ public sealed record CurrentUserDto(Guid Id, string DisplayName)
             new Claim(BeaconClaimTypes.UserId, Id.ToString()),
             new Claim(BeaconClaimTypes.DisplayName, DisplayName)
         });
+
+        if (MembershipType != null)
+            identity.AddClaim(BeaconClaimTypes.MembershipType, MembershipType.Value.ToString());
 
         return new ClaimsPrincipal(identity);
     }

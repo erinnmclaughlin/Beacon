@@ -1,4 +1,4 @@
-﻿<button type="button" class="btn btn-primary" disabled="@IsDisabled" @onclick="ShowInviteMemberModal">
+﻿<button type="button" disabled="@IsDisabled" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
     <span class="icon">
         <i class="fa-solid fa-user-plus"></i>
     </span>
@@ -7,18 +7,16 @@
 
 @code {
 
-    [CascadingParameter]
-    private LaboratoryDto CurrentLab { get; set; } = default!;
+    [Inject]
+    private ICurrentUser CurrentUser { get; set; } = default!;
 
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
 
-    private bool IsDisabled { get; set; } = true;
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
 
-    protected override void OnParametersSet()
-    {
-        IsDisabled = CurrentLab.MyMembershipType < LaboratoryMembershipType.Manager;
-    }
+    private bool IsDisabled => CurrentUser.MembershipType is null or < LaboratoryMembershipType.Manager;
 
     private async Task ShowInviteMemberModal()
     {
