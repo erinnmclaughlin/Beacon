@@ -1,0 +1,30 @@
+﻿@inherits LayoutComponentBase
+
+<MainLayout>
+    <Body>
+        @if (CurrentLab is not null)
+        {
+            <CascadingValue Value="CurrentLab">
+                <LaboratorySideNav />
+                <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+                    @Body
+                </div>
+            </CascadingValue>
+        }
+    </Body>
+</MainLayout>
+
+@code {
+
+    private LaboratoryDto? CurrentLab { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var result = await ApiClient.GetCurrentLaboratory();
+
+        result.Switch(
+            value => CurrentLab = value,
+            error => NavigationManager.NavigateTo("")
+        );
+    }
+}

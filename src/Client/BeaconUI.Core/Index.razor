@@ -1,0 +1,53 @@
+﻿@page "/"
+@using BeaconUI.Core.Laboratories.Components
+@using BeaconUI.Core.Laboratories.Modals
+@attribute [Authorize]
+
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
+            <div class="d-flex align-items-center">
+                <div class="flex-grow-1">
+                    <h3>My Laboratories</h3>
+                </div>
+                <div>
+                    <button type="button" class="btn btn-primary" @onclick="ShowCreateLabModal">
+                        <span class="icon">
+                            <i class="fa-solid fa-plus"></i>
+                        </span>
+                        <span>New lab</span>
+                    </button>
+                </div>
+            </div>
+
+            <MyLaboratoriesTable Laboratories="Laboratories" />
+        </div>
+    </div>
+</div>
+
+@code {
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = null!;
+
+    private LaboratoryDto[]? Laboratories { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMyLaboratories();
+    }
+
+    private async Task LoadMyLaboratories()
+    {
+        var errorOrLaboratories = await ApiClient.GetMyLaboratories();
+        Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;        
+    }
+
+    private async Task ShowCreateLabModal()
+    {
+        var result = await ModalService.Show<CreateLaboratoryModal>("Create New Lab").Result;
+
+        if (result.Confirmed)
+            await LoadMyLaboratories();
+    }
+}

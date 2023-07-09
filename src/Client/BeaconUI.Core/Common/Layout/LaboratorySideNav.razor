@@ -1,0 +1,43 @@
+﻿@using BeaconUI.Core.Laboratories.Components
+
+<SideNav>
+    <ul class="navbar-nav flex-column">
+        <li class="nav-item">
+            <div class="d-flex align-items-center justify-content-center px-2">
+                <span class="nav-icon">
+                    <AvatarSquare Value="@CurrentLab.Name.ToUpper()[0]" FontSize="1rem" Size="1.5rem" />
+                </span>
+                <span class="nav-text flex-grow-1 fw-bolder">@CurrentLab.Name</span>
+            </div>
+        </li>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" href="l" class="nav-link d-flex align-items-center justify-content-center">
+                <span class="nav-icon">
+                    <i class="fa-regular fa-chart-line"></i>
+                </span>
+                <span class="nav-text flex-grow-1">Overview</span>
+            </NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink href="l/projects" class="nav-link d-flex align-items-center justify-content-center">
+                <span class="nav-icon">
+                    <i class="fa-light fa-table-tree"></i>
+                </span>
+                <span class="nav-text flex-grow-1">Projects</span>
+            </NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink href="l/members" class="nav-link d-flex align-items-center justify-content-center">
+                <span class="nav-icon">
+                    <i class="fa-light fa-users"></i>
+                </span>
+                <span class="nav-text flex-grow-1">Members</span>
+            </NavLink>
+        </li>
+    </ul>
+</SideNav>
+
+@code {
+    [CascadingParameter]
+    private LaboratoryDto CurrentLab { get; set; } = null!;
+}

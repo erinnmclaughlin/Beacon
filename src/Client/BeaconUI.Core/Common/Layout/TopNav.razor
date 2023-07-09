@@ -1,0 +1,39 @@
+﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
+@inject AuthService AuthService
+
+<AuthorizeView>
+    <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="">Beacon LMS</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="icon">
+                    <i class="fa-solid fa-bars"></i>
+                </span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+                    <li class="nav-item dropdown text-end-lg">
+                        <a href="#" class="nav-link dropdown-toggle" data-test-id="profileDropdown" data-bs-toggle="dropdown" aria-expanded="false" @onclick="() => { }">
+                            <span>@context.User.Identity?.Name</span>
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end text-small">
+                            <li>
+                                <button class="dropdown-item" data-test-id="logoutButton" type="button" @onclick="Logout">
+                                    Sign out
+                                </button>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+</AuthorizeView>
+
+@code {
+    private async Task Logout()
+    {
+        await AuthService.LogoutAsync();
+        NavigationManager.NavigateToLogin("login");
+    }
+}

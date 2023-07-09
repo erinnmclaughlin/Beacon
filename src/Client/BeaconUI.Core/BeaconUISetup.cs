@@ -1,5 +1,7 @@
 ﻿using Beacon.Common.Services;
-using BeaconUI.Core.Services;
+using BeaconUI.Core.Common.Auth;
+using BeaconUI.Core.Common.Http;
+using BeaconUI.Core.Laboratories;
 using Blazored.LocalStorage;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Authorization;
