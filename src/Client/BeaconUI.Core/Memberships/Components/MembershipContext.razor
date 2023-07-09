@@ -25,7 +25,7 @@
 
     public bool CanManagePermissions()
     {
-        return CurrentLab.MyMembershipType >= LaboratoryMembershipType.Manager;
+        return CurrentLab.MyMembershipType is { } and >= LaboratoryMembershipType.Manager;
     }
 
     public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)

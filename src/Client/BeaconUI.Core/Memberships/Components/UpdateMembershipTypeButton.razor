@@ -1,5 +1,7 @@
-﻿<button type="button" disabled="@IsDisabled" @onclick="ShowModal" @attributes="@Attributes">
-    <span class="icon text-primary">
+﻿@inherits ButtonBase
+
+<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+    <span class="icon @(IsDisabled ? "" : "text-primary")">
         <i class="fa-regular fa-pencil"></i>
     </span>
     <span>Manage Permissions</span>
@@ -7,15 +9,12 @@
 
 @code {
 
-    [Parameter]
-    public IDictionary<string, object?>? Attributes { get; set; }
-
     [Parameter, EditorRequired]
     public required LaboratoryMemberDto Member { get; set; }
 
     [CascadingParameter]
     private MembershipContext Context { get; set; } = default!;
 
-    private bool IsDisabled => !Context.CanManagePermissions(Member);
-    private Task ShowModal() => Context.ShowManagePermissionsModal(Member);
+    protected override bool IsDisabled => !Context.CanManagePermissions(Member);
+    protected override Task Click() => Context.ShowManagePermissionsModal(Member);
 }

@@ -1,0 +1,32 @@
+﻿@inherits ButtonBase
+
+<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Create project</span>
+</button>
+
+@code {
+
+    [Parameter]
+    public EventCallback OnProjectCreated { get; set; }
+
+    [CascadingParameter]
+    private LaboratoryDto CurrentLab { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
+
+    protected override bool IsDisabled => CurrentLab.MyMembershipType is not { } or < LaboratoryMembershipType.Analyst;
+
+    protected override async Task Click()
+    {
+        var result = await ModalService.Show<CreateProjectModal>("Create New Project").Result;
+
+        if (!result.Cancelled)
+        {
+            await OnProjectCreated.InvokeAsync();
+        }
+    }
+}

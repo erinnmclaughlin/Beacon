@@ -3,17 +3,8 @@
 @layout LaboratoryLayout
 
 <LaboratoryPageHeader>
-    <div class="flex-grow-1">
-        <h4>Projects</h4>
-    </div>
-    <div>
-        <button type="button" class="btn btn-primary" @onclick="ShowCreateProjectsModal" disabled="@(CurrentLab.MyMembershipType is LaboratoryMembershipType.Member)">
-            <span class="icon">
-                <i class="fa-solid fa-plus"></i>
-            </span>
-            <span>Create project</span>
-        </button>
-    </div>
+    <h4 class="mb-0 me-auto">Projects</h4>
+    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-primary" />
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
@@ -134,17 +125,6 @@
     protected override async Task OnInitializedAsync()
     {
         await LoadProjects();
-    }
-
-    private async Task ShowCreateProjectsModal()
-    {
-        var result = await ModalService.Show<CreateProjectModal>("Create New Project").Result;
-
-        if (!result.Cancelled)
-        {
-            ProjectsOrError = null;
-            await LoadProjects();
-        }
     }
 
     private async Task LoadProjects()
