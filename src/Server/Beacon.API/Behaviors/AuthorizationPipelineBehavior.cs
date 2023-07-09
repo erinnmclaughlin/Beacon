@@ -10,17 +10,13 @@ namespace Beacon.API.Behaviors;
 
 public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
-    private readonly ICurrentUser _currentUser;
-    private readonly ILabContext _labContext;
-
     private readonly IEnumerable<IAuthorizer<TRequest>> _authorizers;
+    private readonly ICurrentUser _currentUser;
 
     public AuthorizationPipelineBehavior(IEnumerable<IAuthorizer<TRequest>> authorizers, ICurrentUser currentUser, ILabContext labContext)
     {
         _authorizers = authorizers;
-
         _currentUser = currentUser;
-        _labContext = labContext;
     }
 
     public async Task Process(TRequest request, CancellationToken ct)
@@ -28,7 +24,7 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
         if (_currentUser.UserId == Guid.Empty && !AllowsAnonymous())
             throw new UnauthorizedAccessException();
 
-        if (HasMembershipRequirement(out var allowedRoles) && !await CurrentUserIsMember(allowedRoles, ct))
+        if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
             throw new UserNotAllowedException();
 
         foreach (var authorizer in _authorizers)
@@ -50,9 +46,8 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
         return requirement is not null;
     }
 
-    private async Task<bool> CurrentUserIsMember(LaboratoryMembershipType[] types, CancellationToken ct)
+    private bool CurrentUserIsMember(LaboratoryMembershipType[] types)
     {
-        var type = await _labContext.GetMembershipTypeAsync(_currentUser.UserId, ct);
-        return type is not null && types.Contains(type.Value);
+        return _currentUser.MembershipType is { } type && types.Contains(type);
     }
 }

@@ -37,8 +37,7 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
                 {
                     Id = m.Laboratory.Id,
                     Name = m.Laboratory.Name,
-                    MyMembershipType = m.MembershipType,
-                    MemberCount = m.Laboratory.Memberships.Count()
+                    MemberCount = m.Laboratory.Memberships.Count
                 })
                 .ToArrayAsync(ct);
         }

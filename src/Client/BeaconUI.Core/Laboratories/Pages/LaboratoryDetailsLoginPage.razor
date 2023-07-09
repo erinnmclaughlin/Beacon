@@ -1,8 +1,6 @@
 ﻿@page "/laboratories/{Id:guid}"
-@using Blazored.LocalStorage
 @attribute [Authorize]
-@inject ILabContext LabContext
-@inject ILocalStorageService LocalStorage
+@inject ApiClient ApiClient
 @inject NavigationManager NavigationManager
 
 @code {
@@ -12,7 +10,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await LocalStorage.SetItemAsync("CurrentLaboratoryId", Id);
+        await ApiClient.SetCurrentLaboratory(Id);
         NavigationManager.NavigateTo("l", replace: true);
     }
 }

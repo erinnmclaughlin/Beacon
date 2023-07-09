@@ -2,6 +2,7 @@
 using Beacon.App.Entities;
 using Beacon.App.Services;
 using Beacon.App.Settings;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Services;
 using FluentValidation;
@@ -18,6 +19,23 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost<CreateEmailInvitationRequest>("invitations").WithTags(EndpointTags.Invitations);
+    }
+
+    public sealed class Authorizer : IAuthorizer<CreateEmailInvitationRequest>
+    {
+        private readonly ICurrentUser _currentUser;
+
+        public Authorizer(ICurrentUser currentUser)
+        {
+            _currentUser = currentUser;
+        }
+
+        public Task<bool> IsAuthorizedAsync(CreateEmailInvitationRequest request, CancellationToken ct = default)
+        {
+            // only admins can invite other admins:
+            return Task.FromResult(request.MembershipType is not LaboratoryMembershipType.Admin ||
+                _currentUser.MembershipType is LaboratoryMembershipType.Admin);
+        }
     }
 
     public sealed class Validator : AbstractValidator<CreateEmailInvitationRequest>

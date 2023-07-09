@@ -61,7 +61,15 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<LaboratoryDto>> GetCurrentLaboratory()
     {
-        return await _httpClientFactory.GetAsync<LaboratoryDto>($"api/laboratories/current");
+        return await _httpClientFactory.GetAsync<LaboratoryDto>("api/laboratories/current");
+    }
+
+    public async Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
+    {
+        return await _httpClientFactory.PostAsync("api/laboratories/current", new SetCurrentLaboratoryRequest
+        {
+            LaboratoryId = id
+        });
     }
 
     public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
