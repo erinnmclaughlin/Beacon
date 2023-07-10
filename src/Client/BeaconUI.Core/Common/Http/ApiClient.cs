@@ -6,6 +6,7 @@ using Beacon.Common.Requests.Memberships;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Requests.Projects.Contacts;
 using Beacon.Common.Requests.Projects.SampleGroups;
+using Beacon.Common.Services;
 using ErrorOr;
 
 namespace BeaconUI.Core.Common.Http;

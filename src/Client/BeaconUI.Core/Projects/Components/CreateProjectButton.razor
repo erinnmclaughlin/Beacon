@@ -1,6 +1,4 @@
-﻿@inject ICurrentUser CurrentUser
-
-<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+﻿<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
     <span class="icon">
         <i class="fa-solid fa-plus"></i>
     </span>
@@ -16,9 +14,12 @@
     public EventCallback OnProjectCreated { get; set; }
 
     [CascadingParameter]
+    private ILabContext LabContext { get; set; } = default!;
+
+    [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
 
-    private bool IsDisabled => CurrentUser.MembershipType is null or <= LaboratoryMembershipType.Analyst;
+    private bool IsDisabled => LabContext.CurrentLab.MembershipType <= LaboratoryMembershipType.Analyst;
 
     private async Task Click()
     {

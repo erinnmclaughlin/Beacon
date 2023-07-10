@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.App.Services;
 using Beacon.Common.Requests.Projects.SampleGroups;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -42,7 +42,7 @@ public sealed class CreateSampleGroup : IBeaconEndpoint
             {
                 Id = Guid.NewGuid(),
                 ProjectId = request.ProjectId,
-                LaboratoryId = _labContext.LaboratoryId,
+                LaboratoryId = _labContext.CurrentLab.Id,
                 SampleName = request.SampleName,
                 ContainerType = request.ContainerType,
                 IsHazardous = request.IsHazardous,

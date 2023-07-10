@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
-using Beacon.Common.Models;
+using Beacon.App.Exceptions;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
 using MediatR;
@@ -19,11 +19,11 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<SetCurrentLaboratoryRequest>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ISessionContext _currentUser;
         private readonly BeaconDbContext _dbContext;
         private readonly ISignInManager _signInManager;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ISignInManager signInManager)
+        public Handler(ISessionContext currentUser, BeaconDbContext dbContext, ISignInManager signInManager)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;
@@ -32,31 +32,17 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
 
         public async Task Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
         {
-            var currentLab = request.LaboratoryId is null ? null : await _dbContext.Memberships
+            var newContext = await _dbContext.Memberships
                 .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _currentUser.UserId)
-                .Select(m => new CurrentLabDto
+                .Select(m => new SessionContext
                 {
-                    Id = m.Laboratory.Id,
-                    Name = m.Laboratory.Name,
-                    MembershipType = m.MembershipType
+                    CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
+                    CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
                 })
-                .SingleAsync(ct);
+                .SingleOrDefaultAsync(ct)
+                ?? throw new UserNotAllowedException("The current user is not a member of the specified lab.");
 
-            var sessionInfo = await _dbContext.Users
-                .Where(u => u.Id == _currentUser.UserId)
-                .Select(u => new SessionContext
-                {
-                    CurrentLab = currentLab,
-                    CurrentUser = new()
-                    {
-                        Id = u.Id,
-                        DisplayName = u.DisplayName
-                    }
-                })
-                .AsNoTracking()
-                .SingleAsync(ct);
-
-            await _signInManager.SignInAsync(sessionInfo.ToClaimsPrincipal());
+            await _signInManager.SignInAsync(newContext.ToClaimsPrincipal());
         }
     }
 }

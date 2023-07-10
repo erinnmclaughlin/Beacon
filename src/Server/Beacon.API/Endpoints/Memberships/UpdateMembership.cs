@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
 using Beacon.Common.Requests.Memberships;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -29,7 +29,7 @@ public sealed class UpdateMembership : IBeaconEndpoint
         public async Task Handle(UpdateMembershipRequest request, CancellationToken ct)
         {
             var member = await _dbContext.Memberships
-                .SingleAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == request.MemberId, ct);
+                .SingleAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.MemberId == request.MemberId, ct);
 
             member.MembershipType = request.MembershipType;
             await _dbContext.SaveChangesAsync(ct);

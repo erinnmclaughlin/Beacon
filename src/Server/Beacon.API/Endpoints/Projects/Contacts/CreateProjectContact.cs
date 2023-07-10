@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Endpoints;
 using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.App.Services;
 using Beacon.Common.Requests.Projects.Contacts;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -45,7 +45,7 @@ public sealed class CreateProjectContact : IBeaconEndpoint
                 Name = request.Name,
                 EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress,
                 PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
-                LaboratoryId = _labContext.LaboratoryId,
+                LaboratoryId = _labContext.CurrentLab.Id,
                 ProjectId = request.ProjectId
             });
 

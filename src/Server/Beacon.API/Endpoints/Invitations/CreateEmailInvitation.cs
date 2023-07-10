@@ -39,7 +39,7 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
         private async Task<bool> NotBeAnExistingMember(CreateEmailInvitationRequest request, string email, CancellationToken ct)
         {
             var isAMember = await _dbContext.Memberships
-                .AnyAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.Member.EmailAddress == email, ct);
+                .AnyAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.Member.EmailAddress == email, ct);
 
             return !isAMember;
         }
@@ -48,34 +48,26 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
     internal sealed class CommandHandler : IRequestHandler<CreateEmailInvitationRequest>
     {
         private readonly ApplicationSettings _appSettings;
-        private readonly ICurrentUser _currentUser;
+        private readonly ILabContext _context;
         private readonly BeaconDbContext _dbContext;
         private readonly IEmailService _emailService;
-        private readonly ILabContext _labContext;
 
-        public CommandHandler(IOptions<ApplicationSettings> appSettings, ICurrentUser currentUser, BeaconDbContext dbContext, IEmailService emailService, ILabContext labContext)
+        public CommandHandler(IOptions<ApplicationSettings> appSettings, ILabContext context, BeaconDbContext dbContext, IEmailService emailService)
         {
             _appSettings = appSettings.Value;
-            _currentUser = currentUser;
+            _context = context;
             _dbContext = dbContext;
             _emailService = emailService;
-            _labContext = labContext;
         }
 
         public async Task Handle(CreateEmailInvitationRequest request, CancellationToken ct)
         {
-            if (_currentUser.MembershipType < request.MembershipType)
+            if (_context.CurrentLab?.MembershipType is not { } type || type < request.MembershipType)
                 throw new UserNotAllowedException();
 
-            var user = await GetCurrentUser(ct);
+            var user = await _dbContext.Users.SingleAsync(x => x.Id == _context.CurrentUser.Id, ct);
             var invitation = await CreateInvitation(request, user, ct);
             await SendAsync(invitation, ct);
-        }
-
-        private async Task<User> GetCurrentUser(CancellationToken ct)
-        {
-            var id = _currentUser.UserId;
-            return await _dbContext.Users.SingleAsync(x => x.Id == id, ct);
         }
 
         private async Task<InvitationEmail> CreateInvitation(CreateEmailInvitationRequest request, User currentUser, CancellationToken ct)
@@ -89,8 +81,8 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
                 ExpireAfterDays = 10, // TODO: make this configurable
                 NewMemberEmailAddress = request.NewMemberEmailAddress,
                 MembershipType = request.MembershipType,
-                Laboratory = await _dbContext.Laboratories.SingleAsync(x => x.Id == _labContext.LaboratoryId, ct),
-                LaboratoryId = _labContext.LaboratoryId,
+                Laboratory = await _dbContext.Laboratories.SingleAsync(x => x.Id == _context.CurrentLab.Id, ct),
+                LaboratoryId = _context.CurrentLab.Id,
                 CreatedById = currentUser.Id,
                 CreatedBy = currentUser
             };

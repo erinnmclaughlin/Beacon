@@ -1,5 +1,5 @@
 ﻿@inject ApiClient ApiClient
-@inject ICurrentUser CurrentUser
+@inject ISessionContext CurrentUser
 @inject IModalService ModalService
 
 <CascadingValue Value="this">
@@ -7,6 +7,8 @@
 </CascadingValue>
 
 @code {
+    [CascadingParameter]
+    private ILabContext LabContext { get; set; } = default!;
 
     [Parameter]
     public RenderFragment<MembershipContext>? ChildContent { get; set; }
@@ -20,15 +22,14 @@
 
     public bool CanManagePermissions()
     {
-        return CurrentUser.MembershipType is { } and >= LaboratoryMembershipType.Manager;
+        return LabContext.CurrentLab.MembershipType >= LaboratoryMembershipType.Manager;
     }
 
     public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
         return CanManagePermissions()
             && memberToUpdate.Id != CurrentUser.UserId
-            && CurrentUser.MembershipType is not null 
-            && CurrentUser.MembershipType >= memberToUpdate.MembershipType;
+            && LabContext.CurrentLab.MembershipType >= memberToUpdate.MembershipType;
     }
 
     public async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)

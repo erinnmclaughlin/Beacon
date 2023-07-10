@@ -1,5 +1,4 @@
 ﻿@inject ApiClient ApiClient
-@inject ICurrentUser CurrentUser
 @inject IModalService ModalService
 
 <table class="table align-middle">
@@ -8,10 +7,9 @@
             <th>Name</th>
             <th>Email Address</th>
             <th>Phone Number</th>
-            @if (CurrentUser.MembershipType >= LaboratoryMembershipType.Analyst)
-            {
+            <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
                 <th style="width: 0%"></th>
-            }
+            </AuthorizeLabView>
         </tr>
     </thead>
     <tbody>
@@ -64,8 +62,7 @@
                             <text>@contact.PhoneNumber</text>
                         }
                     </td>
-                    @if (CurrentUser.MembershipType >= LaboratoryMembershipType.Analyst)
-                    {
+                    <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
                         <td>
                             <div class="dropdown">
                                 <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
@@ -93,7 +90,7 @@
                                 </ul>
                             </div>
                         </td>
-                    }
+                    </AuthorizeLabView>
                 </tr>
             }
         }

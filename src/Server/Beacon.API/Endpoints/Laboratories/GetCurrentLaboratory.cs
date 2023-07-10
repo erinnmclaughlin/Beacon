@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -30,7 +30,7 @@ public sealed class GetCurrentLaboratory : IBeaconEndpoint
         public async Task<LaboratoryDto> Handle(GetCurrentLaboratoryRequest request, CancellationToken ct)
         {
             return await _dbContext.Laboratories
-                .Where(x => x.Id == _labContext.LaboratoryId)
+                .Where(x => x.Id == _labContext.CurrentLab.Id)
                 .Select(x => new LaboratoryDto
                 {
                     Id = x.Id,

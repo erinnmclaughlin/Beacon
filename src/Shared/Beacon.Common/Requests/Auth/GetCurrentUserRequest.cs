@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common.Services;
 using MediatR;
 
 namespace Beacon.Common.Requests.Auth;

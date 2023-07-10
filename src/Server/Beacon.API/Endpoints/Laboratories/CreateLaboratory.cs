@@ -18,12 +18,12 @@ public sealed class CreateLaboratory : IBeaconEndpoint
 
     internal sealed class CommandHandler : IRequestHandler<CreateLaboratoryRequest>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ISessionContext _context;
         private readonly BeaconDbContext _dbContext;
 
-        public CommandHandler(ICurrentUser currentUser, BeaconDbContext dbContext)
+        public CommandHandler(ISessionContext currentUser, BeaconDbContext dbContext)
         {
-            _currentUser = currentUser;
+            _context = currentUser;
             _dbContext = dbContext;
         }
 
@@ -35,7 +35,7 @@ public sealed class CreateLaboratory : IBeaconEndpoint
                 Name = request.LaboratoryName
             };
 
-            lab.AddMember(_currentUser.UserId, LaboratoryMembershipType.Admin);
+            lab.AddMember(_context.UserId, LaboratoryMembershipType.Admin);
 
             _dbContext.Laboratories.Add(lab);
             await _dbContext.SaveChangesAsync(ct);

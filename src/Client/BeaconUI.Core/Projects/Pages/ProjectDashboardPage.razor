@@ -2,7 +2,6 @@
 @attribute [Authorize]
 @layout LaboratoryLayout
 @inject ApiClient ApiClient
-@inject ICurrentUser CurrentUser
 @inject IModalService ModalService
 @inject NavigationManager NavigationManager
 
@@ -137,7 +136,7 @@
 
     private bool ShowCancelAndCompleteDropdownSection(ProjectDto project)
     {
-        return project.ProjectStatus is ProjectStatus.Active && CurrentUser.MembershipType is > LaboratoryMembershipType.Member;
+        return project.ProjectStatus is ProjectStatus.Active;
     }
 
     private async Task CancelProject(ProjectDto project)

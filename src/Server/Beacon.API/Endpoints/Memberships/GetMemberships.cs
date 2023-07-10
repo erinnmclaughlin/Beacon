@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
@@ -30,7 +30,7 @@ public sealed class GetMemberships : IBeaconEndpoint
         public async Task<LaboratoryMemberDto[]> Handle(GetMembershipsRequest request, CancellationToken ct)
         {
             return await _dbContext.Memberships
-                .Where(m => m.LaboratoryId == _labContext.LaboratoryId)
+                .Where(m => m.LaboratoryId == _labContext.CurrentLab.Id)
                 .Select(m => new LaboratoryMemberDto
                 {
                     Id = m.Member.Id,

@@ -1,20 +1,19 @@
-﻿using Beacon.Common;
-using Beacon.Common.Models;
-using Beacon.Common.Services;
+﻿using Beacon.Common.Services;
 using BeaconUI.Core.Common.Http;
 using Microsoft.AspNetCore.Components.Authorization;
 using System.Security.Claims;
 
 namespace BeaconUI.Core.Common.Auth;
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurrentUser
+public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISessionContext
 {
     private readonly ApiClient _apiClient;
 
-    private ClaimsPrincipal? ClaimsPrincipal { get; set; }
+    private bool IsExpired { get; set; } = true;
+    private ClaimsPrincipal ClaimsPrincipal { get; set; } = AnonymousUser;
 
-    public Guid UserId => ClaimsPrincipal?.GetUserId() ?? Guid.Empty;
-    public LaboratoryMembershipType? MembershipType => ClaimsPrincipal?.GetMembershipType();
+    public CurrentUser CurrentUser => CurrentUser.FromClaimsPrincipal(ClaimsPrincipal);
+    public CurrentLab? CurrentLab => CurrentLab.FromClaimsPrincipal(ClaimsPrincipal);
 
     public BeaconAuthStateProvider(ApiClient apiClient)
     {
@@ -23,12 +22,15 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {
-        if (ClaimsPrincipal == null)
+        if (IsExpired)
         {
             var errorOrUser = await _apiClient.GetCurrentUser();
-            ClaimsPrincipal = errorOrUser.Match(
-                value => value.ToClaimsPrincipal(),
-                error => AnonymousUser);
+
+            ClaimsPrincipal = errorOrUser.IsError 
+                ? AnonymousUser 
+                : errorOrUser.Value.ToClaimsPrincipal();
+
+            IsExpired = false;
         }
 
         return new AuthenticationState(ClaimsPrincipal);
@@ -36,7 +38,7 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ICurr
 
     public void NotifyAuthenticationStateChanged()
     {
-        ClaimsPrincipal = null;
+        IsExpired = true;
         NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
     }
 

@@ -10,16 +10,16 @@ namespace Beacon.API.Behaviors;
 
 public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
 {
-    private readonly ICurrentUser _currentUser;
+    private readonly ISessionContext _context;
 
-    public AuthorizationPipelineBehavior(ICurrentUser currentUser)
+    public AuthorizationPipelineBehavior(ISessionContext context)
     {
-        _currentUser = currentUser;
+        _context = context;
     }
 
     public Task Process(TRequest request, CancellationToken ct)
     {
-        if (_currentUser.UserId == Guid.Empty && !AllowsAnonymous())
+        if (_context.UserId == Guid.Empty && !AllowsAnonymous())
             throw new UnauthorizedAccessException();
 
         if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
@@ -42,6 +42,6 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
 
     private bool CurrentUserIsMember(LaboratoryMembershipType[] types)
     {
-        return _currentUser.MembershipType is { } type && types.Contains(type);
+        return _context.CurrentLab?.MembershipType is { } type && types.Contains(type);
     }
 }

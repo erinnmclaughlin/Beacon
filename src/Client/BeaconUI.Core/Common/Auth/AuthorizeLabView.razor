@@ -1,0 +1,54 @@
+﻿@using System.Security.Claims
+
+<AuthorizeView Context="authState">
+    <Authorized>
+        @if (TryGetLabContext(authState.User, out var context) && context.CurrentLab.MembershipType >= MinimumRole)
+        {
+            <CascadingValue Value="context">
+                @if (Authorized != null)
+                {
+                    @Authorized.Invoke(context)
+                }
+                else if (ChildContent != null)
+                {
+                    @ChildContent.Invoke(context)
+                }
+            </CascadingValue>
+        }
+        else
+        {
+            @NotAuthorized
+        }
+    </Authorized>
+    <NotAuthorized>
+        @NotAuthorized
+    </NotAuthorized>
+</AuthorizeView>
+
+@code {
+
+    [Parameter]
+    public LaboratoryMembershipType MinimumRole { get; set; }
+
+    [Parameter]
+    public RenderFragment<ILabContext>? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment<ILabContext>? Authorized { get; set; }
+
+    [Parameter]
+    public RenderFragment? NotAuthorized { get; set; }
+
+    private bool TryGetLabContext(ClaimsPrincipal principal, out ILabContext context)
+    {
+        var sessionContext = SessionContext.FromClaimsPrincipal(principal);
+
+        context = sessionContext?.CurrentLab is not { } currentLab ? null! : new LabContext
+        {
+            CurrentLab = currentLab,
+            CurrentUser = sessionContext.CurrentUser
+        };
+
+        return sessionContext?.CurrentLab is not null;
+    }
+}

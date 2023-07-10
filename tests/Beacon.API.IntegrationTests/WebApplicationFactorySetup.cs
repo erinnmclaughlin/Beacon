@@ -1,8 +1,8 @@
 ﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence;
 using Beacon.App.Services;
+using Beacon.Common.Models;
 using Beacon.Common.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,16 +38,21 @@ public static class WebApplicationFactorySetup
 
     public static void UseMockedCurrentUser(this IServiceCollection services)
     {
-        services.RemoveAll<ICurrentUser>();
-        services.AddSingleton<Mock<ICurrentUser>>();
-        services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
+        services.RemoveAll<ISessionContext>();
+        services.AddSingleton<Mock<ISessionContext>>();
+        services.AddScoped(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
     }
 
     public static void UseMockedLabContext(this IServiceCollection services)
     {
         services.RemoveAll<ILabContext>();
         var mock = new Mock<ILabContext>();
-        mock.SetupGet(x => x.LaboratoryId).Returns(TestData.Lab.Id);
+        mock.SetupGet(x => x.CurrentLab).Returns(new CurrentLab
+        {
+            Id = TestData.Lab.Id,
+            Name = TestData.Lab.Name,
+            MembershipType = LaboratoryMembershipType.Admin
+        });
         services.AddSingleton(_ => mock.Object);
     }
 

@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
-using Beacon.App.Services;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -63,7 +63,7 @@ public sealed class GetProjectDetails : IBeaconEndpoint
         {
             var project = await _dbContext.Projects
                 .Include(x => x.LeadAnalyst)
-                .Where(x => x.LaboratoryId == _labContext.LaboratoryId)
+                .Where(x => x.LaboratoryId == _labContext.CurrentLab.Id)
                 .AsNoTracking()
                 .SingleOrDefaultAsync(filter, ct);
 

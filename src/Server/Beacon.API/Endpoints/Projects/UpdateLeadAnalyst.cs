@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
+using Beacon.Common.Services;
 using FluentValidation;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
@@ -49,7 +49,7 @@ public sealed class UpdateLeadAnalyst : IBeaconEndpoint
 
             var membership = await _dbContext.Memberships
                 .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == analystId.Value, ct);
+                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.MemberId == analystId.Value, ct);
 
             return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
         }

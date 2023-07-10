@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.App.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
@@ -50,19 +51,29 @@ public abstract class TestBase : IClassFixture<TestFixture>
         return action.Invoke(dbContext);
     }
 
-    protected void RunAsAdmin() => SetCurrentUser(TestData.AdminUser.Id, LaboratoryMembershipType.Admin);
-    protected void RunAsManager() => SetCurrentUser(TestData.ManagerUser.Id, LaboratoryMembershipType.Manager);
-    protected void RunAsAnalyst() => SetCurrentUser(TestData.AnalystUser.Id, LaboratoryMembershipType.Analyst);
-    protected void RunAsMember() => SetCurrentUser(TestData.MemberUser.Id, LaboratoryMembershipType.Member);
-    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser.Id, null);
-    protected void RunAsAnonymous() => SetCurrentUser(Guid.Empty, null);
+    protected void RunAsAdmin() => SetCurrentUser(TestData.AdminUser, LaboratoryMembershipType.Admin);
+    protected void RunAsManager() => SetCurrentUser(TestData.ManagerUser, LaboratoryMembershipType.Manager);
+    protected void RunAsAnalyst() => SetCurrentUser(TestData.AnalystUser, LaboratoryMembershipType.Analyst);
+    protected void RunAsMember() => SetCurrentUser(TestData.MemberUser, LaboratoryMembershipType.Member);
+    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser, null);
+    protected void RunAsAnonymous() => SetCurrentUser(null, null);
 
-    protected void SetCurrentUser(Guid userId, LaboratoryMembershipType? membershipType)
+    protected void SetCurrentUser(User? user, LaboratoryMembershipType? membershipType)
     {
         using var scope = _fixture.Services.CreateScope();
-        var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ICurrentUser>>();
-        currentUserMock.SetupGet(x => x.UserId).Returns(userId);
-        currentUserMock.SetupGet(x => x.MembershipType).Returns(membershipType);
+        var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ISessionContext>>();
+        currentUserMock.SetupGet(x => x.UserId).Returns(user?.Id ?? Guid.Empty);
+        currentUserMock.SetupGet(x => x.CurrentUser).Returns(new CurrentUser
+        {
+            Id = user?.Id ?? Guid.Empty,
+            DisplayName = user?.DisplayName ?? "",
+        });
+        currentUserMock.SetupGet(x => x.CurrentLab).Returns(membershipType is null ? null : new CurrentLab
+        {
+            Id = TestData.Lab.Id,
+            Name = TestData.Lab.Name,
+            MembershipType = membershipType.Value
+        });
     }
 
     protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)

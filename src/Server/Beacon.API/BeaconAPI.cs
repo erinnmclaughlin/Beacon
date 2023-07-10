@@ -62,9 +62,9 @@ public static class BeaconAPI
             options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         services.AddHttpContextAccessor();
-        services.AddScoped<ICurrentUser, CurrentUser>();
+        services.AddScoped<ISessionContext, HttpSessionContext>();
+        services.AddScoped<ILabContext, HttpSessionContext>();
         services.AddScoped<ISignInManager, SignInManager>();
-        services.AddScoped<ILabContext, LaboratoryContext>();
 
         // Database
         services.AddDbContext<BeaconDbContext>(dbOptionsAction);

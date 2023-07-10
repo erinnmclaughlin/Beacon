@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.Common.Models;
+using Beacon.Common.Services;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 

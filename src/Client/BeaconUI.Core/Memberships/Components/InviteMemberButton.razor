@@ -1,11 +1,13 @@
-﻿@inject ICurrentUser CurrentUser
+﻿@inject ISessionContext CurrentUser
 
-<button type="button" disabled="@IsDisabled" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
-    <span class="icon">
-        <i class="fa-solid fa-user-plus"></i>
-    </span>
-    <span>Invite member</span>
-</button>
+<AuthorizeLabView>
+    <button type="button" disabled="@IsDisabled(context)" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
+        <span class="icon">
+            <i class="fa-solid fa-user-plus"></i>
+        </span>
+        <span>Invite member</span>
+    </button>
+</AuthorizeLabView>
 
 @code {
 
@@ -15,7 +17,10 @@
     [Parameter(CaptureUnmatchedValues = true)]
     public IDictionary<string, object?>? AdditionalAttributes { get; set; }
 
-    private bool IsDisabled => CurrentUser.MembershipType is null or < LaboratoryMembershipType.Manager;
+    private static bool IsDisabled(ILabContext context)
+    {
+        return context.CurrentLab.MembershipType < LaboratoryMembershipType.Manager;
+    }
 
     private async Task ShowInviteMemberModal()
     {

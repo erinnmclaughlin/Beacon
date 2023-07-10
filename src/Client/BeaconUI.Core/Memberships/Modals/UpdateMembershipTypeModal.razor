@@ -1,31 +1,30 @@
 ﻿@inject ApiClient ApiClient
-@inject ICurrentUser CurrentUser
+@inject ISessionContext CurrentUser
 
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
-            @if (CurrentUser.MembershipType < LaboratoryMembershipType.Manager)
-            {
-                <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
-            }
-            else
-            {
-                <div class="field">
-                    <label class="form-label" for="member">Member</label>
-                    <input class="form-control" id="member" readonly value="@MemberToUpdate.DisplayName" />
-                </div>
-                <div class="field">
-                    <label class="form-label" for="type">Membership Type</label>
-                    <InputSelect class="form-select" @bind-Value="Model.MembershipType">
-                        @foreach (var option in Enum.GetValues<LaboratoryMembershipType>())
-                        {
-                            <option value="@option" disabled="@IsDisabled(option)">@option</option>
-                        }
-                    </InputSelect>
-                    <ValidationMessage For="() => Model.MembershipType" />
-                </div>
-            }
-            
+            <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Manager">
+                <Authorized>
+                    <div class="field">
+                        <label class="form-label" for="member">Member</label>
+                        <input class="form-control" id="member" readonly value="@MemberToUpdate.DisplayName" />
+                    </div>
+                    <div class="field">
+                        <label class="form-label" for="type">Membership Type</label>
+                        <InputSelect class="form-select" @bind-Value="Model.MembershipType">
+                            @foreach (var option in Enum.GetValues<LaboratoryMembershipType>())
+                            {
+                                <option value="@option" disabled="@IsDisabled(context, option)">@option</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Model.MembershipType" />
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
+                </NotAuthorized>
+            </AuthorizeLabView>
         </div>
         <footer class="modal-footer">
             <SubmitButton class="btn btn-primary">Update Membership</SubmitButton>
@@ -62,9 +61,8 @@
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private bool IsDisabled(LaboratoryMembershipType targetType)
+    private bool IsDisabled(ILabContext context, LaboratoryMembershipType targetType)
     {
-        return CurrentUser.MembershipType is null or < LaboratoryMembershipType.Manager
-            || CurrentUser.MembershipType <= targetType;
+        return context.CurrentLab.MembershipType < targetType;
     }
 }

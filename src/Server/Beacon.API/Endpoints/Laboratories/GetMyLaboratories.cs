@@ -18,10 +18,10 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<GetMyLaboratoriesRequest, LaboratoryDto[]>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ISessionContext _currentUser;
         private readonly BeaconDbContext _dbContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext)
+        public Handler(ISessionContext currentUser, BeaconDbContext dbContext)
         {
             _currentUser = currentUser;
             _dbContext = dbContext;

@@ -1,4 +1,4 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common.Services;
 
 namespace Beacon.WebApp.IntegrationTests.Pages;
 
