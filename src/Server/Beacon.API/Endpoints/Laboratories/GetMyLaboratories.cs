@@ -18,18 +18,18 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<GetMyLaboratoriesRequest, LaboratoryDto[]>
     {
-        private readonly ISessionContext _currentUser;
+        private readonly ISessionContext _context;
         private readonly BeaconDbContext _dbContext;
 
-        public Handler(ISessionContext currentUser, BeaconDbContext dbContext)
+        public Handler(ISessionContext context, BeaconDbContext dbContext)
         {
-            _currentUser = currentUser;
+            _context = context;
             _dbContext = dbContext;
         }
 
         public async Task<LaboratoryDto[]> Handle(GetMyLaboratoriesRequest request, CancellationToken ct)
         {
-            var currentUserId = _currentUser.UserId;
+            var currentUserId = _context.UserId;
 
             return await _dbContext.Memberships
                 .Where(m => m.MemberId == currentUserId)

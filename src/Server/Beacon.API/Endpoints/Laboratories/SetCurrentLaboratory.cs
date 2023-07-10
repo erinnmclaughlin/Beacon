@@ -19,13 +19,13 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<SetCurrentLaboratoryRequest>
     {
-        private readonly ISessionContext _currentUser;
+        private readonly ISessionContext _context;
         private readonly BeaconDbContext _dbContext;
         private readonly ISignInManager _signInManager;
 
-        public Handler(ISessionContext currentUser, BeaconDbContext dbContext, ISignInManager signInManager)
+        public Handler(ISessionContext context, BeaconDbContext dbContext, ISignInManager signInManager)
         {
-            _currentUser = currentUser;
+            _context = context;
             _dbContext = dbContext;
             _signInManager = signInManager;
         }
@@ -33,7 +33,7 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
         public async Task Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
         {
             var newContext = await _dbContext.Memberships
-                .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _currentUser.UserId)
+                .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _context.UserId)
                 .Select(m => new SessionContext
                 {
                     CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
