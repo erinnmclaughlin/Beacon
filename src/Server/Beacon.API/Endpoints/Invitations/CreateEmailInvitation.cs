@@ -45,19 +45,17 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
         }
     }
 
-    internal sealed class CommandHandler : IRequestHandler<CreateEmailInvitationRequest>
+    internal sealed class Handler : IRequestHandler<CreateEmailInvitationRequest>
     {
-        private readonly ApplicationSettings _appSettings;
         private readonly ILabContext _context;
         private readonly BeaconDbContext _dbContext;
-        private readonly IEmailService _emailService;
+        private readonly IPublisher _publisher;
 
-        public CommandHandler(IOptions<ApplicationSettings> appSettings, ILabContext context, BeaconDbContext dbContext, IEmailService emailService)
+        public Handler(ILabContext context, BeaconDbContext dbContext, IPublisher publisher)
         {
-            _appSettings = appSettings.Value;
             _context = context;
             _dbContext = dbContext;
-            _emailService = emailService;
+            _publisher = publisher;
         }
 
         public async Task Handle(CreateEmailInvitationRequest request, CancellationToken ct)
@@ -67,7 +65,8 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
 
             var user = await _dbContext.Users.SingleAsync(x => x.Id == _context.CurrentUser.Id, ct);
             var invitation = await CreateInvitation(request, user, ct);
-            await SendAsync(invitation, ct);
+
+            await _publisher.Publish(new EmailInvitationCreated(invitation.Id), ct);
         }
 
         private async Task<InvitationEmail> CreateInvitation(CreateEmailInvitationRequest request, User currentUser, CancellationToken ct)
@@ -94,24 +93,49 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
 
             return emailInvitation;
         }
+    }
 
-        private async Task SendAsync(InvitationEmail emailInvitation, CancellationToken ct)
+    public record EmailInvitationCreated(Guid EmailInvitationId) : INotification;
+
+    internal sealed class NotificationHandler : INotificationHandler<EmailInvitationCreated>
+    {
+        private readonly ApplicationSettings _appSettings;
+        private readonly BeaconDbContext _dbContext;
+        private readonly IEmailService _emailService;
+
+        public NotificationHandler(IOptions<ApplicationSettings> appSettings, BeaconDbContext dbContext, IEmailService emailService)
         {
-            var emailSendOperation = await _emailService.SendAsync(
+            _appSettings = appSettings.Value;
+            _dbContext = dbContext;
+            _emailService = emailService;
+        }
+
+        public async Task Handle(EmailInvitationCreated notification, CancellationToken ct)
+        {
+            var emailInvitation = await _dbContext.InvitationEmails
+                .Include(i => i.LaboratoryInvitation)
+                    .ThenInclude(i => i.CreatedBy)
+                .Include(i => i.Laboratory)
+                .SingleAsync(i => i.Id == notification.EmailInvitationId, ct);
+
+            var sendOperation = await SendAsync(emailInvitation);
+
+            emailInvitation.OperationId = sendOperation.OperationId;
+            await _dbContext.SaveChangesAsync(ct);
+        }
+
+        private async Task<IEmailSendOperation> SendAsync(InvitationEmail emailInvitation)
+        {
+            return await _emailService.SendAsync(
                 GetSubject(emailInvitation.LaboratoryInvitation),
                 GetBody(_appSettings.BaseUrl, emailInvitation),
                 emailInvitation.LaboratoryInvitation.NewMemberEmailAddress)
                 ?? throw new Exception("There was an error sending the invitation email."); // TODO: throw better exception
-
-            emailInvitation.OperationId = emailSendOperation.OperationId;
-
-            await _dbContext.SaveChangesAsync(ct);
         }
 
         private static string GetSubject(Invitation invitation)
         {
             return $"{invitation.CreatedBy.DisplayName} invites you to join a lab!";
-
         }
 
         private static string GetAcceptUrl(string baseUrl, InvitationEmail invitation)
