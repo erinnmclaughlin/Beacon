@@ -15,6 +15,16 @@ internal sealed class AuthService
         _authStateProvider = authStateProvider;
     }
 
+    public async Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
+    {
+        var result = await _apiClient.SetCurrentLaboratory(id);
+
+        if (!result.IsError)
+            _authStateProvider.NotifyAuthenticationStateChanged();
+
+        return result;
+    }
+
     public async Task<ErrorOr<Success>> LoginAsync(LoginRequest request)
     {
         var result = await _apiClient.Login(request);

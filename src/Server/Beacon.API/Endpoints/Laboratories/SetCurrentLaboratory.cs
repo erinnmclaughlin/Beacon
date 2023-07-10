@@ -1,13 +1,12 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
-using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
-using System.Security.Claims;
 
 namespace Beacon.API.Endpoints.Laboratories;
 
@@ -33,24 +32,31 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
 
         public async Task Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
         {
-            var membershipInfo = await _dbContext.Memberships
+            var currentLab = request.LaboratoryId is null ? null : await _dbContext.Memberships
                 .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _currentUser.UserId)
-                .Select(m => new
+                .Select(m => new CurrentLabDto
                 {
-                    m.Laboratory.Id,
-                    m.MembershipType
+                    Id = m.Laboratory.Id,
+                    Name = m.Laboratory.Name,
+                    MembershipType = m.MembershipType
                 })
                 .SingleAsync(ct);
 
-            var identity = new ClaimsIdentity("AuthCookie");
-            identity.AddClaims(new[]
-            {
-                new Claim(BeaconClaimTypes.UserId, _currentUser.UserId.ToString()),
-                new Claim(BeaconClaimTypes.LabId, membershipInfo.Id.ToString()),
-                new Claim(BeaconClaimTypes.MembershipType, membershipInfo.MembershipType.ToString())
-            });
+            var sessionInfo = await _dbContext.Users
+                .Where(u => u.Id == _currentUser.UserId)
+                .Select(u => new SessionContext
+                {
+                    CurrentLab = currentLab,
+                    CurrentUser = new()
+                    {
+                        Id = u.Id,
+                        DisplayName = u.DisplayName
+                    }
+                })
+                .AsNoTracking()
+                .SingleAsync(ct);
 
-            await _signInManager.SignInAsync(new ClaimsPrincipal(identity));
+            await _signInManager.SignInAsync(sessionInfo.ToClaimsPrincipal());
         }
     }
 }

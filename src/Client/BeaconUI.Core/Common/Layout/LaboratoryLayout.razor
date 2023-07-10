@@ -1,0 +1,15 @@
+﻿@inherits LayoutComponentBase
+
+<AuthorizeView>
+    <MainLayout>
+        <Body>
+            @if (context.User.GetLabName() is { Length: > 0 } labName)
+            {
+                <LaboratorySideNav LabName="@labName" />
+            }
+            <div class="d-flex flex-column flex-grow-1">
+                @Body
+            </div>
+        </Body>
+    </MainLayout>
+</AuthorizeView>

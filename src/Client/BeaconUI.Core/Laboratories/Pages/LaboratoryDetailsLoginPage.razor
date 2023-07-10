@@ -1,6 +1,6 @@
 ﻿@page "/laboratories/{Id:guid}"
 @attribute [Authorize]
-@inject ApiClient ApiClient
+@inject AuthService AuthService
 @inject NavigationManager NavigationManager
 
 @code {
@@ -10,7 +10,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        await ApiClient.SetCurrentLaboratory(Id);
+        await AuthService.SetCurrentLaboratory(Id);
         NavigationManager.NavigateTo("l", replace: true);
     }
 }
