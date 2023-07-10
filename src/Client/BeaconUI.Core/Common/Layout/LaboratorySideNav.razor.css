@@ -1,0 +1,41 @@
+.nav {
+    background: #f1f5f9;
+    border-right: 1px solid #dbdbdb;
+    transition: width 0.2s ease;
+    width: 4rem;
+}
+
+    .nav ::deep .nav-link.active {
+        background-color: #e2e8f0;
+    }
+
+    .nav ::deep .nav-link:not(.active) {
+        color: #1e293b;
+    }
+
+        .nav ::deep .nav-link:not(.active):hover {
+            background-color: #e2e8f0;
+        }
+
+    .nav ::deep .nav-icon {
+        display: inline-block;
+        text-align: center;
+        width: 1.75rem;
+    }
+
+    .nav ::deep .nav-text {
+        display: inline-block;
+        display: none;
+    }
+
+@media (min-width: 768px) {
+
+    .nav {
+        width: 16.5rem;
+    }
+
+        .nav ::deep .nav-text {
+            display: unset;
+            transition: display 0.2s ease;
+        }
+}
