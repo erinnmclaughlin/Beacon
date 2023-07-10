@@ -1,5 +1,7 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.App.Entities;
 using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
@@ -49,11 +51,30 @@ public abstract class TestBase : IClassFixture<TestFixture>
         return action.Invoke(dbContext);
     }
 
-    protected void SetCurrentUser(Guid userId)
+    protected void RunAsAdmin() => SetCurrentUser(TestData.AdminUser, LaboratoryMembershipType.Admin);
+    protected void RunAsManager() => SetCurrentUser(TestData.ManagerUser, LaboratoryMembershipType.Manager);
+    protected void RunAsAnalyst() => SetCurrentUser(TestData.AnalystUser, LaboratoryMembershipType.Analyst);
+    protected void RunAsMember() => SetCurrentUser(TestData.MemberUser, LaboratoryMembershipType.Member);
+    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser, null);
+    protected void RunAsAnonymous() => SetCurrentUser(null, null);
+
+    protected void SetCurrentUser(User? user, LaboratoryMembershipType? membershipType)
     {
         using var scope = _fixture.Services.CreateScope();
-        var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ICurrentUser>>();
-        currentUserMock.SetupGet(x => x.UserId).Returns(userId);
+        var sessionMock = scope.ServiceProvider.GetRequiredService<Mock<ISessionContext>>();
+        sessionMock.SetupGet(x => x.UserId).Returns(user?.Id ?? Guid.Empty);
+        sessionMock.SetupGet(x => x.CurrentUser).Returns(new CurrentUser
+        {
+            Id = user?.Id ?? Guid.Empty,
+            DisplayName = user?.DisplayName ?? "",
+        });
+        sessionMock.SetupGet(x => x.CurrentLab).Returns(membershipType is null ? null : new CurrentLab
+        {
+            Id = TestData.Lab.Id,
+            Name = TestData.Lab.Name,
+            MembershipType = membershipType.Value
+        });
+
     }
 
     protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)

@@ -1,0 +1,9 @@
+﻿<header class="border-bottom d-flex flex-column">
+    @ChildContent
+</header>
+
+@code {
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+}

@@ -1,0 +1,20 @@
+﻿<AuthorizeLabView>
+    <PageHeader>
+        <PageHeaderContent>
+            @ChildContent?.Invoke(context.CurrentLab)
+        </PageHeaderContent>
+        @if (TabsContent is not null)
+        {
+            <ul class="nav nav-tabs" style="margin-left: -1px; margin-bottom: -1px;">@TabsContent</ul>
+        }
+    </PageHeader>
+</AuthorizeLabView>
+
+@code {
+
+    [Parameter]
+    public RenderFragment<CurrentLab>? ChildContent { get; set; }
+
+    [Parameter]
+    public RenderFragment? TabsContent { get; set; }
+}

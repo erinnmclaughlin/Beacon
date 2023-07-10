@@ -14,7 +14,7 @@ public sealed class GetSampleGroupsTests : ProjectTestBase
     [Fact(DisplayName = "[016] Get project sample groups returns sample groups associated with the specified project")]
     public async Task GetProjectSampleGroups_ReturnsExpectedResults()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await GetAsync($"api/projects/{ProjectId}/sample-groups");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);

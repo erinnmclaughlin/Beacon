@@ -1,0 +1,79 @@
+﻿@page "/register"
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+<div class="container m-auto px-3" style="width: 27.5em; max-width: 95vw;">
+
+    <header class="text-center mb-3">
+        <span class="text-primary mb-1 fs-2">
+            <i class="fa-regular fa-flask-vial"></i>
+        </span>
+        <h3 class="fw-bold">
+            <span>Create an account</span>
+        </h3>
+    </header>
+
+    <BeaconForm Model="Model" OnValidSubmit="Submit">
+
+        <div class="field">
+            <label class="form-label" for="email">Email</label>
+            <InputText @bind-Value="Model.EmailAddress" @bind-Value:after="DoAfterUpdateEmail" class="form-control" id="email" type="email" placeholder="e.g., jsparrow@blackpearl.arg" autocomplete="new-password" />
+            <ValidationMessage For="() => Model.EmailAddress" />
+        </div>
+            
+        <div class="field">
+            <label class="form-label" for="username">Display Name</label>
+            <InputText @bind-Value="Model.DisplayName" class="form-control" id="username" placeholder="e.g., jsparrow" autocomplete="new-password" />
+            <ValidationMessage For="() => Model.DisplayName" />
+        </div>
+
+        <div class="field">
+            <label class="form-label" for="password">Password</label>
+            <InputText @bind-Value="Model.Password" class="form-control" id="password" type="password" placeholder="**********" autocomplete="new-password" />
+            <ValidationMessage For="() => Model.Password" />
+        </div>
+
+        <div class="field">
+            <button type="submit" class="btn btn-primary w-100">Create Account</button>
+        </div>
+
+        <div class="field text-center">
+            <span>Already have an account?</span>
+            <a href="login">Login</a>
+        </div>
+    </BeaconForm>
+
+</div>
+
+@code {
+
+    [Parameter, SupplyParameterFromQuery(Name = "redirectUri")]
+    public string? RedirectUri { get; set; }
+
+    private RegisterRequest Model { get; set; } = new();
+
+    private async Task Submit(BeaconForm formContext)
+    {
+        var result = await AuthService.RegisterAsync(Model);
+
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        await AuthService.LoginAsync(new LoginRequest
+        {
+            EmailAddress = Model.EmailAddress,
+            Password = Model.Password
+        });
+
+        NavigationManager.NavigateTo(RedirectUri ?? "");
+    }
+
+    private void DoAfterUpdateEmail()
+    {
+        if (string.IsNullOrWhiteSpace(Model.DisplayName))
+            Model.DisplayName = Model.EmailAddress[..Model.EmailAddress.IndexOf('@')];
+    }
+}

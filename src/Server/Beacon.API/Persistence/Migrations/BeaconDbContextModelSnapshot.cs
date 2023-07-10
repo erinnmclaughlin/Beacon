@@ -377,8 +377,7 @@ namespace Beacon.API.Persistence.Migrations
 
                             b1.HasKey("ProjectId");
 
-                            b1.HasIndex("CustomerCode", "Suffix")
-                                .IsUnique();
+                            b1.HasIndex("CustomerCode", "Suffix");
 
                             b1.ToTable("Projects");
 

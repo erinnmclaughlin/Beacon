@@ -35,11 +35,9 @@ public sealed class GetProjects : IBeaconEndpoint
 
         public async Task<ProjectDto[]> Handle(GetProjectsRequest request, CancellationToken ct)
         {
-            var labId = _labContext.LaboratoryId;
-
             var projects = await _dbContext.Projects
                 .Include(x => x.LeadAnalyst)
-                .Where(x => x.LaboratoryId == labId)
+                .Where(x => x.LaboratoryId == _labContext.CurrentLab.Id)
                 .AsNoTracking()
                 .ToArrayAsync(ct);
 

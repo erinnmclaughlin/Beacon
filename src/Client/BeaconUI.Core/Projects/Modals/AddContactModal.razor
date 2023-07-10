@@ -1,0 +1,54 @@
+﻿@inject ApiClient ApiClient
+
+<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="name">Name</label>
+                <InputText @bind-Value="Request.Name" class="form-control" id="customerName" placeholder="e.g., Ben Folds" />
+                <ValidationMessage For="() => Request.Name" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="email">Email Address</label>
+                <InputText @bind-Value="Request.EmailAddress" class="form-control" id="email" placeholder="e.g., sara@pvamp.com" />
+                <ValidationMessage For="() => Request.EmailAddress" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="phone">Phone Number</label>
+                <InputText @bind-Value="Request.PhoneNumber" class="form-control" id="phone" placeholder="e.g., 800-867-5309" />
+                <ValidationMessage For="() => Request.PhoneNumber" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton class="btn btn-primary">Add Contact</SubmitButton>
+            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+
+    [Parameter]
+    public required Guid ProjectId { get; set; }
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    private CreateProjectContactRequest? _request;
+    private CreateProjectContactRequest Request => _request ??= new() { ProjectId = ProjectId };
+
+    private async Task Submit(BeaconForm formContext)
+    {
+        var result = await ApiClient.AddProjectContact(Request);
+
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+
+    private async Task Cancel() => await Modal.CancelAsync();
+}

@@ -16,7 +16,7 @@ public sealed class UpdateMembershipTests : TestBase
     [Fact(DisplayName = "[170] Update membership type succeeds when user is authorized")]
     public async Task UpdateMembershipType_Succeeds_WhenUserIsAuthorized()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PutAsync("api/memberships", new UpdateMembershipRequest
         {
@@ -38,7 +38,7 @@ public sealed class UpdateMembershipTests : TestBase
     [Fact(DisplayName = "[170] Update membership type endpoint returns 403 when user is not authorized")]
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsMember();
 
         var response = await PutAsync("api/memberships", new UpdateMembershipRequest
         {

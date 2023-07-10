@@ -20,10 +20,12 @@ public sealed class CreateProject : IBeaconEndpoint
 
     public sealed class Validator : AbstractValidator<CreateProjectRequest>
     {
+        private readonly BeaconDbContext _dbContext;
         private readonly ILabContext _labContext;
 
-        public Validator(ILabContext labContext)
+        public Validator(BeaconDbContext dbContext, ILabContext labContext)
         {
+            _dbContext = dbContext;
             _labContext = labContext;
 
             RuleFor(x => x.LeadAnalystId)
@@ -36,21 +38,23 @@ public sealed class CreateProject : IBeaconEndpoint
             if (analystId == null)
                 return true;
 
-            return await _labContext.GetMembershipTypeAsync(analystId.Value, ct) >= LaboratoryMembershipType.Analyst;
+            var membership = await _dbContext.Memberships
+                .AsNoTracking()
+                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.MemberId == analystId.Value, ct);
+
+            return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
         }
     }
 
     internal sealed class Handler : IRequestHandler<CreateProjectRequest>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ILabContext _context;
         private readonly BeaconDbContext _dbContext;
-        private readonly ILabContext _labContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext, ILabContext labContext)
+        public Handler(ILabContext context, BeaconDbContext dbContext)
         {
-            _currentUser = currentUser;
+            _context = context;
             _dbContext = dbContext;
-            _labContext = labContext;
         }
 
         public async Task Handle(CreateProjectRequest request, CancellationToken ct)
@@ -60,8 +64,8 @@ public sealed class CreateProject : IBeaconEndpoint
                 Id = Guid.NewGuid(),
                 ProjectCode = await GenerateProjectCode(request, ct),
                 CustomerName = request.CustomerName,
-                CreatedById = _currentUser.UserId,
-                LaboratoryId = _labContext.LaboratoryId,
+                CreatedById = _context.CurrentUser.Id,
+                LaboratoryId = _context.CurrentLab!.Id,
                 LeadAnalystId = request.LeadAnalystId
             });
 
@@ -71,7 +75,7 @@ public sealed class CreateProject : IBeaconEndpoint
         private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
         {
             var lastSuffix = await _dbContext.Projects
-                .Where(p => p.LaboratoryId == _labContext.LaboratoryId && p.ProjectCode.CustomerCode == request.CustomerCode)
+                .Where(p => p.LaboratoryId == _context.CurrentLab.Id && p.ProjectCode.CustomerCode == request.CustomerCode)
                 .OrderBy(p => p.ProjectCode.Suffix)
                 .Select(p => p.ProjectCode.Suffix)
                 .LastOrDefaultAsync(ct);

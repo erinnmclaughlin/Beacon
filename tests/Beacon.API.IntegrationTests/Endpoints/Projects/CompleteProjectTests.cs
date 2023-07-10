@@ -13,7 +13,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
     [Fact(DisplayName = "[005] Complete project succeeds when request is valid")]
     public async Task CompleteProject_SucceedsWhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
         {
@@ -29,7 +29,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
     [Fact(DisplayName = "[005] Complete project fails when request is invalid")]
     public async Task CompleteProject_FailsWhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
         {

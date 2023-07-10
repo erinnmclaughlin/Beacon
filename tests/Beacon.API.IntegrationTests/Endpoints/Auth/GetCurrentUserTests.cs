@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.Common.Models;
+using Beacon.Common.Services;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
@@ -13,7 +13,7 @@ public sealed class GetCurrentUserTests : TestBase
     [Fact(DisplayName = "[008] Get current user returns 401 if user is not logged in")]
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {
-        SetCurrentUser(Guid.Empty);
+        RunAsAnonymous();
 
         var response = await GetAsync("api/users/current");
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -22,17 +22,17 @@ public sealed class GetCurrentUserTests : TestBase
     [Fact(DisplayName = "[008] Get current user returns logged in user")]
     public async Task GetCurrentUser_ReturnsExpectedResult_WhenUserIsLoggedIn()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await GetAsync("api/users/current");
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var currentUser = await DeserializeAsync<CurrentUserDto>(response);
+        var session = await DeserializeAsync<SessionContext>(response);
 
-        Assert.NotNull(currentUser);
-        Assert.Equal(TestData.AdminUser.Id, currentUser.Id);
-        Assert.Equal(TestData.AdminUser.DisplayName, currentUser.DisplayName);
+        Assert.NotNull(session);
+        Assert.Equal(TestData.AdminUser.Id, session.CurrentUser.Id);
+        Assert.Equal(TestData.AdminUser.DisplayName, session.CurrentUser.DisplayName);
     }
 
     protected override void AddTestData(BeaconDbContext db)

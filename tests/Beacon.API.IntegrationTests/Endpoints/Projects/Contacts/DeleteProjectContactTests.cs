@@ -15,7 +15,7 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Delete contact succeeds when request is valid")]
     public async Task DeleteContact_Succeeds_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await _httpClient.DeleteAsync($"api/projects/{ProjectId}/contacts/{ContactId}");
 
@@ -26,7 +26,7 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Delete contact endpoint returns 403 when user is not authorized")]
     public async Task DeleteContact_FailsWhenUserIsNotAuthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await _httpClient.DeleteAsync($"api/projects/{ProjectId}/contacts/{ContactId}");
 

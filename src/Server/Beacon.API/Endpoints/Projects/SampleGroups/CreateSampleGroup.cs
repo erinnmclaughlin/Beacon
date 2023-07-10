@@ -42,7 +42,7 @@ public sealed class CreateSampleGroup : IBeaconEndpoint
             {
                 Id = Guid.NewGuid(),
                 ProjectId = request.ProjectId,
-                LaboratoryId = _labContext.LaboratoryId,
+                LaboratoryId = _labContext.CurrentLab.Id,
                 SampleName = request.SampleName,
                 ContainerType = request.ContainerType,
                 IsHazardous = request.IsHazardous,

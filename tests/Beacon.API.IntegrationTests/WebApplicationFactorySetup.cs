@@ -1,8 +1,8 @@
 ﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence;
 using Beacon.App.Services;
+using Beacon.Common.Models;
 using Beacon.Common.Services;
-using Microsoft.AspNetCore.Http;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
@@ -38,20 +38,23 @@ public static class WebApplicationFactorySetup
 
     public static void UseMockedCurrentUser(this IServiceCollection services)
     {
-        services.RemoveAll<ICurrentUser>();
-        services.AddSingleton<Mock<ICurrentUser>>();
-        services.AddScoped(sp => sp.GetRequiredService<Mock<ICurrentUser>>().Object);
+        services.RemoveAll<ISessionContext>();
+        services.AddSingleton<Mock<ISessionContext>>();
+        services.AddSingleton(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
     }
 
-    public static void UseMockedHttpContextAccessor(this IServiceCollection services)
+    public static void UseMockedLabContext(this IServiceCollection services)
     {
-        services.RemoveAll<IHttpContextAccessor>();
-
-        var mock = new Mock<IHttpContextAccessor>();
-        mock.Setup(x => x.HttpContext!.Request.Headers["X-LaboratoryId"])
-            .Returns(TestData.Lab.Id.ToString());
-
-        services.AddSingleton(_ => mock.Object);
+        services.RemoveAll<ILabContext>();
+        services.AddSingleton<ILabContext>(sp =>
+        {
+            var sessionContext = sp.GetRequiredService<ISessionContext>();
+            return new LabContext
+            {
+                CurrentUser = sessionContext.CurrentUser,
+                CurrentLab = sessionContext.CurrentLab!
+            };
+        });
     }
 
     public static void UseFakeEmailService(this IServiceCollection services)

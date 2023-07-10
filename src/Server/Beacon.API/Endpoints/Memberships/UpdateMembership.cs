@@ -29,7 +29,7 @@ public sealed class UpdateMembership : IBeaconEndpoint
         public async Task Handle(UpdateMembershipRequest request, CancellationToken ct)
         {
             var member = await _dbContext.Memberships
-                .SingleAsync(m => m.LaboratoryId == _labContext.LaboratoryId && m.MemberId == request.MemberId, ct);
+                .SingleAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.MemberId == request.MemberId, ct);
 
             member.MembershipType = request.MembershipType;
             await _dbContext.SaveChangesAsync(ct);

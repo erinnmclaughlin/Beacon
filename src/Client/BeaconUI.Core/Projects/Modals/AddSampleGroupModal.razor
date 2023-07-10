@@ -1,0 +1,64 @@
+﻿@inject ApiClient ApiClient
+
+<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="sampleName">Sample Name</label>
+                <InputText @bind-Value="Request.SampleName" class="form-control" id="sampleName" />
+                <ValidationMessage For="() => Request.SampleName" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="quantity">Quantity</label>
+                <InputNumber @bind-Value="Request.Quantity" class="form-control" id="quantity" />
+                <ValidationMessage For="() => Request.Quantity" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="type">Container Type</label>
+                <InputText @bind-Value="Request.ContainerType" class="form-control" id="type" />
+                <ValidationMessage For="() => Request.ContainerType" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="volume">Volume</label>
+                <InputNumber @bind-Value="Request.Volume" class="form-control" id="volume" />
+                <ValidationMessage For="() => Request.Volume" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="notes">Notes</label>
+                <InputTextArea @bind-Value="Request.Notes" class="form-control" id="notes" rows="3" />
+                <ValidationMessage For="() => Request.Notes" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton class="btn btn-primary">Add Sample Group</SubmitButton>
+            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+
+    [Parameter]
+    public required Guid ProjectId { get; set; }
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    private CreateSampleGroupRequest? _request;
+    private CreateSampleGroupRequest Request => _request ??= new() { ProjectId = ProjectId };
+
+    private async Task Submit(BeaconForm formContext)
+    {
+        var result = await ApiClient.CreateSampleGroup(Request);
+
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+
+    private async Task Cancel() => await Modal.CancelAsync();
+}

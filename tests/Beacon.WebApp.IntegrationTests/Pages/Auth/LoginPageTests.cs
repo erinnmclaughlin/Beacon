@@ -1,6 +1,6 @@
 using Beacon.Common.Requests.Auth;
 using Beacon.WebApp.IntegrationTests.Http;
-using BeaconUI.Core.Pages.Auth;
+using BeaconUI.Core.Auth;
 using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using RichardSzalay.MockHttp;

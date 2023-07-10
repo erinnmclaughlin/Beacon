@@ -16,7 +16,7 @@ public sealed class GetMyLaboratoriesTests : TestBase
     [Fact(DisplayName = "[185] Get my labs returns current user's labs only")]
     public async Task GetMyLaboratories_ReturnsOnlyCurrentUsersLabs()
     {
-        SetCurrentUser(TestData.ManagerUser.Id);
+        RunAsManager();
         var response = await GetAsync("api/laboratories");
         var myLabs = await DeserializeAsync<LaboratoryDto[]>(response);
 
@@ -24,7 +24,7 @@ public sealed class GetMyLaboratoriesTests : TestBase
         Assert.Equal(2, myLabs.Length);
         Assert.Contains(myLabs, x => x.Name == "Some other lab");
 
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
         var otherMyLabs = await DeserializeAsync<LaboratoryDto[]>(await GetAsync("api/laboratories"));
 
         Assert.NotNull(otherMyLabs);

@@ -17,7 +17,7 @@ public sealed class AcceptEmailInvitationTests : TestBase
     [Fact(DisplayName = "[003] Accept invitation succeeds when request is valid")]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.NonMemberUser.Id);
+        RunAsNonMember();
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -32,7 +32,7 @@ public sealed class AcceptEmailInvitationTests : TestBase
     [Fact(DisplayName = "[003] Accept invitation endpoint returns 403 when current user email does not match email invitation")]
     public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id); // try to accept as a different user
+        RunAsMember(); // try to accept as a different user
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -49,7 +49,7 @@ public sealed class AcceptEmailInvitationTests : TestBase
             db.SaveChanges();
         });
 
-        SetCurrentUser(TestData.NonMemberUser.Id);
+        RunAsNonMember();
 
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);

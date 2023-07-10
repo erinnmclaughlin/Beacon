@@ -1,0 +1,15 @@
+﻿@page "/l"
+@attribute [Authorize]
+@layout LaboratoryLayout
+
+<LaboratoryPageHeader>
+    <h4 class="mb-0">@context.Name</h4>
+</LaboratoryPageHeader>
+
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
+            <p>This is the lab details page.</p>
+        </div>
+    </div>
+</div>

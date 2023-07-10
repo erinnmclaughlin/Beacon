@@ -1,0 +1,47 @@
+﻿@inject ApiClient ApiClient
+@inject ISessionContext CurrentUser
+@inject IModalService ModalService
+
+<CascadingValue Value="this">
+    @ChildContent?.Invoke(this)
+</CascadingValue>
+
+@code {
+    [CascadingParameter]
+    private ILabContext LabContext { get; set; } = default!;
+
+    [Parameter]
+    public RenderFragment<MembershipContext>? ChildContent { get; set; }
+
+    public ErrorOr<LaboratoryMemberDto[]>? Result { get; private set; }
+
+    protected override async Task OnParametersSetAsync()
+    {
+        Result = await ApiClient.GetLaboratoryMembers();
+    }
+
+    public bool CanManagePermissions()
+    {
+        return LabContext.CurrentLab.MembershipType >= LaboratoryMembershipType.Manager;
+    }
+
+    public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
+    {
+        return CanManagePermissions()
+            && memberToUpdate.Id != CurrentUser.UserId
+            && LabContext.CurrentLab.MembershipType >= memberToUpdate.MembershipType;
+    }
+
+    public async Task ShowManagePermissionsModal(LaboratoryMemberDto memberToUpdate)
+    {
+        var modalParameters = new ModalParameters()
+            .Add(nameof(UpdateMembershipTypeModal.MemberToUpdate), memberToUpdate);
+
+        var result = await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
+
+        if (result.Confirmed)
+            Result = await ApiClient.GetLaboratoryMembers();
+
+        StateHasChanged();
+    }
+}

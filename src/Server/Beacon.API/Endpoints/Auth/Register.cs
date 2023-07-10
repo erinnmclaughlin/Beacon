@@ -1,10 +1,9 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.App.Entities;
+using Beacon.App.Exceptions;
 using Beacon.App.Services;
 using Beacon.Common.Requests.Auth;
-using FluentValidation;
 using MediatR;
-using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
@@ -16,26 +15,6 @@ public sealed class Register : IBeaconEndpoint
     public static void Map(IEndpointRouteBuilder app)
     {
         app.MapPost<RegisterRequest>("auth/register").WithTags(EndpointTags.Authentication);
-    }
-
-    public sealed class EmailAddressValidator : AbstractValidator<RegisterRequest>
-    {
-        private readonly BeaconDbContext _dbContext;
-
-        public EmailAddressValidator(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
-
-            RuleFor(r => r.EmailAddress)
-                .MustAsync(BeAUniqueEmailAddress)
-                .WithMessage("An account with the specified email address already exists.");
-        }
-
-        public async Task<bool> BeAUniqueEmailAddress(string email, CancellationToken ct)
-        {
-            var emailExists = await _dbContext.Users.AnyAsync(u => u.EmailAddress == email, ct);
-            return !emailExists;
-        }
     }
 
     internal sealed class Handler : IRequestHandler<RegisterRequest>
@@ -51,6 +30,8 @@ public sealed class Register : IBeaconEndpoint
 
         public async Task Handle(RegisterRequest request, CancellationToken ct)
         {
+            await EnsureEmailIsUnique(request.EmailAddress, ct);
+
             var user = new User
             {
                 Id = Guid.NewGuid(),
@@ -62,6 +43,12 @@ public sealed class Register : IBeaconEndpoint
 
             _dbContext.Users.Add(user);
             await _dbContext.SaveChangesAsync(ct);
+        }
+
+        private async Task EnsureEmailIsUnique(string email, CancellationToken ct)
+        {
+            if (await _dbContext.Users.AnyAsync(u => u.EmailAddress == email, ct))
+                throw new BeaconValidationException(nameof(RegisterRequest.EmailAddress), "An account with the specified email address already exists.");
         }
     }
 }

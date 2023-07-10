@@ -25,7 +25,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     [Fact(DisplayName = "[004] Create project suceeds when request is valid")]
     public async Task CreateProject_Succeeds_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync("api/projects", SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -40,7 +40,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     [Fact(DisplayName = "[004] Create project fails when request is invalid")]
     public async Task CreateProject_Fails_WhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync("api/projects", SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -52,7 +52,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     [Fact(DisplayName = "[004] Create project fails when user is not authorized")]
     public async Task CreateProject_Fails_WhenUserIsNotAuthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await PostAsync("api/projects", SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

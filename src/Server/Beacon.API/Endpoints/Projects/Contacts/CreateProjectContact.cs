@@ -45,7 +45,7 @@ public sealed class CreateProjectContact : IBeaconEndpoint
                 Name = request.Name,
                 EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress,
                 PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
-                LaboratoryId = _labContext.LaboratoryId,
+                LaboratoryId = _labContext.CurrentLab.Id,
                 ProjectId = request.ProjectId
             });
 

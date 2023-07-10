@@ -12,7 +12,7 @@ public sealed class CreateLaboratoryTests : TestBase
     [Fact(DisplayName = "[002] Create lab succeeds when request is valid")]
     public async Task CreateLab_ShouldSucceed_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync("api/laboratories", new CreateLaboratoryRequest
         {
@@ -28,6 +28,7 @@ public sealed class CreateLaboratoryTests : TestBase
     [Fact(DisplayName = "[002] Create lab fails when request is invalid")]
     public async Task CreateLab_ShouldFail_WhenRequestIsInvalid()
     {
+        RunAsAdmin();
 
         var response = await PostAsync("api/laboratories", new CreateLaboratoryRequest
         {

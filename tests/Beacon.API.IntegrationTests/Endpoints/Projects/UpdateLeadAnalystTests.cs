@@ -12,7 +12,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     [Fact(DisplayName = "[014] Assigning lead analyst fails when analyst is not in valid role")]
     public async Task AssigningLeadAnalyst_ShouldFail_WhenAnalystIsNotValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var request = new UpdateLeadAnalystRequest
         {
@@ -29,7 +29,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     [Fact(DisplayName = "[014] Assigning lead analyst fails when user is not authorized")]
     public async Task AssigningLeadAnalyst_ShouldFail_WhenUserIsNotAuthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var request = new UpdateLeadAnalystRequest
         {
@@ -46,7 +46,8 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     [Fact(DisplayName = "[014] Assigning lead analyst succeeds when request is valid")]
     public async Task AssigningLeadAnalyst_ShouldSucceed_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AnalystUser.Id);
+        RunAsAnalyst();
+
         var request = new UpdateLeadAnalystRequest
         {
             ProjectId = ProjectId,
@@ -69,7 +70,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
             db.SaveChanges();
         });
 
-        SetCurrentUser(TestData.AnalystUser.Id);
+        RunAsAnalyst();
 
         var request = new UpdateLeadAnalystRequest
         {

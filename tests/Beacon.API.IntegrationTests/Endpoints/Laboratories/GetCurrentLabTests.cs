@@ -13,7 +13,7 @@ public sealed class GetCurrentLabTests : TestBase
     [Fact(DisplayName = "[185] Get current lab endpoint returns lab info if current user is a member")]
     public async Task GetCurrentLab_ReturnsExpectedResult()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await GetAsync("api/laboratories/current");
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
@@ -28,7 +28,7 @@ public sealed class GetCurrentLabTests : TestBase
     [Fact(DisplayName = "[185] Get current lab endpoint does not return lab info if current user is not a member")]
     public async Task GetCurrentLab_ReturnsForbidden_IfCurrentUserIsNotAuthorized()
     {
-        SetCurrentUser(TestData.NonMemberUser.Id);
+        RunAsNonMember();
 
         var response = await GetAsync("api/laboratories/current");
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

@@ -1,0 +1,68 @@
+﻿@inject ApiClient ApiClient
+@inject ISessionContext CurrentUser
+
+<BeaconForm Model="Model" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Manager">
+                <Authorized>
+                    <div class="field">
+                        <label class="form-label" for="member">Member</label>
+                        <input class="form-control" id="member" readonly value="@MemberToUpdate.DisplayName" />
+                    </div>
+                    <div class="field">
+                        <label class="form-label" for="type">Membership Type</label>
+                        <InputSelect class="form-select" @bind-Value="Model.MembershipType">
+                            @foreach (var option in Enum.GetValues<LaboratoryMembershipType>())
+                            {
+                                <option value="@option" disabled="@IsDisabled(context, option)">@option</option>
+                            }
+                        </InputSelect>
+                        <ValidationMessage For="() => Model.MembershipType" />
+                    </div>
+                </Authorized>
+                <NotAuthorized>
+                    <p class="text-danger">You do not have permission to update user memberships for this laboratory.</p>
+                </NotAuthorized>
+            </AuthorizeLabView>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton class="btn btn-primary">Update Membership</SubmitButton>
+            <button class="btn btn-secondary" type="button" @onclick="() => Modal.CancelAsync()">Cancel</button>
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = null!;
+
+    [Parameter]
+    public required LaboratoryMemberDto MemberToUpdate { get; set; }
+
+    private UpdateMembershipRequest? _model;
+    private UpdateMembershipRequest Model => _model ??= new()
+        {
+            MemberId = MemberToUpdate.Id,
+            MembershipType = MemberToUpdate.MembershipType
+        };
+
+    private async Task Submit(BeaconForm form)
+    {
+        var result = await ApiClient.UpdateMembershipType(Model);
+
+        if (result.IsError)
+        {
+            form.AddErrors(result.Errors);
+            return;
+        }
+
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+
+    private bool IsDisabled(ILabContext context, LaboratoryMembershipType targetType)
+    {
+        return context.CurrentLab.MembershipType < targetType;
+    }
+}

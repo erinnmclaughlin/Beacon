@@ -1,0 +1,16 @@
+﻿@page "/laboratories/{Id:guid}"
+@attribute [Authorize]
+@inject AuthService AuthService
+@inject NavigationManager NavigationManager
+
+@code {
+
+    [Parameter] 
+    public Guid Id { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await AuthService.SetCurrentLaboratory(Id);
+        NavigationManager.NavigateTo("l", replace: true);
+    }
+}

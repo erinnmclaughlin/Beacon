@@ -26,7 +26,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Create contact endpoint returns 422 when request is invalid")]
     public async Task CreateContact_ShouldFail_WhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -39,7 +39,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Create contact endpoint returns 400 when uri does not match request")]
     public async Task CreateContact_ShouldFail_WhenUriDoesNotMatchRequest()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync($"api/projects/{Guid.NewGuid()}/contacts", SomeValidRequest);
         Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
@@ -51,7 +51,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Create contact endpoint returns 403 when user is not authorized")]
     public async Task CreateContact_ShouldFail_WhenUserIsNotAuthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -63,7 +63,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Create project contact succeeds when request is valid")]
     public async Task CreateContact_SucceedsWhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

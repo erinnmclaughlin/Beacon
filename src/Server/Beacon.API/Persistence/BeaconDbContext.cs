@@ -53,7 +53,7 @@ public class BeaconDbContext : DbContext
             builder.OwnsOne(x => x.ProjectCode, b =>
             {
                 b.Property(x => x.CustomerCode).HasMaxLength(3);
-                b.HasIndex(x => new { x.CustomerCode, x.Suffix }).IsUnique();
+                b.HasIndex(x => new { x.CustomerCode, x.Suffix });
             });
             builder.Property(x => x.ProjectStatus).HasConversion<string>().HasMaxLength(25);
             builder.HasIndex(x => x.ProjectStatus);

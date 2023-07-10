@@ -1,0 +1,33 @@
+﻿<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Create project</span>
+</button>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
+
+    [Parameter]
+    public EventCallback OnProjectCreated { get; set; }
+
+    [CascadingParameter]
+    private ILabContext LabContext { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
+
+    private bool IsDisabled => LabContext.CurrentLab.MembershipType <= LaboratoryMembershipType.Analyst;
+
+    private async Task Click()
+    {
+        var result = await ModalService.Show<CreateProjectModal>("Create New Project").Result;
+
+        if (!result.Cancelled)
+        {
+            await OnProjectCreated.InvokeAsync();
+        }
+    }
+}

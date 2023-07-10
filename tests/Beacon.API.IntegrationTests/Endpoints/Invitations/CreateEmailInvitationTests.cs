@@ -15,7 +15,7 @@ public sealed class CreateEmailInvitationTests : TestBase
     [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
     public async Task InvitingUserSucceedsWhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var request = new CreateEmailInvitationRequest
         {
@@ -38,7 +38,7 @@ public sealed class CreateEmailInvitationTests : TestBase
     [Fact(DisplayName = "[003] Invite new user endpoint returns 422 when request is not valid")]
     public async Task InvitingUserFailsWhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var request = new CreateEmailInvitationRequest
         {
@@ -55,7 +55,7 @@ public sealed class CreateEmailInvitationTests : TestBase
     [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
     public async Task InvitingUserFailsWhenRequestIsUnauthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var request = new CreateEmailInvitationRequest
         {

@@ -1,0 +1,33 @@
+﻿@page "/"
+@using BeaconUI.Core.Laboratories.Components
+@attribute [Authorize]
+@inject ApiClient ApiClient
+
+<div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
+    <div class="content flex-grow-1" style="background-color: #f8fafc">
+        <div class="px-4 h-100">
+            <div class="d-flex align-items-center">
+                <h4 class="mb-0 me-auto">My Laboratories</h4>
+                <CreateLaboratoryButton OnLaboratoryCreated="LoadMyLaboratories" class="btn btn-primary" />
+            </div>
+            <MyLaboratoriesTable Laboratories="Laboratories" />
+        </div>
+    </div>
+</div>
+
+@code {
+
+    private LaboratoryDto[]? Laboratories { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadMyLaboratories();
+    }
+
+    private async Task LoadMyLaboratories()
+    {
+        var errorOrLaboratories = await ApiClient.GetMyLaboratories();
+        Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;        
+    }
+
+}

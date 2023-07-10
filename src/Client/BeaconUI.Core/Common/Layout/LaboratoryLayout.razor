@@ -1,0 +1,12 @@
+﻿@inherits LayoutComponentBase
+
+<AuthorizeLabView>
+    <MainLayout>
+        <Body>
+            <LaboratorySideNav LabName="@context.CurrentLab.Name" />
+            <div class="d-flex flex-column flex-grow-1">
+                @Body
+            </div>
+        </Body>
+    </MainLayout>
+</AuthorizeLabView>

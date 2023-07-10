@@ -1,5 +1,0 @@
-:root {
-    --topnav-height: 3.5rem;
-    --sidebar-width: 4rem;
-    --sidebar-height: calc(100vh - var(--topnav-height));
-}

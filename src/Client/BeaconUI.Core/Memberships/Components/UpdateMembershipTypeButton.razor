@@ -1,0 +1,21 @@
+﻿<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
+    <span class="icon @(IsDisabled ? "" : "text-primary")">
+        <i class="fa-regular fa-pencil"></i>
+    </span>
+    <span>Manage Permissions</span>
+</button>
+
+@code {
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
+
+    [Parameter, EditorRequired]
+    public required LaboratoryMemberDto Member { get; set; }
+
+    [CascadingParameter]
+    private MembershipContext Context { get; set; } = default!;
+
+    private bool IsDisabled => !Context.CanManagePermissions(Member);
+    private Task Click() => Context.ShowManagePermissionsModal(Member);
+}

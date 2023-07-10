@@ -46,12 +46,12 @@ public sealed class AcceptEmailInvitation : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<AcceptEmailInvitationRequest>
     {
-        private readonly ICurrentUser _currentUser;
+        private readonly ISessionContext _context;
         private readonly BeaconDbContext _dbContext;
 
-        public Handler(ICurrentUser currentUser, BeaconDbContext dbContext)
+        public Handler(ISessionContext context, BeaconDbContext dbContext)
         {
-            _currentUser = currentUser;
+            _context = context;
             _dbContext = dbContext;
         }
 
@@ -66,7 +66,7 @@ public sealed class AcceptEmailInvitation : IBeaconEndpoint
 
         private async Task<User> GetCurrentUser(CancellationToken ct)
         {
-            var currentUserId = _currentUser.UserId;
+            var currentUserId = _context.UserId;
             return await _dbContext.Users.SingleAsync(u => u.Id == currentUserId, ct);
         }
 

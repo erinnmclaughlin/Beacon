@@ -2,6 +2,7 @@
 using Beacon.App.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
+using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -38,10 +39,12 @@ public sealed class GetProjectDetails : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<GetProjectByIdRequest, ProjectDto?>, IRequestHandler<GetProjectByProjectCodeRequest, ProjectDto?>
     {
         private readonly BeaconDbContext _dbContext;
+        private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext)
+        public Handler(BeaconDbContext dbContext, ILabContext labContext)
         {
             _dbContext = dbContext;
+            _labContext = labContext;
         }
 
         public async Task<ProjectDto?> Handle(GetProjectByIdRequest request, CancellationToken ct)
@@ -58,7 +61,11 @@ public sealed class GetProjectDetails : IBeaconEndpoint
 
         private async Task<ProjectDto?> GetAsync(Expression<Func<Project, bool>> filter, CancellationToken ct)
         {
-            var project = await _dbContext.Projects.Include(x => x.LeadAnalyst).AsNoTracking().SingleOrDefaultAsync(filter, ct);
+            var project = await _dbContext.Projects
+                .Include(x => x.LeadAnalyst)
+                .Where(x => x.LaboratoryId == _labContext.CurrentLab.Id)
+                .AsNoTracking()
+                .SingleOrDefaultAsync(filter, ct);
 
             return project is null ? null : new ProjectDto
             {

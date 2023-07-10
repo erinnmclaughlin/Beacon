@@ -1,0 +1,94 @@
+﻿@page "/l/projects/{Code}/{Tab?}"
+@attribute [Authorize]
+@layout LaboratoryLayout
+@inject ApiClient ApiClient
+@inject NavigationManager NavigationManager
+
+<LaboratoryPageHeader>
+    <ChildContent>
+        <h4>Project Details</h4>
+    </ChildContent>
+    <TabsContent>
+        <li class="nav-item">
+            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
+        </li>
+    </TabsContent>
+</LaboratoryPageHeader>
+
+<div class="content flex-grow-1" style="background-color: #f8fafc">
+    <div class="px-4 h-100">
+        @if (Project is not { } p)
+        {
+            <p>Loading...</p>
+        }
+        else if (p.IsError)
+        {
+            <p class="text-danger">There was an error loading project details.</p>
+        }
+        else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+        {
+            <ProjectSamples ProjectId="p.Value.Id" />
+        }
+        else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+        {
+            <ProjectContacts Project="p.Value" />
+        }
+        else
+        {
+            <ProjectOverview Project="p.Value" ProjectChanged="(p) => Project = p" />
+        }
+    </div>
+</div>
+
+@code {
+
+    [Parameter]
+    public required string Code { get; set; }
+
+    [Parameter]
+    public string? Tab { get; set; }
+
+    private ErrorOr<ProjectDto>? Project { get; set; }
+
+    private ErrorOr<LaboratoryMemberDto[]>? LabMembers { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await Task.WhenAll(LoadProject(), LoadMembers());
+    }
+
+    private async Task LoadMembers()
+    {
+        LabMembers = await ApiClient.GetLaboratoryMembers();
+    }
+
+    private async Task LoadProject()
+    {
+        if (ProjectCode.FromString(Code) is not { } code)
+        {
+            NavigationManager.NavigateTo("l/projects");
+            return;
+        }
+
+        Project = await ApiClient.GetProject(code);
+    }
+
+    private async Task HandleLeadAnalystChanged(Guid projectId, ChangeEventArgs e)
+    {
+        var request = new UpdateLeadAnalystRequest 
+        { 
+            ProjectId = projectId, 
+            AnalystId = Guid.TryParse(e.Value?.ToString(), out var id) ? id : null
+        };
+
+        await ApiClient.UpdateLeadAnalyst(request);
+        await LoadProject();
+    }
+
+}

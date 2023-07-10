@@ -19,7 +19,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Update contact succeeds when request is valid")]
     public async Task UpdateContact_Succeeds_WhenRequestIsValid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var request = new UpdateProjectContactRequest
         {
@@ -43,7 +43,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Update contact endpoint returns 422 when request is invalid")]
     public async Task UpdateContact_Fails_WhenRequestIsInvalid()
     {
-        SetCurrentUser(TestData.AdminUser.Id);
+        RunAsAdmin();
 
         var request = new UpdateProjectContactRequest
         {
@@ -67,7 +67,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Update contact endpoint returns 403 when user is unauthorized")]
     public async Task UpdateContact_Fails_WhenUserIsUnauthorized()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var request = new UpdateProjectContactRequest
         {

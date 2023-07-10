@@ -12,7 +12,7 @@ public sealed class GetMembershipsTests : TestBase
     [Fact(DisplayName = "[170] Get memberships endpoint returns 403 when user is not authorized")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
-        SetCurrentUser(TestData.NonMemberUser.Id);
+        RunAsNonMember();
 
         var response = await GetAsync("api/memberships");
 
@@ -22,7 +22,7 @@ public sealed class GetMembershipsTests : TestBase
     [Fact(DisplayName = "[170] Get memberships endpoint returns list of lab members when user is authorized")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
-        SetCurrentUser(TestData.MemberUser.Id);
+        RunAsMember();
 
         var response = await GetAsync("api/memberships");
 
