@@ -61,19 +61,20 @@ public abstract class TestBase : IClassFixture<TestFixture>
     protected void SetCurrentUser(User? user, LaboratoryMembershipType? membershipType)
     {
         using var scope = _fixture.Services.CreateScope();
-        var currentUserMock = scope.ServiceProvider.GetRequiredService<Mock<ISessionContext>>();
-        currentUserMock.SetupGet(x => x.UserId).Returns(user?.Id ?? Guid.Empty);
-        currentUserMock.SetupGet(x => x.CurrentUser).Returns(new CurrentUser
+        var sessionMock = scope.ServiceProvider.GetRequiredService<Mock<ISessionContext>>();
+        sessionMock.SetupGet(x => x.UserId).Returns(user?.Id ?? Guid.Empty);
+        sessionMock.SetupGet(x => x.CurrentUser).Returns(new CurrentUser
         {
             Id = user?.Id ?? Guid.Empty,
             DisplayName = user?.DisplayName ?? "",
         });
-        currentUserMock.SetupGet(x => x.CurrentLab).Returns(membershipType is null ? null : new CurrentLab
+        sessionMock.SetupGet(x => x.CurrentLab).Returns(membershipType is null ? null : new CurrentLab
         {
             Id = TestData.Lab.Id,
             Name = TestData.Lab.Name,
             MembershipType = membershipType.Value
         });
+
     }
 
     protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)

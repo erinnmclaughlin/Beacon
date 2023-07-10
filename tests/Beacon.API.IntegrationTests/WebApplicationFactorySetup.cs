@@ -40,20 +40,21 @@ public static class WebApplicationFactorySetup
     {
         services.RemoveAll<ISessionContext>();
         services.AddSingleton<Mock<ISessionContext>>();
-        services.AddScoped(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
+        services.AddSingleton(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
     }
 
     public static void UseMockedLabContext(this IServiceCollection services)
     {
         services.RemoveAll<ILabContext>();
-        var mock = new Mock<ILabContext>();
-        mock.SetupGet(x => x.CurrentLab).Returns(new CurrentLab
+        services.AddSingleton<ILabContext>(sp =>
         {
-            Id = TestData.Lab.Id,
-            Name = TestData.Lab.Name,
-            MembershipType = LaboratoryMembershipType.Admin
+            var sessionContext = sp.GetRequiredService<ISessionContext>();
+            return new LabContext
+            {
+                CurrentUser = sessionContext.CurrentUser,
+                CurrentLab = sessionContext.CurrentLab!
+            };
         });
-        services.AddSingleton(_ => mock.Object);
     }
 
     public static void UseFakeEmailService(this IServiceCollection services)

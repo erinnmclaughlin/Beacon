@@ -57,7 +57,7 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
                 NewMemberEmailAddress = request.NewMemberEmailAddress,
                 MembershipType = request.MembershipType,
                 LaboratoryId = _context.CurrentLab.Id,
-                CreatedById = _context.CurrentLab.Id
+                CreatedById = _context.CurrentUser.Id
             };
 
             var emailInvitation = invitation.AddEmailInvitation(now);
