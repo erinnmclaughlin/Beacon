@@ -26,6 +26,8 @@ public sealed class BeaconAuthenticationService
 
         var identity = new ClaimsIdentity("AuthCookie");
         identity.AddClaim(BeaconClaimTypes.UserId, user.Id.ToString());
+        identity.AddClaim(BeaconClaimTypes.DisplayName, user.DisplayName);
+        identity.AddClaim(BeaconClaimTypes.Email, user.EmailAddress);
         return identity;
     }
 }
