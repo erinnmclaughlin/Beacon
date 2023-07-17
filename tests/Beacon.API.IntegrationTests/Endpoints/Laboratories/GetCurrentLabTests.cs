@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
@@ -36,7 +37,7 @@ public sealed class GetCurrentLabTests : TestBase
 
     protected override void AddTestData(BeaconDbContext db)
     {
-        var lab = new App.Entities.Laboratory
+        var lab = new Laboratory
         {
             Id = TestData.Lab.Id,
             Name = TestData.Lab.Name

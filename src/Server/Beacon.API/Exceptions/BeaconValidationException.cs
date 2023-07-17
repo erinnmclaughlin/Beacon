@@ -1,7 +1,7 @@
 ﻿using FluentValidation;
 using FluentValidation.Results;
 
-namespace Beacon.App.Exceptions;
+namespace Beacon.API.Exceptions;
 
 public class BeaconValidationException : ValidationException
 {

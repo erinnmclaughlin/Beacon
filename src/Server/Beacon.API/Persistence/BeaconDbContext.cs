@@ -1,4 +1,4 @@
-﻿using Beacon.App.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Validation.Rules;
 using Microsoft.EntityFrameworkCore;
 

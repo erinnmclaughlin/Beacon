@@ -1,5 +1,5 @@
-﻿using Beacon.API.Services;
-using Beacon.App.Entities;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.API.Services;
 using Beacon.Common.Models;
 
 namespace Beacon.WebHost;

@@ -1,6 +1,6 @@
 ﻿using Beacon.API.Endpoints;
 using Beacon.API.Persistence;
-using Beacon.App.Entities;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.Contacts;
 using Beacon.Common.Services;
 using MediatR;

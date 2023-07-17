@@ -1,6 +1,6 @@
-﻿namespace Beacon.App.Entities;
+﻿namespace Beacon.API.Persistence.Entities;
 
-public class InvitationEmail : LaboratoryScopedEntityBase
+public sealed class InvitationEmail : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset SentOn { get; init; }

@@ -1,4 +1,4 @@
-﻿using Beacon.App.Exceptions;
+﻿using Beacon.API.Exceptions;
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Http;
 

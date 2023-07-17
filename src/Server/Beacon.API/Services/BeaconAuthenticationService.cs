@@ -1,5 +1,4 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Services;
 using Beacon.Common;
 using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;

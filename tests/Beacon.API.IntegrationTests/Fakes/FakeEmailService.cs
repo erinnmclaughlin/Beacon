@@ -1,4 +1,4 @@
-﻿using Beacon.App.Services;
+﻿using Beacon.API.Services;
 
 namespace Beacon.API.IntegrationTests.Fakes;
 

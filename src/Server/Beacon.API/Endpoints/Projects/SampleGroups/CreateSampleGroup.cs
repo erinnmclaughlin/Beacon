@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.SampleGroups;
 using Beacon.Common.Services;
 using MediatR;

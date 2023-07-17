@@ -1,4 +1,4 @@
-﻿namespace Beacon.App.Settings;
+﻿namespace Beacon.API.Settings;
 
 public sealed class ApplicationSettings
 {

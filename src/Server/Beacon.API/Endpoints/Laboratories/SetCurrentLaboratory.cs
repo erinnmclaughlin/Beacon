@@ -1,6 +1,6 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.Exceptions;
+using Beacon.API.Persistence;
 using Beacon.API.Services;
-using Beacon.App.Exceptions;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
 using MediatR;

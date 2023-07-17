@@ -1,4 +1,4 @@
-﻿namespace Beacon.App.Entities;
+﻿namespace Beacon.API.Persistence.Entities;
 
 public abstract class LaboratoryScopedEntityBase
 {

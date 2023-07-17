@@ -1,8 +1,8 @@
-﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
-using Beacon.App.Exceptions;
-using Beacon.App.Services;
-using Beacon.App.Settings;
+﻿using Beacon.API.Exceptions;
+using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
+using Beacon.API.Services;
+using Beacon.API.Settings;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Services;
 using MediatR;

@@ -1,7 +1,7 @@
-﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
-using Beacon.App.Exceptions;
-using Beacon.App.Services;
+﻿using Beacon.API.Exceptions;
+using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
+using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Http;

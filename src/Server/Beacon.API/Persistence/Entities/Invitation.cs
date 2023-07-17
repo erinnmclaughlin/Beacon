@@ -1,9 +1,9 @@
-﻿using Beacon.App.Exceptions;
+﻿using Beacon.API.Exceptions;
 using Beacon.Common.Models;
 
-namespace Beacon.App.Entities;
+namespace Beacon.API.Persistence.Entities;
 
-public class Invitation : LaboratoryScopedEntityBase
+public sealed class Invitation : LaboratoryScopedEntityBase
 {
     public required Guid Id { get; init; }
     public required DateTimeOffset CreatedOn { get; init; }
@@ -46,7 +46,7 @@ public class Invitation : LaboratoryScopedEntityBase
             LaboratoryInvitationId = Id,
             SentOn = sentOn,
             ExpiresOn = sentOn.AddDays(ExpireAfterDays),
-            LaboratoryId  = LaboratoryId
+            LaboratoryId = LaboratoryId
         };
 
         _emailInvitations.Add(invitationEmail);

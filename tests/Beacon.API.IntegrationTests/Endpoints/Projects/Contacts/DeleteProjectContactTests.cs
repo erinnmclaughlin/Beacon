@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
+using Beacon.API.Persistence.Entities;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 

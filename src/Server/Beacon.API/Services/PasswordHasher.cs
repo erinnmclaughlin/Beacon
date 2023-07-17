@@ -1,8 +1,13 @@
-﻿using Beacon.App.Services;
-using System.Security.Cryptography;
+﻿using System.Security.Cryptography;
 using System.Text;
 
 namespace Beacon.API.Services;
+
+public interface IPasswordHasher
+{
+    string Hash(string plainText, out byte[] salt);
+    bool Verify(string plainText, string hash, byte[] salt);
+}
 
 // https://code-maze.com/csharp-hashing-salting-passwords-best-practices/
 public sealed class PasswordHasher : IPasswordHasher
