@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -25,19 +24,16 @@ public sealed class GetProjects : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<GetProjectsRequest, ProjectDto[]>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext, ILabContext labContext)
+        public Handler(BeaconDbContext dbContext)
         {
             _dbContext = dbContext;
-            _labContext = labContext;
         }
 
         public async Task<ProjectDto[]> Handle(GetProjectsRequest request, CancellationToken ct)
         {
             var projects = await _dbContext.Projects
                 .Include(x => x.LeadAnalyst)
-                .Where(x => x.LaboratoryId == _labContext.CurrentLab.Id)
                 .AsNoTracking()
                 .ToArrayAsync(ct);
 

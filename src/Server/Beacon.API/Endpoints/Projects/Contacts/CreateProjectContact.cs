@@ -29,12 +29,10 @@ public sealed class CreateProjectContact : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<CreateProjectContactRequest>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly ILabContext _labContext;
 
         public Handler(BeaconDbContext dbContext, ILabContext labContext)
         {
             _dbContext = dbContext;
-            _labContext = labContext;
         }
 
         public async Task Handle(CreateProjectContactRequest request, CancellationToken ct)
@@ -45,7 +43,6 @@ public sealed class CreateProjectContact : IBeaconEndpoint
                 Name = request.Name,
                 EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress,
                 PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
-                LaboratoryId = _labContext.CurrentLab.Id,
                 ProjectId = request.ProjectId
             });
 

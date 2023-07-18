@@ -63,7 +63,7 @@ public class BeaconDbContext : DbContext
             builder.HasIndex(x => x.ProjectStatus);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
-            //builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<ProjectContact>(builder =>

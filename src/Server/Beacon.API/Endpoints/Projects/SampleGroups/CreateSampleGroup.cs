@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.SampleGroups;
-using Beacon.Common.Services;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -28,12 +27,10 @@ public sealed class CreateSampleGroup : IBeaconEndpoint
     internal sealed class Handler : IRequestHandler<CreateSampleGroupRequest>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly ILabContext _labContext;
 
-        public Handler(BeaconDbContext dbContext, ILabContext labContext)
+        public Handler(BeaconDbContext dbContext)
         {
             _dbContext = dbContext;
-            _labContext = labContext;
         }
 
         public async Task Handle(CreateSampleGroupRequest request, CancellationToken ct)
@@ -42,7 +39,6 @@ public sealed class CreateSampleGroup : IBeaconEndpoint
             {
                 Id = Guid.NewGuid(),
                 ProjectId = request.ProjectId,
-                LaboratoryId = _labContext.CurrentLab.Id,
                 SampleName = request.SampleName,
                 ContainerType = request.ContainerType,
                 IsHazardous = request.IsHazardous,
