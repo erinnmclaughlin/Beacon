@@ -1,8 +1,8 @@
 ﻿using Beacon.Common.Models;
 
-namespace Beacon.App.Entities;
+namespace Beacon.API.Persistence.Entities;
 
-public class Laboratory
+public sealed class Laboratory
 {
     public required Guid Id { get; init; }
     public required string Name { get; set; }

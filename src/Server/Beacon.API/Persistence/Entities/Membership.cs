@@ -1,8 +1,8 @@
 ﻿using Beacon.Common.Models;
 
-namespace Beacon.App.Entities;
+namespace Beacon.API.Persistence.Entities;
 
-public class Membership : LaboratoryScopedEntityBase
+public sealed class Membership : LaboratoryScopedEntityBase
 {
     public required LaboratoryMembershipType MembershipType { get; set; }
 

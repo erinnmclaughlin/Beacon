@@ -35,7 +35,8 @@ public sealed class UpdateProjectContact : IBeaconEndpoint
 
         public async Task Handle(UpdateProjectContactRequest request, CancellationToken ct)
         {
-            var contact = await _dbContext.ProjectContacts.SingleAsync(x => x.Id == request.ContactId && x.ProjectId == request.ProjectId, ct);
+            var contact = await _dbContext.ProjectContacts
+                .SingleAsync(x => x.Id == request.ContactId && x.ProjectId == request.ProjectId, ct);
 
             contact.Name = request.Name;
             contact.EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress;

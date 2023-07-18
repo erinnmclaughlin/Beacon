@@ -39,6 +39,7 @@ public sealed class GetMyLaboratories : IBeaconEndpoint
                     Name = m.Laboratory.Name,
                     MemberCount = m.Laboratory.Memberships.Count
                 })
+                .IgnoreQueryFilters()
                 .ToArrayAsync(ct);
         }
     }

@@ -1,4 +1,4 @@
-﻿using Beacon.App.Exceptions;
+﻿using Beacon.API.Exceptions;
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Http;
 
@@ -13,7 +13,7 @@ internal sealed class HttpSessionContext : ISessionContext, ILabContext
 
     public HttpSessionContext(IHttpContextAccessor httpContextAccessor)
     {
-        var principal = httpContextAccessor.HttpContext!.User;
+        var principal = httpContextAccessor.HttpContext?.User;
 
         CurrentUser = CurrentUser.FromClaimsPrincipal(principal);
         CurrentLab = CurrentLab.FromClaimsPrincipal(principal);

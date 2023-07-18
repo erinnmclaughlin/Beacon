@@ -1,7 +1,6 @@
 ﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence;
-using Beacon.App.Services;
-using Beacon.Common.Models;
+using Beacon.API.Services;
 using Beacon.Common.Services;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
@@ -40,13 +39,13 @@ public static class WebApplicationFactorySetup
     {
         services.RemoveAll<ISessionContext>();
         services.AddSingleton<Mock<ISessionContext>>();
-        services.AddSingleton(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
+        services.AddScoped(sp => sp.GetRequiredService<Mock<ISessionContext>>().Object);
     }
 
     public static void UseMockedLabContext(this IServiceCollection services)
     {
         services.RemoveAll<ILabContext>();
-        services.AddSingleton<ILabContext>(sp =>
+        services.AddScoped<ILabContext>(sp =>
         {
             var sessionContext = sp.GetRequiredService<ISessionContext>();
             return new LabContext

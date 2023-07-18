@@ -16,8 +16,11 @@ public class CurrentLab
         new Claim(BeaconClaimTypes.MembershipType, MembershipType.ToString())
     };
 
-    public static CurrentLab? FromClaimsPrincipal(ClaimsPrincipal user)
+    public static CurrentLab? FromClaimsPrincipal(ClaimsPrincipal? user)
     {
+        if (user == null)
+            return null;
+
         var id = user.FindGuidValue(BeaconClaimTypes.LabId);
         var membershipType = user.FindEnumValue<LaboratoryMembershipType>(BeaconClaimTypes.MembershipType);
 

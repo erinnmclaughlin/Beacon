@@ -1,4 +1,4 @@
-﻿using Beacon.App.Exceptions;
+﻿using Beacon.API.Exceptions;
 using Beacon.Common.Validation;
 using FluentValidation;
 using Microsoft.AspNetCore.Diagnostics;

@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Persistence;
-using Beacon.App.Entities;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
@@ -27,16 +27,11 @@ public abstract class TestBase : IClassFixture<TestFixture>
 
     protected virtual void AddTestData(BeaconDbContext db)
     {
-        AddDefaultTestData(db);
+        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
+        db.Laboratories.Add(TestData.Lab);
         db.SaveChanges();
     }
     
-    protected void AddDefaultTestData(BeaconDbContext db)
-    {
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        db.Laboratories.Add(TestData.Lab);
-    }
-
     protected void ExecuteDbContext(Action<BeaconDbContext> action)
     {
         using var scope = _fixture.Services.CreateScope();

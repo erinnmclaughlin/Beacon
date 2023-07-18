@@ -1,10 +1,20 @@
-﻿using Azure.Communication.Email;
-using Azure;
+﻿using Azure;
+using Azure.Communication.Email;
+using Beacon.API.Settings;
 using Microsoft.Extensions.Options;
-using Beacon.App.Settings;
-using Beacon.App.Services;
 
 namespace Beacon.API.Services;
+
+public interface IEmailService
+{
+    Task<IEmailSendOperation?> SendAsync(string subject, string htmlBody, string toAddress);
+}
+
+public interface IEmailSendOperation
+{
+    string OperationId { get; }
+    DateTimeOffset Timestamp { get; }
+}
 
 internal sealed class EmailService : IEmailService
 {

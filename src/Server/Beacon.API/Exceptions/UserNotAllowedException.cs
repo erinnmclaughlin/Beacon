@@ -1,4 +1,4 @@
-﻿namespace Beacon.App.Exceptions;
+﻿namespace Beacon.API.Exceptions;
 
 public class UserNotAllowedException : ApplicationException
 {

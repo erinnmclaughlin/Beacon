@@ -1,5 +1,5 @@
-﻿using Beacon.API.Services;
-using Beacon.App.Exceptions;
+﻿using Beacon.API.Exceptions;
+using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Http;

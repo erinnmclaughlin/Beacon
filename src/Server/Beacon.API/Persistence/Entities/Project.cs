@@ -1,6 +1,6 @@
 ﻿using Beacon.Common.Models;
 
-namespace Beacon.App.Entities;
+namespace Beacon.API.Persistence.Entities;
 
 public class Project : LaboratoryScopedEntityBase
 {
