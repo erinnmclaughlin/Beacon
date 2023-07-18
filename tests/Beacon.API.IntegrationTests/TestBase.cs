@@ -27,16 +27,11 @@ public abstract class TestBase : IClassFixture<TestFixture>
 
     protected virtual void AddTestData(BeaconDbContext db)
     {
-        AddDefaultTestData(db);
+        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
+        db.Laboratories.Add(TestData.Lab);
         db.SaveChanges();
     }
     
-    protected void AddDefaultTestData(BeaconDbContext db)
-    {
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        db.Laboratories.Add(TestData.Lab);
-    }
-
     protected void ExecuteDbContext(Action<BeaconDbContext> action)
     {
         using var scope = _fixture.Services.CreateScope();

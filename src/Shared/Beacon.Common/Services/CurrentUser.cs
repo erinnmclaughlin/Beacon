@@ -13,9 +13,9 @@ public class CurrentUser
         new Claim(BeaconClaimTypes.DisplayName, DisplayName)
     };
 
-    public static CurrentUser FromClaimsPrincipal(ClaimsPrincipal user) => new()
+    public static CurrentUser FromClaimsPrincipal(ClaimsPrincipal? user) => new()
     {
-        Id = user.FindGuidValue(BeaconClaimTypes.UserId),
-        DisplayName = user.FindFirst(BeaconClaimTypes.DisplayName)?.Value ?? ""
+        Id = user?.FindGuidValue(BeaconClaimTypes.UserId) ?? Guid.Empty,
+        DisplayName = user?.FindFirst(BeaconClaimTypes.DisplayName)?.Value ?? ""
     };
 }

@@ -63,14 +63,14 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     [Fact(DisplayName = "[014] Unassigning lead analyst succeeds when request is valid")]
     public async Task UnassigningLeadAnalyst_ShouldSucceed_WhenRequestIsValid()
     {
+        RunAsAnalyst();
+
         ExecuteDbContext(db =>
         {
             var project = db.Projects.Single(p => p.Id == ProjectId);
             project.LeadAnalystId = TestData.AdminUser.Id;
             db.SaveChanges();
         });
-
-        RunAsAnalyst();
 
         var request = new UpdateLeadAnalystRequest
         {

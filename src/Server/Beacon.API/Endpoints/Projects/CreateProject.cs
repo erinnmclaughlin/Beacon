@@ -48,13 +48,13 @@ public sealed class CreateProject : IBeaconEndpoint
 
     internal sealed class Handler : IRequestHandler<CreateProjectRequest>
     {
-        private readonly ILabContext _context;
         private readonly BeaconDbContext _dbContext;
+        private readonly ISessionContext _sessionContext;
 
-        public Handler(ILabContext context, BeaconDbContext dbContext)
+        public Handler(BeaconDbContext dbContext, ISessionContext sessionContext)
         {
-            _context = context;
             _dbContext = dbContext;
+            _sessionContext = sessionContext;
         }
 
         public async Task Handle(CreateProjectRequest request, CancellationToken ct)
@@ -64,8 +64,7 @@ public sealed class CreateProject : IBeaconEndpoint
                 Id = Guid.NewGuid(),
                 ProjectCode = await GenerateProjectCode(request, ct),
                 CustomerName = request.CustomerName,
-                CreatedById = _context.CurrentUser.Id,
-                LaboratoryId = _context.CurrentLab!.Id,
+                CreatedById = _sessionContext.CurrentUser.Id,
                 LeadAnalystId = request.LeadAnalystId
             });
 
@@ -75,7 +74,7 @@ public sealed class CreateProject : IBeaconEndpoint
         private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
         {
             var lastSuffix = await _dbContext.Projects
-                .Where(p => p.LaboratoryId == _context.CurrentLab.Id && p.ProjectCode.CustomerCode == request.CustomerCode)
+                .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode)
                 .OrderBy(p => p.ProjectCode.Suffix)
                 .Select(p => p.ProjectCode.Suffix)
                 .LastOrDefaultAsync(ct);

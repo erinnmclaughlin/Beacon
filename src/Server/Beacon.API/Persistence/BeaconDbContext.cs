@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Services;
 using Beacon.Common.Validation.Rules;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,6 +7,8 @@ namespace Beacon.API.Persistence;
 
 public class BeaconDbContext : DbContext
 {
+    private readonly ISessionContext _sessionContext;
+
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
     public DbSet<Laboratory> Laboratories => Set<Laboratory>();
@@ -15,8 +18,9 @@ public class BeaconDbContext : DbContext
     public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
     public DbSet<User> Users => Set<User>();
 
-    public BeaconDbContext(DbContextOptions options) : base(options)
+    public BeaconDbContext(DbContextOptions options, ISessionContext sessionContext) : base(options)
     {
+        _sessionContext = sessionContext;
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -59,6 +63,7 @@ public class BeaconDbContext : DbContext
             builder.HasIndex(x => x.ProjectStatus);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
+            //builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<ProjectContact>(builder =>
@@ -73,5 +78,28 @@ public class BeaconDbContext : DbContext
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
             builder.HasIndex(x => x.EmailAddress).IsUnique();
         });
+    }
+
+    public override int SaveChanges(bool acceptAllChangesOnSuccess)
+    {
+        UpdateLaboratoryScopedEntities();
+        return base.SaveChanges(acceptAllChangesOnSuccess);
+    }
+
+    public override Task<int> SaveChangesAsync(bool acceptAllChangesOnSuccess, CancellationToken ct = default)
+    {
+        UpdateLaboratoryScopedEntities();
+        return base.SaveChangesAsync(acceptAllChangesOnSuccess, ct);
+    }
+
+    private void UpdateLaboratoryScopedEntities()
+    {
+        var entries = ChangeTracker.Entries<LaboratoryScopedEntityBase>();
+
+        foreach (var e in entries.Where(e => e.State == EntityState.Added))
+        {
+            if (e.Entity.LaboratoryId == default)
+                e.Entity.LaboratoryId = _sessionContext.CurrentLab?.Id ?? default;
+        }
     }
 }

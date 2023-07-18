@@ -2,6 +2,6 @@
 
 public abstract class LaboratoryScopedEntityBase
 {
-    public Guid LaboratoryId { get; init; }
-    public Laboratory Laboratory { get; init; } = null!;
+    public Guid LaboratoryId { get; set; }
+    public Laboratory Laboratory { get; set; } = null!;
 }
