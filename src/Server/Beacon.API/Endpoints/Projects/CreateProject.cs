@@ -21,12 +21,10 @@ public sealed class CreateProject : IBeaconEndpoint
     public sealed class Validator : AbstractValidator<CreateProjectRequest>
     {
         private readonly BeaconDbContext _dbContext;
-        private readonly ILabContext _labContext;
 
-        public Validator(BeaconDbContext dbContext, ILabContext labContext)
+        public Validator(BeaconDbContext dbContext)
         {
             _dbContext = dbContext;
-            _labContext = labContext;
 
             RuleFor(x => x.LeadAnalystId)
                 .MustAsync(BeAuthorized)
@@ -40,7 +38,7 @@ public sealed class CreateProject : IBeaconEndpoint
 
             var membership = await _dbContext.Memberships
                 .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.LaboratoryId == _labContext.CurrentLab.Id && m.MemberId == analystId.Value, ct);
+                .SingleOrDefaultAsync(m => m.MemberId == analystId.Value, ct);
 
             return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
         }
