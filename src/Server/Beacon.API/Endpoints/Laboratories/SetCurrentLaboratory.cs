@@ -39,6 +39,7 @@ public sealed class SetCurrentLaboratory : IBeaconEndpoint
                     CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
                     CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
                 })
+                .IgnoreQueryFilters()
                 .SingleOrDefaultAsync(ct)
                 ?? throw new UserNotAllowedException("The current user is not a member of the specified lab.");
 

@@ -31,12 +31,14 @@ public class BeaconDbContext : DbContext
             builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<InvitationEmail>(builder =>
         {
             builder.HasOne(x => x.LaboratoryInvitation).WithMany(x => x.EmailInvitations).OnDelete(DeleteBehavior.Cascade);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<Laboratory>(builder =>
@@ -50,6 +52,7 @@ public class BeaconDbContext : DbContext
             builder.Property(x => x.MembershipType).HasConversion<string>().HasMaxLength(20);
             builder.HasOne(x => x.Laboratory).WithMany(x => x.Memberships).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.Member).WithMany(x => x.Memberships);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<Project>(builder =>
@@ -66,11 +69,17 @@ public class BeaconDbContext : DbContext
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
+        modelBuilder.Entity<SampleGroup>(builder =>
+        {
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+        });
+
         modelBuilder.Entity<ProjectContact>(builder =>
         {
             builder.Property(x => x.Name).HasMaxLength(ContactRules.MaximumNameLength).IsRequired();
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<User>(builder =>

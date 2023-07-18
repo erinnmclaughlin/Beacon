@@ -56,7 +56,6 @@ public sealed class CreateEmailInvitation : IBeaconEndpoint
                 ExpireAfterDays = 10, // TODO: make this configurable
                 NewMemberEmailAddress = request.NewMemberEmailAddress,
                 MembershipType = request.MembershipType,
-                LaboratoryId = _context.CurrentLab.Id,
                 CreatedById = _context.CurrentUser.Id
             };
 
