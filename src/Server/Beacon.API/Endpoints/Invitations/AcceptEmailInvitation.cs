@@ -39,7 +39,11 @@ public sealed class AcceptEmailInvitation : IBeaconEndpoint
 
         private async Task<bool> NotBeExpired(Guid emailId, CancellationToken ct)
         {
-            var emailInvite = await _dbContext.InvitationEmails.AsNoTracking().SingleAsync(i => i.Id == emailId, ct);
+            var emailInvite = await _dbContext.InvitationEmails
+                .AsNoTracking()
+                .IgnoreQueryFilters()
+                .SingleAsync(i => i.Id == emailId, ct);
+
             return !emailInvite.IsExpired(DateTimeOffset.UtcNow);
         }
     }
@@ -78,6 +82,7 @@ public sealed class AcceptEmailInvitation : IBeaconEndpoint
                 .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
                 .Where(i => i.Id == request.EmailInvitationId)
                 .Select(i => i.LaboratoryInvitation)
+                .IgnoreQueryFilters()
                 .SingleAsync(ct);
         }
     }

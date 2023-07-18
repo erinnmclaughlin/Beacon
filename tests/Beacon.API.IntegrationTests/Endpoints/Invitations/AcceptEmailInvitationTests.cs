@@ -22,10 +22,10 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var invitation = ExecuteDbContext(db => db.InvitationEmails.Include(x => x.LaboratoryInvitation).Single());
+        var invitation = ExecuteDbContext(db => db.InvitationEmails.IgnoreQueryFilters().Include(x => x.LaboratoryInvitation).Single());
         Assert.Equal(TestData.NonMemberUser.Id, invitation.LaboratoryInvitation.AcceptedById);
 
-        var membership = ExecuteDbContext(db => db.Memberships.Single(m => m.MemberId == TestData.NonMemberUser.Id));
+        var membership = ExecuteDbContext(db => db.Memberships.IgnoreQueryFilters().Single(m => m.MemberId == TestData.NonMemberUser.Id));
         Assert.Equal(LaboratoryMembershipType.Analyst, membership.MembershipType);
     }
 
@@ -44,7 +44,8 @@ public sealed class AcceptEmailInvitationTests : TestBase
         // update invite to be expired
         ExecuteDbContext(db =>
         {
-            var invite = db.InvitationEmails.Single();
+            var invite = db.InvitationEmails.IgnoreQueryFilters().Single();
+            invite.LaboratoryId = TestData.Lab.Id;
             invite.ExpiresOn = DateTime.UtcNow.AddDays(-1);
             db.SaveChanges();
         });
@@ -54,7 +55,7 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var membership = ExecuteDbContext(db => db.Memberships.SingleOrDefault(m => m.MemberId == TestData.NonMemberUser.Id));
+        var membership = ExecuteDbContext(db => db.Memberships.IgnoreQueryFilters().SingleOrDefault(m => m.MemberId == TestData.NonMemberUser.Id));
         Assert.Null(membership);
     }
 
