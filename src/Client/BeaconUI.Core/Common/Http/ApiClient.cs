@@ -22,7 +22,7 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<SessionContext>> GetCurrentUser()
     {
-        return await _httpClientFactory.GetAsync<SessionContext>("api/users/current");
+        return await _httpClientFactory.PostAsync<SessionContext>($"api/{nameof(GetSessionContextRequest)}", new GetSessionContextRequest());
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)

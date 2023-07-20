@@ -3,7 +3,6 @@ using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
-using System.Reflection;
 
 namespace Beacon.API.Endpoints;
 
@@ -21,7 +20,23 @@ internal static class EndpointMapper
 
         foreach (var requestType in requestTypes)
         {
+            var interfaceType = requestType.GetInterfaces().First(i => i.IsAssignableTo(typeof(IBaseRequest)));
 
+            if (interfaceType.IsAssignableTo(typeof(IRequest)))
+            {
+                typeof(EndpointMapper)
+                    .GetMethod(nameof(Map), 1, new[] { typeof(IEndpointRouteBuilder) })!
+                    .MakeGenericMethod(requestType)
+                    .Invoke(null, new object[] { app });
+            }
+            else if (interfaceType.GetGenericTypeDefinition() == typeof(IRequest<>))
+            {
+                var responseType = interfaceType.GetGenericArguments()[0];
+                typeof(EndpointMapper)
+                    .GetMethod(nameof(Map), 2, new[] { typeof(IEndpointRouteBuilder) })!
+                    .MakeGenericMethod(requestType, responseType)
+                    .Invoke(null, new object[] { app });
+            }
         }
 
         //var endpoints = Assembly.GetExecutingAssembly().GetTypes()
@@ -37,7 +52,7 @@ internal static class EndpointMapper
 
     public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest
     {
-        app.MapPost($"api/{typeof(TRequest).Name}", async (TRequest request, IMediator m, CancellationToken ct) =>
+        app.MapPost(typeof(TRequest).Name, async (TRequest request, IMediator m, CancellationToken ct) =>
         {
             await m.Send(request, ct);
             return Results.NoContent();
@@ -46,7 +61,7 @@ internal static class EndpointMapper
 
     public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>
     {
-        app.MapPost($"api/{typeof(TRequest).Name}", async (TRequest request, IMediator m, CancellationToken ct) =>
+        app.MapPost(typeof(TRequest).Name, async (TRequest request, IMediator m, CancellationToken ct) =>
         {
             var response = await m.Send(request, ct);
             return Results.Ok(response);
