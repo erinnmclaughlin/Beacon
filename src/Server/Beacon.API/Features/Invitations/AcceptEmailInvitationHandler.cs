@@ -24,7 +24,15 @@ internal sealed class AcceptEmailInvitationHandler : IBeaconRequestHandler<Accep
         var currentUser = await GetCurrentUser(ct);
         var invitation = await GetInvitation(request, currentUser.Id, ct);
 
-        invitation.Accept(currentUser);
+        if (invitation.NewMemberEmailAddress != currentUser.EmailAddress)
+            return BeaconError.Forbid("The current user's email address does not match the email address in the invitation.");
+
+        if (!invitation.Laboratory.HasMember(currentUser))
+        {
+            invitation.AcceptedById = currentUser.Id;
+            invitation.Laboratory.AddMember(currentUser.Id, invitation.MembershipType);
+        }
+
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success;
     }

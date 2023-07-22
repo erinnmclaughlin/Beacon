@@ -1,15 +1,15 @@
-﻿using Beacon.API.Exceptions;
+﻿using Beacon.API.Features;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
+using ErrorOr;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Beacon.API.Behaviors;
 
-public sealed class AuthorizationPipelineBehavior<TRequest, TResponse> 
-    : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
+public sealed class AuthorizationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, ErrorOr<TResponse>> where TRequest : notnull
 {
     private readonly ISessionContext _context;
 
@@ -18,15 +18,15 @@ public sealed class AuthorizationPipelineBehavior<TRequest, TResponse>
         _context = context;
     }
 
-    public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
+    public async Task<ErrorOr<TResponse>> Handle(TRequest request, RequestHandlerDelegate<ErrorOr<TResponse>> next, CancellationToken ct)
     {
         if (_context.UserId == Guid.Empty && !AllowsAnonymous())
-            throw new UnauthorizedAccessException();
+            return BeaconError.Unauthorized();
 
         if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
-            throw new UserNotAllowedException();
+            return BeaconError.Forbid("The current user does not have permission to perform that action.");
 
-        return next();
+        return await next();
     }
 
     private static bool AllowsAnonymous()

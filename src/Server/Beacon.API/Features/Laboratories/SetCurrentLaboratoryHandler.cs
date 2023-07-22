@@ -1,5 +1,4 @@
-﻿using Beacon.API.Exceptions;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
@@ -31,8 +30,10 @@ internal sealed class SetCurrentLaboratoryHandler : IBeaconRequestHandler<SetCur
                 CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
             })
             .IgnoreQueryFilters()
-            .SingleOrDefaultAsync(ct)
-            ?? throw new UserNotAllowedException("The current user is not a member of the specified lab.");
+            .SingleOrDefaultAsync(ct);
+
+        if (newContext is null)
+            return BeaconError.Forbid("The current user is not a member of the specified lab.");
 
         await _signInManager.SignInAsync(newContext.ToClaimsPrincipal());
         return Result.Success;

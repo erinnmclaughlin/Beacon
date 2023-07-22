@@ -1,6 +1,4 @@
-﻿using Beacon.API.Behaviors;
-using Beacon.API.Features;
-using Beacon.API.Middleware;
+﻿using Beacon.API.Features;
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.API.Settings;
@@ -54,8 +52,6 @@ public static class BeaconAPI
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(serviceAssemblies);
-            config.AddOpenBehavior(typeof(AuthorizationPipelineBehavior<,>));
-            config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
         services.AddScoped<ISessionContext, HttpSessionContext>();
         services.AddScoped<ILabContext, HttpSessionContext>();
@@ -76,11 +72,6 @@ public static class BeaconAPI
 
     public static IEndpointRouteBuilder UseBeacon<T>(this T app) where T : IApplicationBuilder, IEndpointRouteBuilder
     {
-        app.UseExceptionHandler(new ExceptionHandlerOptions
-        {
-            ExceptionHandler = ExceptionHandler.HandleException
-        });
-
         app.MapBeaconEndpoints();
         app.Map("api/{**slug}", () => Results.NotFound("Unrecognized endpoint."));
 

@@ -1,4 +1,5 @@
-﻿using Beacon.API.Features.Auth;
+﻿using Beacon.API.Behaviors;
+using Beacon.API.Features.Auth;
 using Beacon.Common;
 using Beacon.Common.Requests;
 using Beacon.Common.Validation;
@@ -44,6 +45,8 @@ internal static class EndpointMapper
             var genericInterfaceType = typeof(IRequestHandler<,>).MakeGenericType(requestType, genericResponseType);
 
             services.AddScoped(genericInterfaceType, handlerType);
+            services.AddScoped(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, genericResponseType), typeof(AuthorizationPipelineBehavior<,>).MakeGenericType(requestType, responseType));
+            services.AddScoped(typeof(IPipelineBehavior<,>).MakeGenericType(requestType, genericResponseType), typeof(ValidationPipelineBehavior<,>).MakeGenericType(requestType, responseType));
         }
     }
 
@@ -116,11 +119,24 @@ internal static class EndpointMapper
             return value is null || value.GetType() == typeof(Success) ? Results.NoContent() : Results.Ok(value);
         }
 
+        var errors = errorOrValue.Errors;
+
+        if (errors.Any(e => e.NumericType == 401))
+        {
+            return Results.Unauthorized();
+        }
+
+        if (errors.Any(e => e.NumericType == 403))
+        {
+            return Results.Forbid();
+        }
+
         if (errorOrValue.Errors.Where(e => e.Type == ErrorType.Validation).ToList() is { Count: > 0 } validationErrors)
         {
             return Results.UnprocessableEntity(new BeaconValidationProblem
             {
-                Errors = validationErrors.GroupBy(v => v.Code)
+                Errors = validationErrors
+                    .GroupBy(v => v.Code)
                     .ToDictionary(x => x.Key, x => x.Select(v => v.Description).ToArray())
             });
         }

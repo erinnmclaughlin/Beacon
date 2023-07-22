@@ -1,5 +1,4 @@
-﻿using Beacon.API.Exceptions;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.API.Services;
 using Beacon.API.Settings;
@@ -28,10 +27,10 @@ internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<Creat
     public async Task<ErrorOr<Success>> Handle(CreateEmailInvitationRequest request, CancellationToken ct)
     {
         if (_context.CurrentLab.MembershipType < request.MembershipType)
-            throw new UserNotAllowedException();
+            return BeaconError.Forbid();
 
         if (await InvitedUserIsMember(request.NewMemberEmailAddress, ct))
-            return Error.Validation(nameof(CreateEmailInvitationRequest.NewMemberEmailAddress), "User is already a member of the specified laboratory.");
+            return BeaconError.Validation(nameof(CreateEmailInvitationRequest.NewMemberEmailAddress), "User is already a member of the specified laboratory.");
 
         var invitation = await CreateInvitation(request, ct);
 
