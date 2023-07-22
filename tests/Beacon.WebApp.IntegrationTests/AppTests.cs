@@ -1,8 +1,5 @@
 ﻿using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
-using Bunit.TestDoubles;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.WebApp.IntegrationTests;
 
@@ -13,8 +10,6 @@ public class AppTests : BeaconTestContext
     public void WebApp_RedirectsToLogin_WhenUserIsNotAuthorized()
     {
         // Arrange
-        this.AddTestAuthorization().SetNotAuthorized();
-        SetupCoreServices();
         MockApi.Fails<GetSessionContextRequest, SessionContext>();
 
         // Act
@@ -22,15 +17,13 @@ public class AppTests : BeaconTestContext
         NavigationManager.NavigateTo("");
 
         // Assert
-        cut.WaitForAssertion(() => NavigationManager.Uri.Should().Be($"{NavigationManager.BaseUri}login"));
+        cut.WaitForAssertion(() => UrlShouldBe("login"));
     }
 
     [Fact]
     public void WebApp_RedirectsToLogin_WhenLoggedInUserClicksLogout()
     {
-        SetupCoreServices();
-        Services.AddScoped<IAuthorizationService, FakeAuthorizationService>();
-
+        // Arrange
         MockApi.Succeeds<GetSessionContextRequest, SessionContext>(AuthHelper.DefaultSession);
         MockApi.Succeeds<LogoutRequest>();
 
@@ -42,10 +35,6 @@ public class AppTests : BeaconTestContext
         cut.WaitForElement("[data-test-id=\"logoutButton\"]").Click();
 
         // Assert
-        cut.WaitForAssertion(() => NavigationManager.Uri.Should().Be($"{NavigationManager.BaseUri}login"));
-    }
-
-    protected override void Initialize()
-    {
+        cut.WaitForAssertion(() => UrlShouldBe("login"));
     }
 }

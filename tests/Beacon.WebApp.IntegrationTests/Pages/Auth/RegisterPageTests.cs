@@ -20,7 +20,7 @@ public class RegisterPageTests : BeaconTestContext
         await cut.Find("form").SubmitAsync();
 
         // Assert:
-        cut.WaitForAssertion(() => NavigationManager.Uri.Should().Be(NavigationManager.BaseUri));
+        cut.WaitForAssertion(() => UrlShouldBe(""));
     }
 
     [Fact]
