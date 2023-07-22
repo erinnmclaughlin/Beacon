@@ -43,10 +43,10 @@
 
     private UpdateMembershipRequest? _model;
     private UpdateMembershipRequest Model => _model ??= new()
-        {
-            MemberId = MemberToUpdate.Id,
-            MembershipType = MemberToUpdate.MembershipType
-        };
+    {
+        MemberId = MemberToUpdate.Id,
+        MembershipType = MemberToUpdate.MembershipType
+    };
 
     private async Task Submit(BeaconForm form)
     {

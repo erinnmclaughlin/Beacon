@@ -16,7 +16,7 @@ public sealed class CreateSampleGroupRequest : BeaconRequest<CreateSampleGroupRe
     public double? TargetStorageHumidity { get; set; }
     public string? Notes { get; set; }
 
-    public required Guid ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
 
     public sealed class Validator : AbstractValidator<CreateSampleGroupRequest>
     {

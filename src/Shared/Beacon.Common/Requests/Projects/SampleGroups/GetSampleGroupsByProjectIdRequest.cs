@@ -5,5 +5,5 @@ namespace Beacon.Common.Requests.Projects.SampleGroups;
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class GetSampleGroupsByProjectIdRequest : BeaconRequest<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>
 {
-    public required Guid ProjectId { get; init; }
+    public Guid ProjectId { get; init; }
 }

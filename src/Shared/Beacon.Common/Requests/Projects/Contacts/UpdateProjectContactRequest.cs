@@ -7,11 +7,11 @@ namespace Beacon.Common.Requests.Projects.Contacts;
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
 public class UpdateProjectContactRequest : BeaconRequest<UpdateProjectContactRequest>
 {
-    public required Guid ProjectId { get; set; }
-    public required Guid ContactId { get; set; }
-    public required string Name { get; set; }
-    public required string? PhoneNumber { get; set; }
-    public required string? EmailAddress { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid ContactId { get; set; }
+    public string Name { get; set; } = string.Empty;
+    public string? PhoneNumber { get; set; }
+    public string? EmailAddress { get; set; }
 
     public sealed class Validator : AbstractValidator<UpdateProjectContactRequest>
     {

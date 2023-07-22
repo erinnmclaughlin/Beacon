@@ -2,5 +2,5 @@
 
 public sealed class AcceptEmailInvitationRequest : BeaconRequest<AcceptEmailInvitationRequest>
 {
-    public required Guid EmailInvitationId { get; set; }
+    public Guid EmailInvitationId { get; set; }
 }

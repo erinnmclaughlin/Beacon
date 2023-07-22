@@ -25,7 +25,7 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISess
     {
         if (IsExpired)
         {
-            var errorOrUser = await _apiClient.SendAsync(new GetSessionContextRequest());
+            var errorOrUser = await _apiClient.SendAsync<GetSessionContextRequest, SessionContext>(new GetSessionContextRequest());
 
             ClaimsPrincipal = errorOrUser.IsError 
                 ? AnonymousUser 

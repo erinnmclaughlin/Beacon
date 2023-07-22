@@ -1,4 +1,5 @@
-﻿using Beacon.API.Persistence;
+﻿using Azure;
+using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
@@ -75,15 +76,15 @@ public abstract class TestBase : IClassFixture<TestFixture>
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
-        where TRequest : BeaconRequest<TRequest>
+        where TRequest : BeaconRequest<TRequest>, IBeaconRequest<TRequest>, new()
     {
-        return SendAsync<TRequest, Success>(request);
+        return TRequest.SendAsync(_httpClient, request as TRequest ?? new());
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
-        where TRequest : BeaconRequest<TRequest, TResponse>
+        where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
     {
-        return _httpClient.SendAsync(request);
+        return TRequest.SendAsync(_httpClient, request as TRequest ?? new());
     }
 
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)
