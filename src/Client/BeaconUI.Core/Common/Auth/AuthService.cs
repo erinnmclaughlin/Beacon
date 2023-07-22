@@ -7,10 +7,10 @@ namespace BeaconUI.Core.Common.Auth;
 
 internal sealed class AuthService
 {
-    private readonly HttpClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly BeaconAuthStateProvider _authStateProvider;
 
-    public AuthService(HttpClient apiClient, BeaconAuthStateProvider authStateProvider)
+    public AuthService(IApiClient apiClient, BeaconAuthStateProvider authStateProvider)
     {
         _apiClient = apiClient;
         _authStateProvider = authStateProvider;

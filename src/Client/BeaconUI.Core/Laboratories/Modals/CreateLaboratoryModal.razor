@@ -1,7 +1,4 @@
-﻿@using Beacon.Common.Requests.Laboratories
-@inject HttpClient ApiClient
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="field">
@@ -19,8 +16,11 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter] 
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private BlazoredModalInstance Modal { get; set; } = default!;
 
     private CreateLaboratoryRequest Model { get; } = new();
 

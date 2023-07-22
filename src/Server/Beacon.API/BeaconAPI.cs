@@ -74,14 +74,14 @@ public static class BeaconAPI
         return services;
     }
 
-    public static IEndpointRouteBuilder MapBeaconEndpoints<T>(this T app) where T : IApplicationBuilder, IEndpointRouteBuilder
+    public static IEndpointRouteBuilder UseBeacon<T>(this T app) where T : IApplicationBuilder, IEndpointRouteBuilder
     {
         app.UseExceptionHandler(new ExceptionHandlerOptions
         {
             ExceptionHandler = ExceptionHandler.HandleException
         });
 
-        app.MapGroup("api").MapBeaconEndpoints();
+        app.MapBeaconEndpoints();
         app.Map("api/{**slug}", () => Results.NotFound("Unrecognized endpoint."));
 
         return app;

@@ -8,7 +8,7 @@ namespace BeaconUI.Core.Common.Auth;
 
 public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISessionContext
 {
-    private readonly HttpClient _apiClient;
+    private readonly IApiClient _apiClient;
 
     private bool IsExpired { get; set; } = true;
     private ClaimsPrincipal ClaimsPrincipal { get; set; } = AnonymousUser;
@@ -16,7 +16,7 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISess
     public CurrentUser CurrentUser => CurrentUser.FromClaimsPrincipal(ClaimsPrincipal);
     public CurrentLab? CurrentLab => CurrentLab.FromClaimsPrincipal(ClaimsPrincipal);
 
-    public BeaconAuthStateProvider(HttpClient apiClient)
+    public BeaconAuthStateProvider(IApiClient apiClient)
     {
         _apiClient = apiClient;
     }

@@ -73,6 +73,6 @@ public sealed class LoginTests : IClassFixture<AuthTestFixture>
 
     private async Task<HttpResponseMessage> LoginAsync(LoginRequest request)
     {
-        return await _httpClient.PostAsJsonAsync($"api/{nameof(LoginRequest)}", request);
+        return await _httpClient.SendAsync(request);
     }
 }

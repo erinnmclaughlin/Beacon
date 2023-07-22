@@ -1,5 +1,6 @@
 ﻿using Beacon.Common.Services;
 using BeaconUI.Core.Common.Auth;
+using BeaconUI.Core.Common.Http;
 using Blazored.Modal;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
@@ -11,6 +12,7 @@ public static class BeaconUISetup
     public static IServiceCollection AddBeaconUI(this IServiceCollection services, string baseUri)
     {
         services
+            .AddScoped<IApiClient, ApiClient>()
             .AddHttpClient("BeaconApi", o => o.BaseAddress = new Uri(baseUri));
 
         services
@@ -19,7 +21,6 @@ public static class BeaconUISetup
             .AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>()
             .AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
             .AddScoped<ISessionContext>(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
-            .AddTransient(sp => sp.GetRequiredService<IHttpClientFactory>().CreateClient("BeaconApi"))
             .AddScoped<AuthService>()
             .AddBlazoredModal();
 

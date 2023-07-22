@@ -1,9 +1,6 @@
 ﻿@page "/l/projects"
 @attribute [Authorize]
 @layout LaboratoryLayout
-@inject HttpClient ApiClient
-@inject IModalService ModalService
-@inject NavigationManager NavigationManager
 
 <LaboratoryPageHeader>
     <h4 class="mb-0 me-auto">Projects</h4>
@@ -116,6 +113,15 @@
 </div>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
 
     private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
 

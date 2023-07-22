@@ -2,7 +2,6 @@
 @using Beacon.Common.Requests.Laboratories
 @using BeaconUI.Core.Laboratories.Components
 @attribute [Authorize]
-@inject HttpClient ApiClient
 
 <div class="d-flex flex-column flex-grow-1" style="overflow-x: auto;">
     <div class="content flex-grow-1" style="background-color: #f8fafc">
@@ -18,6 +17,9 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     private LaboratoryDto[]? Laboratories { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -30,5 +32,4 @@
         var errorOrLaboratories = await ApiClient.SendAsync(new GetMyLaboratoriesRequest());
         Laboratories = errorOrLaboratories.IsError ? null : errorOrLaboratories.Value;        
     }
-
 }

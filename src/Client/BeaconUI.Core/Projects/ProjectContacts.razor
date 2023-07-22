@@ -1,7 +1,4 @@
-﻿@inject HttpClient ApiClient
-@inject IModalService ModalService
-
-<table class="table align-middle">
+﻿<table class="table align-middle">
     <thead>
         <tr>
             <th>Name</th>
@@ -105,6 +102,12 @@
 </button>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
 
     [Parameter, EditorRequired] 
     public required ProjectDto Project { get; set; }

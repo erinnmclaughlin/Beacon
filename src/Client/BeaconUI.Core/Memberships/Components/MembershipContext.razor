@@ -1,14 +1,17 @@
-﻿@inject HttpClient ApiClient
-@inject ISessionContext CurrentUser
-@inject IModalService ModalService
-
-<CascadingValue Value="this">
+﻿<CascadingValue Value="this">
     @ChildContent?.Invoke(this)
 </CascadingValue>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter]
     private ILabContext LabContext { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
 
     [Parameter]
     public RenderFragment<MembershipContext>? ChildContent { get; set; }
@@ -28,7 +31,7 @@
     public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
         return CanManagePermissions()
-            && memberToUpdate.Id != CurrentUser.UserId
+            && memberToUpdate.Id != LabContext.CurrentUser.Id
             && LabContext.CurrentLab.MembershipType >= memberToUpdate.MembershipType;
     }
 

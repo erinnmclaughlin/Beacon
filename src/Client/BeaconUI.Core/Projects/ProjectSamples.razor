@@ -1,6 +1,4 @@
-﻿@inject HttpClient ApiClient
-
-<table class="table align-middle">
+﻿<table class="table align-middle">
     <thead>
         <tr>
             <th>Sample Name</th>
@@ -73,8 +71,11 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter]
-    private IModalService ModalService { get; set; } = null!;
+    private IModalService ModalService { get; set; } = default!;
 
     [Parameter, EditorRequired] 
     public required Guid ProjectId { get; set; }

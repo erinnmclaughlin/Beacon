@@ -4,6 +4,7 @@ using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests;
 using Beacon.Common.Services;
+using ErrorOr;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
 using System.Net.Http.Json;
@@ -76,13 +77,13 @@ public abstract class TestBase : IClassFixture<TestFixture>
     protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
         where TRequest : BeaconRequest<TRequest>
     {
-        return request.SendAsync(_httpClient);
+        return SendAsync<TRequest, Success>(request);
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
         where TRequest : BeaconRequest<TRequest, TResponse>
     {
-        return request.SendAsync(_httpClient);
+        return _httpClient.SendAsync(request);
     }
 
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)

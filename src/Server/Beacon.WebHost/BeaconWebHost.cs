@@ -32,7 +32,7 @@ public static class BeaconWebHost
         app.UseAuthentication();
         app.UseAuthorization();
 
-        app.MapBeaconEndpoints();
+        app.UseBeacon();
         app.MapGet("api/ping", () => Results.Ok("pong")).ExcludeFromDescription();
 
         app.MapFallbackToFile("index.html");

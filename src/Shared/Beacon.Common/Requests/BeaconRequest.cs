@@ -10,19 +10,32 @@ public abstract class BeaconRequest<TRequest> : BeaconRequest<TRequest, Success>
 {
     public override Task<HttpResponseMessage> SendAsync(HttpClient httpClient, CancellationToken ct = default)
     {
-        var body = this as TRequest;
-        return httpClient.PostAsJsonAsync(Route, body, JsonDefaults.JsonSerializerOptions, ct);
+        return httpClient.PostAsJsonAsync(GetRoute(), this as TRequest, JsonDefaults.JsonSerializerOptions, ct);
+    }
+
+    public override string GetRoute()
+    {
+        return $"api/commands/{GetName()}";
     }
 }
 
 public abstract class BeaconRequest<TRequest, TResponse> : IRequest<ErrorOr<TResponse>>
     where TRequest : BeaconRequest<TRequest, TResponse>
 {
-    public virtual string Route { get; protected set; } = $"api/{typeof(TRequest).Name}";
-
     public virtual Task<HttpResponseMessage> SendAsync(HttpClient httpClient, CancellationToken ct = default)
     {
         var json = JsonSerializer.Serialize(this as TRequest, JsonSerializerOptions.Default);
-        return httpClient.GetAsync(Route + $"?data={json}", ct);
+        return httpClient.GetAsync(GetRoute() + $"?data={json}", ct);
+    }
+
+    public virtual string GetRoute()
+    {
+        return $"api/queries/{GetName()}";
+    }
+
+    public virtual string GetName()
+    {
+        var name = typeof(TRequest).Name.Replace("Request", "");
+        return name[0..1].ToLower() + name[1..];
     }
 }

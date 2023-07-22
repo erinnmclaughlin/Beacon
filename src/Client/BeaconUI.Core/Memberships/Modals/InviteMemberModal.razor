@@ -1,6 +1,4 @@
-﻿@inject HttpClient ApiClient
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="field">
@@ -17,6 +15,9 @@
 </BeaconForm>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
 
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = default!;

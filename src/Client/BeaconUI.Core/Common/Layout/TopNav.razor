@@ -1,6 +1,4 @@
 ﻿@using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject AuthService AuthService
-@inject NavigationManager NavigationManager
 
 <AuthorizeView>
     <nav class="navbar navbar-expand-lg bg-white border-bottom sticky-top">
@@ -32,6 +30,13 @@
 </AuthorizeView>
 
 @code {
+
+    [Inject]
+    private AuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
     private async Task Logout()
     {
         await AuthService.LogoutAsync();

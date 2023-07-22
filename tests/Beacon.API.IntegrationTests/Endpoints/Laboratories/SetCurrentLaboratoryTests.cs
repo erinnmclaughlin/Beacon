@@ -2,7 +2,6 @@
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
@@ -28,7 +27,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
             Password = "!!admin"
         });
 
-        var response = await httpClient.PostAsJsonAsync($"api/{nameof(SetCurrentLaboratoryRequest)}", new SetCurrentLaboratoryRequest
+        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
         {
             LaboratoryId = TestData.Lab.Id
         });
@@ -48,7 +47,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
             Password = "!!nonmember"
         });
         
-        var response = await httpClient.PostAsJsonAsync($"api/{nameof(SetCurrentLaboratoryRequest)}", new SetCurrentLaboratoryRequest
+        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
         {
             LaboratoryId = TestData.Lab.Id
         });
@@ -59,8 +58,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
 
     private static async Task Login(HttpClient httpClient, LoginRequest request)
     {
-        var response = await httpClient.PostAsJsonAsync($"api/{nameof(LoginRequest)}", request);
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
     }
 

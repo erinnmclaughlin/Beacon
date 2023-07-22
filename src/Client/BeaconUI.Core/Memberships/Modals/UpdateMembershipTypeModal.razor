@@ -1,7 +1,4 @@
-﻿@inject HttpClient ApiClient
-@inject ISessionContext CurrentUser
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Manager">
@@ -35,8 +32,11 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private BlazoredModalInstance Modal { get; set; } = default!;
 
     [Parameter]
     public required LaboratoryMemberDto MemberToUpdate { get; set; }

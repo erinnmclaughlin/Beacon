@@ -1,6 +1,6 @@
 ﻿using Beacon.Common.Services;
 
-namespace Beacon.WebApp.IntegrationTests.Pages;
+namespace Beacon.WebApp.IntegrationTests;
 
 public static class AuthHelper
 {

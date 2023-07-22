@@ -4,7 +4,6 @@ using Beacon.Common.Requests;
 using Beacon.Common.Validation;
 using ErrorOr;
 using MediatR;
-using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -82,7 +81,7 @@ internal static class EndpointMapper
 
     public static void MapPost<TRequest>(IEndpointRouteBuilder app) where TRequest : BeaconRequest<TRequest>, new()
     {
-        app.MapPost(typeof(TRequest).Name, async([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
+        app.MapPost(new TRequest().GetRoute(), async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
             var response = await m.Send(request ?? new(), ct);
             return response.ToHttpResult();
@@ -92,7 +91,7 @@ internal static class EndpointMapper
 
     public static void MapGet<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : BeaconRequest<TRequest, TResponse>, new()
     {
-        app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
+        app.MapGet(new TRequest().GetRoute(), async (string? data, IMediator m, CancellationToken ct) =>
         {
             var request = JsonSerializer.Deserialize<TRequest>(data ?? "", JsonDefaults.JsonSerializerOptions);
             var response = await m.Send(request ?? new(), ct);

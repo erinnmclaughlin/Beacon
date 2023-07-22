@@ -1,6 +1,4 @@
-﻿@inject HttpClient ApiClient
-
-<BeaconForm Model="Request" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="row">
@@ -29,6 +27,9 @@
 </BeaconForm>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
 
     [Parameter]
     public required Guid ProjectId { get; set; }

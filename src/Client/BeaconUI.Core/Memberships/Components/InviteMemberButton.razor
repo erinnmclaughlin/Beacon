@@ -1,6 +1,4 @@
-﻿@inject ISessionContext CurrentUser
-
-<AuthorizeLabView>
+﻿<AuthorizeLabView>
     <button type="button" disabled="@IsDisabled(context)" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
         <span class="icon">
             <i class="fa-solid fa-user-plus"></i>
