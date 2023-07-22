@@ -4,6 +4,7 @@ using Beacon.Common.Requests;
 using Beacon.Common.Validation;
 using ErrorOr;
 using MediatR;
+using Microsoft.AspNetCore.Authentication.OAuth;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
@@ -85,7 +86,8 @@ internal static class EndpointMapper
         {
             var response = await m.Send(request ?? new(), ct);
             return response.ToHttpResult();
-        });
+        })
+        .AddMetaData<TRequest>();
     }
 
     public static void MapGet<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : BeaconRequest<TRequest, TResponse>, new()
@@ -95,7 +97,16 @@ internal static class EndpointMapper
             var request = JsonSerializer.Deserialize<TRequest>(data ?? "", JsonDefaults.JsonSerializerOptions);
             var response = await m.Send(request ?? new(), ct);
             return response.ToHttpResult();
-        });
+        })
+        .AddMetaData<TRequest>();
+    }
+
+    public static void AddMetaData<TRequest>(this RouteHandlerBuilder builder)
+    {
+        if (typeof(TRequest).Namespace is { } requestNamespace)
+        {
+            builder.WithTags(requestNamespace[(requestNamespace.LastIndexOf(".") + 1)..]);
+        }
     }
 
     public static IResult ToHttpResult<T>(this ErrorOr<T> errorOrValue)
