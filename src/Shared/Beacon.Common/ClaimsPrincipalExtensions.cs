@@ -1,13 +1,9 @@
-﻿using Beacon.Common.Models;
-using System.Security.Claims;
+﻿using System.Security.Claims;
 
 namespace Beacon.Common;
 
 public static class ClaimsPrincipalExtensions
 {
-    
-
-    
     public static T? FindEnumValue<T>(this ClaimsPrincipal user, string type) where T : struct
     {
         var value = user.FindFirst(type)?.Value;

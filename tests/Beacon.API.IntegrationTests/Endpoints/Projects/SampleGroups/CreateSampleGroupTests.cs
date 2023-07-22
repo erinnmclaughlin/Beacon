@@ -1,5 +1,4 @@
-﻿using Azure.Core;
-using Beacon.Common.Requests.Projects.SampleGroups;
+﻿using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 

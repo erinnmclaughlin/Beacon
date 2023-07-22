@@ -44,7 +44,7 @@ public sealed class LogoutTests : IClassFixture<AuthTestFixture>
 
     private async Task AssertGetCurrentUserStatus(HttpStatusCode expectedStatusCode)
     {
-        var response = await _httpClient.GetAsync($"api/{nameof(GetSessionContextRequest)}");
+        var response = await new GetSessionContextRequest().SendAsync(_httpClient);
         Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 

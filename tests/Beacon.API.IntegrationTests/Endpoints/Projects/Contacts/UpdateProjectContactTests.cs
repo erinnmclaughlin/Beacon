@@ -1,6 +1,5 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Projects.Contacts;
-using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 

@@ -6,6 +6,7 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
+[Trait("Feature", "Laboratory Management")]
 public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
 {
     private readonly AuthTestFixture _fixture;
@@ -16,7 +17,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
         AddSeedData();
     }
 
-    [Fact(DisplayName = "Set current lab succeeds when request is valid")]
+    [Fact(DisplayName = "[185] Set current lab succeeds when request is valid")]
     public async Task SetCurrentLaboratory_SucceedsWhenRequestIsValid()
     {
         var httpClient = _fixture.CreateClient();
@@ -36,7 +37,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
         Assert.True(response.Headers.Contains("Set-Cookie"));
     }
 
-    [Fact(DisplayName = "Set current lab fails when user is not a lab member")]
+    [Fact(DisplayName = "[185] Set current lab fails when user is not a lab member")]
     public async Task SetCurrentLaboratory_FailsWhenUserIsNotAMember()
     {
         var httpClient = _fixture.CreateClient();

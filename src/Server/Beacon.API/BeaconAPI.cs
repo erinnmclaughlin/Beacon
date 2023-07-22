@@ -1,5 +1,5 @@
 ﻿using Beacon.API.Behaviors;
-using Beacon.API.Endpoints;
+using Beacon.API.Features;
 using Beacon.API.Middleware;
 using Beacon.API.Persistence;
 using Beacon.API.Services;

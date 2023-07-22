@@ -6,9 +6,7 @@ using Beacon.Common.Requests;
 using Beacon.Common.Services;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
-using System.Net.Http;
 using System.Net.Http.Json;
-using System.Text.Json;
 
 namespace Beacon.API.IntegrationTests;
 
