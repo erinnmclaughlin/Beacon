@@ -1,9 +1,11 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.Common;
+using Beacon.Common.Requests.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Text.Json;
 
 namespace Beacon.API.Endpoints;
 
@@ -17,7 +19,7 @@ internal static class EndpointMapper
     public static void MapBeaconEndpoints(this IEndpointRouteBuilder app)
     {
         var requestTypes = typeof(LoginRequest).Assembly.GetTypes()
-            .Where(t => t.GetInterfaces().Any(i => i.IsAssignableTo(typeof(IBaseRequest))));
+            .Where(t => !t.IsAbstract && t.GetInterfaces().Any(i => i.IsAssignableTo(typeof(IBaseRequest))));
 
         foreach (var requestType in requestTypes)
         {
@@ -39,31 +41,22 @@ internal static class EndpointMapper
                     .Invoke(null, new object[] { app });
             }
         }
-
-        //var endpoints = Assembly.GetExecutingAssembly().GetTypes()
-        //    .Where(t => t.GetInterfaces().Any(i => i == typeof(IBeaconEndpoint)));
-
-        //foreach (var endpoint in endpoints)
-        //{
-        //    var mapMethod = endpoint.GetMethod(nameof(IBeaconEndpoint.Map), types: new[] { typeof(IEndpointRouteBuilder) });
-        //    mapMethod!.Invoke(null, new object[] { app });
-        //}
-    
     }
 
-    public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest
+    public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest, new()
     {
-        app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest request, IMediator m, CancellationToken ct) =>
+        app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
-            await m.Send(request, ct);
+            await m.Send(request ?? new(), ct);
             return Results.NoContent();
         });
     }
 
     public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>, new()
     {
-        app.MapGet(typeof(TRequest).Name, async ([FromQuery] TRequest? request, IMediator m, CancellationToken ct) =>
+        app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
         {
+            var request = data is null ? new() : JsonSerializer.Deserialize<TRequest>(data, JsonDefaults.JsonSerializerOptions) ?? new();
             var response = await m.Send(request ?? new(), ct);
             return Results.Ok(response);
         });

@@ -1,10 +1,9 @@
 ﻿using FluentValidation;
-using MediatR;
 
 namespace Beacon.Common.Requests.Auth;
 
 [AllowAnonymous]
-public sealed class LoginRequest : BeaconRequest<LoginRequest>, IRequest
+public sealed class LoginRequest : BeaconRequest<LoginRequest>
 {
     public string EmailAddress { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;

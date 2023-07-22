@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Models;
+using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Requests.Laboratories;
@@ -11,6 +12,23 @@ using ErrorOr;
 
 namespace BeaconUI.Core.Common.Http;
 
+public static class RequestExtensions
+{
+    public static async Task<ErrorOr<Success>> SendAsync<TRequest>(this IHttpClientFactory httpClientFactory, TRequest request, CancellationToken ct = default) where TRequest : BeaconRequest<TRequest>
+    {
+        using var httpClient = httpClientFactory.CreateBeaconClient();
+        var response = await request.SendAsync(httpClient, request, ct);
+        return await response.ToErrorOrResult(ct);
+    }
+
+    public static async Task<ErrorOr<TResult>> SendAsync<TRequest, TResult>(this IHttpClientFactory httpClientFactory, TRequest request, CancellationToken ct = default) where TRequest : BeaconRequest<TRequest, TResult>
+    {
+        using var httpClient = httpClientFactory.CreateBeaconClient();
+        var response = await request.SendAsync(httpClient, request, ct);
+        return await response.ToErrorOrResult<TResult>(ct);
+    }
+}
+
 public sealed class ApiClient
 {
     private readonly IHttpClientFactory _httpClientFactory;
@@ -22,52 +40,52 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<SessionContext>> GetCurrentUser()
     {
-        return await _httpClientFactory.GetAsync<SessionContext>($"api/{nameof(GetSessionContextRequest)}");
+        return await _httpClientFactory.SendAsync<GetSessionContextRequest, SessionContext>(new GetSessionContextRequest());
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)
     {
-        return await _httpClientFactory.PostAsync($"api/{nameof(LoginRequest)}", request);
+        return await _httpClientFactory.SendAsync(request);
     }
 
     public async Task<ErrorOr<Success>> Register(RegisterRequest request)
     {
-        return await _httpClientFactory.PostAsync($"api/{nameof(RegisterRequest)}", request);
+        return await _httpClientFactory.SendAsync(request);
     }
 
     public async Task<ErrorOr<Success>> Logout()
     {
-        return await _httpClientFactory.GetAsync($"api/{nameof(LogoutRequest)}");
+        return await _httpClientFactory.SendAsync(new LogoutRequest());
     }
 
     public async Task<ErrorOr<Success>> SendEmailInvitation(CreateEmailInvitationRequest request)
     {
-        return await _httpClientFactory.PostAsync("api/invitations", request);
+        return await _httpClientFactory.SendAsync(request);
     }
 
     public async Task<ErrorOr<Success>> AcceptEmailInvitation(Guid emailId)
     {
-        return await _httpClientFactory.GetAsync($"api/invitations/{emailId}/accept");
+        return await _httpClientFactory.SendAsync(new AcceptEmailInvitationRequest { EmailInvitationId = emailId });
     }
 
     public async Task<ErrorOr<LaboratoryDto[]>> GetMyLaboratories()
     {
-        return await _httpClientFactory.GetAsync<LaboratoryDto[]>("api/laboratories");
+        return await _httpClientFactory.SendAsync<GetMyLaboratoriesRequest, LaboratoryDto[]>(new ());
     }
 
     public async Task<ErrorOr<Success>> CreateLaboratory(CreateLaboratoryRequest request)
     {
-        return await _httpClientFactory.PostAsync("api/laboratories", request);
+        return await _httpClientFactory.SendAsync(request);
     }
 
     public async Task<ErrorOr<LaboratoryDto>> GetCurrentLaboratory()
     {
-        return await _httpClientFactory.GetAsync<LaboratoryDto>("api/laboratories/current");
+        return await _httpClientFactory.SendAsync<GetCurrentLaboratoryRequest, LaboratoryDto>(new GetCurrentLaboratoryRequest());
     }
 
     public async Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
     {
-        return await _httpClientFactory.PostAsync("api/laboratories/current", new SetCurrentLaboratoryRequest
+        return await _httpClientFactory.SendAsync(new SetCurrentLaboratoryRequest
         {
             LaboratoryId = id
         });
@@ -75,17 +93,17 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<LaboratoryMemberDto[]>> GetLaboratoryMembers()
     {
-        return await _httpClientFactory.GetAsync<LaboratoryMemberDto[]>($"api/memberships");
+        return await _httpClientFactory.SendAsync<GetMembershipsRequest, LaboratoryMemberDto[]>(new GetMembershipsRequest());
     }
 
     public async Task<ErrorOr<Success>> UpdateMembershipType(UpdateMembershipRequest request)
     {
-        return await _httpClientFactory.PutAsync($"api/memberships", request);
+        return await _httpClientFactory.SendAsync(request);
     }
 
     public async Task<ErrorOr<ProjectDto[]>> GetProjects()
     {
-        return await _httpClientFactory.GetAsync<ProjectDto[]>("api/projects");
+        return await _httpClientFactory.SendAsync<GetProjectsRequest, ProjectDto[]>(new GetProjectsRequest());
     }
 
     public async Task<ErrorOr<ProjectDto>> GetProject(ProjectCode projectCode)

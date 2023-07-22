@@ -1,12 +1,11 @@
 ﻿using Beacon.Common.Models;
 using Beacon.Common.Validation.Rules;
 using FluentValidation;
-using MediatR;
 
 namespace Beacon.Common.Requests.Projects;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public sealed class CreateProjectRequest : BeaconRequest<CreateProjectRequest>, IRequest
+public sealed class CreateProjectRequest : BeaconRequest<CreateProjectRequest>
 {
     public string CustomerCode { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
