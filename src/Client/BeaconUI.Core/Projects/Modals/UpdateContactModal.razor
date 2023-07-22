@@ -1,6 +1,4 @@
-﻿@inject ApiClient ApiClient
-
-<BeaconForm Model="Request" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="row">
@@ -30,6 +28,9 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [Parameter]
     public required Guid ProjectId { get; set; }
 
@@ -51,7 +52,7 @@
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.UpdateProjectContact(Request);
+        var result = await ApiClient.SendAsync(Request);
 
         if (result.IsError)
         {

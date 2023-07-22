@@ -1,6 +1,4 @@
-﻿@inject ApiClient ApiClient
-
-<BeaconForm Model="Request" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="field">
@@ -38,18 +36,21 @@
 
 @code {
 
-    [Parameter]
-    public required Guid ProjectId { get; set; }
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private BlazoredModalInstance Modal { get; set; } = default!;
+
+    [Parameter]
+    public required Guid ProjectId { get; set; }
 
     private CreateSampleGroupRequest? _request;
     private CreateSampleGroupRequest Request => _request ??= new() { ProjectId = ProjectId };
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.CreateSampleGroup(Request);
+        var result = await ApiClient.SendAsync(Request);
 
         if (result.IsError)
         {

@@ -1,6 +1,4 @@
-﻿@inject ApiClient ApiClient
-
-<BeaconForm Model="Model" OnValidSubmit="Submit">
+﻿<BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
         <div class="modal-body">
             <div class="field">
@@ -18,6 +16,9 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter] 
     private BlazoredModalInstance Modal { get; set; } = default!;
 
@@ -25,7 +26,7 @@
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await ApiClient.SendEmailInvitation(Model);
+        var result = await ApiClient.SendAsync(Model);
 
         if (result.IsError)
         {

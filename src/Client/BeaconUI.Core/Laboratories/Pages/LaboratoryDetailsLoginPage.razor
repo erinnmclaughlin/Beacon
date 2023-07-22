@@ -1,9 +1,12 @@
 ﻿@page "/laboratories/{Id:guid}"
 @attribute [Authorize]
-@inject AuthService AuthService
-@inject NavigationManager NavigationManager
 
 @code {
+    [Inject]
+    private AuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] 
     public Guid Id { get; set; }

@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects.Contacts;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
@@ -16,7 +17,7 @@ public sealed class GetProjectContactsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync($"api/projects/{ProjectId}/contacts");
+        var response = await SendAsync(new GetProjectContactsRequest { ProjectId = ProjectId });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var contacts = await DeserializeAsync<ProjectContactDto[]>(response);

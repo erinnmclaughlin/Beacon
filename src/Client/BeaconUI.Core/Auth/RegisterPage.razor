@@ -1,6 +1,4 @@
 ﻿@page "/register"
-@inject AuthService AuthService
-@inject NavigationManager NavigationManager
 
 <div class="container m-auto px-3" style="width: 27.5em; max-width: 95vw;">
 
@@ -46,6 +44,12 @@
 </div>
 
 @code {
+
+    [Inject]
+    private AuthService AuthService { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter, SupplyParameterFromQuery(Name = "redirectUri")]
     public string? RedirectUri { get; set; }

@@ -23,7 +23,7 @@ public sealed class RegisterTests : TestBase
             DisplayName = "New User"
         };
 
-        var response = await PostAsync("api/auth/register", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var user = ExecuteDbContext(db => db.Users.Single(x => x.EmailAddress == request.EmailAddress));
@@ -36,7 +36,7 @@ public sealed class RegisterTests : TestBase
     {
         RunAsAnonymous();
 
-        var response = await PostAsync("api/auth/register", new RegisterRequest());
+        var response = await SendAsync(new RegisterRequest());
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
     }
 
@@ -45,7 +45,7 @@ public sealed class RegisterTests : TestBase
     {
         RunAsAnonymous();
 
-        var response = await PostAsync("api/auth/register", new RegisterRequest
+        var response = await SendAsync(new RegisterRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "something",

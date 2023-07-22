@@ -23,7 +23,7 @@ public sealed class CreateEmailInvitationTests : TestBase
             MembershipType = LaboratoryMembershipType.Manager
         };
 
-        var response = await PostAsync("api/invitations", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var emailInvitation = ExecuteDbContext(db => db.InvitationEmails.Include(x => x.LaboratoryInvitation).Single());
@@ -46,7 +46,7 @@ public sealed class CreateEmailInvitationTests : TestBase
             MembershipType = LaboratoryMembershipType.Manager
         };
         
-        var response = await PostAsync("api/invitations", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         Assert.False(await ExecuteDbContext(db => db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));
@@ -63,7 +63,7 @@ public sealed class CreateEmailInvitationTests : TestBase
             MembershipType = LaboratoryMembershipType.Manager
         };
 
-        var response = await PostAsync("api/invitations", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         Assert.False(await ExecuteDbContext(db => db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));

@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Requests.Auth;
+using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Common.Http;
 using ErrorOr;
 
@@ -6,10 +7,10 @@ namespace BeaconUI.Core.Common.Auth;
 
 internal sealed class AuthService
 {
-    private readonly ApiClient _apiClient;
+    private readonly IApiClient _apiClient;
     private readonly BeaconAuthStateProvider _authStateProvider;
 
-    public AuthService(ApiClient apiClient, BeaconAuthStateProvider authStateProvider)
+    public AuthService(IApiClient apiClient, BeaconAuthStateProvider authStateProvider)
     {
         _apiClient = apiClient;
         _authStateProvider = authStateProvider;
@@ -17,7 +18,7 @@ internal sealed class AuthService
 
     public async Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
     {
-        var result = await _apiClient.SetCurrentLaboratory(id);
+        var result = await _apiClient.SendAsync(new SetCurrentLaboratoryRequest { LaboratoryId = id });
 
         if (!result.IsError)
             _authStateProvider.NotifyAuthenticationStateChanged();
@@ -27,7 +28,7 @@ internal sealed class AuthService
 
     public async Task<ErrorOr<Success>> LoginAsync(LoginRequest request)
     {
-        var result = await _apiClient.Login(request);
+        var result = await _apiClient.SendAsync(request);
 
         if (!result.IsError)
             _authStateProvider.NotifyAuthenticationStateChanged();
@@ -37,7 +38,7 @@ internal sealed class AuthService
 
     public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request)
     {
-        var result = await _apiClient.Register(request);
+        var result = await _apiClient.SendAsync(request);
 
         if (!result.IsError)
             _authStateProvider.NotifyAuthenticationStateChanged();
@@ -47,7 +48,7 @@ internal sealed class AuthService
 
     public async Task<ErrorOr<Success>> LogoutAsync()
     {
-        var result = await _apiClient.Logout();
+        var result = await _apiClient.SendAsync(new LogoutRequest());
 
         if (!result.IsError)
             _authStateProvider.NotifyAuthenticationStateChanged();

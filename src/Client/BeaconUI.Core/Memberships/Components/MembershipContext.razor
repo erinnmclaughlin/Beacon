@@ -1,14 +1,17 @@
-﻿@inject ApiClient ApiClient
-@inject ISessionContext CurrentUser
-@inject IModalService ModalService
-
-<CascadingValue Value="this">
+﻿<CascadingValue Value="this">
     @ChildContent?.Invoke(this)
 </CascadingValue>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter]
     private ILabContext LabContext { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
 
     [Parameter]
     public RenderFragment<MembershipContext>? ChildContent { get; set; }
@@ -17,7 +20,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Result = await ApiClient.GetLaboratoryMembers();
+        Result = await ApiClient.SendAsync(new GetMembershipsRequest());
     }
 
     public bool CanManagePermissions()
@@ -28,7 +31,7 @@
     public bool CanManagePermissions(LaboratoryMemberDto memberToUpdate)
     {
         return CanManagePermissions()
-            && memberToUpdate.Id != CurrentUser.UserId
+            && memberToUpdate.Id != LabContext.CurrentUser.Id
             && LabContext.CurrentLab.MembershipType >= memberToUpdate.MembershipType;
     }
 
@@ -40,7 +43,7 @@
         var result = await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
 
         if (result.Confirmed)
-            Result = await ApiClient.GetLaboratoryMembers();
+            Result = await ApiClient.SendAsync(new GetMembershipsRequest());
 
         StateHasChanged();
     }

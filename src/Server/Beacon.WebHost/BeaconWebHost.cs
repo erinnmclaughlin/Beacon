@@ -34,6 +34,7 @@ public static class BeaconWebHost
 
         app.MapBeaconEndpoints();
         app.MapGet("api/ping", () => Results.Ok("pong")).ExcludeFromDescription();
+        app.Map("api/{**slug}", () => Results.NotFound("Unrecognized endpoint.")).ExcludeFromDescription();
 
         app.MapFallbackToFile("index.html");
 

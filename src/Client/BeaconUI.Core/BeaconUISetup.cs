@@ -12,6 +12,7 @@ public static class BeaconUISetup
     public static IServiceCollection AddBeaconUI(this IServiceCollection services, string baseUri)
     {
         services
+            .AddScoped<IApiClient, ApiClient>()
             .AddHttpClient("BeaconApi", o => o.BaseAddress = new Uri(baseUri));
 
         services
@@ -20,7 +21,6 @@ public static class BeaconUISetup
             .AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>()
             .AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
             .AddScoped<ISessionContext>(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
-            .AddScoped<ApiClient>()
             .AddScoped<AuthService>()
             .AddBlazoredModal();
 

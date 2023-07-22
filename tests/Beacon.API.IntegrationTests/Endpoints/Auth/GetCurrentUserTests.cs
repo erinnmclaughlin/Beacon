@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
@@ -15,7 +16,7 @@ public sealed class GetCurrentUserTests : TestBase
     {
         RunAsAnonymous();
 
-        var response = await GetAsync("api/users/current");
+        var response = await SendAsync(new GetSessionContextRequest());
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
@@ -24,7 +25,7 @@ public sealed class GetCurrentUserTests : TestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync("api/users/current");
+        var response = await SendAsync(new GetSessionContextRequest());
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

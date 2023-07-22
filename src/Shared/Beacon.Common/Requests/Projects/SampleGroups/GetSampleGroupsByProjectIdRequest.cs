@@ -1,9 +1,9 @@
 ﻿using Beacon.Common.Models;
-using MediatR;
 
 namespace Beacon.Common.Requests.Projects.SampleGroups;
 
-public class GetSampleGroupsByProjectIdRequest : IRequest<SampleGroupDto[]>
+[RequireMinimumMembership(LaboratoryMembershipType.Member)]
+public sealed class GetSampleGroupsByProjectIdRequest : BeaconRequest<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>
 {
     public required Guid ProjectId { get; init; }
 }

@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Invitations;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
@@ -19,7 +20,8 @@ public sealed class AcceptEmailInvitationTests : TestBase
     {
         RunAsNonMember();
 
-        var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
+        var request = new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId };
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var invitation = ExecuteDbContext(db => db.InvitationEmails.IgnoreQueryFilters().Include(x => x.LaboratoryInvitation).Single());
@@ -34,7 +36,8 @@ public sealed class AcceptEmailInvitationTests : TestBase
     {
         RunAsMember(); // try to accept as a different user
 
-        var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
+        var request = new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId };
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
@@ -52,7 +55,8 @@ public sealed class AcceptEmailInvitationTests : TestBase
 
         RunAsNonMember();
 
-        var response = await GetAsync($"api/invitations/{EmailInvitationId}/accept");
+        var request = new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId };
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         var membership = ExecuteDbContext(db => db.Memberships.IgnoreQueryFilters().SingleOrDefault(m => m.MemberId == TestData.NonMemberUser.Id));

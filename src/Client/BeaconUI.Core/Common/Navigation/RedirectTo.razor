@@ -1,5 +1,7 @@
-﻿@inject NavigationManager NavigationManager
-@code {
+﻿@code {
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter, EditorRequired] 
     public required string Uri { get; set; }

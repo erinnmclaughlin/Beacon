@@ -1,12 +1,16 @@
 ﻿@page "/invitations/{EmailId:guid}/accept"
 @using Microsoft.AspNetCore.Components.WebAssembly.Authentication
-@inject ApiClient ApiClient
-@inject NavigationManager NavigationManager
 
 @code {
 
     [Inject]
-    private AuthenticationStateProvider AuthStateProvider { get; set; } = null!;
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [Inject]
+    private AuthenticationStateProvider AuthStateProvider { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
 
     [Parameter] 
     public Guid EmailId { get; set; }
@@ -22,7 +26,7 @@
             return;
         }
 
-        var response = await ApiClient.AcceptEmailInvitation(EmailId);
+        var response = await ApiClient.SendAsync(new AcceptEmailInvitationRequest { EmailInvitationId = EmailId });
 
         if (!response.IsError)
             NavigationManager.NavigateTo("");

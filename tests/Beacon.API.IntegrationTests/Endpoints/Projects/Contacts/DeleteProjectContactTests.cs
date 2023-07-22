@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
+using Beacon.Common.Requests.Projects.Contacts;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
@@ -15,9 +16,15 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Delete contact succeeds when request is valid")]
     public async Task DeleteContact_Succeeds_WhenRequestIsValid()
     {
-        RunAsAdmin();
+        RunAsAdmin(); 
+        
+        var request = new DeleteProjectContactRequest
+        {
+            ContactId = ContactId,
+            ProjectId = ProjectId
+        };
 
-        var response = await _httpClient.DeleteAsync($"api/projects/{ProjectId}/contacts/{ContactId}");
+        var response = await SendAsync(request);
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.False(ExecuteDbContext(db => db.ProjectContacts.Any(c => c.Id == ContactId)));
@@ -28,7 +35,13 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await _httpClient.DeleteAsync($"api/projects/{ProjectId}/contacts/{ContactId}");
+        var request = new DeleteProjectContactRequest
+        {
+            ContactId = ContactId,
+            ProjectId = ProjectId
+        };
+
+        var response = await SendAsync(request);
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.True(ExecuteDbContext(db => db.ProjectContacts.Any(c => c.Id == ContactId)));

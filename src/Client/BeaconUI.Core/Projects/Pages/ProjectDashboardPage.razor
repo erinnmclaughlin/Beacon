@@ -1,9 +1,6 @@
 ﻿@page "/l/projects"
 @attribute [Authorize]
 @layout LaboratoryLayout
-@inject ApiClient ApiClient
-@inject IModalService ModalService
-@inject NavigationManager NavigationManager
 
 <LaboratoryPageHeader>
     <h4 class="mb-0 me-auto">Projects</h4>
@@ -117,6 +114,15 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
+
     private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
@@ -126,7 +132,7 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects();
+        ProjectsOrError = await ApiClient.SendAsync(new GetProjectsRequest());
     }
 
     private void NavigateToProjectDetails(ProjectDto project)
@@ -148,7 +154,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(new() { ProjectId = project.Id });
+            await ApiClient.SendAsync(new CancelProjectRequest { ProjectId = project.Id });
             await LoadProjects();
         }
     }
@@ -162,7 +168,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(new() { ProjectId = project.Id });
+            await ApiClient.SendAsync(new CompleteProjectRequest { ProjectId = project.Id });
             await LoadProjects();
         }
     }

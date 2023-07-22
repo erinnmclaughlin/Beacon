@@ -1,12 +1,11 @@
 ﻿using Beacon.Common.Models;
 using Beacon.Common.Validation.Rules;
 using FluentValidation;
-using MediatR;
 
 namespace Beacon.Common.Requests.Projects.Contacts;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public sealed class CreateProjectContactRequest : IRequest
+public sealed class CreateProjectContactRequest : BeaconRequest<CreateProjectContactRequest>
 {
     public required Guid ProjectId { get; set; }
     public string Name { get; set; } = string.Empty;

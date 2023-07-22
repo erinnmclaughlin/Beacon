@@ -28,21 +28,8 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeInvalidRequest);
+        var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-
-        var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
-        Assert.Null(createdContact);
-    }
-
-
-    [Fact(DisplayName = "[013] Create contact endpoint returns 400 when uri does not match request")]
-    public async Task CreateContact_ShouldFail_WhenUriDoesNotMatchRequest()
-    {
-        RunAsAdmin();
-
-        var response = await PostAsync($"api/projects/{Guid.NewGuid()}/contacts", SomeValidRequest);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
 
         var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
         Assert.Null(createdContact);
@@ -53,7 +40,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
@@ -65,7 +52,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/contacts", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var createdContact = ExecuteDbContext(db => db.ProjectContacts.Single());

@@ -1,7 +1,4 @@
-﻿@inject ApiClient ApiClient
-@inject IModalService ModalService
-
-<table class="table align-middle">
+﻿<table class="table align-middle">
     <thead>
         <tr>
             <th>Name</th>
@@ -106,6 +103,12 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
+
     [Parameter, EditorRequired] 
     public required ProjectDto Project { get; set; }
 
@@ -118,7 +121,7 @@
 
     private async Task LoadProjectContacts()
     {
-        Contacts = await ApiClient.GetProjectContacts(Project.Id);
+        Contacts = await ApiClient.SendAsync(new GetProjectContactsRequest { ProjectId = Project.Id });
     }
 
     private async Task ShowAddContactModal()
@@ -151,7 +154,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.DeleteProjectContact(new() { ContactId = contact.Id, ProjectId = Project.Id });
+            await ApiClient.SendAsync(new DeleteProjectContactRequest { ContactId = contact.Id, ProjectId = Project.Id });
             await LoadProjectContacts();
         }
     }

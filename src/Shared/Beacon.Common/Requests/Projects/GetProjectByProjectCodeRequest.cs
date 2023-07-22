@@ -1,10 +1,9 @@
 ﻿using Beacon.Common.Models;
-using MediatR;
 
 namespace Beacon.Common.Requests.Projects;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
-public sealed class GetProjectByProjectCodeRequest : IRequest<ProjectDto?>
+public sealed class GetProjectByProjectCodeRequest : BeaconRequest<GetProjectByProjectCodeRequest, ProjectDto>
 {
     public required ProjectCode ProjectCode { get; set; }
 }

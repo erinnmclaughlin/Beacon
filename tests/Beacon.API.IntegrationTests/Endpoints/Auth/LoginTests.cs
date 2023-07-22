@@ -1,7 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Auth;
 using Microsoft.Extensions.DependencyInjection;
-using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
@@ -73,6 +72,6 @@ public sealed class LoginTests : IClassFixture<AuthTestFixture>
 
     private async Task<HttpResponseMessage> LoginAsync(LoginRequest request)
     {
-        return await _httpClient.PostAsJsonAsync("api/auth/login", request);
+        return await _httpClient.SendAsync(request);
     }
 }

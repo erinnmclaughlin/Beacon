@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Models;
+using Beacon.Common.Requests.Memberships;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
@@ -14,7 +15,7 @@ public sealed class GetMembershipsTests : TestBase
     {
         RunAsNonMember();
 
-        var response = await GetAsync("api/memberships");
+        var response = await SendAsync(new GetMembershipsRequest());
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
@@ -24,7 +25,7 @@ public sealed class GetMembershipsTests : TestBase
     {
         RunAsMember();
 
-        var response = await GetAsync("api/memberships");
+        var response = await SendAsync(new GetMembershipsRequest());
 
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 

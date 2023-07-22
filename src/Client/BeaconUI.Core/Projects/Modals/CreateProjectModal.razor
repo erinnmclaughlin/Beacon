@@ -1,5 +1,4 @@
 ﻿@using BeaconUI.Core.Memberships.Components
-@inject ApiClient ApiClient
 
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
@@ -42,14 +41,17 @@
 
 @code {
 
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = null!;
+    private BlazoredModalInstance Modal { get; set; } = default!;
 
     private CreateProjectRequest Model { get; } = new();
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.CreateProject(Model);
+        var result = await ApiClient.SendAsync(Model);
 
         if (result.IsError)
         {

@@ -7,17 +7,17 @@
 
 @code {
 
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
-
-    [Parameter]
-    public EventCallback OnProjectCreated { get; set; }
-
     [CascadingParameter]
     private ILabContext LabContext { get; set; } = default!;
 
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
+
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
+
+    [Parameter]
+    public EventCallback OnProjectCreated { get; set; }
 
     private bool IsDisabled => LabContext.CurrentLab.MembershipType <= LaboratoryMembershipType.Analyst;
 

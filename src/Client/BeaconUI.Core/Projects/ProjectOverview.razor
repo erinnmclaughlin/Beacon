@@ -1,6 +1,4 @@
-﻿@inject ApiClient ApiClient
-
-<div class="row">
+﻿<div class="row">
     <div class="col-12 col-lg">
         <p>This is the overview page for project @Project.ProjectCode.</p>
     </div>
@@ -10,6 +8,9 @@
 </div>
 
 @code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
 
     [Parameter]
     public required ProjectDto Project { get; set; }
@@ -24,7 +25,7 @@
         if (IsBusy) return;
         IsBusy = true;
 
-        var result = await ApiClient.UpdateLeadAnalyst(new UpdateLeadAnalystRequest
+        var result = await ApiClient.SendAsync(new UpdateLeadAnalystRequest
         {
             AnalystId = analyst?.Id,
             ProjectId = Project.Id

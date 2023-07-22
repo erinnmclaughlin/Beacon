@@ -1,5 +1,3 @@
-﻿using MediatR;
+﻿namespace Beacon.Common.Requests.Auth;
 
-namespace Beacon.Common.Requests.Auth;
-
-public sealed class LogoutRequest : IRequest { }
+public sealed class LogoutRequest : BeaconRequest<LogoutRequest> { }

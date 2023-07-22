@@ -2,15 +2,10 @@
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using Microsoft.Extensions.DependencyInjection;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net.Http.Json;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
+[Trait("Feature", "Laboratory Management")]
 public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
 {
     private readonly AuthTestFixture _fixture;
@@ -21,7 +16,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
         AddSeedData();
     }
 
-    [Fact(DisplayName = "Set current lab succeeds when request is valid")]
+    [Fact(DisplayName = "[185] Set current lab succeeds when request is valid")]
     public async Task SetCurrentLaboratory_SucceedsWhenRequestIsValid()
     {
         var httpClient = _fixture.CreateClient();
@@ -32,7 +27,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
             Password = "!!admin"
         });
 
-        var response = await httpClient.PostAsJsonAsync("api/laboratories/current", new SetCurrentLaboratoryRequest
+        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
         {
             LaboratoryId = TestData.Lab.Id
         });
@@ -41,7 +36,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
         Assert.True(response.Headers.Contains("Set-Cookie"));
     }
 
-    [Fact(DisplayName = "Set current lab fails when user is not a lab member")]
+    [Fact(DisplayName = "[185] Set current lab fails when user is not a lab member")]
     public async Task SetCurrentLaboratory_FailsWhenUserIsNotAMember()
     {
         var httpClient = _fixture.CreateClient();
@@ -52,7 +47,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
             Password = "!!nonmember"
         });
         
-        var response = await httpClient.PostAsJsonAsync("api/laboratories/current", new SetCurrentLaboratoryRequest
+        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
         {
             LaboratoryId = TestData.Lab.Id
         });
@@ -63,8 +58,7 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
 
     private static async Task Login(HttpClient httpClient, LoginRequest request)
     {
-        var response = await httpClient.PostAsJsonAsync("api/auth/login", request);
-        var content = await response.Content.ReadAsStringAsync();
+        var response = await httpClient.SendAsync(request);
         response.EnsureSuccessStatusCode();
     }
 

@@ -1,6 +1,5 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Projects.Contacts;
-using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
@@ -30,7 +29,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
             PhoneNumber = "800-588-2300"
         };
 
-        var response = await _httpClient.PutAsJsonAsync($"api/projects/{ProjectId}/contacts/{ContactId}", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));
@@ -54,7 +53,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
             PhoneNumber = "800-588-2300"
         };
 
-        var response = await _httpClient.PutAsJsonAsync($"api/projects/{ProjectId}/contacts/{ContactId}", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));
@@ -78,7 +77,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
             PhoneNumber = "800-588-2300"
         };
 
-        var response = await _httpClient.PutAsJsonAsync($"api/projects/{ProjectId}/contacts/{ContactId}", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));

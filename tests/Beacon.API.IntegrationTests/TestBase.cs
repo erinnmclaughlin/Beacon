@@ -2,7 +2,9 @@
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Requests;
 using Beacon.Common.Services;
+using ErrorOr;
 using Microsoft.Extensions.DependencyInjection;
 using System.Data.Common;
 using System.Net.Http.Json;
@@ -72,19 +74,16 @@ public abstract class TestBase : IClassFixture<TestFixture>
 
     }
 
-    protected async Task<HttpResponseMessage> PostAsync<T>(string uri, T? data)
+    protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
+        where TRequest : BeaconRequest<TRequest>
     {
-        return await _httpClient.PostAsJsonAsync(uri, data, JsonDefaults.JsonSerializerOptions);
+        return SendAsync<TRequest, Success>(request);
     }
 
-    protected async Task<HttpResponseMessage> PutAsync<T>(string uri, T? data)
+    protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
+        where TRequest : BeaconRequest<TRequest, TResponse>
     {
-        return await _httpClient.PutAsJsonAsync(uri, data, JsonDefaults.JsonSerializerOptions);
-    }
-
-    protected async Task<HttpResponseMessage> GetAsync(string uri)
-    {
-        return await _httpClient.GetAsync(uri);
+        return _httpClient.SendAsync(request);
     }
 
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)

@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
@@ -16,7 +17,8 @@ public sealed class GetSampleGroupsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync($"api/projects/{ProjectId}/sample-groups");
+        var request = new GetSampleGroupsByProjectIdRequest { ProjectId = ProjectId };
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var sampleGroups = await DeserializeAsync<SampleGroupDto[]>(response);
