@@ -41,7 +41,11 @@
 
     private bool TryGetLabContext(ClaimsPrincipal principal, out ILabContext context)
     {
-        var sessionContext = SessionContext.FromClaimsPrincipal(principal);
+        var sessionContext = new SessionContext
+        {
+            CurrentUser = CurrentUser.FromClaimsPrincipal(principal),
+            CurrentLab = CurrentLab.FromClaimsPrincipal(principal)
+        };
 
         context = sessionContext?.CurrentLab is not { } currentLab ? null! : new LabContext
         {

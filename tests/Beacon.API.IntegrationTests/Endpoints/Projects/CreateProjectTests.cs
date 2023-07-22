@@ -6,13 +6,13 @@ namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 [Trait("Feature", "Project Management")]
 public sealed class CreateProjectTests : ProjectTestBase
 {
-    private static CreateProjectRequest SomeValidRequest { get; } = new()
+    private static CreateProjectRequest SomeValidRequest => new()
     {
         CustomerCode = "ABC",
         CustomerName = "ABC Company"
     };
 
-    public static CreateProjectRequest SomeInvalidRequest { get; } = new()
+    public static CreateProjectRequest SomeInvalidRequest => new()
     {
         CustomerCode = "ABCD",
         CustomerName = "ABC Company"
@@ -47,6 +47,27 @@ public sealed class CreateProjectTests : ProjectTestBase
 
         var createdProject = ExecuteDbContext(db => db.Projects.SingleOrDefault(x => x.CustomerName == SomeInvalidRequest.CustomerName));
         Assert.Null(createdProject);
+    }
+
+    [Fact(DisplayName = "[004] Create project fails when lead analyst is not authorized")]
+    public async Task CreateProject_Fails_WhenLeadAnalystIsNotAuthorized()
+    {
+        RunAsAdmin();
+
+        var response = await SendAsync(new CreateProjectRequest
+        {
+            CustomerCode = SomeValidRequest.CustomerCode,
+            CustomerName = SomeValidRequest.CustomerName,
+            LeadAnalystId = TestData.MemberUser.Id
+        });
+
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+
+        ExecuteDbContext(db =>
+        {
+            var projectOrNull = db.Projects.SingleOrDefault(x => x.CustomerName == SomeInvalidRequest.CustomerName);
+            Assert.Null(projectOrNull);
+        });
     }
 
     [Fact(DisplayName = "[004] Create project fails when user is not authorized")]
