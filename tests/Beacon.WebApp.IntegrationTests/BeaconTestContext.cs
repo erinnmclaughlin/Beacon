@@ -27,7 +27,6 @@ public abstract class BeaconTestContext : TestContext
         JSInterop.SetupModule("https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js");
     }
 
-    protected BeaconAuthStateProvider AuthStateProvider => Services.GetRequiredService<BeaconAuthStateProvider>();
     protected Mock<IApiClient> MockApi => Services.GetRequiredService<Mock<IApiClient>>();
     protected FakeNavigationManager NavigationManager => Services.GetRequiredService<FakeNavigationManager>();
 
