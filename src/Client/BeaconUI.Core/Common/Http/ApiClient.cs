@@ -22,22 +22,22 @@ public sealed class ApiClient
 
     public async Task<ErrorOr<SessionContext>> GetCurrentUser()
     {
-        return await _httpClientFactory.PostAsync<SessionContext>($"api/{nameof(GetSessionContextRequest)}", new GetSessionContextRequest());
+        return await _httpClientFactory.GetAsync<SessionContext>($"api/{nameof(GetSessionContextRequest)}");
     }
 
     public async Task<ErrorOr<Success>> Login(LoginRequest request)
     {
-        return await _httpClientFactory.PostAsync("api/auth/login", request);
+        return await _httpClientFactory.PostAsync($"api/{nameof(LoginRequest)}", request);
     }
 
     public async Task<ErrorOr<Success>> Register(RegisterRequest request)
     {
-        return await _httpClientFactory.PostAsync("api/auth/register", request);
+        return await _httpClientFactory.PostAsync($"api/{nameof(RegisterRequest)}", request);
     }
 
     public async Task<ErrorOr<Success>> Logout()
     {
-        return await _httpClientFactory.GetAsync("api/auth/logout");
+        return await _httpClientFactory.GetAsync($"api/{nameof(LogoutRequest)}");
     }
 
     public async Task<ErrorOr<Success>> SendEmailInvitation(CreateEmailInvitationRequest request)

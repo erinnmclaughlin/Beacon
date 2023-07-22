@@ -4,4 +4,4 @@ using MediatR;
 namespace Beacon.Common.Requests.Laboratories;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
-public class GetCurrentLaboratoryRequest : IRequest<LaboratoryDto> { }
+public sealed class GetCurrentLaboratoryRequest : BeaconRequest<GetCurrentLaboratoryRequest>, IRequest<LaboratoryDto> { }

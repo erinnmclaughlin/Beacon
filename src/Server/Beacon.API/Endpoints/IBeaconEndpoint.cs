@@ -2,6 +2,7 @@
 using MediatR;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 
 namespace Beacon.API.Endpoints;
@@ -52,18 +53,18 @@ internal static class EndpointMapper
 
     public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest
     {
-        app.MapPost(typeof(TRequest).Name, async (TRequest request, IMediator m, CancellationToken ct) =>
+        app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest request, IMediator m, CancellationToken ct) =>
         {
             await m.Send(request, ct);
             return Results.NoContent();
         });
     }
 
-    public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>
+    public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>, new()
     {
-        app.MapPost(typeof(TRequest).Name, async (TRequest request, IMediator m, CancellationToken ct) =>
+        app.MapGet(typeof(TRequest).Name, async ([FromQuery] TRequest? request, IMediator m, CancellationToken ct) =>
         {
-            var response = await m.Send(request, ct);
+            var response = await m.Send(request ?? new(), ct);
             return Results.Ok(response);
         });
     }

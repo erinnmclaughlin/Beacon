@@ -6,7 +6,7 @@ using MediatR;
 namespace Beacon.Common.Requests.Projects.Contacts;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public sealed class CreateProjectContactRequest : IRequest
+public sealed class CreateProjectContactRequest : BeaconRequest<CreateProjectContactRequest>, IRequest
 {
     public required Guid ProjectId { get; set; }
     public string Name { get; set; } = string.Empty;

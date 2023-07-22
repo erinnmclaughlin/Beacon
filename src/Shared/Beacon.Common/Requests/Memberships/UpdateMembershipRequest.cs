@@ -4,7 +4,7 @@ using MediatR;
 namespace Beacon.Common.Requests.Memberships;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Manager)]
-public sealed class UpdateMembershipRequest : IRequest
+public sealed class UpdateMembershipRequest : BeaconRequest<UpdateMembershipRequest>, IRequest
 {
     public required Guid MemberId { get; set; }
     public LaboratoryMembershipType MembershipType { get; set; } = LaboratoryMembershipType.Member;

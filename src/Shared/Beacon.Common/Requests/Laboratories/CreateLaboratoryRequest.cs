@@ -4,7 +4,7 @@ using MediatR;
 
 namespace Beacon.Common.Requests.Laboratories;
 
-public class CreateLaboratoryRequest : IRequest
+public sealed class CreateLaboratoryRequest : BeaconRequest<CreateLaboratoryRequest>, IRequest
 {
     public string LaboratoryName { get; set; } = string.Empty;
 

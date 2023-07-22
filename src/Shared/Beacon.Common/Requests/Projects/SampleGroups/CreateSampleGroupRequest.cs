@@ -5,7 +5,7 @@ using MediatR;
 namespace Beacon.Common.Requests.Projects.SampleGroups;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public sealed class CreateSampleGroupRequest : IRequest
+public sealed class CreateSampleGroupRequest : BeaconRequest<CreateSampleGroupRequest>, IRequest
 {
     public string SampleName { get; set; } = "";
     public int? Quantity { get; set; }

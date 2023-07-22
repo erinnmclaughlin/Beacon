@@ -4,4 +4,4 @@ using MediatR;
 namespace Beacon.Common.Requests.Projects;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
-public sealed class GetProjectsRequest : IRequest<ProjectDto[]> { }
+public sealed class GetProjectsRequest : BeaconRequest<GetProjectsRequest>, IRequest<ProjectDto[]> { }
