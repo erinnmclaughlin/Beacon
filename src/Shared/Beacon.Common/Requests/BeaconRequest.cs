@@ -24,9 +24,7 @@ public interface IBeaconRequest<TRequest> : IBeaconRequest where TRequest : IBea
 public abstract class BeaconRequest<TRequest> : 
     IBeaconRequest<TRequest>, 
     IRequest<ErrorOr<Success>> where TRequest : 
-    IBeaconRequest<TRequest>, 
-    IRequest<ErrorOr<Success>>,
-    new()
+    IBeaconRequest<TRequest>
 {
     public static Task<HttpResponseMessage> SendAsync(HttpClient httpClient, TRequest request, CancellationToken ct = default)
     {
@@ -42,9 +40,7 @@ public abstract class BeaconRequest<TRequest> :
 public abstract class BeaconRequest<TRequest, TResponse> : 
     IBeaconRequest<TRequest>, 
     IRequest<ErrorOr<TResponse>> where TRequest : 
-    IBeaconRequest<TRequest>, 
-    IRequest<ErrorOr<TResponse>>,
-    new()
+    IBeaconRequest<TRequest>
 {
     public static Task<HttpResponseMessage> SendAsync(HttpClient httpClient, TRequest request, CancellationToken ct = default)
     {
