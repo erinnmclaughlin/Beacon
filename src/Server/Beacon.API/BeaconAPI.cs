@@ -23,6 +23,8 @@ public static class BeaconAPI
     {
         var serviceAssemblies = new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly };
 
+        services.RegisterBeaconRequestHandlers();
+
         services.AddMediatR(config =>
         {
             config.RegisterServicesFromAssemblies(serviceAssemblies);

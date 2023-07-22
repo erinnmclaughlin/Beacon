@@ -2,45 +2,35 @@
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Laboratories;
 
-public sealed class GetMyLaboratories : IBeaconEndpoint
+internal sealed class GetMyLaboratoriesHandler : IBeaconRequestHandler<GetMyLaboratoriesRequest, LaboratoryDto[]>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly ISessionContext _context;
+    private readonly BeaconDbContext _dbContext;
+
+    public GetMyLaboratoriesHandler(ISessionContext context, BeaconDbContext dbContext)
     {
-        app.MapGet("laboratories", new GetMyLaboratoriesRequest()).WithTags(EndpointTags.Laboratories);
+        _context = context;
+        _dbContext = dbContext;
     }
 
-    internal sealed class Handler : IRequestHandler<GetMyLaboratoriesRequest, LaboratoryDto[]>
+    public async Task<ErrorOr<LaboratoryDto[]>> Handle(GetMyLaboratoriesRequest request, CancellationToken ct)
     {
-        private readonly ISessionContext _context;
-        private readonly BeaconDbContext _dbContext;
+        var currentUserId = _context.UserId;
 
-        public Handler(ISessionContext context, BeaconDbContext dbContext)
-        {
-            _context = context;
-            _dbContext = dbContext;
-        }
-
-        public async Task<LaboratoryDto[]> Handle(GetMyLaboratoriesRequest request, CancellationToken ct)
-        {
-            var currentUserId = _context.UserId;
-
-            return await _dbContext.Memberships
-                .Where(m => m.MemberId == currentUserId)
-                .Select(m => new LaboratoryDto
-                {
-                    Id = m.Laboratory.Id,
-                    Name = m.Laboratory.Name,
-                    MemberCount = m.Laboratory.Memberships.Count
-                })
-                .IgnoreQueryFilters()
-                .ToArrayAsync(ct);
-        }
+        return await _dbContext.Memberships
+            .Where(m => m.MemberId == currentUserId)
+            .Select(m => new LaboratoryDto
+            {
+                Id = m.Laboratory.Id,
+                Name = m.Laboratory.Name,
+                MemberCount = m.Laboratory.Memberships.Count
+            })
+            .IgnoreQueryFilters()
+            .ToArrayAsync(ct);
     }
 }

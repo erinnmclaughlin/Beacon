@@ -1,30 +1,21 @@
 ﻿using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 
 namespace Beacon.API.Endpoints.Auth;
 
-public sealed class Logout : IBeaconEndpoint
+internal sealed class LogoutHandler : IBeaconRequestHandler<LogoutRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly ISignInManager _signInManager;
+
+    public LogoutHandler(ISignInManager signInManager)
     {
-        app.MapGet("auth/logout", new LogoutRequest()).WithTags(EndpointTags.Authentication);
+        _signInManager = signInManager;
     }
 
-    internal sealed class Handler : IRequestHandler<LogoutRequest>
+    public async Task<ErrorOr<Success>> Handle(LogoutRequest request, CancellationToken ct)
     {
-        private readonly ISignInManager _signInManager;
-
-        public Handler(ISignInManager signInManager)
-        {
-            _signInManager = signInManager;
-        }
-
-        public async Task Handle(LogoutRequest request, CancellationToken ct)
-        {
-            await _signInManager.SignOutAsync();
-        }
+        await _signInManager.SignOutAsync();
+        return Result.Success;
     }
 }

@@ -3,42 +3,36 @@ using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
+using ErrorOr;
 using MediatR;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 
 namespace Beacon.API.Endpoints.Laboratories;
 
-public sealed class CreateLaboratory : IBeaconEndpoint
+internal sealed class CreateLaboratoryHandler : IBeaconRequestHandler<CreateLaboratoryRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly ISessionContext _context;
+    private readonly BeaconDbContext _dbContext;
+
+    public CreateLaboratoryHandler(ISessionContext currentUser, BeaconDbContext dbContext)
     {
-        app.MapPost<CreateLaboratoryRequest>("laboratories").WithTags(EndpointTags.Laboratories);
+        _context = currentUser;
+        _dbContext = dbContext;
     }
 
-    internal sealed class CommandHandler : IRequestHandler<CreateLaboratoryRequest>
+    public async Task<ErrorOr<Success>> Handle(CreateLaboratoryRequest request, CancellationToken ct)
     {
-        private readonly ISessionContext _context;
-        private readonly BeaconDbContext _dbContext;
-
-        public CommandHandler(ISessionContext currentUser, BeaconDbContext dbContext)
+        var lab = new Laboratory
         {
-            _context = currentUser;
-            _dbContext = dbContext;
-        }
+            Id = Guid.NewGuid(),
+            Name = request.LaboratoryName
+        };
 
-        public async Task Handle(CreateLaboratoryRequest request, CancellationToken ct)
-        {
-            var lab = new Laboratory
-            {
-                Id = Guid.NewGuid(),
-                Name = request.LaboratoryName
-            };
+        lab.AddMember(_context.UserId, LaboratoryMembershipType.Admin);
 
-            lab.AddMember(_context.UserId, LaboratoryMembershipType.Admin);
-
-            _dbContext.Laboratories.Add(lab);
-            await _dbContext.SaveChangesAsync(ct);
-        }
+        _dbContext.Laboratories.Add(lab);
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 }

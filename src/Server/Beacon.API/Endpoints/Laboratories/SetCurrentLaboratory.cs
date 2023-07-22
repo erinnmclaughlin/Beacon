@@ -3,47 +3,38 @@ using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Laboratories;
 
-public sealed class SetCurrentLaboratory : IBeaconEndpoint
+internal sealed class SetCurrentLaboratoryHandler : IBeaconRequestHandler<SetCurrentLaboratoryRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly ISessionContext _context;
+    private readonly BeaconDbContext _dbContext;
+    private readonly ISignInManager _signInManager;
+
+    public SetCurrentLaboratoryHandler(ISessionContext context, BeaconDbContext dbContext, ISignInManager signInManager)
     {
-        app.MapPost<SetCurrentLaboratoryRequest>("laboratories/current").WithTags(EndpointTags.Laboratories);
+        _context = context;
+        _dbContext = dbContext;
+        _signInManager = signInManager;
     }
 
-    internal sealed class Handler : IRequestHandler<SetCurrentLaboratoryRequest>
+    public async Task<ErrorOr<Success>> Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
     {
-        private readonly ISessionContext _context;
-        private readonly BeaconDbContext _dbContext;
-        private readonly ISignInManager _signInManager;
+        var newContext = await _dbContext.Memberships
+            .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _context.UserId)
+            .Select(m => new SessionContext
+            {
+                CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
+                CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
+            })
+            .IgnoreQueryFilters()
+            .SingleOrDefaultAsync(ct)
+            ?? throw new UserNotAllowedException("The current user is not a member of the specified lab.");
 
-        public Handler(ISessionContext context, BeaconDbContext dbContext, ISignInManager signInManager)
-        {
-            _context = context;
-            _dbContext = dbContext;
-            _signInManager = signInManager;
-        }
-
-        public async Task Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
-        {
-            var newContext = await _dbContext.Memberships
-                .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _context.UserId)
-                .Select(m => new SessionContext
-                {
-                    CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
-                    CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
-                })
-                .IgnoreQueryFilters()
-                .SingleOrDefaultAsync(ct)
-                ?? throw new UserNotAllowedException("The current user is not a member of the specified lab.");
-
-            await _signInManager.SignInAsync(newContext.ToClaimsPrincipal());
-        }
+        await _signInManager.SignInAsync(newContext.ToClaimsPrincipal());
+        return Result.Success;
     }
 }

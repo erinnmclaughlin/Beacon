@@ -35,19 +35,6 @@ public sealed class CreateProjectContactTests : ProjectTestBase
         Assert.Null(createdContact);
     }
 
-
-    [Fact(DisplayName = "[013] Create contact endpoint returns 400 when uri does not match request")]
-    public async Task CreateContact_ShouldFail_WhenUriDoesNotMatchRequest()
-    {
-        RunAsAdmin();
-
-        var response = await SendAsync(SomeValidRequest);
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-
-        var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
-        Assert.Null(createdContact);
-    }
-
     [Fact(DisplayName = "[013] Create contact endpoint returns 403 when user is not authorized")]
     public async Task CreateContact_ShouldFail_WhenUserIsNotAuthorized()
     {

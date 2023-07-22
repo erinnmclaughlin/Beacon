@@ -1,61 +1,29 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Projects;
 
-public sealed class CompleteProject : IBeaconEndpoint
+internal sealed class CompleteProjectHandler : IBeaconRequestHandler<CompleteProjectRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+
+    public CompleteProjectHandler(BeaconDbContext dbContext)
     {
-        app.MapPost<CompleteProjectRequest>("projects/complete").WithTags(EndpointTags.Projects);
+        _dbContext = dbContext;
     }
 
-    public sealed class Validator : AbstractValidator<CompleteProjectRequest>
+    public async Task<ErrorOr<Success>> Handle(CompleteProjectRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        var project = await _dbContext.Projects.SingleAsync(x => x.Id == request.ProjectId, ct);
 
-        public Validator(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
+        if (project.ProjectStatus is not ProjectStatus.Active)
+            return Error.Validation(nameof(CompleteProjectRequest.ProjectId), "Inactive projects cannot be completed.");
 
-            RuleFor(x => x.ProjectId)
-                .MustAsync(BeActive).WithMessage("Inactive projects cannot be completed.");
-        }
-
-        private async Task<bool> BeActive(Guid projectId, CancellationToken ct)
-        {
-            var project = await _dbContext.Projects
-                .AsNoTracking()
-                .SingleAsync(x => x.Id == projectId, ct);
-
-            return project.ProjectStatus is ProjectStatus.Active;
-        }
-    }
-
-    internal sealed class Handler : IRequestHandler<CompleteProjectRequest>
-    {
-        private readonly BeaconDbContext _dbContext;
-
-        public Handler(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public async Task Handle(CompleteProjectRequest request, CancellationToken ct)
-        {
-            var project = await _dbContext.Projects.SingleAsync(x => x.Id == request.ProjectId, ct);
-
-            if (project.ProjectStatus is not ProjectStatus.Completed)
-            {
-                project.ProjectStatus = ProjectStatus.Completed;
-                await _dbContext.SaveChangesAsync(ct);
-            }
-        }
+        project.ProjectStatus = ProjectStatus.Completed;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 }

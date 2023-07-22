@@ -78,14 +78,13 @@ public abstract class TestBase : IClassFixture<TestFixture>
     protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
         where TRequest : BeaconRequest<TRequest>
     {
-        return _httpClient.PostAsJsonAsync($"api/{typeof(TRequest).Name}", request as TRequest);
+        return request.SendAsync(_httpClient);
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
         where TRequest : BeaconRequest<TRequest, TResponse>
     {
-        var json = JsonSerializer.Serialize(request as TRequest, JsonDefaults.JsonSerializerOptions);
-        return _httpClient.GetAsync($"api/{typeof(TRequest).Name}?data={json}");
+        return request.SendAsync(_httpClient);
     }
 
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)

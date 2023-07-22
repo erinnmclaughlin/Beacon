@@ -30,7 +30,7 @@ public sealed class CreateLaboratoryTests : TestBase
     {
         RunAsAdmin();
 
-        var response = await SendAsync( new CreateLaboratoryRequest
+        var response = await SendAsync(new CreateLaboratoryRequest
         {
             LaboratoryName = "no" // must be at least 3 characters
         });

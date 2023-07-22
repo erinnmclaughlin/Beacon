@@ -1,56 +1,37 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.SampleGroups;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 
 namespace Beacon.API.Endpoints.Projects.SampleGroups;
 
-public sealed class CreateSampleGroup : IBeaconEndpoint
+internal sealed class CreateSampleGroupHandler : IBeaconRequestHandler<CreateSampleGroupRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+
+    public CreateSampleGroupHandler(BeaconDbContext dbContext)
     {
-        var builder = app.MapPost("projects/{projectId:guid}/sample-groups", async (Guid projectId, CreateSampleGroupRequest request, IMediator m, CancellationToken ct) =>
-        {
-            if (request.ProjectId != projectId)
-                return Results.BadRequest();
-
-            await m.Send(request, ct);
-            return Results.NoContent();
-        });
-
-        builder.WithTags(EndpointTags.SampleGroups);
+        _dbContext = dbContext;
     }
 
-    internal sealed class Handler : IRequestHandler<CreateSampleGroupRequest>
+    public async Task<ErrorOr<Success>> Handle(CreateSampleGroupRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
-
-        public Handler(BeaconDbContext dbContext)
+        _dbContext.SampleGroups.Add(new SampleGroup
         {
-            _dbContext = dbContext;
-        }
+            Id = Guid.NewGuid(),
+            ProjectId = request.ProjectId,
+            SampleName = request.SampleName,
+            ContainerType = request.ContainerType,
+            IsHazardous = request.IsHazardous,
+            IsLightSensitive = request.IsLightSensitive,
+            Notes = request.Notes,
+            Quantity = request.Quantity,
+            TargetStorageHumidity = request.TargetStorageHumidity,
+            TargetStorageTemperature = request.TargetStorageTemperature,
+            Volume = request.Volume
+        });
 
-        public async Task Handle(CreateSampleGroupRequest request, CancellationToken ct)
-        {
-            _dbContext.SampleGroups.Add(new SampleGroup
-            {
-                Id = Guid.NewGuid(),
-                ProjectId = request.ProjectId,
-                SampleName = request.SampleName,
-                ContainerType = request.ContainerType,
-                IsHazardous = request.IsHazardous,
-                IsLightSensitive = request.IsLightSensitive,
-                Notes = request.Notes,
-                Quantity = request.Quantity,
-                TargetStorageHumidity = request.TargetStorageHumidity,
-                TargetStorageTemperature = request.TargetStorageTemperature,
-                Volume = request.Volume
-            });
-
-            await _dbContext.SaveChangesAsync(ct);
-        }
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 }

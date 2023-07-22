@@ -38,7 +38,7 @@ public class LoginPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, $"/api/auth/{nameof(LoginRequest)}").ThenRespondValidationProblem(new()
+        mockHttp.When(HttpMethod.Post, $"/api/{nameof(LoginRequest)}").ThenRespondValidationProblem(new()
         {
             { nameof(LoginRequest.EmailAddress), new[] { "Some error message" } }
         });

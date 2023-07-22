@@ -1,28 +1,50 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Services;
+using ErrorOr;
 using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Invitations;
 
-public sealed class AcceptEmailInvitation : IBeaconEndpoint
+internal sealed class AcceptEmailInvitationHandler : IBeaconRequestHandler<AcceptEmailInvitationRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
-    {
-        var builder = app.MapGet("invitations/{emailId:Guid}/accept", async (Guid emailId, IMediator m, CancellationToken ct) =>
-        {
-            await m.Send(new AcceptEmailInvitationRequest { EmailInvitationId = emailId }, ct);
-            return Results.NoContent();
-        });
+    private readonly ISessionContext _context;
+    private readonly BeaconDbContext _dbContext;
 
-        builder.WithTags(EndpointTags.Invitations);
+    public AcceptEmailInvitationHandler(ISessionContext context, BeaconDbContext dbContext)
+    {
+        _context = context;
+        _dbContext = dbContext;
+    }
+
+    public async Task<ErrorOr<Success>> Handle(AcceptEmailInvitationRequest request, CancellationToken ct)
+    {
+        var currentUser = await GetCurrentUser(ct);
+        var invitation = await GetInvitation(request, currentUser.Id, ct);
+
+        invitation.Accept(currentUser);
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
+    }
+
+    private async Task<User> GetCurrentUser(CancellationToken ct)
+    {
+        var currentUserId = _context.UserId;
+        return await _dbContext.Users.SingleAsync(u => u.Id == currentUserId, ct);
+    }
+
+    private async Task<Invitation> GetInvitation(AcceptEmailInvitationRequest request, Guid currentUserId, CancellationToken ct)
+    {
+        return await _dbContext.InvitationEmails
+            .Include(i => i.LaboratoryInvitation)
+            .ThenInclude(i => i.Laboratory)
+            .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
+            .Where(i => i.Id == request.EmailInvitationId)
+            .Select(i => i.LaboratoryInvitation)
+            .IgnoreQueryFilters()
+            .SingleAsync(ct);
     }
 
     public sealed class Validator : AbstractValidator<AcceptEmailInvitationRequest>
@@ -45,45 +67,6 @@ public sealed class AcceptEmailInvitation : IBeaconEndpoint
                 .SingleAsync(i => i.Id == emailId, ct);
 
             return !emailInvite.IsExpired(DateTimeOffset.UtcNow);
-        }
-    }
-
-    internal sealed class Handler : IRequestHandler<AcceptEmailInvitationRequest>
-    {
-        private readonly ISessionContext _context;
-        private readonly BeaconDbContext _dbContext;
-
-        public Handler(ISessionContext context, BeaconDbContext dbContext)
-        {
-            _context = context;
-            _dbContext = dbContext;
-        }
-
-        public async Task Handle(AcceptEmailInvitationRequest request, CancellationToken ct)
-        {
-            var currentUser = await GetCurrentUser(ct);
-            var invitation = await GetInvitation(request, currentUser.Id, ct);
-
-            invitation.Accept(currentUser);
-            await _dbContext.SaveChangesAsync(ct);
-        }
-
-        private async Task<User> GetCurrentUser(CancellationToken ct)
-        {
-            var currentUserId = _context.UserId;
-            return await _dbContext.Users.SingleAsync(u => u.Id == currentUserId, ct);
-        }
-
-        private async Task<Invitation> GetInvitation(AcceptEmailInvitationRequest request, Guid currentUserId, CancellationToken ct)
-        {
-            return await _dbContext.InvitationEmails
-                .Include(i => i.LaboratoryInvitation)
-                .ThenInclude(i => i.Laboratory)
-                .ThenInclude(l => l.Memberships.Where(m => m.Member.Id == currentUserId))
-                .Where(i => i.Id == request.EmailInvitationId)
-                .Select(i => i.LaboratoryInvitation)
-                .IgnoreQueryFilters()
-                .SingleAsync(ct);
         }
     }
 }

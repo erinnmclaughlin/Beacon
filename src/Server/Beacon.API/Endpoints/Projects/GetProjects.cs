@@ -1,54 +1,38 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Projects;
 
-public sealed class GetProjects : IBeaconEndpoint
+internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequest, ProjectDto[]>
 {
-    public static void Map(IEndpointRouteBuilder app)
-    {
-        var builder = app.MapGet("projects", async ([AsParameters] GetProjectsRequest request, IMediator m, CancellationToken ct) =>
-        {
-            return Results.Ok(await m.Send(request, ct));
-        });
+    private readonly BeaconDbContext _dbContext;
 
-        builder.WithTags(EndpointTags.Projects);
+    public GetProjectsHandler(BeaconDbContext dbContext)
+    {
+        _dbContext = dbContext;
     }
 
-    internal sealed class Handler : IRequestHandler<GetProjectsRequest, ProjectDto[]>
+    public async Task<ErrorOr<ProjectDto[]>> Handle(GetProjectsRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        var projects = await _dbContext.Projects
+            .Include(x => x.LeadAnalyst)
+            .AsNoTracking()
+            .ToArrayAsync(ct);
 
-        public Handler(BeaconDbContext dbContext)
+        return projects.Select(x => new ProjectDto
         {
-            _dbContext = dbContext;
-        }
-
-        public async Task<ProjectDto[]> Handle(GetProjectsRequest request, CancellationToken ct)
-        {
-            var projects = await _dbContext.Projects
-                .Include(x => x.LeadAnalyst)
-                .AsNoTracking()
-                .ToArrayAsync(ct);
-
-            return projects.Select(x => new ProjectDto
+            Id = x.Id,
+            CustomerName = x.CustomerName,
+            ProjectStatus = x.ProjectStatus,
+            ProjectCode = x.ProjectCode.ToString(),
+            LeadAnalyst = x.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
             {
-                Id = x.Id,
-                CustomerName = x.CustomerName,
-                ProjectStatus = x.ProjectStatus,
-                ProjectCode = x.ProjectCode.ToString(),
-                LeadAnalyst = x.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
-                {
-                    Id = x.LeadAnalyst.Id,
-                    DisplayName = x.LeadAnalyst.DisplayName
-                }
-            }).ToArray();
-        }
+                Id = x.LeadAnalyst.Id,
+                DisplayName = x.LeadAnalyst.DisplayName
+            }
+        }).ToArray();
     }
 }

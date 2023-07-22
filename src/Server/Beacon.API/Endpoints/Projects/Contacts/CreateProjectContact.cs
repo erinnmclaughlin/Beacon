@@ -1,52 +1,32 @@
-﻿using Beacon.API.Endpoints;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.Contacts;
 using Beacon.Common.Services;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 
 namespace Beacon.API.Endpoints.Projects.Contacts;
 
-public sealed class CreateProjectContact : IBeaconEndpoint
+internal sealed class CreateProjectContactHandler : IBeaconRequestHandler<CreateProjectContactRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+
+    public CreateProjectContactHandler(BeaconDbContext dbContext, ILabContext labContext)
     {
-        var builder = app.MapPost("projects/{projectId:guid}/contacts", async (Guid projectId, CreateProjectContactRequest request, IMediator m, CancellationToken ct) =>
-        {
-            if (request.ProjectId != projectId)
-                return Results.BadRequest();
-
-            await m.Send(request, ct);
-            return Results.NoContent();
-        });
-
-        builder.WithTags(EndpointTags.Projects);
+        _dbContext = dbContext;
     }
 
-    internal sealed class Handler : IRequestHandler<CreateProjectContactRequest>
+    public async Task<ErrorOr<Success>> Handle(CreateProjectContactRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
-
-        public Handler(BeaconDbContext dbContext, ILabContext labContext)
+        _dbContext.ProjectContacts.Add(new ProjectContact
         {
-            _dbContext = dbContext;
-        }
+            Id = Guid.NewGuid(),
+            Name = request.Name,
+            EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress,
+            PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
+            ProjectId = request.ProjectId
+        });
 
-        public async Task Handle(CreateProjectContactRequest request, CancellationToken ct)
-        {
-            _dbContext.ProjectContacts.Add(new ProjectContact
-            {
-                Id = Guid.NewGuid(),
-                Name = request.Name,
-                EmailAddress = string.IsNullOrWhiteSpace(request.EmailAddress) ? null : request.EmailAddress,
-                PhoneNumber = string.IsNullOrWhiteSpace(request.PhoneNumber) ? null : request.PhoneNumber,
-                ProjectId = request.ProjectId
-            });
-
-            await _dbContext.SaveChangesAsync(ct);
-        }
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 }

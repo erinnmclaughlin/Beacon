@@ -18,17 +18,6 @@ public sealed class AuthorizationPipelineBehavior<TRequest, TResponse>
         _context = context;
     }
 
-    public Task Process(TRequest request, CancellationToken ct)
-    {
-        if (_context.UserId == Guid.Empty && !AllowsAnonymous())
-            throw new UnauthorizedAccessException();
-
-        if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
-            throw new UserNotAllowedException();
-
-        return Task.CompletedTask;
-    }
-
     public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
     {
         if (_context.UserId == Guid.Empty && !AllowsAnonymous())

@@ -1,34 +1,25 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Memberships;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Memberships;
 
-public sealed class UpdateMembership : IBeaconEndpoint
+internal sealed class UpdateMembershipHandler : IBeaconRequestHandler<UpdateMembershipRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+
+    public UpdateMembershipHandler(BeaconDbContext dbContext)
     {
-        app.MapPut<UpdateMembershipRequest>("memberships").WithTags(EndpointTags.Memberships);
+        _dbContext = dbContext;
     }
 
-    internal sealed class Handler : IRequestHandler<UpdateMembershipRequest>
+    public async Task<ErrorOr<Success>> Handle(UpdateMembershipRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        var member = await _dbContext.Memberships.SingleAsync(m => m.MemberId == request.MemberId, ct);
 
-        public Handler(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public async Task Handle(UpdateMembershipRequest request, CancellationToken ct)
-        {
-            var member = await _dbContext.Memberships.SingleAsync(m => m.MemberId == request.MemberId, ct);
-
-            member.MembershipType = request.MembershipType;
-            await _dbContext.SaveChangesAsync(ct);
-        }
+        member.MembershipType = request.MembershipType;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 }

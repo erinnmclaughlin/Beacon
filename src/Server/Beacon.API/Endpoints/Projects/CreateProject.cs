@@ -3,81 +3,58 @@ using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Services;
+using ErrorOr;
 using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Projects;
 
-public sealed class CreateProject : IBeaconEndpoint
+internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProjectRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+    private readonly ISessionContext _sessionContext;
+
+    public CreateProjectHandler(BeaconDbContext dbContext, ISessionContext sessionContext)
     {
-        app.MapPost<CreateProjectRequest>("projects").WithTags(EndpointTags.Projects);
+        _dbContext = dbContext;
+        _sessionContext = sessionContext;
     }
 
-    public sealed class Validator : AbstractValidator<CreateProjectRequest>
+    public async Task<ErrorOr<Success>> Handle(CreateProjectRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        if (request.LeadAnalystId is { } leadId && !await IsValidLeadAnalyst(leadId, ct))
+            return Error.Validation(nameof(CreateProjectRequest.LeadAnalystId), "Lead analyst must have at least an analyst role.");
 
-        public Validator(BeaconDbContext dbContext)
+        _dbContext.Projects.Add(new Project
         {
-            _dbContext = dbContext;
+            Id = Guid.NewGuid(),
+            ProjectCode = await GenerateProjectCode(request, ct),
+            CustomerName = request.CustomerName,
+            CreatedById = _sessionContext.CurrentUser.Id,
+            LeadAnalystId = request.LeadAnalystId
+        });
 
-            RuleFor(x => x.LeadAnalystId)
-                .MustAsync(BeAuthorized)
-                .WithMessage("Lead analyst must have at least an analyst role.");
-        }
-
-        private async Task<bool> BeAuthorized(Guid? analystId, CancellationToken ct)
-        {
-            if (analystId == null)
-                return true;
-
-            var membership = await _dbContext.Memberships
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.MemberId == analystId.Value, ct);
-
-            return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
-        }
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 
-    internal sealed class Handler : IRequestHandler<CreateProjectRequest>
+    private async Task<bool> IsValidLeadAnalyst(Guid analystId, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
-        private readonly ISessionContext _sessionContext;
+        var membership = await _dbContext.Memberships
+           .AsNoTracking()
+           .SingleOrDefaultAsync(m => m.MemberId == analystId, ct);
 
-        public Handler(BeaconDbContext dbContext, ISessionContext sessionContext)
-        {
-            _dbContext = dbContext;
-            _sessionContext = sessionContext;
-        }
+        return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
+    }
 
-        public async Task Handle(CreateProjectRequest request, CancellationToken ct)
-        {
-            _dbContext.Projects.Add(new Project
-            {
-                Id = Guid.NewGuid(),
-                ProjectCode = await GenerateProjectCode(request, ct),
-                CustomerName = request.CustomerName,
-                CreatedById = _sessionContext.CurrentUser.Id,
-                LeadAnalystId = request.LeadAnalystId
-            });
+    private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
+    {
+        var lastSuffix = await _dbContext.Projects
+            .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode)
+            .OrderBy(p => p.ProjectCode.Suffix)
+            .Select(p => p.ProjectCode.Suffix)
+            .LastOrDefaultAsync(ct);
 
-            await _dbContext.SaveChangesAsync(ct);
-        }
-
-        private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
-        {
-            var lastSuffix = await _dbContext.Projects
-                .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode)
-                .OrderBy(p => p.ProjectCode.Suffix)
-                .Select(p => p.ProjectCode.Suffix)
-                .LastOrDefaultAsync(ct);
-
-            return new ProjectCode(request.CustomerCode, lastSuffix + 1);
-        }
+        return new ProjectCode(request.CustomerCode, lastSuffix + 1);
     }
 }

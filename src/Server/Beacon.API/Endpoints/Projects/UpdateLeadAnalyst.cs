@@ -1,72 +1,40 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using FluentValidation;
-using MediatR;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
+using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Endpoints.Projects;
 
-public sealed class UpdateLeadAnalyst : IBeaconEndpoint
+internal sealed class UpdateLeadAnalystHandler : IBeaconRequestHandler<UpdateLeadAnalystRequest>
 {
-    public static void Map(IEndpointRouteBuilder app)
+    private readonly BeaconDbContext _dbContext;
+
+    public UpdateLeadAnalystHandler(BeaconDbContext dbContext)
     {
-        var builder = app.MapPut("projects/{projectId:guid}/analyst", async (Guid projectId, UpdateLeadAnalystRequest request, IMediator m, CancellationToken ct) =>
-        {
-            if (projectId != request.ProjectId)
-                return Results.BadRequest();
-
-            await m.Send(request, ct);
-            return Results.NoContent();
-        });
-
-        builder.WithTags(EndpointTags.Projects);
+        _dbContext = dbContext;
     }
 
-    public sealed class Validator : AbstractValidator<UpdateLeadAnalystRequest>
+    public async Task<ErrorOr<Success>> Handle(UpdateLeadAnalystRequest request, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        if (request.AnalystId is { } analystId && !await IsValidLeadAnalyst(analystId, ct))
+            return Error.Validation(
+                nameof(UpdateLeadAnalystRequest.AnalystId), 
+                "Lead analyst must have at least an analyst role.");
 
-        public Validator(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
+        var project = await _dbContext.Projects.SingleAsync(x => x.Id == request.ProjectId, ct);
 
-            RuleFor(x => x.AnalystId)
-                .MustAsync(BeAuthorized)
-                .WithMessage("Lead analyst must have at least an analyst role.");
-        }
-
-        private async Task<bool> BeAuthorized(Guid? analystId, CancellationToken ct)
-        {
-            if (analystId == null)
-                return true;
-
-            var membership = await _dbContext.Memberships
-                .AsNoTracking()
-                .SingleOrDefaultAsync(m => m.MemberId == analystId.Value, ct);
-
-            return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
-        }
+        project.LeadAnalystId = request.AnalystId;
+        await _dbContext.SaveChangesAsync(ct);
+        return Result.Success;
     }
 
-    internal sealed class Handler : IRequestHandler<UpdateLeadAnalystRequest>
+    private async Task<bool> IsValidLeadAnalyst(Guid analystId, CancellationToken ct)
     {
-        private readonly BeaconDbContext _dbContext;
+        var membership = await _dbContext.Memberships
+            .AsNoTracking()
+            .SingleOrDefaultAsync(m => m.MemberId == analystId, ct);
 
-        public Handler(BeaconDbContext dbContext)
-        {
-            _dbContext = dbContext;
-        }
-
-        public async Task Handle(UpdateLeadAnalystRequest request, CancellationToken ct)
-        {
-            var project = await _dbContext.Projects.SingleAsync(x => x.Id == request.ProjectId, ct);
-
-            project.LeadAnalystId = request.AnalystId;
-            await _dbContext.SaveChangesAsync(ct);
-        }
+        return membership?.MembershipType is >= LaboratoryMembershipType.Analyst;
     }
 }
