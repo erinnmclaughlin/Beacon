@@ -46,26 +46,20 @@ internal static class EndpointMapper
 
     public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest, new()
     {
-        var builder = app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
+        app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
             await m.Send(request ?? new(), ct);
             return Results.NoContent();
         });
-
-        if (typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() == null)
-            builder.RequireAuthorization();
     }
 
     public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>, new()
     {
-        var builder = app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
+        app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
         {
             var request = data is null ? new() : JsonSerializer.Deserialize<TRequest>(data, JsonDefaults.JsonSerializerOptions) ?? new();
             var response = await m.Send(request ?? new(), ct);
             return Results.Ok(response);
         });
-
-        if (typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() == null)
-            builder.RequireAuthorization();
     }
 }

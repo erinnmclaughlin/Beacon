@@ -2,13 +2,14 @@
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
-using MediatR.Pipeline;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Beacon.API.Behaviors;
 
-public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcessor<TRequest> where TRequest : notnull
+public sealed class AuthorizationPipelineBehavior<TRequest, TResponse> 
+    : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
 {
     private readonly ISessionContext _context;
 
@@ -26,6 +27,17 @@ public sealed class AuthorizationPipelineBehavior<TRequest> : IRequestPreProcess
             throw new UserNotAllowedException();
 
         return Task.CompletedTask;
+    }
+
+    public Task<TResponse> Handle(TRequest request, RequestHandlerDelegate<TResponse> next, CancellationToken ct)
+    {
+        if (_context.UserId == Guid.Empty && !AllowsAnonymous())
+            throw new UnauthorizedAccessException();
+
+        if (HasMembershipRequirement(out var allowedRoles) && !CurrentUserIsMember(allowedRoles))
+            throw new UserNotAllowedException();
+
+        return next();
     }
 
     private static bool AllowsAnonymous()

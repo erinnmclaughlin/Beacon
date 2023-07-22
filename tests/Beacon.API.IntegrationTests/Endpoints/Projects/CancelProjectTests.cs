@@ -15,7 +15,7 @@ public sealed class CancelProjectTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync("api/projects/cancel", new CancelProjectRequest
+        var response = await SendAsync(new CancelProjectRequest
         {
             ProjectId = ProjectId
         });
@@ -31,7 +31,7 @@ public sealed class CancelProjectTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await PostAsync("api/projects/cancel", new CancelProjectRequest
+        var response = await SendAsync(new CancelProjectRequest
         {
             ProjectId = ProjectId
         });

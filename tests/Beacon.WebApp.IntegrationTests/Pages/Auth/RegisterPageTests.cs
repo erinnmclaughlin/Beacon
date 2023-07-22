@@ -17,7 +17,7 @@ public class RegisterPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondOK(AuthHelper.DefaultSession);
+        mockHttp.When(HttpMethod.Post, $"/api/{nameof(RegisterRequest)}").ThenRespondOK(AuthHelper.DefaultSession);
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<RegisterPage>();
@@ -38,7 +38,7 @@ public class RegisterPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/register").ThenRespondValidationProblem(new()
+        mockHttp.When(HttpMethod.Post, $"/api/{nameof(RegisterRequest)}").ThenRespondValidationProblem(new()
         {
             { nameof(RegisterRequest.EmailAddress), new[] { "Some error message" } }
         });

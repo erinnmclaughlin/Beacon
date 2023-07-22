@@ -15,7 +15,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
+        var response = await SendAsync(new CompleteProjectRequest
         {
             ProjectId = ProjectId
         });
@@ -31,7 +31,7 @@ public sealed class CompleteProjectTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await PostAsync("api/projects/complete", new CompleteProjectRequest
+        var response = await SendAsync(new CompleteProjectRequest
         {
             ProjectId = ProjectId
         });

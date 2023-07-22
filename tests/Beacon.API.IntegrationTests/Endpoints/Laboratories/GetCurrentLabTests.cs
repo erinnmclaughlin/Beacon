@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
@@ -16,7 +17,7 @@ public sealed class GetCurrentLabTests : TestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync("api/laboratories/current");
+        var response = await SendAsync(new GetCurrentLaboratoryRequest());
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var lab = await DeserializeAsync<LaboratoryDto>(response);
@@ -31,7 +32,7 @@ public sealed class GetCurrentLabTests : TestBase
     {
         RunAsNonMember();
 
-        var response = await GetAsync("api/laboratories/current");
+        var response = await SendAsync(new GetCurrentLaboratoryRequest());
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 

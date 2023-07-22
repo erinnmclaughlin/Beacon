@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
@@ -17,7 +18,7 @@ public sealed class GetMyLaboratoriesTests : TestBase
     public async Task GetMyLaboratories_ReturnsOnlyCurrentUsersLabs()
     {
         RunAsManager();
-        var response = await GetAsync("api/laboratories");
+        var response = await SendAsync(new GetMyLaboratoriesRequest());
         var myLabs = await DeserializeAsync<LaboratoryDto[]>(response);
 
         Assert.NotNull(myLabs);
@@ -25,7 +26,7 @@ public sealed class GetMyLaboratoriesTests : TestBase
         Assert.Contains(myLabs, x => x.Name == "Some other lab");
 
         RunAsAdmin();
-        var otherMyLabs = await DeserializeAsync<LaboratoryDto[]>(await GetAsync("api/laboratories"));
+        var otherMyLabs = await DeserializeAsync<LaboratoryDto[]>(await SendAsync(new GetMyLaboratoriesRequest()));
 
         Assert.NotNull(otherMyLabs);
         Assert.Single(otherMyLabs);

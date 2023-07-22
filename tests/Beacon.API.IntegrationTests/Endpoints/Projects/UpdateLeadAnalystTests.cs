@@ -20,7 +20,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
             AnalystId = TestData.MemberUser.Id
         };
 
-        var response = await PutAsync($"api/projects/{ProjectId}/analyst", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         EnsureLeadAnalystIs(null);
@@ -35,9 +35,9 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         {
             ProjectId = ProjectId,
             AnalystId = TestData.AnalystUser.Id
-        }; 
-        
-        var response = await PutAsync($"api/projects/{ProjectId}/analyst", request);
+        };
+
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         EnsureLeadAnalystIs(null);
@@ -54,7 +54,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
             AnalystId = TestData.AnalystUser.Id
         };
 
-        var response = await PutAsync($"api/projects/{ProjectId}/analyst", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         EnsureLeadAnalystIs(TestData.AnalystUser.Id);
@@ -78,7 +78,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
             AnalystId = null
         };
 
-        var response = await PutAsync($"api/projects/{ProjectId}/analyst", request);
+        var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         EnsureLeadAnalystIs(null);

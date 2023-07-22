@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
@@ -14,7 +15,7 @@ public sealed class GetProjectDetailsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync($"api/projects/{ProjectCode}");
+        var response = await SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = ProjectCode });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var project = await DeserializeAsync<ProjectDto>(response);
@@ -29,7 +30,7 @@ public sealed class GetProjectDetailsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync($"api/projects/{ProjectId}");
+        var response = await SendAsync(new GetProjectByIdRequest { ProjectId = ProjectId });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var project = await DeserializeAsync<ProjectDto>(response);
@@ -38,22 +39,12 @@ public sealed class GetProjectDetailsTests : ProjectTestBase
         Assert.Equal(ProjectCode.ToString(), project.ProjectCode);
     }
 
-    [Fact(DisplayName = "[193] Get project endpoint returns 400 when project code is in invalid format")]
-    public async Task GetProject_ReturnsBadRequest_WhenProjectCodeIsInInvalidFormat()
-    {
-        RunAsAdmin();
-
-        var response = await GetAsync("api/projects/invalid");
-        Assert.Equal(HttpStatusCode.BadRequest, response.StatusCode);
-    }
-
-
     [Fact(DisplayName = "[193] Get project endpoint returns 403 when user is not authorized")]
     public async Task GetProject_ReturnsForbidden_WhenUserIsNotAuthorized()
     {
         RunAsNonMember();
 
-        var response = await GetAsync($"api/projects/{ProjectId}");
+        var response = await SendAsync(new GetProjectByIdRequest { ProjectId = ProjectId });
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 }

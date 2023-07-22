@@ -27,7 +27,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync("api/projects", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var createdProject = ExecuteDbContext(db => db.Projects.Single(x => x.CustomerName == SomeValidRequest.CustomerName));
@@ -42,7 +42,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync("api/projects", SomeInvalidRequest);
+        var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         var createdProject = ExecuteDbContext(db => db.Projects.SingleOrDefault(x => x.CustomerName == SomeInvalidRequest.CustomerName));
@@ -54,7 +54,7 @@ public sealed class CreateProjectTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await PostAsync("api/projects", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         var createdProject = ExecuteDbContext(db => db.Projects.SingleOrDefault(x => x.CustomerName == SomeValidRequest.CustomerName));

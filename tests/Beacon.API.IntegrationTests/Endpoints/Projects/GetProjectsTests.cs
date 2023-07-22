@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
@@ -16,7 +17,7 @@ public sealed class GetProjectsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await GetAsync("api/projects");
+        var response = await SendAsync(new GetProjectsRequest());
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var projects = await DeserializeAsync<ProjectDto[]>(response);
@@ -31,7 +32,7 @@ public sealed class GetProjectsTests : ProjectTestBase
     {
         RunAsNonMember();
 
-        var response = await GetAsync("api/projects");
+        var response = await SendAsync(new GetProjectsRequest());
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 

@@ -21,13 +21,16 @@ public static class BeaconAPI
 {
     public static IServiceCollection AddBeaconCore(this IServiceCollection services)
     {
+        var serviceAssemblies = new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly };
+
         services.AddMediatR(config =>
         {
-            config.RegisterServicesFromAssemblies(typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly);
+            config.RegisterServicesFromAssemblies(serviceAssemblies);
+            config.AddOpenBehavior(typeof(AuthorizationPipelineBehavior<,>));
             config.AddOpenBehavior(typeof(ValidationPipelineBehavior<,>));
         });
 
-        services.AddValidatorsFromAssemblies(new[] { typeof(BeaconAPI).Assembly, typeof(LoginRequest).Assembly }, includeInternalTypes: true);
+        services.AddValidatorsFromAssemblies(serviceAssemblies, includeInternalTypes: true);
         services.AddScoped<BeaconAuthenticationService>();
         services.AddSingleton<IPasswordHasher, PasswordHasher>();
         return services;

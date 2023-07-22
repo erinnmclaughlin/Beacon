@@ -17,7 +17,7 @@ public class LoginPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondOK(AuthHelper.DefaultSession);
+        mockHttp.When(HttpMethod.Post, $"/api/{nameof(LoginRequest)}").ThenRespondOK(AuthHelper.DefaultSession);
 
         var navManager = Services.GetRequiredService<FakeNavigationManager>();
         var cut = RenderComponent<LoginPage>();
@@ -38,7 +38,7 @@ public class LoginPageTests : BeaconTestContext
         SetupCoreServices();
 
         var mockHttp = Services.AddMockHttpClient();
-        mockHttp.When(HttpMethod.Post, "/api/auth/login").ThenRespondValidationProblem(new()
+        mockHttp.When(HttpMethod.Post, $"/api/auth/{nameof(LoginRequest)}").ThenRespondValidationProblem(new()
         {
             { nameof(LoginRequest.EmailAddress), new[] { "Some error message" } }
         });

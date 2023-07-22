@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Requests.Projects.SampleGroups;
+﻿using Azure.Core;
+using Beacon.Common.Requests.Projects.SampleGroups;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
@@ -26,7 +27,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.Single());
@@ -39,7 +40,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeInvalidRequest);
+        var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.SingleOrDefault());
@@ -51,7 +52,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await PostAsync($"api/projects/{ProjectId}/sample-groups", SomeValidRequest);
+        var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.SingleOrDefault());

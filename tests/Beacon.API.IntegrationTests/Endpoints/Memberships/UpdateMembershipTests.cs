@@ -18,7 +18,7 @@ public sealed class UpdateMembershipTests : TestBase
     {
         RunAsAdmin();
 
-        var response = await PutAsync("api/memberships", new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = TestData.MemberUser.Id,
             MembershipType = LaboratoryMembershipType.Analyst
@@ -40,7 +40,7 @@ public sealed class UpdateMembershipTests : TestBase
     {
         RunAsMember();
 
-        var response = await PutAsync("api/memberships", new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = TestData.AdminUser.Id,
             MembershipType = LaboratoryMembershipType.Analyst

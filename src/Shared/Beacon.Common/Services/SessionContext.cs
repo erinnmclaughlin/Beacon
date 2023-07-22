@@ -8,7 +8,6 @@ public interface ISessionContext
     CurrentLab? CurrentLab { get; }
 
     public Guid UserId => CurrentUser.Id;
-    public bool IsLoggedIn() => CurrentUser.Id != Guid.Empty;
 }
 
 public class SessionContext : ISessionContext
