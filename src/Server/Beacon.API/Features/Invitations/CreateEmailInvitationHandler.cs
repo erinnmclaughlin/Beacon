@@ -30,7 +30,8 @@ internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<Creat
         if (_context.CurrentLab.MembershipType < request.MembershipType)
             throw new UserNotAllowedException();
 
-        await EnsureUserIsNotAnExistingMember(request.NewMemberEmailAddress, ct);
+        if (await InvitedUserIsMember(request.NewMemberEmailAddress, ct))
+            return Error.Validation(nameof(CreateEmailInvitationRequest.NewMemberEmailAddress), "User is already a member of the specified laboratory.");
 
         var invitation = await CreateInvitation(request, ct);
 
@@ -60,10 +61,9 @@ internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<Creat
         return emailInvitation;
     }
 
-    private async Task EnsureUserIsNotAnExistingMember(string newMemberEmail, CancellationToken ct)
+    private async Task<bool> InvitedUserIsMember(string newMemberEmail, CancellationToken ct)
     {
-        if (await _dbContext.Memberships.AnyAsync(m => m.LaboratoryId == _context.CurrentLab.Id && m.Member.EmailAddress == newMemberEmail, ct))
-            throw new BeaconValidationException(nameof(CreateEmailInvitationRequest.NewMemberEmailAddress), "User is already a member of the specified laboratory.");
+        return await _dbContext.Memberships.AnyAsync(m => m.Member.EmailAddress == newMemberEmail, ct);
     }
 }
 
