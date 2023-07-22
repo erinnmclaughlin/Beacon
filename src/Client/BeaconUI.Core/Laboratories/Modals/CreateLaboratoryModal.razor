@@ -1,5 +1,5 @@
 ﻿@using Beacon.Common.Requests.Laboratories
-@inject ApiClient ApiClient
+@inject HttpClient ApiClient
 
 <BeaconForm Model="Model" OnValidSubmit="Submit">
     <Modal>
@@ -26,7 +26,7 @@
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.CreateLaboratory(Model);
+        var result = await ApiClient.SendAsync(Model);
 
         if (result.IsError)
         {

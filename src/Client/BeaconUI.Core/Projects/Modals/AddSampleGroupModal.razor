@@ -1,4 +1,4 @@
-﻿@inject ApiClient ApiClient
+﻿@inject HttpClient ApiClient
 
 <BeaconForm Model="Request" OnValidSubmit="Submit">
     <Modal>
@@ -49,7 +49,7 @@
 
     private async Task Submit(BeaconForm formContext)
     {
-        var result = await ApiClient.CreateSampleGroup(Request);
+        var result = await ApiClient.SendAsync(Request);
 
         if (result.IsError)
         {

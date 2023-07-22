@@ -1,7 +1,7 @@
 ﻿@page "/l/projects"
 @attribute [Authorize]
 @layout LaboratoryLayout
-@inject ApiClient ApiClient
+@inject HttpClient ApiClient
 @inject IModalService ModalService
 @inject NavigationManager NavigationManager
 
@@ -126,7 +126,7 @@
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.GetProjects();
+        ProjectsOrError = await ApiClient.SendAsync(new GetProjectsRequest());
     }
 
     private void NavigateToProjectDetails(ProjectDto project)
@@ -148,7 +148,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CancelProject(new() { ProjectId = project.Id });
+            await ApiClient.SendAsync(new CancelProjectRequest { ProjectId = project.Id });
             await LoadProjects();
         }
     }
@@ -162,7 +162,7 @@
 
         if (result.Confirmed)
         {
-            await ApiClient.CompleteProject(new() { ProjectId = project.Id });
+            await ApiClient.SendAsync(new CompleteProjectRequest { ProjectId = project.Id });
             await LoadProjects();
         }
     }

@@ -1,4 +1,4 @@
-﻿@inject ApiClient ApiClient
+﻿@inject HttpClient ApiClient
 @inject ISessionContext CurrentUser
 @inject IModalService ModalService
 
@@ -17,7 +17,7 @@
 
     protected override async Task OnParametersSetAsync()
     {
-        Result = await ApiClient.GetLaboratoryMembers();
+        Result = await ApiClient.SendAsync(new GetMembershipsRequest());
     }
 
     public bool CanManagePermissions()
@@ -40,7 +40,7 @@
         var result = await ModalService.Show<UpdateMembershipTypeModal>("Update Membership", modalParameters).Result;
 
         if (result.Confirmed)
-            Result = await ApiClient.GetLaboratoryMembers();
+            Result = await ApiClient.SendAsync(new GetMembershipsRequest());
 
         StateHasChanged();
     }

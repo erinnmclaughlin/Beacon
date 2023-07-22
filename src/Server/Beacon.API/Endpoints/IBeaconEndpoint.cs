@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using System.Reflection;
 using System.Text.Json;
 
 namespace Beacon.API.Endpoints;
@@ -45,20 +46,26 @@ internal static class EndpointMapper
 
     public static void Map<TRequest>(IEndpointRouteBuilder app) where TRequest : IRequest, new()
     {
-        app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
+        var builder = app.MapPost(typeof(TRequest).Name, async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
             await m.Send(request ?? new(), ct);
             return Results.NoContent();
         });
+
+        if (typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() == null)
+            builder.RequireAuthorization();
     }
 
     public static void Map<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : IRequest<TResponse>, new()
     {
-        app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
+        var builder = app.MapGet(typeof(TRequest).Name, async (string? data, IMediator m, CancellationToken ct) =>
         {
             var request = data is null ? new() : JsonSerializer.Deserialize<TRequest>(data, JsonDefaults.JsonSerializerOptions) ?? new();
             var response = await m.Send(request ?? new(), ct);
             return Results.Ok(response);
         });
+
+        if (typeof(TRequest).GetCustomAttribute<AllowAnonymousAttribute>() == null)
+            builder.RequireAuthorization();
     }
 }

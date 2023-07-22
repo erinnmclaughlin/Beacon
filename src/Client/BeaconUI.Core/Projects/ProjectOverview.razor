@@ -1,4 +1,4 @@
-﻿@inject ApiClient ApiClient
+﻿@inject HttpClient ApiClient
 
 <div class="row">
     <div class="col-12 col-lg">
@@ -24,7 +24,7 @@
         if (IsBusy) return;
         IsBusy = true;
 
-        var result = await ApiClient.UpdateLeadAnalyst(new UpdateLeadAnalystRequest
+        var result = await ApiClient.SendAsync(new UpdateLeadAnalystRequest
         {
             AnalystId = analyst?.Id,
             ProjectId = Project.Id

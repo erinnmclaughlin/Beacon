@@ -1,4 +1,4 @@
-﻿@inject ApiClient ApiClient
+﻿@inject HttpClient ApiClient
 @inject ISessionContext CurrentUser
 
 <BeaconForm Model="Model" OnValidSubmit="Submit">
@@ -50,7 +50,7 @@
 
     private async Task Submit(BeaconForm form)
     {
-        var result = await ApiClient.UpdateMembershipType(Model);
+        var result = await ApiClient.SendAsync(Model);
 
         if (result.IsError)
         {
