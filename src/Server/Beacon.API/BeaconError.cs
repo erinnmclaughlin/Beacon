@@ -1,6 +1,6 @@
 ﻿using ErrorOr;
 
-namespace Beacon.API.Features;
+namespace Beacon.API;
 
 public static class BeaconError
 {

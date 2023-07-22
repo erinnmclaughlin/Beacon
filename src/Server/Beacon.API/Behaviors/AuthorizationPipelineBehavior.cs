@@ -1,5 +1,4 @@
-﻿using Beacon.API.Features;
-using Beacon.Common;
+﻿using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Services;
 using ErrorOr;

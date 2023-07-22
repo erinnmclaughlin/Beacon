@@ -1,14 +1,10 @@
-﻿using Beacon.API.Features;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.API.Settings;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 using FluentValidation;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Builder;
-using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -68,13 +64,5 @@ public static class BeaconAPI
         services.AddValidatorsFromAssemblies(serviceAssemblies, includeInternalTypes: true);
 
         return services;
-    }
-
-    public static IEndpointRouteBuilder UseBeacon<T>(this T app) where T : IApplicationBuilder, IEndpointRouteBuilder
-    {
-        app.MapBeaconEndpoints();
-        app.Map("api/{**slug}", () => Results.NotFound("Unrecognized endpoint."));
-
-        return app;
     }
 }
