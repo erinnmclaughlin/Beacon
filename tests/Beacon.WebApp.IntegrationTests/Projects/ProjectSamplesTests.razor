@@ -1,0 +1,43 @@
+﻿@using Beacon.Common.Requests.Projects.SampleGroups
+@using BeaconUI.Core.Projects
+@inherits BeaconTestContext
+@code {
+
+    private static SampleGroupDto TestSample { get; } = new SampleGroupDto
+    {
+        Id = Guid.NewGuid(),
+        SampleName = "Test Samples",
+        Quantity = 10,
+        ContainerType = null,
+        Volume = 2.5,
+        IsHazardous = false,
+        IsLightSensitive = false,
+        TargetStorageTemperature = null,
+        TargetStorageHumidity = null,
+        Notes = null
+    };
+
+    [Fact]
+    public void ProjectSamples_DisplaysProjectInfo()
+    {
+        MockApi.Succeeds<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>(new[] { TestSample });
+
+        var sut = Render(@<ProjectSamples ProjectId="Guid.NewGuid()" />);
+        sut.WaitForAssertion(() =>
+        {
+            sut.Markup.Should()
+                .Contain(TestSample.SampleName).And
+                .Contain(TestSample.Quantity.ToString()).And
+                .Contain("Not set");
+        });
+    }
+
+    [Fact]
+    public void ProjectSamples_DisplaysErrorWhenApiCallFails()
+    {
+        MockApi.Fails<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>();
+
+        var sut = Render(@<ProjectSamples ProjectId="Guid.NewGuid()" />);
+        sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"));
+    }
+}
