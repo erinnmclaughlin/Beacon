@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Requests.Auth;
+﻿using Beacon.Common.Requests;
+using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Common.Http;
 using ErrorOr;
@@ -8,51 +9,47 @@ namespace BeaconUI.Core.Common.Auth;
 internal sealed class AuthService
 {
     private readonly IApiClient _apiClient;
-    private readonly BeaconAuthStateProvider _authStateProvider;
+    private readonly IAuthenticationStateNotifier _authStateNotifier;
 
-    public AuthService(IApiClient apiClient, BeaconAuthStateProvider authStateProvider)
+    public AuthService(IApiClient apiClient, IAuthenticationStateNotifier authStateNotifier)
     {
         _apiClient = apiClient;
-        _authStateProvider = authStateProvider;
+        _authStateNotifier = authStateNotifier;
     }
 
-    public async Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
+    public Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
     {
-        var result = await _apiClient.SendAsync(new SetCurrentLaboratoryRequest { LaboratoryId = id });
-
-        if (!result.IsError)
-            _authStateProvider.NotifyAuthenticationStateChanged();
-
-        return result;
+        return SendAsync(new SetCurrentLaboratoryRequest { LaboratoryId = id });
     }
 
-    public async Task<ErrorOr<Success>> LoginAsync(LoginRequest request)
+    public Task<ErrorOr<Success>> LoginAsync(LoginRequest request)
+    {
+        return SendAsync(request);
+    }
+
+    public Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request)
+    {
+        return SendAsync(request);
+    }
+
+    public Task<ErrorOr<Success>> LogoutAsync()
+    {
+        return SendAsync(new LogoutRequest());
+    }
+
+    private async Task<ErrorOr<Success>> SendAsync<T>(BeaconRequest<T> request) where T : BeaconRequest<T>, IBeaconRequest<T>, new()
     {
         var result = await _apiClient.SendAsync(request);
 
         if (!result.IsError)
-            _authStateProvider.NotifyAuthenticationStateChanged();
+            await RefreshAuthenticationState();
 
         return result;
     }
 
-    public async Task<ErrorOr<Success>> RegisterAsync(RegisterRequest request)
+    private async Task RefreshAuthenticationState()
     {
-        var result = await _apiClient.SendAsync(request);
-
-        if (!result.IsError)
-            _authStateProvider.NotifyAuthenticationStateChanged();
-
-        return result;
-    }
-
-    public async Task<ErrorOr<Success>> LogoutAsync()
-    {
-        var result = await _apiClient.SendAsync(new LogoutRequest());
-
-        if (!result.IsError)
-            _authStateProvider.NotifyAuthenticationStateChanged();
-
-        return result;
+        var sessionContext = await _apiClient.SendAsync(new GetSessionContextRequest());
+        _authStateNotifier.TriggerAuthenticationStateChanged(sessionContext.IsError ? null : sessionContext.Value);
     }
 }

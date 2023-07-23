@@ -2,5 +2,5 @@
 
 public sealed class SetCurrentLaboratoryRequest : BeaconRequest<SetCurrentLaboratoryRequest>
 {
-    public required Guid? LaboratoryId { get; set; }
+    public Guid? LaboratoryId { get; set; }
 }

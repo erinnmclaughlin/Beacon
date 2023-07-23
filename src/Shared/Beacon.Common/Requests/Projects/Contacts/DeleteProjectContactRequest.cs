@@ -5,6 +5,6 @@ namespace Beacon.Common.Requests.Projects.Contacts;
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
 public sealed class DeleteProjectContactRequest : BeaconRequest<DeleteProjectContactRequest>
 {
-    public required Guid ProjectId { get; set; }
-    public required Guid ContactId { get; set; }
+    public Guid ProjectId { get; set; }
+    public Guid ContactId { get; set; }
 }

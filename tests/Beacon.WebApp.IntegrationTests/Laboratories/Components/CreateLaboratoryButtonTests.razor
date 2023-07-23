@@ -1,0 +1,12 @@
+﻿@using BeaconUI.Core.Laboratories.Components
+@inherits BeaconTestContext
+@code {
+
+    [Fact]
+    public void OnClick_CreateLabModalLaunches()
+    {
+        var sut = RenderModal(@<CreateLaboratoryButton />);
+        sut.Find("button").Click();
+        sut.WaitForElement(".modal");
+    }
+}

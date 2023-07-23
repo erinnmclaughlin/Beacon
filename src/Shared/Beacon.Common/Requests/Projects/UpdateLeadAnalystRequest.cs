@@ -6,5 +6,5 @@ namespace Beacon.Common.Requests.Projects;
 public sealed class UpdateLeadAnalystRequest : BeaconRequest<UpdateLeadAnalystRequest>
 {
     public Guid? AnalystId { get; set; }
-    public required Guid ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
 }

@@ -1,0 +1,27 @@
+﻿<button class="btn btn-sm btn-primary" type="button" @onclick="ShowAddSampleGroupModal">
+    <span class="icon">
+        <i class="fa-solid fa-plus"></i>
+    </span>
+    <span>Add Sample Group</span>
+</button>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required Guid ProjectId { get; set; }
+
+    [Parameter]
+    public EventCallback OnSubmit { get; set; }
+
+    [CascadingParameter]
+    private IModalService ModalService { get; set; } = default!;
+
+    private async Task ShowAddSampleGroupModal()
+    {
+        var parameters = new ModalParameters().Add(nameof(AddSampleGroupModal.ProjectId), ProjectId);
+        var result = await ModalService.Show<AddSampleGroupModal>("Add Sample Group", parameters).Result;
+
+        if (result.Confirmed)
+            await OnSubmit.InvokeAsync();
+    }
+}

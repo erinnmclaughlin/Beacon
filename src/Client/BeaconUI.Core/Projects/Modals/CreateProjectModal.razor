@@ -19,9 +19,9 @@
                     <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
                         <option>None</option>
                         <MembershipContext>
-                            @if (context.Result is { IsError: false } result)
+                            @if (!context.IsLoading() && !context.HasErrors())
                             {
-                                foreach (var member in result.Value.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
+                                foreach (var member in context.Members.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
                                 {
                                     <option value="@member.Id">@member.DisplayName</option>
                                 }
@@ -33,34 +33,9 @@
             </div>
         </div>
         <footer class="modal-footer">
-            <SubmitButton class="btn btn-primary">Create Project</SubmitButton>
-            <button class="btn btn-secondary" type="button" @onclick="Cancel">Cancel</button>
+            <SubmitButton>Create Project</SubmitButton>
+            <ModalCancelButton />
         </footer>
     </Modal>
 </BeaconForm>
 
-@code {
-
-    [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
-
-    [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = default!;
-
-    private CreateProjectRequest Model { get; } = new();
-
-    private async Task Submit(BeaconForm formContext)
-    {
-        var result = await ApiClient.SendAsync(Model);
-
-        if (result.IsError)
-        {
-            formContext.AddErrors(result.Errors);
-            return;
-        }
-
-        await Modal.CloseAsync(ModalResult.Ok());
-    }
-
-    private async Task Cancel() => await Modal.CancelAsync();
-}

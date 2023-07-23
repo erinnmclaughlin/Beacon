@@ -6,8 +6,6 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 using System.Data.Common;
 
 namespace Beacon.API.IntegrationTests;
@@ -60,10 +58,5 @@ public static class WebApplicationFactorySetup
     {
         services.RemoveAll<IEmailService>();
         services.AddSingleton<IEmailService, FakeEmailService>();
-    }
-
-    public static void SuppressLogging(this IServiceCollection services)
-    {
-        services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
     }
 }

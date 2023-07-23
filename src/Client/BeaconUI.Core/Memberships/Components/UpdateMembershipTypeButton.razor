@@ -5,17 +5,3 @@
     <span>Manage Permissions</span>
 </button>
 
-@code {
-
-    [CascadingParameter]
-    private MembershipContext Context { get; set; } = default!;
-
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
-
-    [Parameter, EditorRequired]
-    public required LaboratoryMemberDto Member { get; set; }
-
-    private bool IsDisabled => !Context.CanManagePermissions(Member);
-    private Task Click() => Context.ShowManagePermissionsModal(Member);
-}

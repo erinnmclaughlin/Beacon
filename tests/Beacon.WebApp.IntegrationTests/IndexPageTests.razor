@@ -1,0 +1,28 @@
+@using Beacon.Common.Requests.Laboratories
+@using BeaconUI.Core.Laboratories.Components
+@inherits BeaconTestContext
+@code {
+
+    [Fact]
+    public void IndexPageRendersExpectedContent()
+    {
+        this.SetAuthorized();
+
+        MockApi.Succeeds<GetMyLaboratoriesRequest, LaboratoryDto[]>(new[] 
+        {
+            new LaboratoryDto 
+            { 
+                Id = AuthHelper.DefaultLab.Id,
+                Name = AuthHelper.DefaultLab.Name,
+                MemberCount = 1 
+            }
+        });
+
+        var sut = Render(@<BeaconUI.Core.Index />);
+        sut.WaitForAssertion(() =>
+        {
+            sut.Markup.Contains(AuthHelper.DefaultLab.Name);
+            sut.FindComponent<CreateLaboratoryButton>();
+        });
+    }
+}

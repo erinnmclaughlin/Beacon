@@ -1,0 +1,42 @@
+﻿@using Beacon.Common.Requests.Auth
+@using BeaconUI.Core.Auth
+@attribute [Trait("Feature", "User Registration & Login")]
+@inherits BeaconTestContext
+@code {
+
+    [Fact]
+    public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
+    {
+        MockApi.Succeeds<LoginRequest>();
+
+        var sut = Render(@<LoginPage />);
+
+        // Act:
+        sut.Find("input[type=email]").Change("test@test.com");
+        sut.Find("input[type=password]").Change("password123");
+        await sut.Find("form").SubmitAsync();
+
+        // Assert:
+        sut.WaitForAssertion(() => UrlShouldBe(""));
+    }
+
+    [Fact]
+    public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
+    {
+        MockApi.Fails<LoginRequest>(ErrorOr.Error.Validation(nameof(LoginRequest.EmailAddress), "Some error message"));
+
+        var sut = Render(@<LoginPage />);
+
+        // Act:
+        sut.Find("input[type=email]").Change("test@test.com");
+        sut.Find("input[type=password]").Change("password123");
+        await sut.Find("form").SubmitAsync();
+
+        // Assert:
+        sut.WaitForAssertion(() =>
+        {
+            sut.Find(".validation-message").TextContent.Should().Be("Some error message");
+            NavigationManager.History.Should().BeEmpty();
+        });
+    }
+}

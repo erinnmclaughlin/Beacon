@@ -23,7 +23,7 @@
 
             <ul class="dropdown-menu w-100 pt-0" style="font-size: 0.9rem;">
                 <MembershipContext>
-                    @if (context.Result is not { } result)
+                    @if (context.IsLoading())
                     {
                         <li>
                             <div class="dropdown-item">Loading...</div>
@@ -34,7 +34,7 @@
                         <li class="pt-1 mb-2 bg-light border-bottom" style="border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem;">
                             <h6 class="dropdown-header">Suggestions</h6>
                         </li>
-                        @if (result.IsError)
+                        @if (context.HasErrors())
                         {
                             <li>
                                 <div class="text-danger">There was an error loading lab members.</div>
@@ -42,7 +42,7 @@
                         }
                         else
                         {
-                            foreach (var member in result.Value.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
+                            foreach (var member in context.Members.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
                             {
                                 <li>
                                     <button class="dropdown-item d-flex align-items-center" type="button" disabled="@IsBusy" @onclick="() => UpdateLeadAnalyst(member)">
@@ -73,31 +73,3 @@
         </div>
     </li>
 </ul>
-
-@code {
-
-    [Parameter]
-    public ProjectDto.LeadAnalystDto? LeadAnalyst { get; set; }
-
-    [Parameter]
-    public EventCallback<ProjectDto.LeadAnalystDto?> LeadAnalystChanged { get; set; }
-
-    private bool IsBusy { get; set; }
-
-    private async Task UpdateLeadAnalyst(LaboratoryMemberDto? member)
-    {
-        if (IsBusy) return;
-        IsBusy = true;
-
-        if (member is null && LeadAnalyst is null)
-            return;
-
-        await LeadAnalystChanged.InvokeAsync(member is null || member.Id == LeadAnalyst?.Id ? null : new()
-        {
-            Id  = member.Id,
-            DisplayName = member.DisplayName
-        });
-
-        IsBusy = false;
-    }
-}

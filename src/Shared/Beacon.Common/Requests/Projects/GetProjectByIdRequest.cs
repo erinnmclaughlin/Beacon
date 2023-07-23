@@ -5,5 +5,5 @@ namespace Beacon.Common.Requests.Projects;
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class GetProjectByIdRequest : BeaconRequest<GetProjectByIdRequest, ProjectDto>
 {
-    public required Guid ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
 }

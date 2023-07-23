@@ -1,18 +1,15 @@
-using Beacon.Common.Requests.Auth;
-using BeaconUI.Core.Auth;
-using ErrorOr;
+﻿@using Beacon.Common.Requests.Auth
+@using BeaconUI.Core.Auth
+@attribute [Trait("Feature", "User Registration & Login")]
+@inherits BeaconTestContext
+@code {
 
-namespace Beacon.WebApp.IntegrationTests.Pages.Auth;
-
-[Trait("Feature", "User Registration & Login")]
-public class LoginPageTests : BeaconTestContext
-{
     [Fact]
-    public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
+    public async Task WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
     {
-        MockApi.Succeeds<LoginRequest>();
+        MockApi.Succeeds<RegisterRequest>();
 
-        var cut = RenderComponent<LoginPage>();
+        var cut = RenderComponent<RegisterPage>();
 
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
@@ -24,11 +21,11 @@ public class LoginPageTests : BeaconTestContext
     }
 
     [Fact]
-    public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
+    public async Task WhenRegistrationIsUnsuccessful_ShowError()
     {
-        MockApi.Fails<LoginRequest>(Error.Validation(nameof(LoginRequest.EmailAddress), "Some error message"));
+        MockApi.Fails<RegisterRequest>(ErrorOr.Error.Validation(nameof(RegisterRequest.EmailAddress), "Some error message"));
 
-        var cut = RenderComponent<LoginPage>();
+        var cut = RenderComponent<RegisterPage>();
 
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");

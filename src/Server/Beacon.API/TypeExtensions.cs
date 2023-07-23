@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Features;
+using ErrorOr;
 
 namespace Beacon.API;
 
@@ -17,11 +18,12 @@ public static class TypeExtensions
 
         var interfaceType = t.GetInterfaces().First(i =>
             i.IsGenericType &&
-            i.GetGenericArguments().Length == 2 &&
             i.IsAssignableTo(typeof(IBeaconRequestHandler)));
 
         var genericArgumentTypes = interfaceType.GetGenericArguments();
-        return (genericArgumentTypes[0], genericArgumentTypes[1]);
+        var requestType = genericArgumentTypes[0];
+        var responseType = genericArgumentTypes.Length > 1 ? genericArgumentTypes[1] : typeof(Success);
+        
+        return (requestType, responseType);
     }
-
 }

@@ -47,7 +47,7 @@
             CurrentLab = CurrentLab.FromClaimsPrincipal(principal)
         };
 
-        context = sessionContext?.CurrentLab is not { } currentLab ? null! : new LabContext
+        context = sessionContext.CurrentLab is not { } currentLab ? default! : new LabContext
         {
             CurrentLab = currentLab,
             CurrentUser = sessionContext.CurrentUser

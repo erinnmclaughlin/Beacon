@@ -7,7 +7,7 @@ namespace Beacon.Common.Requests.Projects.Contacts;
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
 public sealed class CreateProjectContactRequest : BeaconRequest<CreateProjectContactRequest>
 {
-    public required Guid ProjectId { get; set; }
+    public Guid ProjectId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string? PhoneNumber { get; set; }
     public string? EmailAddress { get; set; }

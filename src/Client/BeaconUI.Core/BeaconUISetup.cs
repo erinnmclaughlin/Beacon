@@ -12,14 +12,14 @@ public static class BeaconUISetup
     public static IServiceCollection AddBeaconUI(this IServiceCollection services, string baseUri)
     {
         services
-            .AddScoped<IApiClient, ApiClient>()
+            .AddSingleton<IApiClient, ApiClient>()
             .AddHttpClient("BeaconApi", o => o.BaseAddress = new Uri(baseUri));
 
         services
             .AddOptions()
             .AddAuthorizationCore()
             .AddScoped<AuthenticationStateProvider, BeaconAuthStateProvider>()
-            .AddScoped(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
+            .AddScoped<IAuthenticationStateNotifier>(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
             .AddScoped<ISessionContext>(sp => (BeaconAuthStateProvider)sp.GetRequiredService<AuthenticationStateProvider>())
             .AddScoped<AuthService>()
             .AddBlazoredModal();

@@ -28,7 +28,7 @@ public sealed class LogoutTests : IClassFixture<AuthTestFixture>
     [Fact(DisplayName = "[008] Logged in user can sucessfully log out")]
     public async Task LoggedInUserCanSuccessfullyLogOut()
     {
-        await _httpClient.SendAsync(new LoginRequest
+        await LoginRequest.SendAsync(_httpClient, new LoginRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "!!admin"
@@ -36,14 +36,14 @@ public sealed class LogoutTests : IClassFixture<AuthTestFixture>
 
         await AssertGetCurrentUserStatus(HttpStatusCode.OK);
 
-        await _httpClient.SendAsync(new LogoutRequest());
+        await LogoutRequest.SendAsync(_httpClient, new());
 
         await AssertGetCurrentUserStatus(HttpStatusCode.Unauthorized);
     }
 
     private async Task AssertGetCurrentUserStatus(HttpStatusCode expectedStatusCode)
     {
-        var response = await _httpClient.SendAsync(new GetSessionContextRequest());
+        var response = await GetSessionContextRequest.SendAsync(_httpClient, new());
         Assert.Equal(expectedStatusCode, response.StatusCode);
     }
 }

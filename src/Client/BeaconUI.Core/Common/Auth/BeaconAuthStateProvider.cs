@@ -6,7 +6,12 @@ using System.Security.Claims;
 
 namespace BeaconUI.Core.Common.Auth;
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISessionContext
+public interface IAuthenticationStateNotifier
+{
+    void TriggerAuthenticationStateChanged(SessionContext? context);
+}
+
+public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IAuthenticationStateNotifier, ISessionContext
 {
     private readonly IApiClient _apiClient;
 
@@ -37,10 +42,11 @@ public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, ISess
         return new AuthenticationState(ClaimsPrincipal);
     }
 
-    public void NotifyAuthenticationStateChanged()
+    public void TriggerAuthenticationStateChanged(SessionContext? context)
     {
-        IsExpired = true;
-        NotifyAuthenticationStateChanged(GetAuthenticationStateAsync());
+        ClaimsPrincipal = context?.ToClaimsPrincipal() ?? AnonymousUser;
+        var authState = new AuthenticationState(ClaimsPrincipal);
+        NotifyAuthenticationStateChanged(Task.FromResult(authState));
     }
 
     private static ClaimsPrincipal AnonymousUser { get; } = new ClaimsPrincipal(new ClaimsIdentity());

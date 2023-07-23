@@ -38,9 +38,10 @@ public static class BeaconEndpointMapper
         }
     }
 
-    public static void MapPost<TRequest>(IEndpointRouteBuilder app) where TRequest : BeaconRequest<TRequest>, new()
+    public static void MapPost<TRequest>(IEndpointRouteBuilder app)
+        where TRequest : BeaconRequest<TRequest>, IBeaconRequest<TRequest>, new()
     {
-        app.MapPost(new TRequest().GetRoute(), async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
+        app.MapPost(TRequest.GetRoute(), async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
             var response = await m.Send(request ?? new(), ct);
             return response.ToHttpResult();
@@ -48,9 +49,10 @@ public static class BeaconEndpointMapper
         .AddMetaData<TRequest>();
     }
 
-    public static void MapGet<TRequest, TResponse>(IEndpointRouteBuilder app) where TRequest : BeaconRequest<TRequest, TResponse>, new()
+    public static void MapGet<TRequest, TResponse>(IEndpointRouteBuilder app) 
+        where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
     {
-        app.MapGet(new TRequest().GetRoute(), async (string? data, IMediator m, CancellationToken ct) =>
+        app.MapGet(TRequest.GetRoute(), async (string? data, IMediator m, CancellationToken ct) =>
         {
             var request = JsonSerializer.Deserialize<TRequest>(data ?? "", JsonDefaults.JsonSerializerOptions);
             var response = await m.Send(request ?? new(), ct);

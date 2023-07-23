@@ -21,13 +21,13 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
     {
         var httpClient = _fixture.CreateClient();
 
-        await Login(httpClient, new LoginRequest
+        await LoginRequest.SendAsync(httpClient, new LoginRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "!!admin"
         });
 
-        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
+        var response = await SetCurrentLaboratoryRequest.SendAsync(httpClient, new()
         {
             LaboratoryId = TestData.Lab.Id
         });
@@ -41,25 +41,19 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
     {
         var httpClient = _fixture.CreateClient();
 
-        await Login(httpClient, new LoginRequest
+        await LoginRequest.SendAsync(httpClient, new LoginRequest
         {
             EmailAddress = TestData.NonMemberUser.EmailAddress,
             Password = "!!nonmember"
         });
         
-        var response = await httpClient.SendAsync(new SetCurrentLaboratoryRequest
+        var response = await SetCurrentLaboratoryRequest.SendAsync(httpClient, new()
         {
             LaboratoryId = TestData.Lab.Id
         });
 
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.False(response.Headers.Contains("Set-Cookie"));
-    }
-
-    private static async Task Login(HttpClient httpClient, LoginRequest request)
-    {
-        var response = await httpClient.SendAsync(request);
-        response.EnsureSuccessStatusCode();
     }
 
     private void AddSeedData()

@@ -1,0 +1,35 @@
+﻿@using Beacon.Common.Requests.Laboratories
+@using BeaconUI.Core.Laboratories.Modals
+@inherits BeaconTestContext
+@code  {
+
+    [Fact]
+    public void CreateLaboratoryModal_DoesNotCallApi_WhenModelIsInvalid()
+    {
+        MockApi.Setup<CreateLaboratoryRequest>();
+
+        var sut = RenderModal();
+        var modal = ModalService.Show<CreateLaboratoryModal>();
+
+        sut.WaitForElement("form", TimeSpan.FromSeconds(5)).Submit();
+        sut.WaitForAssertion(() => sut.Find(".validation-message"));
+
+        MockApi.Verify<CreateLaboratoryRequest>(Times.Never());
+    }
+
+    [Fact]
+    public void CreateLaboratoryModal_CallsApi_WhenModelIsValid()
+    {
+        MockApi.Setup<CreateLaboratoryRequest>();
+
+        var sut = RenderModal();
+        var modal = ModalService.Show<CreateLaboratoryModal>();
+
+        var form = sut.WaitForElement("form");
+        sut.Find("input#lab-name").Change("My New Lab");
+        form.Submit();
+
+        sut.WaitForAssertion(() => MockApi.Verify<CreateLaboratoryRequest>(Times.Once()));
+    }
+
+}
