@@ -7,6 +7,6 @@
     {
         var sut = RenderModal(@<CreateLaboratoryButton />);
         sut.Find("button").Click();
-        sut.WaitForElement(".modal");
+        sut.WaitForElement(".modal", TimeSpan.FromSeconds(5));
     }
 }

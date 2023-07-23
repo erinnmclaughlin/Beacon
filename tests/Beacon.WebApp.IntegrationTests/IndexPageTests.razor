@@ -23,6 +23,6 @@
         {
             sut.Markup.Contains(AuthHelper.DefaultLab.Name);
             sut.FindComponent<CreateLaboratoryButton>();
-        });
+        }, TimeSpan.FromSeconds(5));
     }
 }

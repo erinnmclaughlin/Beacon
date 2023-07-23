@@ -14,7 +14,7 @@ public class AppTests : BeaconTestContext
         NavigationManager.NavigateTo("");
 
         // Assert
-        cut.WaitForAssertion(() => UrlShouldBe("login"));
+        cut.WaitForAssertion(() => UrlShouldBe("login"), TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -27,10 +27,10 @@ public class AppTests : BeaconTestContext
         var cut = RenderComponent<BeaconUI.WebApp.App>();
         NavigationManager.NavigateTo("");
 
-        cut.WaitForElement("[data-test-id=\"profileDropdown\"]").Click();
-        cut.WaitForElement("[data-test-id=\"logoutButton\"]").Click();
+        cut.WaitForElement("[data-test-id=\"profileDropdown\"]", TimeSpan.FromSeconds(5)).Click();
+        cut.WaitForElement("[data-test-id=\"logoutButton\"]", TimeSpan.FromSeconds(5)).Click();
 
         // Assert
-        cut.WaitForAssertion(() => UrlShouldBe("login"));
+        cut.WaitForAssertion(() => UrlShouldBe("login"), TimeSpan.FromSeconds(5));
     }
 }

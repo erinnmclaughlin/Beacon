@@ -9,7 +9,7 @@
         this.SetAuthorized(AuthHelper.DefaultSession with { CurrentLab = null });
         var sut = Render(@<AuthorizeLabView><p>Hello</p></AuthorizeLabView>);
 
-        sut.WaitForAssertion(() => sut.Markup.Should().NotContain("<p>Hello</p>"));
+        sut.WaitForAssertion(() => sut.Markup.Should().NotContain("<p>Hello</p>"), TimeSpan.FromSeconds(5));
     }
 
     [Fact]

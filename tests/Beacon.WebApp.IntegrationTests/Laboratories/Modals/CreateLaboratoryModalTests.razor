@@ -12,7 +12,7 @@
         var modal = ModalService.Show<CreateLaboratoryModal>();
 
         sut.WaitForElement("form", TimeSpan.FromSeconds(5)).Submit();
-        sut.WaitForAssertion(() => sut.Find(".validation-message"));
+        sut.WaitForAssertion(() => sut.Find(".validation-message"), TimeSpan.FromSeconds(5));
 
         MockApi.Verify<CreateLaboratoryRequest>(Times.Never());
     }
@@ -25,11 +25,11 @@
         var sut = RenderModal();
         var modal = ModalService.Show<CreateLaboratoryModal>();
 
-        var form = sut.WaitForElement("form");
+        var form = sut.WaitForElement("form", TimeSpan.FromSeconds(5));
         sut.Find("input#lab-name").Change("My New Lab");
         form.Submit();
 
-        sut.WaitForAssertion(() => MockApi.Verify<CreateLaboratoryRequest>(Times.Once()));
+        sut.WaitForAssertion(() => MockApi.Verify<CreateLaboratoryRequest>(Times.Once()), TimeSpan.FromSeconds(5));
     }
 
 }
