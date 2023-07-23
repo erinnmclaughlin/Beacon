@@ -1,13 +1,10 @@
-﻿using Beacon.Common.Models;
-using Beacon.Common.Requests.Auth;
-using Beacon.Common.Services;
+﻿using Beacon.Common.Requests.Auth;
 using BeaconUI.Core.Common.Auth;
-using Bunit.TestDoubles;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using System.Security.Claims;
 
-namespace Beacon.WebApp.IntegrationTests;
+namespace Beacon.WebApp.IntegrationTests.TestHelpers;
 
 public static class AuthHelper
 {

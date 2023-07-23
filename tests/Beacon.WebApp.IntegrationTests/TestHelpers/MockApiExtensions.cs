@@ -1,9 +1,8 @@
 ﻿using Beacon.Common.Requests;
 using BeaconUI.Core.Common.Http;
 using ErrorOr;
-using Moq;
 
-namespace Beacon.WebApp.IntegrationTests;
+namespace Beacon.WebApp.IntegrationTests.TestHelpers;
 
 public static class MockApiExtensions
 {

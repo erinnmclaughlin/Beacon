@@ -1,9 +1,7 @@
-﻿using Beacon.Common.Services;
-using BeaconUI.Core.Common.Auth;
-using Bunit.TestDoubles;
+﻿using BeaconUI.Core.Common.Auth;
 using Microsoft.AspNetCore.Components.Authorization;
 
-namespace Beacon.WebApp.IntegrationTests;
+namespace Beacon.WebApp.IntegrationTests.TestHelpers;
 
 public sealed class FakeAuthenticationStateNotifier : IAuthenticationStateNotifier
 {
