@@ -1,0 +1,24 @@
+﻿@using Beacon.Common.Requests.Auth
+@using Beacon.Common.Services
+@using BeaconUI.Core.Common.Auth
+@inherits BeaconTestContext
+@code {
+
+    [Fact]
+    public void AuthorizeLabView_DoesNotRenderChildContent_WhenUserIsNotAuthorized()
+    {
+        this.SetAuthorized(AuthHelper.DefaultSession with { CurrentLab = null });
+        var sut = Render(@<AuthorizeLabView><p>Hello</p></AuthorizeLabView>);
+
+        sut.WaitForAssertion(() => sut.Markup.Should().NotContain("<p>Hello</p>"));
+    }
+
+    [Fact]
+    public void AuthorizeLabView_RendersChildContent_WhenUserIsAuthorized()
+    {
+        this.SetAuthorized(AuthHelper.DefaultSession);
+        var sut = Render(@<AuthorizeLabView><p>Hello</p></AuthorizeLabView>);
+
+        sut.WaitForAssertion(() => sut.Markup.Should().Contain("<p>Hello</p>"), TimeSpan.FromSeconds(5));
+    }
+}

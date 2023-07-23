@@ -2,7 +2,7 @@
 
 namespace Beacon.Common.Services;
 
-public class SessionContext : ISessionContext
+public sealed record SessionContext : ISessionContext
 {
     public required CurrentUser CurrentUser { get; init; }
     public required CurrentLab? CurrentLab { get; init; }

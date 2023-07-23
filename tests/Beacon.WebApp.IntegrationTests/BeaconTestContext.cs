@@ -1,8 +1,6 @@
 ﻿using BeaconUI.Core;
 using BeaconUI.Core.Common.Http;
 using Bunit.TestDoubles;
-using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
 using Moq;
@@ -11,8 +9,8 @@ namespace Beacon.WebApp.IntegrationTests;
 
 public abstract class BeaconTestContext : TestContext
 {
-    protected Mock<IApiClient> MockApi => Services.GetRequiredService<Mock<IApiClient>>();
-    protected FakeNavigationManager NavigationManager => Services.GetRequiredService<FakeNavigationManager>();
+    public Mock<IApiClient> MockApi => Services.GetRequiredService<Mock<IApiClient>>();
+    public FakeNavigationManager NavigationManager => Services.GetRequiredService<FakeNavigationManager>();
 
     public BeaconTestContext()
     {
@@ -21,12 +19,7 @@ public abstract class BeaconTestContext : TestContext
 
     protected virtual void Initialize()
     {
-        // remove fake services that are auto-registered with bUnit:
-        Services.RemoveAll<AuthenticationStateProvider>();
-        Services.RemoveAll<IAuthorizationService>();
-        Services.RemoveAll<HttpClient>();
-
-        // then set up default beacon services:
+        // set up default beacon services:
         Services.AddBeaconUI("localhost"); 
         this.AddBlazoredLocalStorage();
         JSInterop.SetupModule("./_content/Blazored.Modal/BlazoredModal.razor.js");

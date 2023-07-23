@@ -1,7 +1,4 @@
-﻿using Beacon.Common.Requests.Auth;
-using Beacon.Common.Services;
-
-namespace Beacon.WebApp.IntegrationTests;
+﻿namespace Beacon.WebApp.IntegrationTests;
 
 [Trait("Feature", "User Registration & Login")]
 public class AppTests : BeaconTestContext
@@ -10,7 +7,7 @@ public class AppTests : BeaconTestContext
     public void WebApp_RedirectsToLogin_WhenUserIsNotAuthorized()
     {
         // Arrange
-        MockApi.Fails<GetSessionContextRequest, SessionContext>();
+        this.SetNotAuthorized();
 
         // Act
         var cut = RenderComponent<BeaconUI.WebApp.App>();
@@ -24,8 +21,7 @@ public class AppTests : BeaconTestContext
     public void WebApp_RedirectsToLogin_WhenLoggedInUserClicksLogout()
     {
         // Arrange
-        MockApi.Succeeds<GetSessionContextRequest, SessionContext>(AuthHelper.DefaultSession);
-        MockApi.Succeeds<LogoutRequest>();
+        this.SetAuthorized();
 
         // Act
         var cut = RenderComponent<BeaconUI.WebApp.App>();
