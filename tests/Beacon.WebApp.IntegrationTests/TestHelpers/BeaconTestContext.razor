@@ -1,12 +1,9 @@
-﻿using BeaconUI.Core.Common.Http;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+﻿@using BeaconUI.Core.Common.Http
+@inherits TestContext
+@code {
 
-namespace Beacon.WebApp.IntegrationTests.TestHelpers;
-
-public abstract class BeaconTestContext : TestContext
-{
     public Mock<IApiClient> MockApi => Services.GetRequiredService<Mock<IApiClient>>();
+    public IModalService ModalService => Services.GetRequiredService<IModalService>();
     public FakeNavigationManager NavigationManager => Services.GetRequiredService<FakeNavigationManager>();
 
     public BeaconTestContext()
@@ -31,5 +28,11 @@ public abstract class BeaconTestContext : TestContext
     protected void UrlShouldBe(string url)
     {
         NavigationManager.Uri.Should().Be(NavigationManager.BaseUri + url);
+    }
+
+    protected IRenderedFragment RenderModal()
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        return Render(@<CascadingValue Value="ModalService"><BlazoredModal /></CascadingValue>);
     }
 }
