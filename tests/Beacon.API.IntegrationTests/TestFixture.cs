@@ -1,5 +1,8 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Logging;
+using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Beacon.API.IntegrationTests;
 
@@ -13,12 +16,9 @@ public sealed class TestFixture : WebApplicationFactory<Program>
             services.UseMockedCurrentUser();
             services.UseMockedLabContext();
             services.UseFakeEmailService();
-        });
 
-        builder.ConfigureLogging(config =>
-        {
-            config.SetMinimumLevel(LogLevel.Warning);
-            config.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
+            services.RemoveAll<ILoggerFactory>();
+            services.AddScoped<ILoggerFactory>(_ => new NullLoggerFactory());
         });
     }
 }
