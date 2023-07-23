@@ -2,6 +2,7 @@
 
 namespace Beacon.Common.Requests.Laboratories;
 
+[RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class GetLaboratoryEventsRequest : BeaconRequest<GetLaboratoryEventsRequest, LaboratoryEventDto[]>
 {
     public DateOnly? MinDate { get; set; }
