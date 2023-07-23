@@ -4,7 +4,7 @@ namespace Beacon.API.Persistence.Entities;
 
 public sealed class Laboratory
 {
-    public required Guid Id { get; init; }
+    public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
 
     private readonly List<Membership> _memberships = new();
