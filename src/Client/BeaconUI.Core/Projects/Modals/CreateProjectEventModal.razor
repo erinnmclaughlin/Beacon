@@ -1,0 +1,36 @@
+﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="title">Title</label>
+                <InputText @bind-Value="Request.Title" class="form-control" id="title" placeholder="e.g., My Awesome Event" />
+                <ValidationMessage For="() => Request.Title" />
+            </div>
+            <div class="row">
+                <div class="col">
+                    <div class="field">
+                        <label class="form-label" for="startDate">Starts On</label>
+                        <InputDate @bind-Value="Request.ScheduledStart" class="form-control" id="startDate" />
+                        <ValidationMessage For="() => Request.ScheduledStart" />
+                    </div>
+                </div>
+                <div class="col">
+                    <div class="field">
+                        <label class="form-label" for="endDate">Ends On</label>
+                        <InputDate @bind-Value="Request.ScheduledEnd" class="form-control" id="endDate" />
+                        <ValidationMessage For="() => Request.ScheduledEnd" />
+                    </div>
+                </div>
+            </div>
+            <div class="field">
+                <label class="form-label" for="description">Description</label>
+                <InputTextArea @bind-Value="Request.Description" class="form-control" id="description" placeholder="Event details..."></InputTextArea>
+                <ValidationMessage For="() => Request.Description" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton>Create Event</SubmitButton>
+            <ModalCancelButton />
+        </footer>
+    </Modal>
+</BeaconForm>

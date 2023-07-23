@@ -1,6 +1,7 @@
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Projects;
+using Beacon.Common.Requests.Projects.Events;
 using BeaconUI.Core.Common.Http;
+using ErrorOr;
 using Microsoft.AspNetCore.Components;
 
 namespace BeaconUI.Core.Projects;
@@ -16,20 +17,23 @@ public partial class ProjectOverview
     [Parameter]
     public required EventCallback<ProjectDto> ProjectChanged { get; set; }
 
-    private bool IsBusy { get; set; }
+    private ErrorOr<ProjectEventDto[]>? Events { get; set; }
 
-    private async Task UpdateLeadAnalyst(ProjectDto.LeadAnalystDto? analyst)
+    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
+    private static DateOnly ThisMonth => new(Today.Year, Today.Month, 1);
+
+    protected override async Task OnInitializedAsync()
     {
-        if (IsBusy) return;
-        IsBusy = true;
+        await LoadEvents();
+    }
 
-        var result = await ApiClient.SendAsync(new UpdateLeadAnalystRequest { AnalystId = analyst?.Id, ProjectId = Project.Id });
-        
-        if (!result.IsError)
+    private async Task LoadEvents()
+    {
+        Events = await ApiClient.SendAsync(new GetProjectEventsRequest
         {
-            await ProjectChanged.InvokeAsync(Project with { LeadAnalyst = analyst });
-        }
-
-        IsBusy = false;
+            MinDate = Today,
+            MaxDate = ThisMonth.AddMonths(1),
+            ProjectId = Project.Id
+        });
     }
 }

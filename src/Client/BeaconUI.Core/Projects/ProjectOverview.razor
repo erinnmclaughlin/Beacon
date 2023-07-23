@@ -1,10 +1,39 @@
 ﻿<div class="row">
     <div class="col-12 col-lg">
-        <p>This is the overview page for project @Project.ProjectCode.</p>
+        @if (Events is not { } events)
+        {
+            <p>Loading events...</p>
+        }
+        else if (events.IsError)
+        {
+            <p class="text-danger">There was an error loading project events.</p>
+        }
+        else if (!events.Value.Any())
+        {
+            <p>There are no events scheduled for this month!</p>
+        }
+        else
+        {
+            <dl>
+                @foreach (var e in events.Value.OrderBy(x => x.ScheduledStart).ThenBy(x => x.ScheduledEnd))
+                {
+                    <dt>@e.Title</dt>
+                    <dd>
+                        @if (e.ScheduledStart >= DateTime.Today)
+                        {
+                            <small class="text-muted">Ongoing &middot; Ends @e.ScheduledEnd.ToString("dd-MMM-yyyy")</small>
+                        }
+                        else
+                        {
+                            <small class="text-muted">Upcoming &middot; Starts @e.ScheduledStart.ToString("dd-MMM-yyyy")</small>
+                        }
+                    </dd>
+                }
+            </dl>
+        }
+        <CreateProjectEventButton ProjectId="Project.Id" OnEventCreated="LoadEvents" />
     </div>
     <div class="col-12 col-lg-auto" style="min-width: 21rem;">
-        <LeadAnalystCard LeadAnalyst="Project.LeadAnalyst" LeadAnalystChanged="UpdateLeadAnalyst" />
+        <LeadAnalystCard Project="Project" ProjectChanged="ProjectChanged" />
     </div>
 </div>
-
-
