@@ -19,6 +19,7 @@
             .Returns(modalReferenceMock.Object);
 
         var eventRaised = false;
+
         var sut = RenderComponent<CreateLaboratoryButton>(p => p
             .Add(m => m.ModalService, modalServiceMock.Object)
             .Add(m => m.OnLaboratoryCreated, () => eventRaised = true));

@@ -18,6 +18,7 @@ public sealed class TestFixture : WebApplicationFactory<Program>
         builder.ConfigureLogging(config =>
         {
             config.SetMinimumLevel(LogLevel.Warning);
+            config.AddFilter("Microsoft.EntityFrameworkCore.Database.Command", LogLevel.Warning);
         });
     }
 }
