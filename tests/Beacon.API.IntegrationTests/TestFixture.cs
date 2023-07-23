@@ -18,7 +18,7 @@ public sealed class TestFixture : WebApplicationFactory<Program>
             services.UseFakeEmailService();
 
             services.RemoveAll<ILoggerFactory>();
-            services.AddScoped<ILoggerFactory>(_ => new NullLoggerFactory());
+            services.AddSingleton<ILoggerFactory>(_ => new NullLoggerFactory());
         });
     }
 }
