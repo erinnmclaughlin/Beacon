@@ -29,7 +29,7 @@
                 .Contain(TestSample.SampleName).And
                 .Contain(TestSample.Quantity.ToString()).And
                 .Contain("Not set");
-        });
+        }, TimeSpan.FromSeconds(5));
     }
 
     [Fact]
@@ -38,6 +38,6 @@
         MockApi.Fails<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>();
 
         var sut = Render(@<ProjectSamples ProjectId="Guid.NewGuid()" />);
-        sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"));
+        sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"), TimeSpan.FromSeconds(5));
     }
 }

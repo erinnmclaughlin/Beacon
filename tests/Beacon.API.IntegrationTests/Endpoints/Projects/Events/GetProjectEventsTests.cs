@@ -2,11 +2,6 @@
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects.Events;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 

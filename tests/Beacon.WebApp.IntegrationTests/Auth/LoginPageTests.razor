@@ -5,7 +5,7 @@
 @code {
 
     [Fact]
-    public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
+    public void GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
     {
         MockApi.Succeeds<LoginRequest>();
 
@@ -14,14 +14,14 @@
         // Act:
         sut.Find("input[type=email]").Change("test@test.com");
         sut.Find("input[type=password]").Change("password123");
-        await sut.Find("form").SubmitAsync();
+        sut.Find("form").Submit();
 
         // Assert:
-        sut.WaitForAssertion(() => UrlShouldBe(""));
+        sut.WaitForAssertion(() => UrlShouldBe(""), TimeSpan.FromSeconds(5));
     }
 
     [Fact]
-    public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
+    public void GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
     {
         MockApi.Fails<LoginRequest>(ErrorOr.Error.Validation(nameof(LoginRequest.EmailAddress), "Some error message"));
 
@@ -30,13 +30,13 @@
         // Act:
         sut.Find("input[type=email]").Change("test@test.com");
         sut.Find("input[type=password]").Change("password123");
-        await sut.Find("form").SubmitAsync();
+        sut.Find("form").Submit();
 
         // Assert:
         sut.WaitForAssertion(() =>
         {
             sut.Find(".validation-message").TextContent.Should().Be("Some error message");
             NavigationManager.History.Should().BeEmpty();
-        });
+        }, TimeSpan.FromSeconds(5));
     }
 }

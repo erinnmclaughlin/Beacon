@@ -12,6 +12,7 @@ public class BeaconDbContext : DbContext
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
     public DbSet<Laboratory> Laboratories => Set<Laboratory>();
+    public DbSet<LaboratoryInstrument> LaboratoryInstruments => Set<LaboratoryInstrument>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
@@ -45,6 +46,14 @@ public class BeaconDbContext : DbContext
         modelBuilder.Entity<Laboratory>(builder =>
         {
             builder.Property(x => x.Name).HasMaxLength(50);
+        });
+
+        modelBuilder.Entity<LaboratoryInstrument>(builder =>
+        {
+            builder.Property(x => x.SerialNumber).HasMaxLength(100);
+            builder.Property(x => x.InstrumentType).HasMaxLength(100);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<Membership>(builder =>
