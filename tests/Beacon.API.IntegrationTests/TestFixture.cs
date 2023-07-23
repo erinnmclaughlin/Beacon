@@ -1,4 +1,5 @@
 ﻿using Microsoft.AspNetCore.Hosting;
+using Microsoft.Extensions.Logging;
 
 namespace Beacon.API.IntegrationTests;
 
@@ -9,10 +10,14 @@ public sealed class TestFixture : WebApplicationFactory<Program>
         builder.ConfigureServices(services =>
         {
             services.ReplaceWithTestDatabase();
-            services.SuppressLogging();
             services.UseMockedCurrentUser();
             services.UseMockedLabContext();
             services.UseFakeEmailService();
+        });
+
+        builder.ConfigureLogging(config =>
+        {
+            config.SetMinimumLevel(LogLevel.Warning);
         });
     }
 }

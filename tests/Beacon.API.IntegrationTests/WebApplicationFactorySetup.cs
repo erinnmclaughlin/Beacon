@@ -61,9 +61,4 @@ public static class WebApplicationFactorySetup
         services.RemoveAll<IEmailService>();
         services.AddSingleton<IEmailService, FakeEmailService>();
     }
-
-    public static void SuppressLogging(this IServiceCollection services)
-    {
-        services.AddSingleton<ILoggerFactory, NullLoggerFactory>();
-    }
 }
