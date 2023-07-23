@@ -47,7 +47,7 @@
                                 <li>
                                     <button class="dropdown-item d-flex align-items-center" type="button" disabled="@IsBusy" @onclick="() => UpdateLeadAnalyst(member)">
                                         <span class="icon d-flex m-0" style="width: 0.75rem;">
-                                            @if (LeadAnalyst?.Id == member.Id)
+                                            @if (Project.LeadAnalyst?.Id == member.Id)
                                             {
                                                 <i class="fa-regular fa-check fa-xs"></i>
                                             }
@@ -62,9 +62,9 @@
             </ul>
         </div>
         <div style="font-size:0.8rem;">
-            @if (LeadAnalyst is not null)
+            @if (Project.LeadAnalyst is not null)
             {
-                <span class="fw-medium">@LeadAnalyst.DisplayName</span>
+                <span class="fw-medium">@Project.LeadAnalyst.DisplayName</span>
             }
             else
             {

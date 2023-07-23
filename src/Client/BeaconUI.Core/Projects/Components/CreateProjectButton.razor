@@ -1,7 +1,8 @@
-﻿<button type="button" disabled="@IsDisabled" @onclick="Click" @attributes="@AdditionalAttributes">
-    <span class="icon">
-        <i class="fa-solid fa-plus"></i>
-    </span>
-    <span>Create project</span>
-</button>
-
+﻿<AuthorizeLabView>
+    <button type="button" disabled="@(context.CurrentLab.MembershipType < LaboratoryMembershipType.Analyst)" @onclick="Click" @attributes="@AdditionalAttributes">
+        <span class="icon">
+            <i class="fa-solid fa-plus"></i>
+        </span>
+        <span>Create project</span>
+    </button>
+</AuthorizeLabView>

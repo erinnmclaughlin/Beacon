@@ -40,24 +40,24 @@ internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<Creat
 
     private async Task<InvitationEmail> CreateInvitation(CreateEmailInvitationRequest request, CancellationToken ct)
     {
-        var now = DateTimeOffset.UtcNow;
-
         var invitation = new Invitation
         {
-            Id = Guid.NewGuid(),
-            CreatedOn = now,
-            ExpireAfterDays = 10, // TODO: make this configurable
             NewMemberEmailAddress = request.NewMemberEmailAddress,
             MembershipType = request.MembershipType,
             CreatedById = _context.CurrentUser.Id
         };
 
-        var emailInvitation = invitation.AddEmailInvitation(now);
+        var email = new InvitationEmail
+        {
+            ExpiresOn = invitation.CreatedOn.AddDays(invitation.ExpireAfterDays)
+        };
+
+        invitation.EmailInvitations.Add(email);
 
         _dbContext.Invitations.Add(invitation);
         await _dbContext.SaveChangesAsync(ct);
 
-        return emailInvitation;
+        return email;
     }
 
     private async Task<bool> InvitedUserIsMember(string newMemberEmail, CancellationToken ct)

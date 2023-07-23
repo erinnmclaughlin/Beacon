@@ -1,15 +1,20 @@
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Projects;
+using BeaconUI.Core.Common.Http;
 using Microsoft.AspNetCore.Components;
 
 namespace BeaconUI.Core.Projects.Components;
 
 public partial class LeadAnalystCard
 {
-    [Parameter]
-    public ProjectDto.LeadAnalystDto? LeadAnalyst { get; set; }
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
 
     [Parameter]
-    public EventCallback<ProjectDto.LeadAnalystDto?> LeadAnalystChanged { get; set; }
+    public required ProjectDto Project { get; set; }
+
+    [Parameter]
+    public EventCallback<ProjectDto> ProjectChanged { get; set; }
 
     private bool IsBusy { get; set; }
 
@@ -18,10 +23,27 @@ public partial class LeadAnalystCard
         if (IsBusy) return;
         IsBusy = true;
 
-        if (member is null && LeadAnalyst is null)
+        if (member is null && Project.LeadAnalyst is null)
             return;
-        
-        await LeadAnalystChanged.InvokeAsync(member is null || member.Id == LeadAnalyst?.Id ? null : new() { Id = member.Id, DisplayName = member.DisplayName });
+
+        var result = await ApiClient.SendAsync(new UpdateLeadAnalystRequest
+        {
+            AnalystId = member?.Id,
+            ProjectId = Project.Id 
+        });
+
+        if (!result.IsError)
+        {
+            await ProjectChanged.InvokeAsync(Project with
+            { 
+                LeadAnalyst = member is null ? null : new()
+                {
+                    Id = member.Id,
+                    DisplayName = member.DisplayName
+                } 
+            });
+        }
+
         IsBusy = false;
     }
 }
