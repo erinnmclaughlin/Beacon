@@ -35,4 +35,10 @@
         JSInterop.Mode = JSRuntimeMode.Loose;
         return Render(@<CascadingValue Value="ModalService"><BlazoredModal /></CascadingValue>);
     }
+
+    protected IRenderedFragment RenderModal(RenderFragment childContent)
+    {
+        JSInterop.Mode = JSRuntimeMode.Loose;
+        return Render(@<CascadingValue Value="ModalService"><BlazoredModal />@childContent</CascadingValue>);
+    }
 }

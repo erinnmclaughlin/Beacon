@@ -62,11 +62,4 @@
     </tbody>
 </table>
 
-<button class="btn btn-sm btn-primary" type="button" disabled="@(SampleGroups is null)" @onclick="ShowAddSampleGroupModal">
-    <span class="icon">
-        <i class="fa-solid fa-plus"></i>
-    </span>
-    <span>Add Sample Group</span>
-</button>
-
-
+<AddSampleGroupButton ProjectId="ProjectId" OnSubmit="LoadSampleGroups" />

@@ -15,7 +15,7 @@ public partial class AddSampleGroupModal
     [CascadingParameter]
     private BlazoredModalInstance Modal { get; set; } = default!;
 
-    [Parameter]
+    [Parameter, EditorRequired]
     public required Guid ProjectId { get; set; }
 
     private CreateSampleGroupRequest? _request;

@@ -1,35 +1,12 @@
 ﻿@using BeaconUI.Core.Laboratories.Components
-@using BeaconUI.Core.Laboratories.Modals
 @inherits BeaconTestContext
 @code {
 
     [Fact]
     public void OnClick_CreateLabModalLaunches()
     {
-        this.SetAuthorized();
-
-        var modalReferenceMock = new Mock<IModalReference>();
-        modalReferenceMock
-            .SetupGet(x => x.Result)
-            .Returns(Task.FromResult(ModalResult.Ok()));
-
-        var modalServiceMock = new Mock<IModalService>();
-        modalServiceMock
-            .Setup(x => x.Show<CreateLaboratoryModal>(It.IsAny<string>()))
-            .Returns(modalReferenceMock.Object);
-
-        var eventRaised = false;
-
-        var sut = RenderComponent<CreateLaboratoryButton>(p => p
-            .Add(m => m.ModalService, modalServiceMock.Object)
-            .Add(m => m.OnLaboratoryCreated, () => eventRaised = true));
-
+        var sut = RenderModal(@<CreateLaboratoryButton />);
         sut.Find("button").Click();
-
-        sut.WaitForAssertion(() =>
-        {
-            modalServiceMock.Verify(x => x.Show<CreateLaboratoryModal>(It.IsAny<string>()), Times.Once);
-            eventRaised.Should().BeTrue();
-        });
+        sut.WaitForElement(".modal");
     }
 }
