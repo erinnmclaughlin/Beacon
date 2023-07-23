@@ -79,7 +79,7 @@
                                                         <span>View Details</span>
                                                     </a>
                                                 </li>
-                                                @if (ShowCancelAndCompleteDropdownSection(project))
+                                                @if (project.ProjectStatus is ProjectStatus.Active)
                                                 {
                                                     <li><hr class="dropdown-divider"></li>
                                                     <li>
@@ -112,64 +112,3 @@
     </div>
 </div>
 
-@code {
-
-    [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    [CascadingParameter]
-    private IModalService ModalService { get; set; } = default!;
-
-    private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await LoadProjects();
-    }
-
-    private async Task LoadProjects()
-    {
-        ProjectsOrError = await ApiClient.SendAsync(new GetProjectsRequest());
-    }
-
-    private void NavigateToProjectDetails(ProjectDto project)
-    {
-        NavigationManager.NavigateTo($"l/projects/{project.ProjectCode}");
-    }
-
-    private bool ShowCancelAndCompleteDropdownSection(ProjectDto project)
-    {
-        return project.ProjectStatus is ProjectStatus.Active;
-    }
-
-    private async Task CancelProject(ProjectDto project)
-    {
-        var parameters = new ModalParameters()
-            .Add(nameof(AreYouSureModal.Content), $"Really cancel project {project.ProjectCode}?");
-
-        var result = await ModalService.Show<AreYouSureModal>("Confirm Action", parameters).Result;
-
-        if (result.Confirmed)
-        {
-            await ApiClient.SendAsync(new CancelProjectRequest { ProjectId = project.Id });
-            await LoadProjects();
-        }
-    }
-
-    private async Task CompleteProject(ProjectDto project)
-    {
-        var parameters = new ModalParameters()
-            .Add(nameof(AreYouSureModal.Content), $"Really complete project {project.ProjectCode}?");
-
-        var result = await ModalService.Show<AreYouSureModal>("Confirm Action", parameters).Result;
-
-        if (result.Confirmed)
-        {
-            await ApiClient.SendAsync(new CompleteProjectRequest { ProjectId = project.Id });
-            await LoadProjects();
-        }
-    }
-}

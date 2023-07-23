@@ -1,5 +1,4 @@
 ﻿@page "/l/projects/{Code}/{Tab?}"
-@using Beacon.Common.Requests.Memberships
 @attribute [Authorize]
 @layout LaboratoryLayout
 
@@ -45,55 +44,3 @@
     </div>
 </div>
 
-@code {
-
-    [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
-
-    [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
-
-    [Parameter]
-    public required string Code { get; set; }
-
-    [Parameter]
-    public string? Tab { get; set; }
-
-    private ErrorOr<ProjectDto>? Project { get; set; }
-
-    private ErrorOr<LaboratoryMemberDto[]>? LabMembers { get; set; }
-
-    protected override async Task OnInitializedAsync()
-    {
-        await Task.WhenAll(LoadProject(), LoadMembers());
-    }
-
-    private async Task LoadMembers()
-    {
-        LabMembers = await ApiClient.SendAsync(new GetMembershipsRequest());
-    }
-
-    private async Task LoadProject()
-    {
-        if (ProjectCode.FromString(Code) is not { } code)
-        {
-            NavigationManager.NavigateTo("l/projects");
-            return;
-        }
-
-        Project = await ApiClient.SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = code });
-    }
-
-    private async Task HandleLeadAnalystChanged(Guid projectId, ChangeEventArgs e)
-    {
-        var request = new UpdateLeadAnalystRequest 
-        { 
-            ProjectId = projectId, 
-            AnalystId = Guid.TryParse(e.Value?.ToString(), out var id) ? id : null
-        };
-
-        await ApiClient.SendAsync(request);
-        await LoadProject();
-    }
-
-}
