@@ -33,6 +33,15 @@ public class GetProjectEventsTests : ProjectTestBase
         Assert.Equal(new DateTime(2023, 10, 1), testEvent.ScheduledEnd);
     }
 
+    [Fact]
+    public async Task GetProjectEvents_FailsWhenUserIsNotAuthorized()
+    {
+        RunAsNonMember();
+
+        var response = await SendAsync(new GetProjectEventsRequest { ProjectId = ProjectId });
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
     protected override void AddTestData(BeaconDbContext db)
     {
         db.ProjectEvents.Add(new ProjectEvent
