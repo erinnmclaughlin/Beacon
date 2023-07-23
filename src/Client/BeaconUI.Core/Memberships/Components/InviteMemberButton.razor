@@ -1,27 +1,6 @@
-﻿<AuthorizeLabView>
-    <button type="button" disabled="@IsDisabled(context)" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
-        <span class="icon">
-            <i class="fa-solid fa-user-plus"></i>
-        </span>
-        <span>Invite member</span>
-    </button>
-</AuthorizeLabView>
-
-@code {
-
-    [CascadingParameter]
-    private IModalService ModalService { get; set; } = default!;
-
-    [Parameter(CaptureUnmatchedValues = true)]
-    public IDictionary<string, object?>? AdditionalAttributes { get; set; }
-
-    private static bool IsDisabled(ILabContext context)
-    {
-        return context.CurrentLab.MembershipType < LaboratoryMembershipType.Manager;
-    }
-
-    private async Task ShowInviteMemberModal()
-    {
-        await ModalService.Show<InviteMemberModal>("Invite Lab Member").Result;
-    }
-}
+﻿<button type="button" disabled="@IsDisabled()" @onclick="ShowInviteMemberModal" @attributes="@AdditionalAttributes">
+    <span class="icon">
+        <i class="fa-solid fa-user-plus"></i>
+    </span>
+    <span>Invite member</span>
+</button>

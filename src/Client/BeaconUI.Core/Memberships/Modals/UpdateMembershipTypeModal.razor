@@ -30,39 +30,3 @@
     </Modal>
 </BeaconForm>
 
-@code {
-
-    [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
-
-    [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = default!;
-
-    [Parameter]
-    public required LaboratoryMemberDto MemberToUpdate { get; set; }
-
-    private UpdateMembershipRequest? _model;
-    private UpdateMembershipRequest Model => _model ??= new()
-    {
-        MemberId = MemberToUpdate.Id,
-        MembershipType = MemberToUpdate.MembershipType
-    };
-
-    private async Task Submit(BeaconForm form)
-    {
-        var result = await ApiClient.SendAsync(Model);
-
-        if (result.IsError)
-        {
-            form.AddErrors(result.Errors);
-            return;
-        }
-
-        await Modal.CloseAsync(ModalResult.Ok());
-    }
-
-    private bool IsDisabled(ILabContext context, LaboratoryMembershipType targetType)
-    {
-        return context.CurrentLab.MembershipType < targetType;
-    }
-}

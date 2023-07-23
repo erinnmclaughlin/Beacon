@@ -19,9 +19,9 @@
                     <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
                         <option>None</option>
                         <MembershipContext>
-                            @if (context.Result is { IsError: false } result)
+                            @if (!context.IsLoading() && !context.HasErrors())
                             {
-                                foreach (var member in result.Value.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
+                                foreach (var member in context.Members.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
                                 {
                                     <option value="@member.Id">@member.DisplayName</option>
                                 }
