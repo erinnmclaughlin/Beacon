@@ -1,0 +1,39 @@
+﻿@page "/l/instruments"
+@using BeaconUI.Core.Instruments.CreateInstrument
+@layout LaboratoryLayout
+
+<LaboratoryPageHeader>
+    <h4 class="mb-0 me-auto">Instruments</h4>
+    <CreateInstrumentButton OnInstrumentCreated="LoadInstruments" class="btn btn-sm btn-primary" />
+</LaboratoryPageHeader>
+
+<div class="content flex-grow-1" style="background-color: #f8fafc">
+    <div class="px-4 h-100">
+        <div class="mb-3" style="max-width: 400px">
+            @if (ErrorOrInstruments is not { } errorOrInstruments)
+            {
+                <p>Loading events...</p>
+            }
+            else if (errorOrInstruments.IsError)
+            {
+                <p class="text-danger">There was an error loading laboratory instruments.</p>
+            }
+            else if (!errorOrInstruments.Value.Any())
+            {
+                <p>There are no instruments associated with this laboratory!</p>
+            }
+            else
+            {
+                <div class="list-group">
+                    @foreach (var instrument in errorOrInstruments.Value)
+                    {
+                        <button type="button" class="list-group-item list-group-item-action">
+                            <div class="fw-bold">@instrument.InstrumentType</div>
+                            <small class="text-muted">SN @instrument.SerialNumber</small>
+                        </button>
+                    }
+                </div>
+            }
+        </div>
+    </div>
+</div>

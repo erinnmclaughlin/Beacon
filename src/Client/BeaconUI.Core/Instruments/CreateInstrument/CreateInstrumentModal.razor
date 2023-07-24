@@ -1,0 +1,20 @@
+﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="sn">Serial Number</label>
+                <InputText @bind-Value="Request.SerialNumber" class="form-control" id="sn" />
+                <ValidationMessage For="() => Request.SerialNumber" />
+            </div>
+            <div class="field">
+                <label class="form-label" for="instrumentType">Instrument Type</label>
+                <InputText @bind-Value="Request.InstrumentType" class="form-control" id="instrumentType" />
+                <ValidationMessage For="() => Request.InstrumentType" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton>Create Instrument</SubmitButton>
+            <ModalCancelButton />
+        </footer>
+    </Modal>
+</BeaconForm>

@@ -5,7 +5,7 @@
 @code {
 
     [Fact]
-    public void GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
+    public async Task GivenValidCredentials_WhenLoginIsClicked_ThenRedirectToHome()
     {
         MockApi.Succeeds<LoginRequest>();
 
@@ -14,14 +14,14 @@
         // Act:
         sut.Find("input[type=email]").Change("test@test.com");
         sut.Find("input[type=password]").Change("password123");
-        sut.Find("form").Submit();
+        await sut.Find("form").SubmitAsync();
 
         // Assert:
         sut.WaitForAssertion(() => UrlShouldBe(""), TimeSpan.FromSeconds(5));
     }
 
     [Fact]
-    public void GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
+    public async Task GivenInvalidCredentials_WhenLoginIsClicked_ThenDisplayError()
     {
         MockApi.Fails<LoginRequest>(ErrorOr.Error.Validation(nameof(LoginRequest.EmailAddress), "Some error message"));
 
@@ -30,7 +30,7 @@
         // Act:
         sut.Find("input[type=email]").Change("test@test.com");
         sut.Find("input[type=password]").Change("password123");
-        sut.Find("form").Submit();
+        await sut.Find("form").SubmitAsync();
 
         // Assert:
         sut.WaitForAssertion(() =>

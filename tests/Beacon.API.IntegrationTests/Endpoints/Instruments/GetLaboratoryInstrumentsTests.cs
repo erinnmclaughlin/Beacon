@@ -5,13 +5,14 @@ using Beacon.Common.Requests.Instruments;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
+[Trait("Feature", "Instrument Management")]
 public sealed class GetLaboratoryInstrumentsTests : TestBase
 {
     public GetLaboratoryInstrumentsTests(TestFixture fixture) : base(fixture)
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[017] Get lab instruments succeeds when request is valid")]
     public async Task GetLaboratoryInstruments_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
@@ -27,7 +28,7 @@ public sealed class GetLaboratoryInstrumentsTests : TestBase
         Assert.Equal("Test", instrument.InstrumentType);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[017] Get lab instruments fails when user is not authorized")]
     public async Task GetProjectEvents_FailsWhenUserIsNotAuthorized()
     {
         RunAsNonMember();

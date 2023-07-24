@@ -5,7 +5,7 @@
 @code {
 
     [Fact]
-    public void WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
+    public async Task WhenRegistrationIsSuccessful_LogInAndNavigateToHome()
     {
         MockApi.Succeeds<RegisterRequest>();
 
@@ -14,14 +14,14 @@
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
         cut.Find("input[type=password]").Change("password123");
-        cut.Find("form").Submit();
+        await cut.Find("form").SubmitAsync();
 
         // Assert:
         cut.WaitForAssertion(() => UrlShouldBe(""), TimeSpan.FromSeconds(5));
     }
 
     [Fact]
-    public void WhenRegistrationIsUnsuccessful_ShowError()
+    public async Task WhenRegistrationIsUnsuccessful_ShowError()
     {
         MockApi.Fails<RegisterRequest>(ErrorOr.Error.Validation(nameof(RegisterRequest.EmailAddress), "Some error message"));
 
@@ -30,7 +30,7 @@
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
         cut.Find("input[type=password]").Change("password123");
-        cut.Find("form").Submit();
+        await cut.Find("form").SubmitAsync();
 
         // Assert:
         cut.WaitForAssertion(() => cut.Find(".validation-message").TextContent.Should().Be("Some error message"), TimeSpan.FromSeconds(5));

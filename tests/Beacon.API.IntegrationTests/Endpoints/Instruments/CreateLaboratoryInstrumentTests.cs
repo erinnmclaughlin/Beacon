@@ -2,13 +2,14 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
+[Trait("Feature", "Instrument Management")]
 public sealed class CreateLaboratoryInstrumentTests : TestBase
 {
     public CreateLaboratoryInstrumentTests(TestFixture fixture) : base(fixture)
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[017] Adding an instrument to a laboratory succeeds when request is valid")]
     public async Task CreateLaboratoryInstrument_Succeeds_WhenRequestIsValid()
     {
         RunAsAdmin();
@@ -31,7 +32,7 @@ public sealed class CreateLaboratoryInstrumentTests : TestBase
         });
     }
 
-    [Fact]
+    [Fact(DisplayName = "[017] Adding an instrument to a laboratory fails when user is not authorized")]
     public async Task CreateLaboratoryInstrument_Fails_WhenUserIsNotAuthorized()
     {
         RunAsAnalyst();
@@ -48,8 +49,8 @@ public sealed class CreateLaboratoryInstrumentTests : TestBase
         ExecuteDbContext(dbContext => Assert.Null(dbContext.LaboratoryInstruments.SingleOrDefault()));
     }
 
-    [Fact]
-    public async Task CreateProjectEvent_Fails_WhenRequestIsInvalid()
+    [Fact(DisplayName = "[017] Adding an instrument to a laboratory fails when request is invalid")]
+    public async Task CreateLaboratoryInstrument_Fails_WhenRequestIsInvalid()
     {
         RunAsAdmin();
 

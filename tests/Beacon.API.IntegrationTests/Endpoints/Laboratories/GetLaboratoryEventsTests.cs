@@ -5,13 +5,14 @@ using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
+[Trait("Feature", "Project Events")]
 public sealed class GetLaboratoryEventsTests : ProjectTestBase
 {
     public GetLaboratoryEventsTests(TestFixture fixture) : base(fixture)
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Get lab events succeedss when request is valid")]
     public async Task GetLaboratoryEvents_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
@@ -28,7 +29,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal(new DateTime(2023, 10, 1), testEvent.ScheduledEnd);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Get lab events fsils when user is not authorized")]
     public async Task GetProjectEvents_FailsWhenUserIsNotAuthorized()
     {
         RunAsNonMember();

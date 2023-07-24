@@ -19,6 +19,7 @@ public abstract class TestBase : IClassFixture<TestFixture>
     {
         _fixture = fixture;
         _httpClient = _fixture.CreateClient();
+        _httpClient.Timeout = TimeSpan.FromMinutes(3);
 
         using var scope = _fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();

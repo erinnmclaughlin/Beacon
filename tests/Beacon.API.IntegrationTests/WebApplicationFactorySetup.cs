@@ -28,8 +28,7 @@ public static class WebApplicationFactorySetup
 
         services.AddDbContext<BeaconDbContext>((container, options) =>
         {
-            var connection = container.GetRequiredService<DbConnection>();
-            options.UseSqlite(connection);
+            options.UseSqlite(container.GetRequiredService<DbConnection>());
         });
     }
 
