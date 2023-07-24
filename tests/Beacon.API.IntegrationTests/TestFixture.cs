@@ -1,8 +1,4 @@
 ﻿using Microsoft.AspNetCore.Hosting;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
-using Microsoft.Extensions.Logging;
-using Microsoft.Extensions.Logging.Abstractions;
 
 namespace Beacon.API.IntegrationTests;
 
@@ -16,9 +12,6 @@ public sealed class TestFixture : WebApplicationFactory<Program>
             services.UseMockedCurrentUser();
             services.UseMockedLabContext();
             services.UseFakeEmailService();
-
-            services.RemoveAll<ILoggerFactory>();
-            services.AddSingleton<ILoggerFactory>(_ => new NullLoggerFactory());
         });
     }
 }

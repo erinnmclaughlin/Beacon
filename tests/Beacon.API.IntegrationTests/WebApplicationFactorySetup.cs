@@ -6,6 +6,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
+using Microsoft.Extensions.Logging;
 using System.Data.Common;
 
 namespace Beacon.API.IntegrationTests;
@@ -28,8 +29,9 @@ public static class WebApplicationFactorySetup
 
         services.AddDbContext<BeaconDbContext>((container, options) =>
         {
-            var connection = container.GetRequiredService<DbConnection>();
-            options.UseSqlite(connection);
+            options
+                .UseSqlite(container.GetRequiredService<DbConnection>())
+                .LogTo(Console.WriteLine, LogLevel.Warning);
         });
     }
 
