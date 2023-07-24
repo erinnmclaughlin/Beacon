@@ -8,7 +8,7 @@ public sealed class CreateProjectEventTests : ProjectTestBase
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Create project activity succeeds when request is valid")]
     public async Task CreateProjectEvent_Succeeds_WhenRequestIsValid()
     {
         RunAsAdmin();
@@ -34,7 +34,7 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         });
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Create project activity fails when user is not authorized")]
     public async Task CreateProjectEvent_Fails_WhenUserIsNotAuthorized()
     {
         RunAsMember(); 
@@ -53,7 +53,7 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         ExecuteDbContext(dbContext => Assert.Null(dbContext.ProjectEvents.SingleOrDefault()));
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Create project activity fails when request is invalid")]
     public async Task CreateProjectEvent_Fails_WhenRequestIsInvalid()
     {
         RunAsAdmin(); 

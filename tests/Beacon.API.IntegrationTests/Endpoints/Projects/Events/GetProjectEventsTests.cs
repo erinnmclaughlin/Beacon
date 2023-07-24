@@ -11,7 +11,7 @@ public class GetProjectEventsTests : ProjectTestBase
     {
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Get project events succeeds when request is valid")]
     public async Task GetProjectEvents_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
@@ -28,7 +28,7 @@ public class GetProjectEventsTests : ProjectTestBase
         Assert.Equal(new DateTime(2023, 10, 1), testEvent.ScheduledEnd);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[113] Get project events fails when user is not authorized")]
     public async Task GetProjectEvents_FailsWhenUserIsNotAuthorized()
     {
         RunAsNonMember();

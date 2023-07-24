@@ -2,6 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
+[Trait("Feature", "Instrument Management")]
 public sealed class CreateLaboratoryInstrumentTests : TestBase
 {
     public CreateLaboratoryInstrumentTests(TestFixture fixture) : base(fixture)
