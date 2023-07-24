@@ -5,6 +5,7 @@ using Beacon.Common.Requests.Projects.Events;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
+[Trait("Feature", "Project Events")]
 public class GetProjectEventsTests : ProjectTestBase
 {
     public GetProjectEventsTests(TestFixture fixture) : base(fixture)

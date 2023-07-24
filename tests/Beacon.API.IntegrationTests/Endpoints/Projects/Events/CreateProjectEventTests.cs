@@ -2,6 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
+[Trait("Feature", "Project Events")]
 public sealed class CreateProjectEventTests : ProjectTestBase
 {
     public CreateProjectEventTests(TestFixture fixture) : base(fixture)
