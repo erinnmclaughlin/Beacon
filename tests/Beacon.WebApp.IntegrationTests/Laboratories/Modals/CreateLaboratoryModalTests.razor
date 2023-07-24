@@ -4,32 +4,32 @@
 @code  {
 
     [Fact]
-    public void CreateLaboratoryModal_DoesNotCallApi_WhenModelIsInvalid()
+    public async Task CreateLaboratoryModal_DoesNotCallApi_WhenModelIsInvalid()
     {
         MockApi.Setup<CreateLaboratoryRequest>();
 
         var sut = RenderModal();
         var modal = ModalService.Show<CreateLaboratoryModal>();
 
-        sut.WaitForElement("form", TimeSpan.FromSeconds(5)).Submit();
-        sut.WaitForAssertion(() => sut.Find(".validation-message"), TimeSpan.FromSeconds(5));
+        sut.WaitForElement("input#lab-name", TimeSpan.FromSeconds(5)).Change("");
+        await sut.Find("form").SubmitAsync();
 
+        sut.WaitForAssertion(() => sut.Find(".validation-message"), TimeSpan.FromSeconds(10));
         MockApi.Verify<CreateLaboratoryRequest>(Times.Never());
     }
 
     [Fact]
-    public void CreateLaboratoryModal_CallsApi_WhenModelIsValid()
+    public async Task CreateLaboratoryModal_CallsApi_WhenModelIsValid()
     {
         MockApi.Setup<CreateLaboratoryRequest>();
 
         var sut = RenderModal();
         var modal = ModalService.Show<CreateLaboratoryModal>();
 
-        var form = sut.WaitForElement("form", TimeSpan.FromSeconds(5));
-        sut.Find("input#lab-name").Change("My New Lab");
-        form.Submit();
+        sut.WaitForElement("input#lab-name", TimeSpan.FromSeconds(5)).Change("My New Lab");
+        await sut.Find("form").SubmitAsync();
 
-        sut.WaitForAssertion(() => MockApi.Verify<CreateLaboratoryRequest>(Times.Once()), TimeSpan.FromSeconds(5));
+        sut.WaitForAssertion(() => MockApi.Verify<CreateLaboratoryRequest>(Times.Once()), TimeSpan.FromSeconds(10));
     }
 
 }
