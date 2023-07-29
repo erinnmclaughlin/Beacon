@@ -19,7 +19,7 @@ public partial class ProjectOverview
 
     private ErrorOr<ProjectEventDto[]>? Events { get; set; }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await LoadEvents();
     }

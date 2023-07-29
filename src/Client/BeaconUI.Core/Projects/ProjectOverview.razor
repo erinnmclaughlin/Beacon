@@ -1,6 +1,5 @@
 ﻿<div class="row">
     <div class="col-12 col-lg">
-        <CreateProjectEventButton ProjectId="Project.Id" OnEventCreated="LoadEvents" />
     </div>
     <div class="col-12 col-lg-auto" style="min-width: 21rem;">
         @if (Events is { Value: { Length: > 0 } } events)
@@ -8,7 +7,8 @@
             var timelineItems = events.Value
                 .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
 
-            <div class="mb-3">
+            <h6>Project Schedule</h6>
+            <div class="mb-4">
                 <Timeline TimelineItems="timelineItems">
                     <div style="margin-bottom:0.625rem;">
                         <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.75rem; gap: 0.2rem;">
@@ -24,7 +24,6 @@
                     </div>
                 </Timeline>
             </div>
-            
         }
         <LeadAnalystCard Project="Project" ProjectChanged="ProjectChanged" />
     </div>

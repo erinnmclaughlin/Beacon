@@ -13,6 +13,12 @@ public partial class CreateProjectEventButton
     [Parameter, EditorRequired]
     public required Guid ProjectId { get; set; }
 
+    [Parameter(CaptureUnmatchedValues = true)]
+    public IDictionary<string, object?>? Attributes { get; set; }
+
+    [Parameter]
+    public RenderFragment? ChildContent { get; set; }
+
     [Parameter]
     public EventCallback OnEventCreated { get; set; }
 

@@ -4,7 +4,43 @@
 
 <LaboratoryPageHeader>
     <ChildContent>
-        <h4>Project Details</h4>
+        <div class="d-flex flex-grow-1">
+            <h4>Project Details</h4>
+
+            @if (Project is { } projectOrError && !projectOrError.IsError)
+            {
+                var project = projectOrError.Value;
+
+                <div class="dropdown ms-auto">
+                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                        Actions
+                    </button>
+                    <ul class="dropdown-menu" style="font-size: 0.9rem;">
+                        <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst" Context="lab">
+                            <li>
+                                <CreateProjectEventButton ProjectId="project.Id" OnEventCreated="StateHasChanged" class="dropdown-item">
+                                    <span class="icon d-inline-block" style="width: 18px;">
+                                        <i class="fa-regular fa-calendar"></i>
+                                    </span>
+                                    <span>Schedule an Event</span>
+                                </CreateProjectEventButton>
+                            </li>
+                            @if (project.LeadAnalyst is { } analyst)
+                            {
+                                <li>
+                                    <button class="dropdown-item" type="button">
+                                        <span class="icon d-inline-block" style="width: 18px;">
+                                            <i class="fa-regular fa-user-minus"></i>
+                                        </span>
+                                        <span>Unassign @analyst.DisplayName</span>
+                                    </button>
+                                </li>
+                            }
+                        </AuthorizeLabView>
+                    </ul>
+                </div>
+            }
+        </div>
     </ChildContent>
     <TabsContent>
         <li class="nav-item">
