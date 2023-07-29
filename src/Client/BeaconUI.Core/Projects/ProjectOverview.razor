@@ -1,44 +1,39 @@
 ﻿<div class="row">
     <div class="col-12 col-lg">
-
-        <h6>Relevant Events</h6>
-
-        <div class="mb-3" style="max-width: 400px">
-            @if (Events is not { } events)
-            {
-                <p>Loading events...</p>
-            }
-            else if (events.IsError)
-            {
-                <p class="text-danger">There was an error loading project events.</p>
-            }
-            else if (!events.Value.Any())
-            {
-                <p>There are no events scheduled for this month!</p>
-            }
-            else
-            {
-                <div class="list-group">
-                    @foreach (var e in events.Value.OrderBy(x => x.ScheduledStart).ThenBy(x => x.ScheduledEnd))
-                    {
-                        <button type="button" class="list-group-item list-group-item-action">
-                            <div class="fw-bold">@e.Title</div>
-                            @if (e.ScheduledStart >= DateTime.Today)
-                            {
-                                <small class="text-muted">Ongoing &middot; Ends @e.ScheduledEnd.ToString("dd-MMM-yyyy")</small>
-                            }
-                            else
-                            {
-                                <small class="text-muted">Upcoming &middot; Starts @e.ScheduledStart.ToString("dd-MMM-yyyy")</small>
-                            }
-                        </button>
-                    }
-                </div>
-            }
-        </div>
         <CreateProjectEventButton ProjectId="Project.Id" OnEventCreated="LoadEvents" />
     </div>
     <div class="col-12 col-lg-auto" style="min-width: 21rem;">
+        <div class="mb-3">
+            @if (Events is not { } errorOrEvents)
+            {
+                <p>Loading events...</p>
+            }
+            else if (errorOrEvents.IsError)
+            {
+                <p class="text-danger">There was an error loading project events.</p>
+            }
+            else if (errorOrEvents.Value is not { Length: > 0 } events)
+            {
+                <p>There are no events associated with thie project!</p>
+            }
+            else
+            {
+                <Timeline TimelineItems="events.Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e })">
+                    <div style="margin-bottom:0.625rem;">
+                        <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.75rem; gap: 0.2rem;">
+                            <div>@context.Timestamp.ToString("dd-MMM-yyyy")</div>
+                            @if (context.Value.IsOngoingOn(DateTime.UtcNow))
+                            {
+                                <div class="d-flex">
+                                    <Badge Class="is-primary">Ongoing</Badge>
+                                </div>
+                            }
+                        </p>
+                        <a href="#" class="d-block" style="font-size: 0.9rem; text-decoration: none;">@context.Value.Title</a>
+                    </div>
+                </Timeline>
+            }
+        </div>
         <LeadAnalystCard Project="Project" ProjectChanged="ProjectChanged" />
     </div>
 </div>

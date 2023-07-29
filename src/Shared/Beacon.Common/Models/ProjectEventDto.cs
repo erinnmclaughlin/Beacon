@@ -7,4 +7,10 @@ public sealed record ProjectEventDto
     public required string? Description { get; init; }
     public required DateTimeOffset ScheduledStart { get; init; }
     public required DateTimeOffset ScheduledEnd { get; init; }
+    public required LaboratoryInstrumentDto[] AssociatedInstruments { get; init; }
+
+    public bool IsOngoingOn(DateTime timestamp)
+    { 
+        return ScheduledStart.DateTime <= timestamp && ScheduledEnd.DateTime > timestamp;
+    }
 }

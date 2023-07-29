@@ -19,9 +19,6 @@ public partial class ProjectOverview
 
     private ErrorOr<ProjectEventDto[]>? Events { get; set; }
 
-    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
-    private static DateOnly ThisMonth => new(Today.Year, Today.Month, 1);
-
     protected override async Task OnInitializedAsync()
     {
         await LoadEvents();
@@ -31,9 +28,11 @@ public partial class ProjectOverview
     {
         Events = await ApiClient.SendAsync(new GetProjectEventsRequest
         {
-            MinDate = Today,
-            MaxDate = ThisMonth.AddMonths(1),
             ProjectId = Project.Id
         });
     }
+
+    private IEnumerable<ProjectEventDto> GetOngoingEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledStart <= DateTime.Today && e.ScheduledEnd >= DateTime.Today);
+    private IEnumerable<ProjectEventDto> GetUpcomingEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledStart > DateTime.Today);
+    private IEnumerable<ProjectEventDto> GetPastEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledEnd < DateTime.Today);
 }

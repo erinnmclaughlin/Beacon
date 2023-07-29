@@ -22,7 +22,7 @@ public partial class CreateProjectEventButton
             .Add(nameof(CreateProjectEventModal.ProjectId), ProjectId);
 
         var result = await ModalService
-            .Show<CreateProjectEventModal>("Create New Project", modalParameters)
+            .Show<CreateProjectEventModal>("Schedule Event", modalParameters)
             .Result;
 
         if (!result.Cancelled)

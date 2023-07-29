@@ -11,6 +11,7 @@ public sealed class CreateProjectEventRequest : BeaconRequest<CreateProjectEvent
     public DateTimeOffset ScheduledEnd { get; set; }
 
     public Guid ProjectId { get; set; }
+    public List<Guid> InstrumentIds { get; set; } = new();
 
     public sealed class Validator : AbstractValidator<CreateProjectEventRequest>
     {

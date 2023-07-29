@@ -27,7 +27,15 @@ internal sealed class GetProjectEventsHandler : IBeaconRequestHandler<GetProject
                 Title = x.Title,
                 Description = x.Description,
                 ScheduledStart = x.ScheduledStart,
-                ScheduledEnd = x.ScheduledEnd
+                ScheduledEnd = x.ScheduledEnd,
+                AssociatedInstruments = x.AssociatedInstruments
+                    .Select(i => new LaboratoryInstrumentDto
+                    {
+                        Id = i.Id,
+                        InstrumentType = i.InstrumentType,
+                        SerialNumber = i.SerialNumber
+                    })
+                    .ToArray()
             })
             .AsNoTracking()
             .ToArrayAsync(ct);

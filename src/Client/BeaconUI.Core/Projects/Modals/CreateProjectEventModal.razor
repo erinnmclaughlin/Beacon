@@ -23,6 +23,35 @@
                 </div>
             </div>
             <div class="field">
+                <label class="form-label" for="instruments">Related Instruments</label>
+                <ul class="list-group">
+                    @if (ErrorOrInstruments is not { } errorOrInstruments)
+                    {
+                        <li class="list-group-item">Loading...</li>
+                    }
+                    else if (errorOrInstruments.IsError)
+                    {
+                        <li class="list-group-item text-danger">There was an error loading laboratory instruments.</li>
+                    }
+                    else if (errorOrInstruments.Value is not { Length: > 0 } instruments)
+                    {
+                        <li class="list-group-item text-grey">There are no instruments associated with the current laboratory.</li>
+                    }
+                    else
+                    {
+                        foreach (var instrument in instruments)
+                        {
+                            <li class="list-group-item">
+                                <input class="form-check-input me-1" style="cursor: pointer;" type="checkbox" value="@(Request.InstrumentIds.Contains(instrument.Id))" id="instrument-@instrument.Id" @onchange="() => DoSelectInstrument(instrument)">
+                                <label class="form-check-label stretched-link" for="instrument-@instrument.Id" style="cursor: pointer;">
+                                    <span class="fw-bold">@instrument.InstrumentType</span> (@instrument.SerialNumber)
+                                </label>
+                            </li>
+                        }
+                    }
+                </ul>
+            </div>
+            <div class="field">
                 <label class="form-label" for="description">Description</label>
                 <InputTextArea @bind-Value="Request.Description" class="form-control" id="description" placeholder="Event details..."></InputTextArea>
                 <ValidationMessage For="() => Request.Description" />
