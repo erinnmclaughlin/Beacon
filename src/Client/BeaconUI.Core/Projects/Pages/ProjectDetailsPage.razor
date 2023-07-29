@@ -55,28 +55,25 @@
     </TabsContent>
 </LaboratoryPageHeader>
 
-<div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 py-2 h-100">
-        @if (Project is not { } p)
-        {
-            <p>Loading...</p>
-        }
-        else if (p.IsError)
-        {
-            <p class="text-danger">There was an error loading project details.</p>
-        }
-        else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
-        {
-            <ProjectSamples ProjectId="p.Value.Id" />
-        }
-        else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
-        {
-            <ProjectContacts Project="p.Value" />
-        }
-        else
-        {
-            <ProjectOverview Project="p.Value" ProjectChanged="(p) => Project = p" />
-        }
-    </div>
-</div>
-
+<PageContainer>
+    @if (Project is not { } p)
+    {
+        <p>Loading...</p>
+    }
+    else if (p.IsError)
+    {
+        <p class="text-danger">There was an error loading project details.</p>
+    }
+    else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+    {
+        <ProjectSamples ProjectId="p.Value.Id" />
+    }
+    else if ("contacts".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+    {
+        <ProjectContacts Project="p.Value" />
+    }
+    else
+    {
+        <ProjectOverview Project="p.Value" ProjectChanged="(p) => Project = p" />
+    }
+</PageContainer>
