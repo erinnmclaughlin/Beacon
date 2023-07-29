@@ -1,5 +1,6 @@
 ﻿@import url('fontawesome/css/all.min.css');
 @import url('utils.css');
+@import url('_content/BlazorCalendar/BlazorCalendar.css');
 
 html, body, #app {
     height: 100%;
