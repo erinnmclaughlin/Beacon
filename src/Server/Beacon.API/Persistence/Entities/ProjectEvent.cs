@@ -10,4 +10,6 @@ public sealed class ProjectEvent : LaboratoryScopedEntityBase
 
     public Guid ProjectId { get; set; }
     public Project Project { get; set; } = default!;
+
+    public List<LaboratoryInstrument> AssociatedInstruments { get; set; } = new();
 }
