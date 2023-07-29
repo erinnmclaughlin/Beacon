@@ -12,7 +12,7 @@
                 var project = projectOrError.Value;
 
                 <div class="dropdown ms-auto">
-                    <button class="btn btn-outline-primary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                    <button class="btn btn-primary dropdown-toggle" type="button" style="font-size: 0.95rem;" data-bs-toggle="dropdown">
                         Actions
                     </button>
                     <ul class="dropdown-menu" style="font-size: 0.9rem;">
@@ -56,7 +56,7 @@
 </LaboratoryPageHeader>
 
 <div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 h-100">
+    <div class="px-4 py-2 h-100">
         @if (Project is not { } p)
         {
             <p>Loading...</p>

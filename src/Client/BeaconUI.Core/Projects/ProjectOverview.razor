@@ -7,7 +7,7 @@
             var timelineItems = events.Value
                 .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
 
-            <h6>Project Schedule</h6>
+            <h6 style="margin-bottom: 0.75rem;">Project Schedule</h6>
             <div class="mb-4">
                 <Timeline TimelineItems="timelineItems">
                     <div style="margin-bottom:0.625rem;">
@@ -20,7 +20,7 @@
                                 </div>
                             }
                         </p>
-                        <a href="#" class="d-block" style="font-size: 0.9rem; text-decoration: none;">@context.Value.Title</a>
+                        <a class="btn btn-link p-0" style="font-size: 0.925rem; text-decoration: none;">@context.Value.Title</a>
                     </div>
                 </Timeline>
             </div>
