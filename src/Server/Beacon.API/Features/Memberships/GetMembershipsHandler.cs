@@ -17,6 +17,14 @@ internal sealed class GetMembershipsHandler : IBeaconRequestHandler<GetMembershi
 
     public async Task<ErrorOr<LaboratoryMemberDto[]>> Handle(GetMembershipsRequest request, CancellationToken ct)
     {
+        var query = _dbContext.Memberships.AsQueryable();
+
+        if (request.MinimumRole is { } minimumRole)
+        {
+            var validRoles = Enum.GetValues<LaboratoryMembershipType>().Where(m => m >= minimumRole).ToList();
+            query = query.Where(m => validRoles.Contains(m.MembershipType));
+        }
+
         return await _dbContext.Memberships
             .Select(m => new LaboratoryMemberDto
             {

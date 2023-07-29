@@ -2,7 +2,7 @@
     border-left: 1px solid hsl(0, 0%, 90%);
     position: relative;
     list-style: none;
-    padding-left: 2rem;
+    padding-left: 16px;
 }
 
 .timeline-item {
@@ -11,7 +11,7 @@
 
     .timeline-item:after {
         background-color: hsl(0, 0%, 90%);
-        left: -36.5px;
+        left: -20px;
         height: 8px;
         width: 8px;
         border-radius: 50%;

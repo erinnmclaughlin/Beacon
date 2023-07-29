@@ -3,22 +3,13 @@
         <CreateProjectEventButton ProjectId="Project.Id" OnEventCreated="LoadEvents" />
     </div>
     <div class="col-12 col-lg-auto" style="min-width: 21rem;">
-        <div class="mb-3">
-            @if (Events is not { } errorOrEvents)
-            {
-                <p>Loading events...</p>
-            }
-            else if (errorOrEvents.IsError)
-            {
-                <p class="text-danger">There was an error loading project events.</p>
-            }
-            else if (errorOrEvents.Value is not { Length: > 0 } events)
-            {
-                <p>There are no events associated with thie project!</p>
-            }
-            else
-            {
-                <Timeline TimelineItems="events.Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e })">
+        @if (Events is { Value: { Length: > 0 } } events)
+        {
+            var timelineItems = events.Value
+                .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+
+            <div class="mb-3">
+                <Timeline TimelineItems="timelineItems">
                     <div style="margin-bottom:0.625rem;">
                         <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.75rem; gap: 0.2rem;">
                             <div>@context.Timestamp.ToString("dd-MMM-yyyy")</div>
@@ -32,8 +23,9 @@
                         <a href="#" class="d-block" style="font-size: 0.9rem; text-decoration: none;">@context.Value.Title</a>
                     </div>
                 </Timeline>
-            }
-        </div>
+            </div>
+            
+        }
         <LeadAnalystCard Project="Project" ProjectChanged="ProjectChanged" />
     </div>
 </div>
