@@ -5,7 +5,7 @@
         @if (Events is { Value: { Length: > 0 } } events)
         {
             var timelineItems = events.Value
-                .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+                .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
 
             <h6 style="margin-bottom: 0.75rem;">Upcoming Events</h6>
             <div class="mb-4">
@@ -13,7 +13,7 @@
                     <div style="margin-bottom:0.625rem;">
                         <p class="text-muted mb-0 d-flex align-items-center" style="font-size: 0.8rem; gap: 0.2rem;">
                             <div>@context.Timestamp.ToString("dd-MMM-yyyy")</div>
-                            @if (context.Value.IsOngoingOn(DateTime.UtcNow))
+                            @if (context.Value.IsOngoingDuring(DateTime.UtcNow))
                             {
                                 <div class="d-flex">
                                     <Badge Class="is-primary">Ongoing</Badge>

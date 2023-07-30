@@ -28,7 +28,15 @@ internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLabo
                 Description = p.Description,
                 ScheduledStart = p.ScheduledStart,
                 ScheduledEnd = p.ScheduledEnd,
-                ProjectCode = p.Project.ProjectCode
+                ProjectCode = p.Project.ProjectCode,
+                AssociatedInstruments = p.AssociatedInstruments
+                    .Select(i => new LaboratoryInstrumentDto
+                    {
+                        Id = i.Id,
+                        InstrumentType = i.InstrumentType,
+                        SerialNumber = i.SerialNumber
+                    })
+                    .ToArray()
             })
             .AsNoTracking()
             .ToArrayAsync(ct);

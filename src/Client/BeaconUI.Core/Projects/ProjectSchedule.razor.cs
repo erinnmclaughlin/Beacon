@@ -1,5 +1,6 @@
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
+using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Requests.Projects.Events;
 using BeaconUI.Core.Common;
 using BeaconUI.Core.Common.Http;
@@ -16,7 +17,7 @@ public partial class ProjectSchedule
     [Parameter, EditorRequired]
     public required Guid ProjectId { get; set; }
 
-    private ErrorOr<ProjectEventDto[]>? ErrorOrEvents { get; set; }
+    private ErrorOr<LaboratoryEventDto[]>? ErrorOrEvents { get; set; }
     private ErrorOr<LaboratoryInstrumentDto[]>? ErrorOrInstruments { get; set; }
 
     private bool ShowPastEvents { get; set; }
@@ -27,21 +28,21 @@ public partial class ProjectSchedule
         ErrorOrInstruments = await ApiClient.SendAsync(new GetLaboratoryInstrumentsRequest());
     }
 
-    private int CompletedEventCount => ErrorOrEvents?.Value.Count(x => x.IsCompletedOn(DateTime.Now)) ?? 0;
+    private int CompletedEventCount => ErrorOrEvents?.Value.Count(x => x.IsCompletedOnOrBefore(DateTime.Now)) ?? 0;
 
-    private IEnumerable<TimelineItem<ProjectEventDto>> GetTimelineEvents(ProjectEventDto[] events)
+    private IEnumerable<TimelineItem<LaboratoryEventDto>> GetTimelineEvents(LaboratoryEventDto[] events)
     {
         return events
-            .Where(e => ShowPastEvents || !e.IsCompletedOn(DateTime.Now))
-            .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+            .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTime.Now))
+            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
     }
 
     private async Task LoadProjects()
     {
-        ErrorOrEvents = await ApiClient.SendAsync(new GetProjectEventsRequest { ProjectId = ProjectId });
+        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new() { ProjectId } });
     }
 
-    private ErrorOr<LaboratoryInstrumentDto[]>? GetSuggestedInstruments(ProjectEventDto e)
+    private ErrorOr<LaboratoryInstrumentDto[]>? GetSuggestedInstruments(LaboratoryEventDto e)
     {
         if (ErrorOrInstruments is not { IsError: false } errorOrInstruments)
             return ErrorOrInstruments;
@@ -50,7 +51,7 @@ public partial class ProjectSchedule
         return errorOrInstruments.Value.Where(i => !associatedInstrumentIds.Contains(i.Id)).ToArray();
     }
 
-    private async Task Associate(ProjectEventDto e, LaboratoryInstrumentDto i)
+    private async Task Associate(LaboratoryEventDto e, LaboratoryInstrumentDto i)
     {
         var request = new AssociateInstrumentWithProjectEventRequest
         {
@@ -74,7 +75,7 @@ public partial class ProjectSchedule
         }
     }
 
-    private async Task Unassociate(ProjectEventDto e, LaboratoryInstrumentDto i)
+    private async Task Unassociate(LaboratoryEventDto e, LaboratoryInstrumentDto i)
     {
         var request = new UnassociateInstrumentFromProjectEventRequest
         {

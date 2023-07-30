@@ -52,7 +52,7 @@
                         </button>
                         <h6 class="card-title d-flex align-items-center" style="font-size:1.075rem; margin-bottom: 0.675rem;">
                             <span class="me-1">@context.Value.Title</span>
-                            @if (context.Value.IsOngoingOn(DateTime.Today))
+                            @if (context.Value.IsOngoingDuring(DateTime.Today))
                             {
                                 <span class="d-flex">
                                     <Badge Class="is-primary">Ongoing</Badge>
@@ -60,7 +60,7 @@
                             }
                         </h6>
                         <h6 class="card-subtitle mb-2 text-black-50 small">
-                            @if (context.Value.IsCompletedOn(DateTime.Now))
+                            @if (context.Value.IsCompletedOnOrBefore(DateTime.Now))
                             {
                                 <span class="icon">
                                     <i class="fa-regular fa-calendar"></i>
@@ -69,7 +69,7 @@
                                     Completed <Duration TimeSpan="@(DateTime.Now - context.Value.ScheduledEnd)" /> ago
                                 </span>
                             }
-                            else if (context.Value.IsOngoingOn(DateTime.Now))
+                            else if (context.Value.IsOngoingDuring(DateTime.Now))
                             {
                                 <span class="icon">
                                     <i class="fa-regular fa-clock"></i>

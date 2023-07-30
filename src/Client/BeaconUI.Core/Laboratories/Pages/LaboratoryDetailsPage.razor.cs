@@ -22,8 +22,8 @@ public partial class LaboratoryDetailsPage
     {
         Events = await ApiClient.SendAsync(new GetLaboratoryEventsRequest
         {
-            MinEnd = DateTime.UtcNow.Date,
-            MaxStart = DateTime.UtcNow.Date.AddDays(7)
+            MinEnd = DateTime.UtcNow,
+            MaxStart = DateTime.UtcNow.AddDays(7)
         });
     }
 }

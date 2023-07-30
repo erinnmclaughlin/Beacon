@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Projects.Events;
+using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
@@ -17,10 +17,10 @@ public class GetProjectEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await SendAsync(new GetProjectEventsRequest { ProjectId = ProjectId });
+        var response = await SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new() { ProjectId } });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var result = await DeserializeAsync<ProjectEventDto[]>(response);
+        var result = await DeserializeAsync<LaboratoryEventDto[]>(response);
         Assert.NotNull(result);
         
         var testEvent = Assert.Single(result);
@@ -34,7 +34,7 @@ public class GetProjectEventsTests : ProjectTestBase
     {
         RunAsNonMember();
 
-        var response = await SendAsync(new GetProjectEventsRequest { ProjectId = ProjectId });
+        var response = await SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new() { ProjectId } });
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
