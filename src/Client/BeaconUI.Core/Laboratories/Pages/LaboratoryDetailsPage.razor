@@ -14,7 +14,7 @@
             @if (Events is { Value: { Length: > 0 } } events)
             {
                 var timelineItems = events.Value
-                .Select(e => new TimelineItem<LaboratoryEventDto>
+                    .Select(e => new TimelineItem<LaboratoryEventDto>
                     {
                         Timestamp = e.ScheduledStart.DateTime,
                         Value = e

@@ -28,11 +28,9 @@ public partial class ProjectOverview
     {
         Events = await ApiClient.SendAsync(new GetProjectEventsRequest
         {
+            MinEnd = DateTime.UtcNow,
+            MaxStart = DateTime.UtcNow.AddDays(7),
             ProjectId = Project.Id
         });
     }
-
-    private IEnumerable<ProjectEventDto> GetOngoingEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledStart <= DateTime.Today && e.ScheduledEnd >= DateTime.Today);
-    private IEnumerable<ProjectEventDto> GetUpcomingEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledStart > DateTime.Today);
-    private IEnumerable<ProjectEventDto> GetPastEvents(ProjectEventDto[] events) => events.Where(e => e.ScheduledEnd < DateTime.Today);
 }

@@ -48,14 +48,24 @@ internal sealed class GetProjectEventsHandler : IBeaconRequestHandler<GetProject
             x => x.ProjectId == request.ProjectId
         };
 
-        if (request.MinDate?.ToDateTime(TimeOnly.MinValue) is { } minDate)
+        if (request.MinStart is { } minStart)
         {
-            expressions.Add(x => x.ScheduledEnd >= minDate);
+            expressions.Add(x => x.ScheduledStart >= minStart);
         }
 
-        if (request.MaxDate?.ToDateTime(TimeOnly.MinValue) is { } maxDate)
+        if (request.MinEnd is { } minEnd)
         {
-            expressions.Add(x => x.ScheduledStart <= maxDate);
+            expressions.Add(x => x.ScheduledEnd >= minEnd);
+        }
+
+        if (request.MaxStart is { } maxStart)
+        {
+            expressions.Add(x => x.ScheduledStart <= maxStart);
+        }
+
+        if (request.MaxEnd is { } maxEnd)
+        {
+            expressions.Add(x => x.ScheduledEnd <= maxEnd);
         }
 
         return expressions.GetFilter();

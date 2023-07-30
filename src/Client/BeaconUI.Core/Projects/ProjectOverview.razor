@@ -7,7 +7,7 @@
             var timelineItems = events.Value
                 .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
 
-            <h6 style="margin-bottom: 0.75rem;">Project Schedule</h6>
+            <h6 style="margin-bottom: 0.75rem;">Upcoming Events</h6>
             <div class="mb-4">
                 <Timeline TimelineItems="timelineItems">
                     <div style="margin-bottom:0.625rem;">

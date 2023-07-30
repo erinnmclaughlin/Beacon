@@ -11,7 +11,7 @@
 <PageContainer>
     <div style="max-width: 1200px;">
         <div class="d-flex justify-content-space-between" style="margin-top: -0.5rem; margin-bottom: 0.5rem;">
-            <button class="btn btn-sm" type="button" @onclick="() => CurrentMonth = LastMonth">
+            <button class="btn btn-sm" type="button" @onclick="GoToLastMonth">
                 <span class="icon">
                     <i class="fa-regular fa-angle-left fa-sm"></i>
                 </span>
@@ -20,7 +20,7 @@
 
             <h1 class="display-6 mx-auto fs-4 mb-0">@CurrentMonth.ToString("MMMM yyyy")</h1>
 
-            <button class="btn btn-sm" type="button" @onclick="() => CurrentMonth = NextMonth">
+            <button class="btn btn-sm" type="button" @onclick="GoToNextMonth">
                 <span>@NextMonth.ToString("MMMM yyyy")</span>
                 <span class="icon">
                     <i class="fa-regular fa-angle-right fa-sm"></i>
@@ -29,7 +29,7 @@
         </div>
 
         <div style="border: 1px solid hsl(0, 0%, 90%);">
-            <CalendarContainer FirstDate="CurrentMonth.ToDateTime(TimeOnly.MinValue)" DisplayedView="DisplayedView.Monthly" TasksList="Events">
+            <CalendarContainer FirstDate="CurrentMonth" DisplayedView="DisplayedView.Monthly" TasksList="Events">
                 <MonthlyView PriorityDisplay="@PriorityLabel.Caption" />
             </CalendarContainer>
         </div>
@@ -44,16 +44,16 @@
     [Inject]
     private NavigationManager NavigationManager { get; set; } = default!;
 
-    private DateOnly CurrentMonth { get; set; }
-    private DateOnly LastMonth => CurrentMonth.AddMonths(-1);
-    private DateOnly NextMonth => CurrentMonth.AddMonths(1);
+    private DateTime CurrentMonth { get; set; }
+    private DateTime LastMonth => CurrentMonth.AddMonths(-1);
+    private DateTime NextMonth => CurrentMonth.AddMonths(1);
 
     private Tasks[]? Events { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         var today = DateTime.Today;
-        CurrentMonth = new DateOnly(today.Year, today.Month, 1);
+        CurrentMonth = new DateTime(today.Year, today.Month, 1);
 
         await Search();
     }
@@ -65,8 +65,8 @@
 
         var request = new GetLaboratoryEventsRequest
         {
-            MinDate = CurrentMonth,
-            MaxDate = CurrentMonth.AddMonths(1).AddDays(-1)
+            MaxStart = NextMonth,
+            MinEnd = CurrentMonth
         };
 
         var result = await ApiClient.SendAsync(request);
@@ -84,6 +84,18 @@
                 })
                 .ToArray();
         }
+    }
+
+    private async Task GoToNextMonth()
+    {
+        CurrentMonth = NextMonth;
+        await Search();
+    }
+
+    private async Task GoToLastMonth()
+    {
+        CurrentMonth = LastMonth;
+        await Search();
     }
 
 }

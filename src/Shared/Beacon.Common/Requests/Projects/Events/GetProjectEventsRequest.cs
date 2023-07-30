@@ -6,6 +6,8 @@ namespace Beacon.Common.Requests.Projects.Events;
 public sealed class GetProjectEventsRequest : BeaconRequest<GetProjectEventsRequest, ProjectEventDto[]>
 {
     public Guid ProjectId { get; set; }
-    public DateOnly? MinDate { get; set; }
-    public DateOnly? MaxDate { get; set; }
+    public DateTime? MinStart { get; set; }
+    public DateTime? MaxStart { get; set; }
+    public DateTime? MinEnd { get; set; }
+    public DateTime? MaxEnd { get; set; }
 }

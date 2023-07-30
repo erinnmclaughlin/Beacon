@@ -38,14 +38,29 @@ internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLabo
     {
         var expressions = new List<Expression<Func<ProjectEvent, bool>>>();
 
-        if (request.MinDate?.ToDateTime(TimeOnly.MinValue) is { } minDate)
+        if (request.ProjectIds is { Count: > 0 } projectIds)
         {
-            expressions.Add(x => x.ScheduledEnd >= minDate);
+            expressions.Add(x => projectIds.Contains(x.ProjectId));
         }
 
-        if (request.MaxDate?.ToDateTime(TimeOnly.MinValue) is { } maxDate)
+        if (request.MinStart is { } minStart)
         {
-            expressions.Add(x => x.ScheduledStart <= maxDate);
+            expressions.Add(x => x.ScheduledStart >= minStart);
+        }
+
+        if (request.MaxStart is { } maxStart)
+        {
+            expressions.Add(x => x.ScheduledStart <= maxStart);
+        }
+
+        if (request.MinEnd is { } minEnd)
+        {
+            expressions.Add(x => x.ScheduledEnd >= minEnd);
+        }
+
+        if (request.MaxEnd is { } maxEnd)
+        {
+            expressions.Add(x => x.ScheduledEnd <= maxEnd);
         }
 
         return expressions.GetFilter();
