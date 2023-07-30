@@ -6,10 +6,10 @@
             <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
                 <Authorized>
                     <button class="btn btn-link w-100 p-0 text-decoration-none" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                        <div class="d-flex justify-content-between align-items-end">
+                        <div class="d-flex justify-content-between align-items-center">
                             <div class="me-auto" style="font-size: 0.9rem">Lead Analyst</div>
                             <div class="icon">
-                                <i class="fa-regular fa-gear"></i>
+                                <i class="fa-light fa-gear fa-sm"></i>
                             </div>
                         </div>
                     </button>
@@ -22,49 +22,53 @@
             </AuthorizeLabView>
 
             <ul class="dropdown-menu w-100 pt-0" style="font-size: 0.9rem;">
-                <MembershipContext>
-                    @if (context.IsLoading())
+                @if (ErrorOrMembers is not { } errorOrMembers)
+                {
+                    <li>
+                        <div class="dropdown-item">Loading...</div>
+                    </li>
+                }
+                else
+                {
+                    <li class="pt-1 mb-2 bg-light border-bottom" style="border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem;">
+                        <h6 class="dropdown-header">Suggestions</h6>
+                    </li>
+                    @if (errorOrMembers.IsError)
                     {
                         <li>
-                            <div class="dropdown-item">Loading...</div>
+                            <div class="text-danger">There was an error loading lab members.</div>
+                        </li>
+                    }
+                    else if (errorOrMembers.Value is not { Length: > 0 } members)
+                    {
+                        <li>
+                            <div>No suggestions.</div>
                         </li>
                     }
                     else
                     {
-                        <li class="pt-1 mb-2 bg-light border-bottom" style="border-top-left-radius: 0.25rem; border-top-right-radius: 0.25rem;">
-                            <h6 class="dropdown-header">Suggestions</h6>
-                        </li>
-                        @if (context.HasErrors())
+                        foreach (var member in members)
                         {
                             <li>
-                                <div class="text-danger">There was an error loading lab members.</div>
+                                <button class="dropdown-item d-flex align-items-center" type="button" disabled="@IsBusy" @onclick="() => UpdateLeadAnalyst(member)">
+                                    <span class="icon d-flex m-0" style="width: 0.75rem;">
+                                        @if (Project.LeadAnalyst?.Id == member.Id)
+                                        {
+                                            <i class="fa-regular fa-check fa-xs"></i>
+                                        }
+                                    </span>
+                                    <span class="ms-1">@member.DisplayName</span>
+                                </button>
                             </li>
                         }
-                        else
-                        {
-                            foreach (var member in context.Members.Where(m => m.MembershipType >= LaboratoryMembershipType.Analyst))
-                            {
-                                <li>
-                                    <button class="dropdown-item d-flex align-items-center" type="button" disabled="@IsBusy" @onclick="() => UpdateLeadAnalyst(member)">
-                                        <span class="icon d-flex m-0" style="width: 0.75rem;">
-                                            @if (Project.LeadAnalyst?.Id == member.Id)
-                                            {
-                                                <i class="fa-regular fa-check fa-xs"></i>
-                                            }
-                                        </span>
-                                        <span class="ms-1">@member.DisplayName</span>
-                                    </button>
-                                </li>
-                            }
-                        }
                     }
-                </MembershipContext>
+                }
             </ul>
         </div>
-        <div style="font-size:0.8rem;">
+        <div style="font-size:0.8rem; line-height: 1.15; margin-bottom: 0.25rem">
             @if (Project.LeadAnalyst is not null)
             {
-                <span class="fw-medium">@Project.LeadAnalyst.DisplayName</span>
+                <span>@Project.LeadAnalyst.DisplayName</span>
             }
             else
             {

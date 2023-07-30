@@ -1,0 +1,17 @@
+.badge {
+    padding: 0.25em 0.5em;
+    font-weight: 400;
+    vertical-align: middle;
+    font-size: 0.7rem;
+    height: fit-content;
+}
+
+    .badge.fs-7 {
+        font-size: 0.85rem;
+        padding: 0.25em 0.55em;
+    }
+
+    .badge.is-primary {
+        background-color: #3b82f6;
+        color: white;
+    }

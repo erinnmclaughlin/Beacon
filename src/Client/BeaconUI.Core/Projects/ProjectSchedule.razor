@@ -1,0 +1,165 @@
+﻿@using Beacon.Common.Requests.Projects.Events
+
+<div style="max-width: 900px">
+
+    <div class="mb-3">
+        <div class="d-flex align-items-center">
+            <h5 class="display-6 fs-4 mb-0">
+                Project Schedule
+            </h5>
+            <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button">
+                <span class="icon me-0"><i class="fa-regular fa-calendar-circle-plus"></i></span>
+            </CreateProjectEventButton>
+        </div>
+
+        @if (CompletedEventCount > 0 && !ShowPastEvents)
+        {
+            <button class="btn btn-link btn-sm p-0 link-secondary" @onclick="() => ShowPastEvents = true">
+                Show @CompletedEventCount completed event@(CompletedEventCount == 1 ? "" : "s")
+            </button>
+        }
+    </div>
+
+    @if (ErrorOrEvents is not { } errorOrEvents)
+    {
+        <p>Loading...</p>
+    }
+    else if (errorOrEvents.IsError)
+    {
+        <p class="text-danger">There was an error loading project events.</p>
+    }
+    else if (errorOrEvents.Value is not { Length: > 0 } events)
+    {
+        <p>There are not events scheduled for this project!</p>
+    }
+    else
+    {
+        <Timeline TimelineItems="@GetTimelineEvents(events)">
+            <div style="margin-bottom:1.5rem;">
+                <p class="fw-semibold text-muted mb-2">
+                    <span>@context.Timestamp.ToString("dd-MMM-yyyy")</span> 
+                    @if (TimeOnly.FromDateTime(context.Timestamp) != TimeOnly.MinValue)
+                    {
+                        <small class="text-black-50 ms-1" style="font-size: 0.8rem;">@context.Timestamp.ToString("h:mm tt")</small>
+                    }
+                </p>
+                <div class="card">
+                    <div class="card-body position-relative" style="padding: 0.75rem 1rem">
+                        <button type="button" class="btn btn-sm position-absolute top-0 end-0 my-1 me-2 link-secondary">
+                            <span class="icon">
+                                <i class="fa-regular fa-pencil"></i>
+                            </span>
+                        </button>
+                        <h6 class="card-title d-flex align-items-center" style="font-size:1.075rem; margin-bottom: 0.675rem;">
+                            <span class="me-1">@context.Value.Title</span>
+                            @if (context.Value.IsOngoingDuring(DateTime.Today))
+                            {
+                                <span class="d-flex">
+                                    <Badge Class="is-primary">Ongoing</Badge>
+                                </span>
+                            }
+                        </h6>
+                        <h6 class="card-subtitle mb-2 text-black-50 small">
+                            @if (context.Value.IsCompletedOnOrBefore(DateTime.Now))
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+                                <span>
+                                    Completed <Duration TimeSpan="@(DateTime.Now - context.Value.ScheduledEnd)" /> ago
+                                </span>
+                            }
+                            else if (context.Value.IsOngoingDuring(DateTime.Now))
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-clock"></i>
+                                </span>
+                                <span>
+                                    Ends in <Duration TimeSpan="@(context.Value.ScheduledEnd - DateTime.Now)" />
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+                                <span>
+                                    Starts in <Duration TimeSpan="@(context.Value.ScheduledStart - DateTime.Now)" />
+                                </span>
+                            }
+                        </h6>
+                        @if (string.IsNullOrWhiteSpace(context.Value.Description))
+                        {
+                            <p class="card-text text-black-50 fst-italic" style="font-size: 0.95rem">
+                                No description provided.
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="card-text text-muted" style="font-size: 0.95rem">
+                                @context.Value.Description
+                            </p>
+                        }
+                        <div class="d-flex align-items-center">
+                            @foreach (var instrument in context.Value.AssociatedInstruments)
+                            {
+                                <div class="dropdown d-flex">
+                                    <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">
+                                        <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
+                                            <span class="icon me-0">
+                                                <i class="fa-light fa-xs fa-microscope"></i>
+                                            </span>
+                                            <span>@instrument.SerialNumber</span>
+                                        </Badge>
+                                    </button>
+                                    <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                        <div class="list-group" style="white-space: nowrap;">
+                                            <button class="list-group-item list-group-item-action" type="button" @onclick="() => Unassociate(context.Value, instrument)">
+                                                <span class="icon position-relative">
+                                                    <i class="fa-light fa-microscope"></i>
+                                                    <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill text-danger">
+                                                        <i class="fa-solid fa-circle-xmark fa-sm me-1"></i>
+                                                    </span>
+                                                </span>
+                                                <span>Remove instrument @instrument.SerialNumber</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                            @if (GetSuggestedInstruments(context.Value) is { IsError: false, Value: { Length: > 0 } } getInstrumentsResult)
+                            {
+                                <div class="dropdown d-flex">
+                                    <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">
+                                        <Badge Class="bg-primary-subtle text-dark fs-7">
+                                            <span class="icon me-0">
+                                                <i class="fa-light fa-xs fa-plus"></i>
+                                            </span>
+                                        </Badge>
+                                    </button>
+                                    <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                        <div class="list-group" style="white-space: nowrap;">
+                                            @foreach (var instrument in getInstrumentsResult.Value)
+                                            {
+                                                <button class="list-group-item list-group-item-action" type="button" @onclick="() => Associate(context.Value, instrument)">
+                                                    <span class="icon position-relative">
+                                                        <i class="fa-light fa-microscope"></i>
+                                                        <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill text-primary">
+                                                            <i class="fa-solid fa-circle-plus fa-sm me-1"></i>
+                                                        </span>
+                                                    </span>
+                                                    <span>Add instrument @instrument.SerialNumber</span>
+                                                </button>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Timeline>
+    }
+
+</div>

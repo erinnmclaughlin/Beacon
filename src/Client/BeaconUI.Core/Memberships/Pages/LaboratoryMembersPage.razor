@@ -7,62 +7,60 @@
     <InviteMemberButton class="btn btn-primary" />
 </LaboratoryPageHeader>
 
-<div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 h-100">
-        @if (Result is not { } result)
-        {
-            <p>Loading...</p>
-        }
-        else if (result.IsError)
-        {
-            <p class="text-danger">There was an error loading laboratory members.</p>
-        }
-        else
-        {
-            <div class="table-responsive h-100">
-                <table class="table align-middle">
-                    <thead>
+<PageContainer>
+    @if (Result is not { } result)
+    {
+        <p>Loading...</p>
+    }
+    else if (result.IsError)
+    {
+        <p class="text-danger">There was an error loading laboratory members.</p>
+    }
+    else
+    {
+        <div class="table-responsive h-100">
+            <table class="table align-middle">
+                <thead>
+                    <tr>
+                        <th>Display Name</th>
+                        <th>Email Address</th>
+                        <th>Role</th>
+                        @if (CanManagePermissions())
+                        {
+                            <th style="width: 0%;"></th>
+                        }
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var member in result.Value)
+                    {
                         <tr>
-                            <th>Display Name</th>
-                            <th>Email Address</th>
-                            <th>Role</th>
+                            <td>@member.DisplayName</td>
+                            <td>
+                                <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
+                            </td>
+                            <td>@member.MembershipType</td>
                             @if (CanManagePermissions())
                             {
-                                <th style="width: 0%;"></th>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="icon">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <UpdateMembershipTypeButton Member="member" MemberChanged="HandleMemberChanged" class="dropdown-item" />
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
                             }
                         </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var member in result.Value)
-                        {
-                            <tr>
-                                <td>@member.DisplayName</td>
-                                <td>
-                                    <a href="mailto:@member.EmailAddress">@member.EmailAddress</a>
-                                </td>
-                                <td>@member.MembershipType</td>
-                                @if (CanManagePermissions())
-                                {
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="icon">
-                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                                </span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <UpdateMembershipTypeButton Member="member" MemberChanged="HandleMemberChanged" class="dropdown-item" />
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </td>
-                                }
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
-</div>
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</PageContainer>

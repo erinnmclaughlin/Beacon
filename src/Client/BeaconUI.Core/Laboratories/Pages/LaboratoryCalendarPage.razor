@@ -1,0 +1,101 @@
+﻿@using BlazorCalendar
+@using BlazorCalendar.Models;
+@page "/l/calendar"
+@attribute [Authorize]
+@layout LaboratoryLayout
+
+<LaboratoryPageHeader>
+    <h4 class="mb-0">Laboratory Calendar</h4>
+</LaboratoryPageHeader>
+
+<PageContainer>
+    <div style="max-width: 1200px;">
+        <div class="d-flex justify-content-space-between" style="margin-top: -0.5rem; margin-bottom: 0.5rem;">
+            <button class="btn btn-sm" type="button" @onclick="GoToLastMonth">
+                <span class="icon">
+                    <i class="fa-regular fa-angle-left fa-sm"></i>
+                </span>
+                <span>@LastMonth.ToString("MMMM yyyy")</span>
+            </button>
+
+            <h1 class="display-6 mx-auto fs-4 mb-0">@CurrentMonth.ToString("MMMM yyyy")</h1>
+
+            <button class="btn btn-sm" type="button" @onclick="GoToNextMonth">
+                <span>@NextMonth.ToString("MMMM yyyy")</span>
+                <span class="icon">
+                    <i class="fa-regular fa-angle-right fa-sm"></i>
+                </span>
+            </button>
+        </div>
+
+        <div style="border: 1px solid hsl(0, 0%, 90%);">
+            <CalendarContainer FirstDate="CurrentMonth" DisplayedView="DisplayedView.Monthly" TasksList="Events">
+                <MonthlyView PriorityDisplay="@PriorityLabel.Caption" />
+            </CalendarContainer>
+        </div>
+    </div>
+</PageContainer>
+
+@code {
+
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [Inject]
+    private NavigationManager NavigationManager { get; set; } = default!;
+
+    private DateTime CurrentMonth { get; set; }
+    private DateTime LastMonth => CurrentMonth.AddMonths(-1);
+    private DateTime NextMonth => CurrentMonth.AddMonths(1);
+
+    private Tasks[]? Events { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        var today = DateTime.Today;
+        CurrentMonth = new DateTime(today.Year, today.Month, 1);
+
+        await Search();
+    }
+
+    private async Task Search()
+    {
+        Events = null;
+        StateHasChanged();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MaxStart = NextMonth,
+            MinEnd = CurrentMonth
+        };
+
+        var result = await ApiClient.SendAsync(request);
+
+        if (!result.IsError)
+        {
+            Events = result.Value
+                .Select(e => new Tasks
+                {
+                    Caption = e.Title,
+                    Code = e.ProjectCode.ToString(),
+                    DateStart = e.ScheduledStart.DateTime,
+                    DateEnd = e.ScheduledEnd.DateTime,
+                    Color = "#cbd5e1;line-height:1" // lil bit of css injection to get this third party lib to do what I want
+                })
+                .ToArray();
+        }
+    }
+
+    private async Task GoToNextMonth()
+    {
+        CurrentMonth = NextMonth;
+        await Search();
+    }
+
+    private async Task GoToLastMonth()
+    {
+        CurrentMonth = LastMonth;
+        await Search();
+    }
+
+}

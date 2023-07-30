@@ -1,8 +1,3 @@
-﻿<AuthorizeLabView>
-    <button type="button" class="btn btn-primary btn-sm" disabled="@(context.CurrentLab.MembershipType < LaboratoryMembershipType.Analyst)" @onclick="Click">
-        <span class="icon">
-            <i class="fa-solid fa-plus"></i>
-        </span>
-        <span>Add Event</span>
-    </button>
-</AuthorizeLabView>
+﻿<button type="button" @attributes="@Attributes" @onclick="Click">
+    @ChildContent
+</button>

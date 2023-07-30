@@ -13,6 +13,10 @@ a, .btn-link {
     color: #0071c1;
 }
 
+.nav-tabs .nav-link.active {
+    border-bottom: 1px solid #f8fafc;
+}
+
 .btn-primary {
     color: #fff;
     background-color: #1b6ec2;

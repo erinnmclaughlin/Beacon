@@ -1,0 +1,27 @@
+﻿@if (TimeSpan.Days > 0)
+{
+    <text>@GetDurationDescription(TimeSpan.Days, "day")</text>
+}
+else if (TimeSpan.Hours > 0)
+{
+    <text>@GetDurationDescription(TimeSpan.Hours, "hour")</text>
+}
+else if (TimeSpan.Minutes > 0)
+{
+    <text>@GetDurationDescription(TimeSpan.Minutes, "minute")</text>
+}
+else
+{
+    <text>@GetDurationDescription(TimeSpan.Seconds, "second")</text>
+}
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required TimeSpan TimeSpan { get; set; }
+
+    private static string GetDurationDescription(int amount, string text)
+    {
+        return $"{amount} {(amount == 1 ? text : $"{text}s")}";
+    }
+}

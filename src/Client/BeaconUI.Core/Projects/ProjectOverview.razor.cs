@@ -1,5 +1,5 @@
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Projects.Events;
+using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Common.Http;
 using ErrorOr;
 using Microsoft.AspNetCore.Components;
@@ -17,23 +17,20 @@ public partial class ProjectOverview
     [Parameter]
     public required EventCallback<ProjectDto> ProjectChanged { get; set; }
 
-    private ErrorOr<ProjectEventDto[]>? Events { get; set; }
+    private ErrorOr<LaboratoryEventDto[]>? Events { get; set; }
 
-    private static DateOnly Today => DateOnly.FromDateTime(DateTime.Today);
-    private static DateOnly ThisMonth => new(Today.Year, Today.Month, 1);
-
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnParametersSetAsync()
     {
         await LoadEvents();
     }
 
     private async Task LoadEvents()
     {
-        Events = await ApiClient.SendAsync(new GetProjectEventsRequest
+        Events = await ApiClient.SendAsync(new GetLaboratoryEventsRequest
         {
-            MinDate = Today,
-            MaxDate = ThisMonth.AddMonths(1),
-            ProjectId = Project.Id
+            MinEnd = DateTime.UtcNow,
+            MaxStart = DateTime.UtcNow.AddDays(7),
+            ProjectIds = new() { Project.Id }
         });
     }
 }

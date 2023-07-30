@@ -54,6 +54,20 @@ public class BeaconDbContext : DbContext
             builder.Property(x => x.InstrumentType).HasMaxLength(100);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+
+            builder
+                .HasMany(x => x.AssociatedEvents)
+                .WithMany(x => x.AssociatedInstruments)
+                .UsingEntity<LaboratoryInstrumentUsage>(
+                    configureLeft: l => l.HasOne(e => e.Instrument).WithMany().HasForeignKey(e => e.InstrumentId),
+                    configureRight: r => r.HasOne(e => e.ProjectEvent).WithMany().HasForeignKey(e => e.ProjectEventId)
+                );
+        });
+
+        modelBuilder.Entity<LaboratoryInstrumentUsage>(builder =>
+        {
+            builder.HasKey(x => new { x.InstrumentId, x.ProjectEventId });
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
         modelBuilder.Entity<Membership>(builder =>

@@ -18,8 +18,8 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         {
             Title = "My Cool Event",
             ProjectId = ProjectId,
-            ScheduledStart = DateTimeOffset.Now,
-            ScheduledEnd = DateTimeOffset.Now.AddMonths(1)
+            ScheduledStart = DateTime.Now,
+            ScheduledEnd = DateTime.Now.AddMonths(1)
         };
 
         var response = await SendAsync(validRequest);
@@ -44,8 +44,8 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         {
             Title = "My Cool Event",
             ProjectId = ProjectId,
-            ScheduledStart = DateTimeOffset.Now,
-            ScheduledEnd = DateTimeOffset.Now.AddMonths(1)
+            ScheduledStart = DateTime.Now,
+            ScheduledEnd = DateTime.Now.AddMonths(1)
         };
 
         var response = await SendAsync(validRequest);
@@ -63,8 +63,8 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         {
             Title = "My Cool Event",
             ProjectId = ProjectId,
-            ScheduledEnd = DateTimeOffset.Now,
-            ScheduledStart = DateTimeOffset.Now.AddMonths(1) // start date is after end date
+            ScheduledEnd = DateTime.Now,
+            ScheduledStart = DateTime.Now.AddMonths(1) // start date is after end date
         };
 
         var response = await SendAsync(invalidRequest);

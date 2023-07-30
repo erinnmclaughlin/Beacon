@@ -1,10 +1,10 @@
-﻿<div class="modal fade show d-block" tabindex="-1" role="dialog">
+﻿<div class="modal modal-fullscreen-sm-down fade show d-block @BlazoredModal.Options.SizeCustomClass" tabindex="-1" role="dialog">
     <div class="modal-backdrop fade show" @onclick="Cancel"></div>
-    <div class="modal-dialog" style="z-index: 1050">
+    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="z-index: 1050">
         <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title">@BlazoredModal.Title</h5>
-                <button type="button" class="btn-close" @onclick="Cancel"></button>
+            <div class="modal-header py-2">
+                <h5 class="modal-title fw-normal mb-0">@BlazoredModal.Title</h5>
+                <button type="button" class="btn-close btn-sm" @onclick="Cancel"></button>
             </div>
             @ChildContent
         </div>

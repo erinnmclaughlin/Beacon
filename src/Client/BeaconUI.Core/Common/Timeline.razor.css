@@ -1,0 +1,22 @@
+.timeline {
+    border-left: 1px solid hsl(0, 0%, 90%);
+    position: relative;
+    list-style: none;
+    padding-left: 16px;
+}
+
+.timeline-item {
+    position: relative;
+}
+
+    .timeline-item:after {
+        background-color: hsl(0, 0%, 90%);
+        left: -20px;
+        height: 8px;
+        width: 8px;
+        border-radius: 50%;
+        content: "";
+        position: absolute;
+        top: 5px;
+        display: block;
+    }

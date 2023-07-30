@@ -7,108 +7,105 @@
     <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-primary" />
 </LaboratoryPageHeader>
 
-<div class="content flex-grow-1" style="background-color: #f8fafc">
-    <div class="px-4 h-100">
-        @if (ProjectsOrError is not { } projectsOrError)
-        {
-            <p>Loading...</p>
-        }
-        else if (projectsOrError.IsError)
-        {
-            <p class="text-danger">There was an error loading lab projects. Please try again later.</p>
-        }
-        else
-        {
-            <div class="table-responsive h-100">
-                <table class="table table-hover align-middle">
-                    <thead>
+<PageContainer>
+    @if (ProjectsOrError is not { } projectsOrError)
+    {
+        <p>Loading...</p>
+    }
+    else if (projectsOrError.IsError)
+    {
+        <p class="text-danger">There was an error loading lab projects. Please try again later.</p>
+    }
+    else
+    {
+        <div class="table-responsive h-100">
+            <table class="table table-hover align-middle">
+                <thead>
+                    <tr>
+                        <th>Project Code</th>
+                        <th>Project Status</th>
+                        <th>Customer Name</th>
+                        <th>Lead Analyst</th>
+                        <th style="width: 0%;"></th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @if (projectsOrError.Value.Length == 0)
+                    {
                         <tr>
-                            <th>Project Code</th>
-                            <th>Project Status</th>
-                            <th>Customer Name</th>
-                            <th>Lead Analyst</th>
-                            <th style="width: 0%;"></th>
+                            <td colspan="100">No projects found!</td>
                         </tr>
-                    </thead>
-                    <tbody>
-                        @if (projectsOrError.Value.Length == 0)
+                    }
+                    else
+                    {
+                        foreach (var project in projectsOrError.Value)
                         {
                             <tr>
-                                <td colspan="100">No projects found!</td>
+                                <td>
+                                    <a href="l/projects/@project.ProjectCode">
+                                        @project.ProjectCode
+                                    </a>
+                                </td>
+                                <td>
+                                    <ProjectStatusTag Status="project.ProjectStatus" />
+                                </td>
+                                <td>
+                                    @project.CustomerName
+                                </td>
+                                <td>
+                                    @if (project.LeadAnalyst is not { } analyst)
+                                    {
+                                        <span class="text-muted">Unassigned</span>
+                                    }
+                                    else
+                                    {
+                                        <text>@analyst.DisplayName</text>
+                                    }
+                                </td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            <span class="icon">
+                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                            </span>
+                                        </button>
+                                        <ul class="dropdown-menu">
+                                            <li>
+                                                <a class="dropdown-item" href="l/projects/@project.ProjectCode">
+                                                    <span class="icon text-primary">
+                                                        <i class="fa-regular fa-eye"></i>
+                                                    </span>
+                                                    <span>View Details</span>
+                                                </a>
+                                            </li>
+                                            @if (project.ProjectStatus is ProjectStatus.Active)
+                                            {
+                                                <li><hr class="dropdown-divider"></li>
+                                                <li>
+                                                    <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
+                                                        <span class="icon text-danger">
+                                                            <i class="fa-regular fa-ban"></i>
+                                                        </span>
+                                                        <span>Cancel project</span>
+                                                    </button>
+                                                </li>
+                                                <li>
+                                                    <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
+                                                        <span class="icon text-success">
+                                                            <i class="fa-regular fa-check"></i>
+                                                        </span>
+                                                        <span>Complete project</span>
+                                                    </button>
+                                                </li>
+                                            }
+                                        </ul>
+                                    </div>
+                                </td>
                             </tr>
                         }
-                        else
-                        {
-                            foreach (var project in projectsOrError.Value)
-                            {
-                                <tr>
-                                    <td>
-                                        <a href="l/projects/@project.ProjectCode">
-                                            @project.ProjectCode
-                                        </a>
-                                    </td>
-                                    <td>
-                                        <ProjectStatusTag Status="project.ProjectStatus" />
-                                    </td>
-                                    <td>
-                                        @project.CustomerName
-                                    </td>
-                                    <td>
-                                        @if (project.LeadAnalyst is not { } analyst)
-                                        {
-                                            <span class="text-muted">Unassigned</span>
-                                        }
-                                        else
-                                        {
-                                            <text>@analyst.DisplayName</text>
-                                        }
-                                    </td>
-                                    <td>
-                                        <div class="dropdown">
-                                            <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                                <span class="icon">
-                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
-                                                </span>
-                                            </button>
-                                            <ul class="dropdown-menu">
-                                                <li>
-                                                    <a class="dropdown-item" href="l/projects/@project.ProjectCode">
-                                                        <span class="icon text-primary">
-                                                            <i class="fa-regular fa-eye"></i>
-                                                        </span>
-                                                        <span>View Details</span>
-                                                    </a>
-                                                </li>
-                                                @if (project.ProjectStatus is ProjectStatus.Active)
-                                                {
-                                                    <li><hr class="dropdown-divider"></li>
-                                                    <li>
-                                                        <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
-                                                            <span class="icon text-danger">
-                                                                <i class="fa-regular fa-ban"></i>
-                                                            </span>
-                                                            <span>Cancel project</span>
-                                                        </button>
-                                                    </li>
-                                                    <li>
-                                                        <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
-                                                            <span class="icon text-success">
-                                                                <i class="fa-regular fa-check"></i>
-                                                            </span>
-                                                            <span>Complete project</span>
-                                                        </button>
-                                                    </li>
-                                                }
-                                            </ul>
-                                        </div>
-                                    </td>
-                                </tr>
-                            }
-                        }
-                    </tbody>
-                </table>
-            </div>
-        }
-    </div>
-</div>
-
+                    }
+                </tbody>
+            </table>
+        </div>
+    }
+</PageContainer>

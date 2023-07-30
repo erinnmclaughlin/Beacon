@@ -1,0 +1,19 @@
+﻿@typeparam T
+
+<ul class="timeline">
+    @foreach (var item in TimelineItems.OrderBy(i => i.Timestamp))
+    {
+        <li class="timeline-item">
+            @ChildContent(item)
+        </li>
+    }
+</ul>
+
+@code {
+
+    [Parameter, EditorRequired]
+    public required IEnumerable<TimelineItem<T>> TimelineItems { get; set; }
+
+    [Parameter]
+    public required RenderFragment<TimelineItem<T>> ChildContent { get; set; }
+}
