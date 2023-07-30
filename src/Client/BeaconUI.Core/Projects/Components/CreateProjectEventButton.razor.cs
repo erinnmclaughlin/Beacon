@@ -1,5 +1,4 @@
 ﻿using BeaconUI.Core.Projects.Modals;
-using Blazored.Modal;
 using Blazored.Modal.Services;
 using Microsoft.AspNetCore.Components;
 
@@ -24,16 +23,9 @@ public partial class CreateProjectEventButton
 
     private async Task Click()
     {
-        var modalParameters = new ModalParameters()
-            .Add(nameof(CreateProjectEventModal.ProjectId), ProjectId);
-
-        var result = await ModalService
-            .Show<CreateProjectEventModal>("Schedule Event", modalParameters)
-            .Result;
+        var result = await CreateProjectEventModal.Show(ModalService, ProjectId).Result;
 
         if (!result.Cancelled)
-        {
             await OnEventCreated.InvokeAsync();
-        }
     }
 }

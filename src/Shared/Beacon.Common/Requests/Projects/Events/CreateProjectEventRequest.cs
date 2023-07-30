@@ -7,8 +7,8 @@ public sealed class CreateProjectEventRequest : BeaconRequest<CreateProjectEvent
 {
     public string Title { get; set; } = string.Empty;
     public string Description { get; set;} = string.Empty;
-    public DateTimeOffset ScheduledStart { get; set; }
-    public DateTimeOffset ScheduledEnd { get; set; }
+    public DateTime ScheduledStart { get; set; }
+    public DateTime ScheduledEnd { get; set; }
 
     public Guid ProjectId { get; set; }
     public List<Guid> InstrumentIds { get; set; } = new();

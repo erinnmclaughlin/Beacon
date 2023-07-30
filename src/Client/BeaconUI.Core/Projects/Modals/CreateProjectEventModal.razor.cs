@@ -12,6 +12,12 @@ namespace BeaconUI.Core.Projects.Modals;
 
 public partial class CreateProjectEventModal
 {
+    public static IModalReference Show(IModalService modalService, Guid projectId)
+    {
+        var parameters = new ModalParameters().Add(nameof(ProjectId), projectId);
+        return modalService.Show<CreateProjectEventModal>("Schedule an Event", parameters);
+    }
+
     [Inject]
     private IApiClient ApiClient { get; set; } = default!;
 
@@ -48,5 +54,29 @@ public partial class CreateProjectEventModal
             Request.InstrumentIds.Remove(instrument.Id);
         else
             Request.InstrumentIds.Add(instrument.Id);
+    }
+
+    private void UpdateStartDate(DateTime dateTime)
+    {
+        var dateOnly = DateOnly.FromDateTime(dateTime);
+        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledStart));
+    }
+
+    private void UpdateStartTime(DateTime dateTime)
+    {
+        var dateOnly = DateOnly.FromDateTime(Request.ScheduledStart);
+        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
+    }
+
+    private void UpdateEndDate(DateTime dateTime)
+    {
+        var dateOnly = DateOnly.FromDateTime(dateTime);
+        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledEnd));
+    }
+
+    private void UpdateEndTime(DateTime dateTime)
+    {
+        var dateOnly = DateOnly.FromDateTime(Request.ScheduledEnd);
+        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
     }
 }

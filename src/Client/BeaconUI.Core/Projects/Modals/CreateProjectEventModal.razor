@@ -2,62 +2,100 @@
     <Modal>
         <div class="modal-body">
             <div class="field">
-                <label class="form-label" for="title">Title</label>
+                <label for="title">Event name</label>
                 <InputText @bind-Value="Request.Title" class="form-control" id="title" placeholder="e.g., My Awesome Event" />
                 <ValidationMessage For="() => Request.Title" />
             </div>
-            <div class="row">
-                <div class="col">
-                    <div class="field">
-                        <label class="form-label" for="startDate">Starts On</label>
-                        <InputDate @bind-Value="Request.ScheduledStart" class="form-control" id="startDate" />
-                        <ValidationMessage For="() => Request.ScheduledStart" />
-                    </div>
-                </div>
-                <div class="col">
-                    <div class="field">
-                        <label class="form-label" for="endDate">Ends On</label>
-                        <InputDate @bind-Value="Request.ScheduledEnd" class="form-control" id="endDate" />
-                        <ValidationMessage For="() => Request.ScheduledEnd" />
-                    </div>
-                </div>
-            </div>
             <div class="field">
-                <label class="form-label" for="instruments">Related Instruments</label>
-                <ul class="list-group">
-                    @if (ErrorOrInstruments is not { } errorOrInstruments)
-                    {
-                        <li class="list-group-item">Loading...</li>
-                    }
-                    else if (errorOrInstruments.IsError)
-                    {
-                        <li class="list-group-item text-danger">There was an error loading laboratory instruments.</li>
-                    }
-                    else if (errorOrInstruments.Value is not { Length: > 0 } instruments)
-                    {
-                        <li class="list-group-item text-grey">There are no instruments associated with the current laboratory.</li>
-                    }
-                    else
-                    {
-                        foreach (var instrument in instruments)
-                        {
-                            <li class="list-group-item">
-                                <input class="form-check-input me-1" style="cursor: pointer;" type="checkbox" value="@(Request.InstrumentIds.Contains(instrument.Id))" id="instrument-@instrument.Id" @onchange="() => DoSelectInstrument(instrument)">
-                                <label class="form-check-label stretched-link" for="instrument-@instrument.Id" style="cursor: pointer;">
-                                    <span class="fw-bold">@instrument.InstrumentType</span> (@instrument.SerialNumber)
-                                </label>
-                            </li>
-                        }
-                    }
-                </ul>
-            </div>
-            <div class="field">
-                <label class="form-label" for="description">Description</label>
+                <label for="description">Description</label>
                 <InputTextArea @bind-Value="Request.Description" class="form-control" id="description" placeholder="Event details..."></InputTextArea>
                 <ValidationMessage For="() => Request.Description" />
             </div>
+            <div class="field">
+                <label for="startDate">Starts on</label>
+                <div class="input-group">
+                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledStart" ValueChanged="(DateTime v) => UpdateStartDate(v)" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startDate" />
+                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledStart" ValueChanged="(DateTime v) => UpdateStartTime(v)" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startTime" />
+                </div>
+                <ValidationMessage For="() => Request.ScheduledStart" />
+            </div>
+            <div class="field">
+                <label for="endDate">Ends on</label>
+                <div class="input-group">
+                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledEnd" ValueChanged="(DateTime v) => UpdateEndDate(v)" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endDate" />
+                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledEnd" ValueChanged="(DateTime v) => UpdateEndTime(v)" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endTime" />
+                </div>
+                <ValidationMessage For="() => Request.ScheduledEnd" />
+            </div>
+            <div class="field">
+                <label for="instruments">Reserve Instrument(s)</label>
+                <div class="d-flex align-items-center">
+                    @if (ErrorOrInstruments is { IsError: false, Value: { Length: > 0 } } getInstrumentsResult)
+                    {
+                        foreach (var instrumentId in Request.InstrumentIds)
+                        {
+                            var instrument = getInstrumentsResult.Value.Single(i => i.Id == instrumentId);
+
+                            <div class="dropdown d-flex">
+                                <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">
+                                    <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
+                                        <span class="icon me-0">
+                                            <i class="fa-light fa-xs fa-microscope"></i>
+                                        </span>
+                                        <span>@instrument.SerialNumber</span>
+                                    </Badge>
+                                </button>
+                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                    <div class="list-group" style="white-space: nowrap;">
+                                        <button class="list-group-item list-group-item-action" type="button" @onclick="() => Request.InstrumentIds.Remove(instrumentId)">
+                                            <span class="icon position-relative">
+                                                <i class="fa-light fa-microscope"></i>
+                                                <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill text-danger">
+                                                    <i class="fa-solid fa-circle-xmark fa-sm me-1"></i>
+                                                </span>
+                                            </span>
+                                            <span>Remove instrument @instrument.SerialNumber</span>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        }
+
+                        var instrumentOptions = getInstrumentsResult.Value.Where(i => !Request.InstrumentIds.Contains(i.Id));
+
+                        if (instrumentOptions.Any())
+                        {
+                            <div class="dropdown d-flex">
+                                <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">
+                                    <Badge Class="text-dark bg-primary-subtle fs-7">
+                                        <span class="icon me-0">
+                                            <i class="fa-light fa-xs fa-plus"></i>
+                                        </span>
+                                    </Badge>
+                                </button>
+                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                    <div class="list-group" style="white-space: nowrap;">
+                                        @foreach (var instrument in instrumentOptions)
+                                        {
+                                            <button class="list-group-item list-group-item-action" type="button" @onclick="() => Request.InstrumentIds.Add(instrument.Id)">
+                                                <span class="icon position-relative">
+                                                    <i class="fa-light fa-microscope"></i>
+                                                    <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill text-primary">
+                                                        <i class="fa-solid fa-circle-plus fa-sm me-1"></i>
+                                                    </span>
+                                                </span>
+                                                <span>Add instrument @instrument.SerialNumber</span>
+                                            </button>
+                                        }
+                                    </div>
+                                </div>
+                            </div>
+                        }
+                    }
+                </div>
+            </div>
         </div>
-        <footer class="modal-footer">
+        <footer class="modal-footer py-2">
             <SubmitButton>Create Event</SubmitButton>
             <ModalCancelButton />
         </footer>
