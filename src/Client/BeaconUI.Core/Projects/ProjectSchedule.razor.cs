@@ -19,15 +19,21 @@ public partial class ProjectSchedule
     private ErrorOr<ProjectEventDto[]>? ErrorOrEvents { get; set; }
     private ErrorOr<LaboratoryInstrumentDto[]>? ErrorOrInstruments { get; set; }
 
+    private bool ShowPastEvents { get; set; }
+
     protected override async Task OnInitializedAsync()
     {
         await LoadProjects();
         ErrorOrInstruments = await ApiClient.SendAsync(new GetLaboratoryInstrumentsRequest());
     }
 
-    private static IEnumerable<TimelineItem<ProjectEventDto>> GetTimelineEvents(ProjectEventDto[] events)
+    private int CompletedEventCount => ErrorOrEvents?.Value.Count(x => x.IsCompletedOn(DateTime.Now)) ?? 0;
+
+    private IEnumerable<TimelineItem<ProjectEventDto>> GetTimelineEvents(ProjectEventDto[] events)
     {
-        return events.Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+        return events
+            .Where(e => ShowPastEvents || !e.IsCompletedOn(DateTime.Now))
+            .Select(e => new TimelineItem<ProjectEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
     }
 
     private async Task LoadProjects()

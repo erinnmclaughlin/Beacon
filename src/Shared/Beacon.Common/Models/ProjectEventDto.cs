@@ -11,8 +11,13 @@ public sealed record ProjectEventDto
 
     public TimeSpan GetDuration() => ScheduledEnd - ScheduledStart;
 
+    public bool IsCompletedOn(DateTime timestamp)
+    {
+        return ScheduledEnd <= timestamp;
+    }
+
     public bool IsOngoingOn(DateTime timestamp)
     { 
-        return ScheduledStart.DateTime <= timestamp && ScheduledEnd.DateTime > timestamp;
+        return ScheduledStart <= timestamp && ScheduledEnd > timestamp;
     }
 }

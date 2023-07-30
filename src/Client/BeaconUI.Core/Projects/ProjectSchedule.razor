@@ -2,13 +2,22 @@
 
 <div style="max-width: 900px">
 
-    <div class="d-flex align-items-center mb-3">
-        <h5 class="display-6 fs-4 mb-0">
-            Project Schedule
-        </h5>
-        <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button">
-            <span class="icon me-0"><i class="fa-regular fa-calendar-circle-plus"></i></span>
-        </CreateProjectEventButton>
+    <div class="mb-3">
+        <div class="d-flex align-items-center">
+            <h5 class="display-6 fs-4 mb-0">
+                Project Schedule
+            </h5>
+            <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button">
+                <span class="icon me-0"><i class="fa-regular fa-calendar-circle-plus"></i></span>
+            </CreateProjectEventButton>
+        </div>
+
+        @if (CompletedEventCount > 0 && !ShowPastEvents)
+        {
+            <button class="btn btn-link btn-sm p-0 link-secondary" @onclick="() => ShowPastEvents = true">
+                Show @CompletedEventCount completed event@(CompletedEventCount == 1 ? "" : "s")
+            </button>
+        }
     </div>
 
     @if (ErrorOrEvents is not { } errorOrEvents)
@@ -28,7 +37,11 @@
         <Timeline TimelineItems="@GetTimelineEvents(events)">
             <div style="margin-bottom:1.5rem;">
                 <p class="fw-semibold text-muted mb-2">
-                    @context.Timestamp.ToString("dd-MMM-yyyy")
+                    <span>@context.Timestamp.ToString("dd-MMM-yyyy")</span> 
+                    @if (TimeOnly.FromDateTime(context.Timestamp) != TimeOnly.MinValue)
+                    {
+                        <small class="text-black-50 ms-1" style="font-size: 0.8rem;">@context.Timestamp.ToString("h:mm tt")</small>
+                    }
                 </p>
                 <div class="card">
                     <div class="card-body position-relative" style="padding: 0.75rem 1rem">
@@ -47,23 +60,33 @@
                             }
                         </h6>
                         <h6 class="card-subtitle mb-2 text-black-50 small">
-                            <span class="icon">
-                                <i class="fa-regular fa-calendar"></i>
-                            </span>
-                            <span>
-                                Starts @context.Value.ScheduledStart.ToString("dd-MMM-yyyy")
-                            </span>
-                            <span class="mx-1 text-center d-inline-block"> &middot; </span>
-                            <span class="icon">
-                                <i class="fa-regular fa-calendar"></i>
-                            </span>
-                            <span>Ends @context.Value.ScheduledEnd.ToString("dd-MMM-yyyy")</span>
-                            <span class="mx-1 text-center d-inline-block"> &middot; </span> <span class="icon">
-                                <i class="fa-regular fa-clock"></i>
-                            </span>
-                            <span>
-                                <Duration TimeSpan="context.Value.GetDuration()" />
-                            </span>
+                            @if (context.Value.IsCompletedOn(DateTime.Now))
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+                                <span>
+                                    Completed <Duration TimeSpan="@(DateTime.Now - context.Value.ScheduledEnd)" /> ago
+                                </span>
+                            }
+                            else if (context.Value.IsOngoingOn(DateTime.Now))
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-clock"></i>
+                                </span>
+                                <span>
+                                    Ends in <Duration TimeSpan="@(context.Value.ScheduledEnd - DateTime.Now)" />
+                                </span>
+                            }
+                            else
+                            {
+                                <span class="icon">
+                                    <i class="fa-regular fa-calendar"></i>
+                                </span>
+                                <span>
+                                    Starts in <Duration TimeSpan="@(context.Value.ScheduledStart - DateTime.Now)" />
+                                </span>
+                            }
                         </h6>
                         @if (string.IsNullOrWhiteSpace(context.Value.Description))
                         {
