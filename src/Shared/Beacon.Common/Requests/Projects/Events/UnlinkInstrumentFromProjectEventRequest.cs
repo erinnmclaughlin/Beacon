@@ -1,18 +1,14 @@
 ﻿using FluentValidation;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Beacon.Common.Requests.Projects.Events;
 
-public sealed class UnassociateInstrumentFromProjectEventRequest : BeaconRequest<UnassociateInstrumentFromProjectEventRequest>
+[RequireMinimumMembership(Models.LaboratoryMembershipType.Analyst)]
+public sealed class UnlinkInstrumentFromProjectEventRequest : BeaconRequest<UnlinkInstrumentFromProjectEventRequest>
 {
     public Guid ProjectEventId { get; set; }
     public Guid InstrumentId { get; set; }
 
-    public sealed class Validator : AbstractValidator<UnassociateInstrumentFromProjectEventRequest>
+    public sealed class Validator : AbstractValidator<UnlinkInstrumentFromProjectEventRequest>
     {
         public Validator()
         {

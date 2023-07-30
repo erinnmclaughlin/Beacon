@@ -2,12 +2,13 @@
 
 namespace Beacon.Common.Requests.Projects.Events;
 
-public sealed class AssociateInstrumentWithProjectEventRequest : BeaconRequest<AssociateInstrumentWithProjectEventRequest>
+[RequireMinimumMembership(Models.LaboratoryMembershipType.Analyst)]
+public sealed class LinkInstrumentToProjectEventRequest : BeaconRequest<LinkInstrumentToProjectEventRequest>
 {
     public Guid ProjectEventId { get; set; }
     public Guid InstrumentId { get; set; }
 
-    public sealed class Validator : AbstractValidator<UnassociateInstrumentFromProjectEventRequest>
+    public sealed class Validator : AbstractValidator<LinkInstrumentToProjectEventRequest>
     {
         public Validator()
         {

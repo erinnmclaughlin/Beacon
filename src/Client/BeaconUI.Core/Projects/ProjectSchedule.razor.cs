@@ -53,7 +53,7 @@ public partial class ProjectSchedule
 
     private async Task Associate(LaboratoryEventDto e, LaboratoryInstrumentDto i)
     {
-        var request = new AssociateInstrumentWithProjectEventRequest
+        var request = new LinkInstrumentToProjectEventRequest
         {
             ProjectEventId = e.Id,
             InstrumentId = i.Id
@@ -77,7 +77,7 @@ public partial class ProjectSchedule
 
     private async Task Unassociate(LaboratoryEventDto e, LaboratoryInstrumentDto i)
     {
-        var request = new UnassociateInstrumentFromProjectEventRequest
+        var request = new UnlinkInstrumentFromProjectEventRequest
         {
             ProjectEventId = e.Id,
             InstrumentId = i.Id

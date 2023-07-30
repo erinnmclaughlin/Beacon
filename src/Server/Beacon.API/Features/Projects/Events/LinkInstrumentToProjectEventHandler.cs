@@ -6,16 +6,16 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects.Events;
 
-internal sealed class AssociateInstrumentWithProjectEventHandler : IBeaconRequestHandler<AssociateInstrumentWithProjectEventRequest>
+internal sealed class LinkInstrumentToProjectEventHandler : IBeaconRequestHandler<LinkInstrumentToProjectEventRequest>
 {
     private readonly BeaconDbContext _dbContext;
 
-    public AssociateInstrumentWithProjectEventHandler(BeaconDbContext dbContext)
+    public LinkInstrumentToProjectEventHandler(BeaconDbContext dbContext)
     {
         _dbContext = dbContext;
     }
 
-    public async Task<ErrorOr<Success>> Handle(AssociateInstrumentWithProjectEventRequest request, CancellationToken ct)
+    public async Task<ErrorOr<Success>> Handle(LinkInstrumentToProjectEventRequest request, CancellationToken ct)
     {
         var dbSet = _dbContext.Set<LaboratoryInstrumentUsage>();
 
