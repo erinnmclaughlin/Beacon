@@ -17,7 +17,14 @@ internal sealed class GetLaboratoryInstrumentsHandler : IBeaconRequestHandler<Ge
 
     public async Task<ErrorOr<LaboratoryInstrumentDto[]>> Handle(GetLaboratoryInstrumentsRequest request, CancellationToken ct)
     {
-        return await _dbContext.LaboratoryInstruments
+        var query = _dbContext.LaboratoryInstruments.AsQueryable();
+
+        if (request.IgnoredInstrumentIds is { Count: > 0 } ignoredIds)
+        {
+            query = query.Where(i => !ignoredIds.Contains(i.Id));
+        }
+
+        return await query
             .Select(i => new LaboratoryInstrumentDto
             {
                 Id = i.Id,
