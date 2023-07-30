@@ -58,6 +58,12 @@
                                 <i class="fa-regular fa-calendar"></i>
                             </span>
                             <span>Ends @context.Value.ScheduledEnd.ToString("dd-MMM-yyyy")</span>
+                            <span class="mx-1 text-center d-inline-block"> &middot; </span> <span class="icon">
+                                <i class="fa-regular fa-clock"></i>
+                            </span>
+                            <span>
+                                <Duration TimeSpan="context.Value.GetDuration()" />
+                            </span>
                         </h6>
                         @if (string.IsNullOrWhiteSpace(context.Value.Description))
                         {
