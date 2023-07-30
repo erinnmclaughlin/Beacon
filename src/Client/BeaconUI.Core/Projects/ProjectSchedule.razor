@@ -74,12 +74,29 @@
                         <div class="d-flex align-items-center">
                             @foreach (var instrument in context.Value.AssociatedInstruments)
                             {
-                                <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
-                                    <span class="icon me-0">
-                                        <i class="fa-light fa-xs fa-microscope"></i>
-                                    </span>
-                                    <span>@instrument.SerialNumber</span>
-                                </Badge>
+                                <div class="dropdown d-flex">
+                                    <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">
+                                        <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
+                                            <span class="icon me-0">
+                                                <i class="fa-light fa-xs fa-microscope"></i>
+                                            </span>
+                                            <span>@instrument.SerialNumber</span>
+                                        </Badge>
+                                    </button>
+                                    <div class="dropdown-menu p-0 border-0">
+                                        <div class="list-group" style="white-space: nowrap;">
+                                            <button class="list-group-item list-group-item-action" type="button" @onclick="() => Unassociate(context.Value, instrument)">
+                                                <span class="icon position-relative">
+                                                    <i class="fa-light fa-microscope"></i>
+                                                    <span class="position-absolute top-100 start-100 translate-middle badge rounded-pill text-danger">
+                                                        <i class="fa-solid fa-circle-xmark fa-sm me-1"></i>
+                                                    </span>
+                                                </span>
+                                                <span>Remove instrument @instrument.SerialNumber</span>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
                             }
                             @if (GetSuggestedInstruments(context.Value) is { IsError: false, Value: { Length: > 0 } } getInstrumentsResult)
                             {
@@ -102,7 +119,7 @@
                                                             <i class="fa-solid fa-circle-plus fa-sm me-1"></i>
                                                         </span>
                                                     </span>
-                                                    <span>Link to @instrument.SerialNumber</span>
+                                                    <span>Add instrument @instrument.SerialNumber</span>
                                                 </button>
                                             }
                                         </div>

@@ -67,4 +67,28 @@ public partial class ProjectSchedule
             ErrorOrEvents = newInstrumentList.ToArray();
         }
     }
+
+    private async Task Unassociate(ProjectEventDto e, LaboratoryInstrumentDto i)
+    {
+        var request = new UnassociateInstrumentFromProjectEventRequest
+        {
+            ProjectEventId = e.Id,
+            InstrumentId = i.Id
+        };
+
+        var response = await ApiClient.SendAsync(request);
+
+        if (!response.IsError && ErrorOrEvents != null)
+        {
+            var newInstrumentList = ErrorOrEvents.Value.Value.Select(dto =>
+            {
+                if (dto.Id != e.Id)
+                    return dto;
+
+                return dto with { AssociatedInstruments = dto.AssociatedInstruments.Where(x => x.Id != i.Id).ToArray() };
+            });
+
+            ErrorOrEvents = newInstrumentList.ToArray();
+        }
+    }
 }
