@@ -1,0 +1,98 @@
+﻿@using Beacon.Common.Requests.Projects.Events;
+
+<div style="max-width: 900px">
+
+    <div class="d-flex align-items-center mb-3">
+        <h5 class="display-6 fs-4 mb-0">
+            Project Schedule
+        </h5>
+        <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button">
+            <span class="icon me-0"><i class="fa-regular fa-calendar-circle-plus"></i></span>
+        </CreateProjectEventButton>
+    </div>
+
+    @if (ErrorOrEvents is not { } errorOrEvents)
+    {
+        <p>Loading...</p>
+    }
+    else if (errorOrEvents.IsError)
+    {
+        <p class="text-danger">There was an error loading project events.</p>
+    }
+    else if (errorOrEvents.Value is not { Length: > 0 } events)
+    {
+        <p>There are not events scheduled for this project!</p>
+    }
+    else
+    {
+        <Timeline TimelineItems="@GetTimelineEvents(events)">
+            <div style="margin-bottom:1.5rem;">
+                <p class="fw-semibold text-muted mb-2">
+                    @context.Timestamp.ToString("dd-MMM-yyyy")
+                </p>
+                <div class="card">
+                    <div class="card-body position-relative" style="padding: 0.75rem 1rem">
+                        <button type="button" class="btn btn-sm position-absolute top-0 end-0 my-1 me-2 link-secondary">
+                            <span class="icon">
+                                <i class="fa-regular fa-pencil"></i>
+                            </span>
+                        </button>
+                        <h6 class="card-title d-flex align-items-center" style="font-size:1.075rem; margin-bottom: 0.675rem;">
+                            <span class="me-1">@context.Value.Title</span>
+                            @if (context.Value.IsOngoingOn(DateTime.Today))
+                            {
+                                <span class="d-flex">
+                                    <Badge Class="is-primary">Ongoing</Badge>
+                                </span>
+                            }
+                        </h6>
+                        <h6 class="card-subtitle mb-2 text-black-50 small">
+                            <span class="icon">
+                                <i class="fa-regular fa-calendar"></i>
+                            </span>
+                            <span>
+                                Starts @context.Value.ScheduledStart.ToString("dd-MMM-yyyy")
+                            </span>
+                            <span class="mx-1 text-center d-inline-block"> &middot; </span>
+                            <span class="icon">
+                                <i class="fa-regular fa-calendar"></i>
+                            </span>
+                            <span>Ends @context.Value.ScheduledEnd.ToString("dd-MMM-yyyy")</span>
+                        </h6>
+                        @if (string.IsNullOrWhiteSpace(context.Value.Description))
+                        {
+                            <p class="card-text text-black-50 fst-italic" style="font-size: 0.95rem">
+                                No description provided.
+                            </p>
+                        }
+                        else
+                        {
+                            <p class="card-text text-muted" style="font-size: 0.95rem">
+                                @context.Value.Description
+                            </p>
+                        }
+                        <div class="d-flex align-items-center">
+                            @foreach (var instrument in context.Value.AssociatedInstruments)
+                            {
+                                <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
+                                    <span class="icon me-0">
+                                        <i class="fa-light fa-xs fa-microscope"></i>
+                                    </span>
+                                    <span>@instrument.SerialNumber</span>
+                                </Badge>
+                            }
+                            <button class="btn btn-sm me-1 p-0">
+                                <Badge Class="bg-secondary-subtle text-dark fs-7 me-1">
+                                    <span class="icon me-0">
+                                        <i class="fa-light fa-xs fa-plus"></i>
+                                    </span>
+                                </Badge>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </Timeline>
+    }
+
+</div>

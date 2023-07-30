@@ -4,53 +4,20 @@
 
 <LaboratoryPageHeader>
     <ChildContent>
-        <div class="d-flex flex-grow-1">
-            <h4>Project Details</h4>
-
-            @if (Project is { } projectOrError && !projectOrError.IsError)
-            {
-                var project = projectOrError.Value;
-
-                <div class="dropdown ms-auto">
-                    <button class="btn btn-primary dropdown-toggle" type="button" style="font-size: 0.95rem;" data-bs-toggle="dropdown">
-                        Actions
-                    </button>
-                    <ul class="dropdown-menu" style="font-size: 0.9rem;">
-                        <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst" Context="lab">
-                            <li>
-                                <CreateProjectEventButton ProjectId="project.Id" OnEventCreated="StateHasChanged" class="dropdown-item">
-                                    <span class="icon d-inline-block" style="width: 18px;">
-                                        <i class="fa-regular fa-calendar"></i>
-                                    </span>
-                                    <span>Schedule an Event</span>
-                                </CreateProjectEventButton>
-                            </li>
-                            @if (project.LeadAnalyst is { } analyst)
-                            {
-                                <li>
-                                    <button class="dropdown-item" type="button">
-                                        <span class="icon d-inline-block" style="width: 18px;">
-                                            <i class="fa-regular fa-user-minus"></i>
-                                        </span>
-                                        <span>Unassign @analyst.DisplayName</span>
-                                    </button>
-                                </li>
-                            }
-                        </AuthorizeLabView>
-                    </ul>
-                </div>
-            }
-        </div>
+        <h4>Project Details</h4>
     </ChildContent>
     <TabsContent>
         <li class="nav-item">
-            <NavLink Match="NavLinkMatch.All" class="nav-link" href="@($"l/projects/{Code}")">Overview</NavLink>
+            <NavLink Match="NavLinkMatch.All" class="nav-link link-secondary" href="@($"l/projects/{Code}")">Overview</NavLink>
         </li>
         <li class="nav-item">
-            <NavLink class="nav-link" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
+            <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/schedule")">Schedule</NavLink>
         </li>
         <li class="nav-item">
-            <NavLink class="nav-link" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
+            <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
+        </li>
+        <li class="nav-item">
+            <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/contacts")">Contacts</NavLink>
         </li>
     </TabsContent>
 </LaboratoryPageHeader>
@@ -62,6 +29,10 @@
     else if (p.IsError)
     {
         <p class="text-danger">There was an error loading project details.</p>
+    }
+    else if ("schedule".Equals(Tab, StringComparison.OrdinalIgnoreCase))
+    {
+        <ProjectSchedule ProjectId="p.Value.Id" />
     }
     else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
     {
