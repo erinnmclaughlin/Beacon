@@ -1,4 +1,4 @@
-﻿namespace Beacon.Common.Models;
+﻿namespace DataImporter;
 
 public sealed record ProjectCode
 {
@@ -22,18 +22,22 @@ public sealed record ProjectCode
         Suffix = suffix;
     }
 
-    public static ProjectCode? FromString(string projectCode)
+    public static bool TryParse(string value, out ProjectCode projectCode)
     {
-        var parts = projectCode.Split('-');
+        var parts = value.Split('-');
 
         if (parts.Length != 3 || parts[0].Length != 3 || parts[1].Length != 6 || !int.TryParse(parts[2], out var suffix))
-            return null;
+        {
+            projectCode = default!;
+            return false;
+        }
 
-        return new ProjectCode(parts[0], parts[1], suffix);
+        projectCode = new ProjectCode(parts[0], parts[1], suffix);
+        return true;
     }
 
     public override string ToString()
     {
-        return $"{CustomerCode}-{Date}-{Suffix:000}";
+        return $"{CustomerCode}-{Suffix:000}";
     }
 }

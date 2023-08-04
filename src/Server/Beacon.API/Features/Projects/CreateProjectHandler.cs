@@ -49,12 +49,14 @@ internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProject
 
     private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
     {
+        var today = DateTime.Today.ToString("yyyyMM");
+
         var lastSuffix = await _dbContext.Projects
-            .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode)
+            .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode && p.ProjectCode.Date == today)
             .OrderBy(p => p.ProjectCode.Suffix)
             .Select(p => p.ProjectCode.Suffix)
             .LastOrDefaultAsync(ct);
 
-        return new ProjectCode(request.CustomerCode, lastSuffix + 1);
+        return new ProjectCode(request.CustomerCode, today, lastSuffix + 1);
     }
 }

@@ -35,7 +35,7 @@ public sealed class GetSampleGroupsTests : ProjectTestBase
             CreatedById = TestData.AdminUser.Id,
             CustomerName = "Customer",
             LaboratoryId = TestData.Lab.Id,
-            ProjectCode = new ProjectCode("IDK", 1)
+            ProjectCode = new ProjectCode("IDK", "202301", 1)
         };
 
         otherProject.SampleGroups.Add(new SampleGroup
