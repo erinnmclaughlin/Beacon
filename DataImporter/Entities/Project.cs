@@ -16,5 +16,6 @@ public sealed class Project
     public Guid LaboratoryId { get; set; }
     public Laboratory Laboratory { get; set; } = default!;
 
+    public List<ProjectContact> Contacts { get; set; } = new();
     public List<SampleGroup> SampleGroups { get; set; } = new();
 }

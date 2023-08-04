@@ -1,8 +1,8 @@
 ﻿using CsvHelper.Configuration.Attributes;
 
-namespace DataImporter;
+namespace DataImporter.Data;
 
-public sealed class CsvData
+public sealed class ProjectCsvModel
 {
     [Name("Customer Name")]
     public string CustomerName { get; set; } = "";
@@ -22,13 +22,13 @@ public sealed class CsvData
     [Name("Application")]
     public string? Application { get; set; }
 
-    [Name("LHI")]
-    public int? LHI { get; set; }
+    [Name("Product Severity")]
+    public int? ProductSeverity { get; set; }
 
     [Name("Product Name")]
     public string? ProductName { get; set; }
 
-    [Name("Type")]
+    [Name("Product Type")]
     public string? ProductType { get; set; }
 
     [Name("Status")]

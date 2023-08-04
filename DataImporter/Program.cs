@@ -1,8 +1,6 @@
-﻿using CsvHelper;
-using DataImporter;
+﻿using DataImporter;
 using DataImporter.Entities;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 BeaconDbContext? dbContext = null;
 
@@ -33,7 +31,7 @@ while (dbContext is null)
 var allison = CreateUser("Allison", "aalix");
 var erin = CreateUser("Erin", "emclaughlin");
 var kyle = CreateUser("Kyle", "kclements");
-var hunter = CreateUser("Hunter", "hforget");
+var hunter = CreateUser("Hunter", "hunter");
 var jeff = CreateUser("Jeff", "jhorsman");
 var jillian = CreateUser("Jillian", "jillian");
 var jordan = CreateUser("Jordan", "jordan");
@@ -63,30 +61,12 @@ lab.Memberships.AddRange(new[]
 dbContext.Laboratories.Add(lab);
 await dbContext.SaveChangesAsync();
 
-using var reader = new StreamReader("projects.csv");
-using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
-
-var records = csv.GetRecords<CsvData>().ToList();
-
-var projects = new List<Project>();
-foreach (var r in records)
-{
-    if (ProjectCode.TryParse(r.ProjectId, out var projectCode))
-    {
-        projects.Add(new Project
-        {
-            Id = Guid.NewGuid(),
-            LeadAnalystId = users.FirstOrDefault(u => u.DisplayName == r.Lead)?.Id,
-            CreatedById = erin.Id,
-            CustomerName = r.CustomerName,
-            ProjectCode = projectCode,
-            ProjectStatus = GetStatus(r.Status),
-            LaboratoryId = lab.Id
-        });
-    }
-}
-
+var projects = ProjectCsvReader.GetProjects(lab.Id, users).ToArray();
 dbContext.Projects.AddRange(projects);
+await dbContext.SaveChangesAsync();
+
+var contacts = ContactCsvReader.GetProjectContacts(projects);
+dbContext.ProjectContacts.AddRange(contacts);
 await dbContext.SaveChangesAsync();
 
 static User CreateUser(string displayName, string username) => new()
@@ -98,19 +78,3 @@ static User CreateUser(string displayName, string username) => new()
     HashedPasswordSalt = salt
 };
 
-static string GetStatus(string initialStatus)
-{
-    if (initialStatus == "Cancelled")
-        return "Canceled";
-
-    if (initialStatus == "EU Lab")
-        return "Expired";
-
-    if (initialStatus == "On Hold")
-        return "OnHold";
-
-    if (initialStatus == "Current")
-        return "Active";
-
-    return initialStatus;
-}
