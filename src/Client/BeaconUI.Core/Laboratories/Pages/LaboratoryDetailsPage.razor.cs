@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Common.Http;
 using ErrorOr;
@@ -11,7 +12,7 @@ public partial class LaboratoryDetailsPage
     [Inject]
     private IApiClient ApiClient { get; set; } = default!;
 
-    private ErrorOr<LaboratoryEventDto[]>? Events { get; set; }
+    private ErrorOr<PagedList<LaboratoryEventDto>>? Events { get; set; }
 
     protected override async Task OnInitializedAsync()
     {

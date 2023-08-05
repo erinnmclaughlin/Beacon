@@ -1,3 +1,4 @@
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using BeaconUI.Core.Common.Http;
@@ -17,7 +18,7 @@ public partial class ProjectOverview
     [Parameter]
     public required EventCallback<ProjectDto> ProjectChanged { get; set; }
 
-    private ErrorOr<LaboratoryEventDto[]>? Events { get; set; }
+    private ErrorOr<PagedList<LaboratoryEventDto>>? Events { get; set; }
 
     protected override async Task OnParametersSetAsync()
     {

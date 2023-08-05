@@ -73,7 +73,7 @@
 
         if (!result.IsError)
         {
-            Events = result.Value
+            Events = result.Value.Items
                 .Select(e => new Tasks
                 {
                     Caption = e.Title,

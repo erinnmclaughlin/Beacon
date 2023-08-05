@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using ErrorOr;
@@ -8,7 +9,7 @@ using System.Linq.Expressions;
 
 namespace Beacon.API.Features.Laboratories;
 
-internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLaboratoryEventsRequest, LaboratoryEventDto[]>
+internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>
 {
     private readonly BeaconDbContext _dbContext;
 
@@ -17,9 +18,9 @@ internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLabo
         _dbContext = dbContext;
     }
 
-    public async Task<ErrorOr<LaboratoryEventDto[]>> Handle(GetLaboratoryEventsRequest request, CancellationToken ct)
+    public async Task<ErrorOr<PagedList<LaboratoryEventDto>>> Handle(GetLaboratoryEventsRequest request, CancellationToken ct)
     {
-        return await _dbContext.ProjectEvents
+        var result = await _dbContext.ProjectEvents
             .Where(GetFilter(request))
             .Select(p => new LaboratoryEventDto
             {
@@ -38,8 +39,13 @@ internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLabo
                     })
                     .ToArray()
             })
+            .OrderBy(p => p.ScheduledStart)
+                .ThenBy(p => p.Title)
+                    .ThenBy(p => p.Id)
             .AsNoTracking()
-            .ToArrayAsync(ct);
+            .ToPagedListAsync(request, ct);
+
+        return result;
     }
 
     private static Expression<Func<ProjectEvent, bool>> GetFilter(GetLaboratoryEventsRequest request)
