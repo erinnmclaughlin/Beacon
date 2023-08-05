@@ -1,3 +1,4 @@
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using BeaconUI.Core.Common.Http;
@@ -17,7 +18,7 @@ public partial class ProjectDashboardPage
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
 
-    private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
+    private ErrorOr<PagedList<ProjectDto>>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
