@@ -20,15 +20,28 @@ public static class ProjectCsvReader
         {
             if (ProjectCode.TryParse(r.ProjectId, out var projectCode))
             {
-                yield return new Project
+                var project = new Project
                 {
                     Id = Guid.NewGuid(),
                     LeadAnalystId = users.FirstOrDefault(u => u.DisplayName == r.Lead)?.Id,
                     CreatedById = erin.Id,
                     CustomerName = r.CustomerName,
                     ProjectCode = projectCode,
-                    ProjectStatus = GetStatus(r.Status)
+                    ProjectStatus = GetStatus(r.Status),
                 };
+
+                if (r.ProductName?.ToLower().Trim() is { } product && !string.IsNullOrWhiteSpace(product) && product != "na" && product != "n/a" && product != "none" && product != "empty")
+                {
+                    project.SampleGroups.Add(new SampleGroup
+                    {
+                        Id = Guid.NewGuid(),
+                        IsHazardous = r.ProductSeverity >= 3,
+                        SampleName = product,
+                        Notes = r.ProductType
+                    });
+                }
+
+                yield return project;
             }
         }
     }
