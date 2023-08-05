@@ -26,7 +26,6 @@ public static class ProjectContactCsvReader
                     Name = r.ContactName,
                     EmailAddress = r.ContactEmail,
                     PhoneNumber = r.ContactPhone,
-                    LaboratoryId = project.LaboratoryId,
                     ProjectId = project.Id
                 };
             }

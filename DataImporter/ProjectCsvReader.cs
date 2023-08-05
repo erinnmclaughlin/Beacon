@@ -8,7 +8,7 @@ namespace DataImporter;
 
 public static class ProjectCsvReader
 {
-    public static IEnumerable<Project> GetProjects(Guid labId, User[] users)
+    public static IEnumerable<Project> GetProjects(User[] users)
     {
         using var reader = new StreamReader("Data\\projects.csv");
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -27,8 +27,7 @@ public static class ProjectCsvReader
                     CreatedById = erin.Id,
                     CustomerName = r.CustomerName,
                     ProjectCode = projectCode,
-                    ProjectStatus = GetStatus(r.Status),
-                    LaboratoryId = labId,
+                    ProjectStatus = GetStatus(r.Status)
                 };
             }
         }

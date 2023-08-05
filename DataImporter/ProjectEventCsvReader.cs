@@ -26,7 +26,6 @@ public static class ProjectEventCsvReader
                     Title = r.What,
                     ScheduledStart = r.Date.ToDateTime(TimeOnly.MinValue),
                     ScheduledEnd = r.Date.ToDateTime(TimeOnly.MinValue).AddHours(r.Hours ?? 0),
-                    LaboratoryId = project.LaboratoryId,
                     ProjectId = project.Id,
                     AssociatedInstruments = instruments.Where(i => r.Equipment == i.SerialNumber).ToList()
                 };
