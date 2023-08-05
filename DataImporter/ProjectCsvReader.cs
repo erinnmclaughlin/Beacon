@@ -32,13 +32,13 @@ public static class ProjectCsvReader
 
                 if (r.ProductName?.ToLower().Trim() is { } product && !string.IsNullOrWhiteSpace(product) && product != "na" && product != "n/a" && product != "none" && product != "empty")
                 {
-                    project.SampleGroups.Add(new SampleGroup
+                    project.SampleGroups.AddRange(product.Split(",").Select(productName => new SampleGroup
                     {
                         Id = Guid.NewGuid(),
                         IsHazardous = r.ProductSeverity >= 3,
-                        SampleName = product,
+                        SampleName = productName.Trim(),
                         Notes = r.ProductType
-                    });
+                    }));
                 }
 
                 yield return project;
