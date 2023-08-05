@@ -97,7 +97,7 @@ public class BeaconDbContext : DbContext
         {
             builder.Property(x => x.Name).HasMaxLength(ContactRules.MaximumNameLength).IsRequired();
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
-            builder.Property(x => x.PhoneNumber).HasMaxLength(20);
+            builder.Property(x => x.PhoneNumber).HasMaxLength(50);
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 

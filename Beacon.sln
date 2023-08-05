@@ -33,6 +33,10 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BeaconUI.DesktopApp", "src\
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Beacon.API.IntegrationTests", "tests\Beacon.API.IntegrationTests\Beacon.API.IntegrationTests.csproj", "{5308039E-952D-40B6-A5B1-9CD523DED437}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Tools", "Tools", "{838CD4C5-FF90-49A6-80C2-1F26F2E8E245}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "DataImporter", "tools\DataImporter\DataImporter.csproj", "{0B7E704B-B262-488D-9F0D-17A76B79AE97}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -73,6 +77,10 @@ Global
 		{5308039E-952D-40B6-A5B1-9CD523DED437}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{5308039E-952D-40B6-A5B1-9CD523DED437}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{5308039E-952D-40B6-A5B1-9CD523DED437}.Release|Any CPU.Build.0 = Release|Any CPU
+		{0B7E704B-B262-488D-9F0D-17A76B79AE97}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{0B7E704B-B262-488D-9F0D-17A76B79AE97}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{0B7E704B-B262-488D-9F0D-17A76B79AE97}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{0B7E704B-B262-488D-9F0D-17A76B79AE97}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -86,6 +94,7 @@ Global
 		{D71DAC0F-5D85-4D42-9C8E-09AB3C499608} = {532CBA62-82CF-4D77-96B9-B21A39D3F993}
 		{92A2817B-49F8-4301-85E1-806D62B613EC} = {00A1D311-E025-4B74-906A-9585A34775EA}
 		{5308039E-952D-40B6-A5B1-9CD523DED437} = {532CBA62-82CF-4D77-96B9-B21A39D3F993}
+		{0B7E704B-B262-488D-9F0D-17A76B79AE97} = {838CD4C5-FF90-49A6-80C2-1F26F2E8E245}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E1D1693-99AE-4EC0-89BA-3EA69BE684A4}

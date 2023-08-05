@@ -4,8 +4,8 @@ namespace Beacon.API.Persistence.Entities;
 
 public sealed class Membership : LaboratoryScopedEntityBase
 {
-    public required LaboratoryMembershipType MembershipType { get; set; }
+    public LaboratoryMembershipType MembershipType { get; set; }
 
-    public required Guid MemberId { get; init; }
+    public Guid MemberId { get; init; }
     public User Member { get; set; } = null!;
 }

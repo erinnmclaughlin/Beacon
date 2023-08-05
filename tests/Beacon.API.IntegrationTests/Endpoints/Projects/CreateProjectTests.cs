@@ -31,7 +31,7 @@ public sealed class CreateProjectTests : ProjectTestBase
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var createdProject = ExecuteDbContext(db => db.Projects.Single(x => x.CustomerName == SomeValidRequest.CustomerName));
-        Assert.Equal("ABC-001", createdProject.ProjectCode.ToString());
+        Assert.Equal($"ABC-{DateTime.Today:yyyyMM}-001", createdProject.ProjectCode.ToString());
         Assert.Equal(TestData.AdminUser.Id, createdProject.CreatedById);
         Assert.Equal(TestData.Lab.Id, createdProject.LaboratoryId);
         Assert.Equal(ProjectStatus.Active, createdProject.ProjectStatus);

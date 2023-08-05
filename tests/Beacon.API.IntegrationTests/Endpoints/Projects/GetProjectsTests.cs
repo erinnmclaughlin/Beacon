@@ -48,7 +48,7 @@ public sealed class GetProjectsTests : ProjectTestBase
             CreatedById = TestData.AdminUser.Id,
             CustomerName = "Some customer",
             LaboratoryId = otherLab.Id,
-            ProjectCode = new ProjectCode("AAA", 1),
+            ProjectCode = new ProjectCode("AAA", "202301", 1),
             ProjectStatus = ProjectStatus.Active
         };
 
