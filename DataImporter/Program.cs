@@ -25,7 +25,6 @@ while (dbContext is null)
     try 
     {
         dbContext = new BeaconDbContext(options, importContext);
-        //dbContext.Database.EnsureCreated();
         Console.WriteLine("Connected.");
     }
     catch
