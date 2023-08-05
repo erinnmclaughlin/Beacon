@@ -65,8 +65,12 @@ var projects = ProjectCsvReader.GetProjects(lab.Id, users).ToArray();
 dbContext.Projects.AddRange(projects);
 await dbContext.SaveChangesAsync();
 
-var contacts = ContactCsvReader.GetProjectContacts(projects);
+var contacts = ProjectContactCsvReader.GetProjectContacts(projects);
 dbContext.ProjectContacts.AddRange(contacts);
+await dbContext.SaveChangesAsync();
+
+var events = ProjectEventCsvReader.GetProjectEvents(projects);
+dbContext.ProjectEvents.AddRange(events);
 await dbContext.SaveChangesAsync();
 
 static User CreateUser(string displayName, string username) => new()

@@ -9,6 +9,7 @@ public sealed class BeaconDbContext : DbContext
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Project> Projects => Set<Project>();
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
+    public DbSet<ProjectEvent> ProjectEvents => Set<ProjectEvent>();
     public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
     public DbSet<User> Users => Set<User>();
 
@@ -48,6 +49,12 @@ public sealed class BeaconDbContext : DbContext
         {
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
             builder.Property(x => x.PhoneNumber).HasMaxLength(20);
+        });
+
+        modelBuilder.Entity<ProjectEvent>(builder =>
+        {
+            builder.Property(x => x.Title).HasMaxLength(50);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(builder =>

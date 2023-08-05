@@ -20,5 +20,5 @@ public sealed class EventCsvModel
     public string Equipment { get; set; } = "";
 
     [Name("Hours")]
-    public double Hours { get; set; }
+    public double? Hours { get; set; }
 }
