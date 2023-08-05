@@ -22,6 +22,13 @@ public sealed record ProjectCode
         Suffix = suffix;
     }
 
+    public static bool TryParse(string value, out ProjectCode projectCode)
+    {
+        var result = FromString(value);
+        projectCode = result ?? null!;
+        return result != null;    
+    }
+
     public static ProjectCode? FromString(string projectCode)
     {
         var parts = projectCode.Split('-');

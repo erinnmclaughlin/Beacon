@@ -7,8 +7,7 @@ public sealed class Laboratory
     public Guid Id { get; init; } = Guid.NewGuid();
     public required string Name { get; set; }
 
-    private readonly List<Membership> _memberships = new();
-    public IReadOnlyList<Membership> Memberships => _memberships;
+    public List<Membership> Memberships { get; set; } = new();
 
     public Membership AddMember(Guid userId, LaboratoryMembershipType membershipType = LaboratoryMembershipType.Member)
     {
@@ -19,10 +18,10 @@ public sealed class Laboratory
             MembershipType = membershipType
         };
 
-        _memberships.Add(membership);
+        Memberships.Add(membership);
 
         return membership;
     }
 
-    public bool HasMember(User user) => _memberships.Any(m => m.MemberId == user.Id);
+    public bool HasMember(User user) => Memberships.Any(m => m.MemberId == user.Id);
 }

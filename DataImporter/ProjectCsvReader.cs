@@ -1,6 +1,7 @@
-﻿using CsvHelper;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Models;
+using CsvHelper;
 using DataImporter.Data;
-using DataImporter.Entities;
 using System.Globalization;
 
 namespace DataImporter;
@@ -33,12 +34,12 @@ public static class ProjectCsvReader
         }
     }
 
-    private static string GetStatus(string initialStatus) => initialStatus switch
+    private static ProjectStatus GetStatus(string initialStatus) => initialStatus switch
     {
-        "Cancelled" => "Canceled",
-        "EU Lab" => "Expired",
-        "On Hold" => "OnHold",
-        "Current" => "Active",
-        _ => initialStatus
+        "Cancelled" => ProjectStatus.Canceled,
+        "EU Lab" => ProjectStatus.Expired,
+        "On Hold" => ProjectStatus.OnHold,
+        "Current" => ProjectStatus.Active,
+        _ => Enum.Parse<ProjectStatus>(initialStatus)
     };
 }

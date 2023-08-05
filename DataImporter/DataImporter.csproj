@@ -13,6 +13,10 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\src\Server\Beacon.API\Beacon.API.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
     <None Update="Data\contacts.csv">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>

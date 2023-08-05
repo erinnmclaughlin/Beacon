@@ -1,5 +1,7 @@
-﻿using DataImporter;
-using DataImporter.Entities;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.API.Services;
+using Beacon.Common.Models;
+using DataImporter;
 using Microsoft.EntityFrameworkCore;
 
 BeaconDbContext? dbContext = null;
@@ -45,17 +47,17 @@ var users = new[] {allison, erin, kyle, hunter, jeff, jillian, jordan, julianne,
 var lab = new Laboratory { Id = Guid.NewGuid(), Name = "Lighthouse Instruments" };
 lab.Memberships.AddRange(new[]
 {
-    new Membership { Member = allison, MembershipType = "Analyst" },
-    new Membership { Member = erin, MembershipType = "Admin" },
-    new Membership { Member = kyle, MembershipType = "Analyst" },
-    new Membership { Member = hunter, MembershipType = "Analyst" },
-    new Membership { Member = jeff, MembershipType = "Analyst" },
-    new Membership { Member = jillian, MembershipType = "Analyst" },
-    new Membership { Member = jordan, MembershipType = "Analyst" },
-    new Membership { Member = julianne, MembershipType = "Analyst" },
-    new Membership { Member = ken, MembershipType = "Manager" },
-    new Membership { Member = michael, MembershipType = "Analyst" },
-    new Membership { Member = page, MembershipType = "Analyst" },
+    new Membership { Member = allison, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = erin, MembershipType = LaboratoryMembershipType.Admin },
+    new Membership { Member = kyle, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = hunter, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = jeff, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = jillian, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = jordan, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = julianne, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = ken, MembershipType = LaboratoryMembershipType.Manager },
+    new Membership { Member = michael, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = page, MembershipType = LaboratoryMembershipType.Analyst },
 });
 
 dbContext.Laboratories.Add(lab);

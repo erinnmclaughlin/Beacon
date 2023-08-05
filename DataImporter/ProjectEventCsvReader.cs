@@ -1,6 +1,7 @@
-﻿using CsvHelper;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Models;
+using CsvHelper;
 using DataImporter.Data;
-using DataImporter.Entities;
 using System.Globalization;
 
 namespace DataImporter;
