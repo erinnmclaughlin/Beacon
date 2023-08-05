@@ -28,7 +28,7 @@ public static class ProjectCsvReader
                     CustomerName = r.CustomerName,
                     ProjectCode = projectCode,
                     ProjectStatus = GetStatus(r.Status),
-                    LaboratoryId = labId
+                    LaboratoryId = labId,
                 };
             }
         }

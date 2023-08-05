@@ -366,3 +366,4 @@ FodyWeavers.xsd
 /DataImporter/Data/hours.csv
 /DataImporter/Data/projects.csv
 /DataImporter/Data/events.csv
+/DataImporter/Data/instruments.csv

@@ -1,8 +1,16 @@
-﻿using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
 using Beacon.API.Services;
 using Beacon.Common.Models;
+using Beacon.Common.Services;
 using DataImporter;
 using Microsoft.EntityFrameworkCore;
+
+var importContext = new SessionContext
+{
+    CurrentLab = new() { Id = Guid.NewGuid(), Name = "Lighthouse Instruments", MembershipType = LaboratoryMembershipType.Admin },
+    CurrentUser = default!
+};
 
 BeaconDbContext? dbContext = null;
 
@@ -16,7 +24,7 @@ while (dbContext is null)
 
     try 
     {
-        dbContext = new BeaconDbContext(options);
+        dbContext = new BeaconDbContext(options, importContext);
         //dbContext.Database.EnsureCreated();
         Console.WriteLine("Connected.");
     }
@@ -44,7 +52,7 @@ var page = CreateUser("Page", "page");
 
 var users = new[] {allison, erin, kyle, hunter, jeff, jillian, jordan, julianne, michael, ken, page};
 
-var lab = new Laboratory { Id = Guid.NewGuid(), Name = "Lighthouse Instruments" };
+var lab = new Laboratory { Id = importContext.CurrentLab.Id, Name = importContext.CurrentLab.Name };
 lab.Memberships.AddRange(new[]
 {
     new Membership { Member = allison, MembershipType = LaboratoryMembershipType.Analyst },
@@ -63,6 +71,10 @@ lab.Memberships.AddRange(new[]
 dbContext.Laboratories.Add(lab);
 await dbContext.SaveChangesAsync();
 
+var instruments = LaboratoryInstrumentCsvReader.GetLaboratoryInstruments(lab.Id).ToArray();
+dbContext.LaboratoryInstruments.AddRange(instruments);
+await dbContext.SaveChangesAsync();
+
 var projects = ProjectCsvReader.GetProjects(lab.Id, users).ToArray();
 dbContext.Projects.AddRange(projects);
 await dbContext.SaveChangesAsync();
@@ -71,7 +83,7 @@ var contacts = ProjectContactCsvReader.GetProjectContacts(projects);
 dbContext.ProjectContacts.AddRange(contacts);
 await dbContext.SaveChangesAsync();
 
-var events = ProjectEventCsvReader.GetProjectEvents(projects);
+var events = ProjectEventCsvReader.GetProjectEvents(projects, instruments);
 dbContext.ProjectEvents.AddRange(events);
 await dbContext.SaveChangesAsync();
 

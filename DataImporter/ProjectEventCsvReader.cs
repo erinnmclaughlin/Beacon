@@ -8,7 +8,7 @@ namespace DataImporter;
 
 public static class ProjectEventCsvReader
 {
-    public static IEnumerable<ProjectEvent> GetProjectEvents(Project[] projects)
+    public static IEnumerable<ProjectEvent> GetProjectEvents(Project[] projects, LaboratoryInstrument[] instruments)
     {
         using var reader = new StreamReader("Data\\events.csv");
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -27,7 +27,8 @@ public static class ProjectEventCsvReader
                     ScheduledStart = r.Date.ToDateTime(TimeOnly.MinValue),
                     ScheduledEnd = r.Date.ToDateTime(TimeOnly.MinValue).AddHours(r.Hours ?? 0),
                     LaboratoryId = project.LaboratoryId,
-                    ProjectId = project.Id
+                    ProjectId = project.Id,
+                    AssociatedInstruments = instruments.Where(i => r.Equipment == i.SerialNumber).ToList()
                 };
             }
         }
