@@ -18,16 +18,24 @@ public partial class ProjectDashboardPage
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
 
+    private GetProjectsRequest Request { get; set; } = new();
     private ErrorOr<PagedList<ProjectDto>>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        Request.PageSize = 10;
+        await LoadProjects();
+    }
+
+    private async Task GoToPage(int page)
+    {
+        Request.PageNumber = page;
         await LoadProjects();
     }
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.SendAsync(new GetProjectsRequest());
+        ProjectsOrError = await ApiClient.SendAsync(Request);
     }
 
     private async Task CancelProject(ProjectDto project)

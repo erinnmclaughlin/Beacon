@@ -1,0 +1,32 @@
+﻿<nav @attributes="@Attributes">
+    <ul class="pagination justify-content-center">
+        <li class="page-item @(PagedList.HasPrevious ? "" : "disabled")">
+            <button 
+                class="page-link" 
+                disabled="@(!PagedList.HasPrevious)" 
+                @onclick="() => SelectPage(PagedList.CurrentPage - 1)">
+                Previous
+            </button>
+        </li>
+
+        @foreach (var pageNumber in GetPageNumbers(10))
+        {
+            var p = pageNumber;
+
+            <li class="page-item">
+                <button class="page-link @(p == PagedList.CurrentPage ? "active" : "")" @onclick="() => SelectPage(p)">@p</button>
+            </li>
+        }
+
+        <li class="page-item @(PagedList.HasNext ? "" : "disabled")">
+            <button 
+                class="page-link" 
+                disabled="@(!PagedList.HasNext)" 
+                @onclick="() => SelectPage(PagedList.CurrentPage + 1)">
+                Next
+            </button>
+        </li>
+    </ul>
+</nav>
+
+
