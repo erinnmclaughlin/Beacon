@@ -5,7 +5,7 @@ namespace Beacon.API.Persistence.Entities;
 public sealed class Invitation : LaboratoryScopedEntityBase
 {
     public Guid Id { get; init; } = Guid.NewGuid();
-    public DateTimeOffset CreatedOn { get; init; } = DateTimeOffset.UtcNow;
+    public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
     public double ExpireAfterDays { get; init; } = 10;
 
     public required string NewMemberEmailAddress { get; init; }

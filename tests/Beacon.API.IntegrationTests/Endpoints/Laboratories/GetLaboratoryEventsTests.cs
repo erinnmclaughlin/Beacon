@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 
@@ -12,7 +13,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
     }
 
-    [Fact(DisplayName = "[113] Get lab events succeedss when request is valid")]
+    [Fact(DisplayName = "[113] Get lab events succeeds when request is valid")]
     public async Task GetLaboratoryEvents_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
@@ -20,16 +21,16 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         var response = await SendAsync(new GetLaboratoryEventsRequest());
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var result = await DeserializeAsync<LaboratoryEventDto[]>(response);
+        var result = await DeserializeAsync<PagedList<LaboratoryEventDto>>(response);
         Assert.NotNull(result);
 
-        var testEvent = Assert.Single(result);
+        var testEvent = Assert.Single(result.Items);
         Assert.Equal("Test", testEvent.Title);
         Assert.Equal(new DateTime(2023, 5, 1), testEvent.ScheduledStart);
         Assert.Equal(new DateTime(2023, 10, 1), testEvent.ScheduledEnd);
     }
 
-    [Fact(DisplayName = "[113] Get lab events fsils when user is not authorized")]
+    [Fact(DisplayName = "[113] Get lab events fails when user is not authorized")]
     public async Task GetProjectEvents_FailsWhenUserIsNotAuthorized()
     {
         RunAsNonMember();

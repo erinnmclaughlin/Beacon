@@ -79,9 +79,9 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var emailInvitation = new InvitationEmail
         {
             Id = EmailInvitationId,
-            ExpiresOn = DateTimeOffset.UtcNow.AddDays(10),
+            ExpiresOn = DateTime.UtcNow.AddDays(10),
             LaboratoryId = TestData.Lab.Id,
-            SentOn = DateTimeOffset.UtcNow,
+            SentOn = DateTime.UtcNow,
             LaboratoryInvitationId = invitation.Id
         };
 

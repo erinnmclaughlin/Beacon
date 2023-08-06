@@ -35,7 +35,7 @@ public partial class ProjectSchedule
     {
         return events
             .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTime.Now))
-            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart, Value = e });
     }
 
     private async Task LoadProjects()
