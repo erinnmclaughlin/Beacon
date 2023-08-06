@@ -19,12 +19,14 @@ public partial class ProjectDashboardPage
     private IModalService ModalService { get; set; } = default!;
 
     private GetProjectsRequest Request { get; set; } = new();
+    private ErrorOr<LaboratoryMemberDto[]>? AnalystsOrError { get; set; }
     private ErrorOr<PagedList<ProjectDto>>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
         Request.PageSize = 10;
-        await LoadProjects();
+        Request.IncludedStatuses = new List<ProjectStatus>() { ProjectStatus.Active, ProjectStatus.Pending };
+        await Task.WhenAll(LoadProjects(), LoadLeadAnalystOptions());
     }
 
     private async Task GoToPage(int page)
@@ -36,6 +38,12 @@ public partial class ProjectDashboardPage
     private async Task LoadProjects()
     {
         ProjectsOrError = await ApiClient.SendAsync(Request);
+    }
+
+    private async Task LoadLeadAnalystOptions()
+    {
+        var request = new GetAnalystsRequest { IncludeHistoricAnalysts = true };
+        AnalystsOrError = await ApiClient.SendAsync(request);
     }
 
     private async Task CancelProject(ProjectDto project)
@@ -66,6 +74,18 @@ public partial class ProjectDashboardPage
             Request.IncludedStatuses.Remove(status);
         else
             Request.IncludedStatuses.Add(status);
+
+        await LoadProjects();
+    }
+
+    private async Task ToggleLeadAnalyst(LaboratoryMemberDto? analyst)
+    {
+        var id = analyst?.Id ?? Guid.Empty;
+
+        if (Request.LeadAnalystIds.Contains(id))
+            Request.LeadAnalystIds.Remove(id);
+        else
+            Request.LeadAnalystIds.Add(id);
 
         await LoadProjects();
     }

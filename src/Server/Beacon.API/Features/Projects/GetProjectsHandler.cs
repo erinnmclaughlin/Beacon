@@ -1,11 +1,11 @@
-﻿using System.Linq.Expressions;
-using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
+using System.Linq.Expressions;
 
 namespace Beacon.API.Features.Projects;
 
@@ -49,8 +49,10 @@ internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequ
         if (request.IncludedStatuses is { Count: > 0 } includedStatuses)
             builder.Add(project => includedStatuses.Contains(project.ProjectStatus));
 
-        if (request.ExcludedStatuses is { Count: > 0 } excludedStatuses)
-            builder.Add(project => !excludedStatuses.Contains(project.ProjectStatus));
+        if (request.LeadAnalystIds.Select(id => id == Guid.Empty ? (Guid?)null: id).ToList() is { Count: > 0 } analystIds)
+        {
+            builder.Add(project => analystIds.Contains(project.LeadAnalystId));
+        }
 
         return builder.Build();
     }

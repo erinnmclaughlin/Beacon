@@ -33,6 +33,8 @@ internal sealed class GetMembershipsHandler : IBeaconRequestHandler<GetMembershi
                 EmailAddress = m.Member.EmailAddress,
                 MembershipType = m.MembershipType
             })
+            .OrderBy(m => m.DisplayName)
+            .ThenBy(m => m.EmailAddress)
             .ToArrayAsync(ct);
     }
 }

@@ -9,5 +9,5 @@ public sealed class GetProjectsRequest : BeaconRequest<GetProjectsRequest, Paged
     public int PageSize { get; set; } = 20;
 
     public List<ProjectStatus> IncludedStatuses { get; set; } = new();
-    public List<ProjectStatus> ExcludedStatuses { get; set; } = new();
+    public List<Guid> LeadAnalystIds { get; set; } = new();
 }
