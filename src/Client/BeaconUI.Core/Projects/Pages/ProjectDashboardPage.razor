@@ -4,7 +4,7 @@
 
 <LaboratoryPageHeader>
     <h4 class="mb-0 me-auto">Projects</h4>
-    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-primary" />
+    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-sm btn-primary" />
 </LaboratoryPageHeader>
 
 <PageContainer>
@@ -30,22 +30,26 @@
                                     <div>Project Status</div>
                                     <div class="dropdown">
                                         <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                            <span class="icon">
+                                            <span class="icon position-relative">
                                                 <i class="fa-regular fa-bars-filter fa-xs"></i>
+                                                @if (Request.IncludedStatuses.Any())
+                                                {
+                                                    <span class="position-absolute start-100 translate-middle rounded-circle bg-primary fw-normal p-1 border border-2 border-white" style="top: 80%;"></span>
+                                                }
                                             </span>
                                         </button>
                                         <div class="dropdown-menu py-0 overflow-auto">
                                             <ul class="list-group list-group-flush small">
                                                 @foreach (var status in Enum.GetValues<ProjectStatus>().OrderBy(s => s.GetDescription()))
                                                 {
-                                                    <li class="list-group-item">
+                                                    <li class="list-group-item d-flex align-items-center">
                                                         <input 
-                                                            class="form-check-input me-1" 
+                                                            class="form-check-input me-2" 
                                                             type="checkbox"
                                                             id="filter-@status" 
                                                             checked="@Request.IncludedStatuses.Contains(status)"
                                                             @onchange="() => Toggle(status)">
-                                                        <label class="form-check-label" for="filter-@status">
+                                                        <label class="form-check-label flex-grow-1" for="filter-@status">
                                                             <ProjectStatusTag Status="status" />
                                                         </label>
                                                     </li>
@@ -60,8 +64,12 @@
                                     <div>Lead Analyst</div>
                                     <div class="dropdown">
                                         <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
-                                            <span class="icon">
+                                            <span class="icon position-relative">
                                                 <i class="fa-regular fa-bars-filter fa-xs"></i>
+                                                @if (Request.LeadAnalystIds.Any())
+                                                {
+                                                    <span class="position-absolute start-100 translate-middle rounded-circle bg-primary fw-normal p-1 border border-2 border-white" style="top: 80%;"></span>
+                                                }
                                             </span>
                                         </button>
                                         <div class="dropdown-menu py-0 overflow-auto">
@@ -78,25 +86,25 @@
                                                 <ul class="list-group list-group-flush small">
                                                     @foreach (var analyst in analystsOrError.Value)
                                                     {
-                                                        <li class="list-group-item">
-                                                            <input class="form-check-input me-1"
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <input class="form-check-input mt-1 me-2"
                                                                    type="checkbox"
                                                                    id="filter-analyst-@analyst.Id"
                                                                    checked="@Request.LeadAnalystIds.Contains(analyst.Id)"
                                                             @onchange="() => ToggleLeadAnalyst(analyst)">
-                                                            <label class="form-check-label fw-normal" for="filter-analyst-@analyst.Id">
+                                                            <label class="form-check-label fw-normal flex-grow-1" for="filter-analyst-@analyst.Id">
                                                                 @analyst.DisplayName
                                                             </label>
                                                         </li>
                                                     }
 
-                                                    <li class="list-group-item">
-                                                        <input class="form-check-input me-1"
+                                                    <li class="list-group-item d-flex align-items-center">
+                                                        <input class="form-check-input mt-1 me-2"
                                                                type="checkbox"
                                                                id="filter-analyst-none"
                                                                checked="@Request.LeadAnalystIds.Contains(Guid.Empty)"
                                                                @onchange="() => ToggleLeadAnalyst(null)">
-                                                        <label class="form-check-label fw-normal" for="filter-analyst-none">
+                                                        <label class="form-check-label fw-normal flex-grow-1" for="filter-analyst-none">
                                                             Unassigned
                                                         </label>
                                                     </li>

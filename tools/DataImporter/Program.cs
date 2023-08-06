@@ -56,15 +56,15 @@ lab.Memberships.AddRange(new[]
 {
     new Membership { Member = allison, MembershipType = LaboratoryMembershipType.Analyst },
     new Membership { Member = erin, MembershipType = LaboratoryMembershipType.Admin },
-    new Membership { Member = kyle, MembershipType = LaboratoryMembershipType.Analyst },
-    new Membership { Member = hunter, MembershipType = LaboratoryMembershipType.Analyst },
-    new Membership { Member = jeff, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = kyle, MembershipType = LaboratoryMembershipType.Member },
+    new Membership { Member = hunter, MembershipType = LaboratoryMembershipType.Member },
+    new Membership { Member = jeff, MembershipType = LaboratoryMembershipType.Member },
     new Membership { Member = jillian, MembershipType = LaboratoryMembershipType.Analyst },
     new Membership { Member = jordan, MembershipType = LaboratoryMembershipType.Analyst },
     new Membership { Member = julianne, MembershipType = LaboratoryMembershipType.Analyst },
     new Membership { Member = ken, MembershipType = LaboratoryMembershipType.Manager },
-    new Membership { Member = michael, MembershipType = LaboratoryMembershipType.Analyst },
-    new Membership { Member = page, MembershipType = LaboratoryMembershipType.Analyst },
+    new Membership { Member = michael, MembershipType = LaboratoryMembershipType.Member },
+    new Membership { Member = page, MembershipType = LaboratoryMembershipType.Member },
 });
 
 dbContext.Laboratories.Add(lab);
@@ -94,4 +94,3 @@ static User CreateUser(string displayName, string username) => new()
     HashedPassword = new PasswordHasher().Hash($"!!{username}", out var salt),
     HashedPasswordSalt = salt
 };
-
