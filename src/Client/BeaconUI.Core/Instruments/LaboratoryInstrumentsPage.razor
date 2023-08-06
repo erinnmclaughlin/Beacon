@@ -24,14 +24,24 @@
             }
             else
             {
-                <div class="list-group">
-                    @foreach (var instrument in errorOrInstruments.Value)
-                    {
-                        <button type="button" class="list-group-item list-group-item-action">
-                            <div class="fw-bold">@instrument.InstrumentType</div>
-                            <small class="text-muted">SN @instrument.SerialNumber</small>
-                        </button>
-                    }
+                <div class="table-responsive">
+                    <table class="table align-middle border border-1">
+                        <thead class="table-light small">
+                        <tr>
+                            <th>Instrument Type</th>
+                            <th>Instrument Name</th>
+                        </tr>
+                        </thead>
+                        <tbody class="small">
+                        @foreach (var instrument in errorOrInstruments.Value.OrderBy(i => i.InstrumentType).ThenBy(i => i.SerialNumber))
+                        {
+                            <tr>
+                                <td>@instrument.InstrumentType</td>
+                                <td>@instrument.SerialNumber</td>
+                            </tr>
+                        }
+                        </tbody>
+                    </table>
                 </div>
             }
         </div>

@@ -1,98 +1,100 @@
-﻿<table class="table align-middle">
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Email Address</th>
-            <th>Phone Number</th>
-            <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
-                <th style="width: 0%"></th>
-            </AuthorizeLabView>
-        </tr>
-    </thead>
-    <tbody>
-        @if (Contacts is not { } c)
-        {
+﻿<div class="table-responsive">
+    <table class="table align-middle border border-1">
+        <thead class="table-light small">
             <tr>
-                <td colspan="100">Loading...</td>
+                <th>Name</th>
+                <th>Email Address</th>
+                <th>Phone Number</th>
+                <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
+                    <th style="width: 0%"></th>
+                </AuthorizeLabView>
             </tr>
-        }
-        else if (c.IsError)
-        {
-            <tr>
-                <td colspan="100">
-                    <p class="text-danger mb-0">There was an error loading project contacts.</p>
-                </td>
-            </tr>
-        }
-        else
-        {
-            if (!c.Value.Any())
+        </thead>
+        <tbody class="small">
+            @if (Contacts is not { } c)
+            {
+                <tr>
+                    <td colspan="100">Loading...</td>
+                </tr>
+            }
+            else if (c.IsError)
             {
                 <tr>
                     <td colspan="100">
-                        <p class="text-muted mb-0">No contacts have been added.</p>
+                        <p class="text-danger mb-0">There was an error loading project contacts.</p>
                     </td>
                 </tr>
             }
-
-            foreach (var contact in c.Value)
+            else
             {
-                <tr>
-                    <td>@contact.Name</td>
-                    <td>
-                        @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
-                        {
-                            <span class="text-muted fst-italic">Not set</span>
-                        }
-                        else
-                        {
-                            <text>@contact.EmailAddress</text>
-                        }
-                    </td>
-                    <td>
-                        @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
-                        {
-                            <span class="text-muted fst-italic">Not set</span>
-                        }
-                        else
-                        {
-                            <text>@contact.PhoneNumber</text>
-                        }
-                    </td>
-                    <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
-                        <td>
-                            <div class="dropdown">
-                                <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    <span class="icon">
-                                        <i class="fa-solid fa-ellipsis-vertical"></i>
-                                    </span>
-                                </button>
-                                <ul class="dropdown-menu">
-                                    <li>
-                                        <button class="dropdown-item" type="button" @onclick="() => ShowUpdateContactModal(contact)">
-                                            <span class="icon text-primary">
-                                                <i class="fa-regular fa-pencil"></i>
-                                            </span>
-                                            <span>Update Contact</span>
-                                        </button>
-                                    </li>
-                                    <li>
-                                        <button class="dropdown-item" type="button" @onclick="() => ShowDeleteContactModal(contact)">
-                                            <span class="icon text-danger">
-                                                <i class="fa-regular fa-trash"></i>
-                                            </span>
-                                            <span>Delete Contact</span>
-                                        </button>
-                                    </li>
-                                </ul>
-                            </div>
+                if (!c.Value.Any())
+                {
+                    <tr>
+                        <td colspan="100">
+                            <p class="text-muted mb-0">No contacts have been added.</p>
                         </td>
-                    </AuthorizeLabView>
-                </tr>
+                    </tr>
+                }
+
+                foreach (var contact in c.Value)
+                {
+                    <tr>
+                        <td>@contact.Name</td>
+                        <td>
+                            @if (string.IsNullOrWhiteSpace(contact.EmailAddress))
+                            {
+                                <span class="text-muted fst-italic">Not set</span>
+                            }
+                            else
+                            {
+                                <text>@contact.EmailAddress</text>
+                            }
+                        </td>
+                        <td>
+                            @if (string.IsNullOrWhiteSpace(contact.PhoneNumber))
+                            {
+                                <span class="text-muted fst-italic">Not set</span>
+                            }
+                            else
+                            {
+                                <text>@contact.PhoneNumber</text>
+                            }
+                        </td>
+                        <AuthorizeLabView MinimumRole="LaboratoryMembershipType.Analyst">
+                            <td>
+                                <div class="dropdown">
+                                    <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                        <span class="icon">
+                                            <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        </span>
+                                    </button>
+                                    <ul class="dropdown-menu">
+                                        <li>
+                                            <button class="dropdown-item" type="button" @onclick="() => ShowUpdateContactModal(contact)">
+                                                <span class="icon text-primary">
+                                                    <i class="fa-regular fa-pencil"></i>
+                                                </span>
+                                                <span>Update Contact</span>
+                                            </button>
+                                        </li>
+                                        <li>
+                                            <button class="dropdown-item" type="button" @onclick="() => ShowDeleteContactModal(contact)">
+                                                <span class="icon text-danger">
+                                                    <i class="fa-regular fa-trash"></i>
+                                                </span>
+                                                <span>Delete Contact</span>
+                                            </button>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </td>
+                        </AuthorizeLabView>
+                    </tr>
+                }
             }
-        }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 <button class="btn btn-sm btn-primary" type="button" disabled="@(Contacts is null)" @onclick="ShowAddContactModal">
     <span class="icon">
@@ -100,5 +102,3 @@
     </span>
     <span>Add Contact</span>
 </button>
-
-

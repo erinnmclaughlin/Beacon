@@ -1,13 +1,14 @@
-﻿<table class="table align-middle">
-    <thead>
+﻿<div class="table-responsive">
+    <table class="table align-middle border border-1">
+        <thead class="table-light small">
         <tr>
             <th>Sample Name</th>
             <th>Quantity</th>
             <th>Container Type</th>
             <th>Notes</th>
         </tr>
-    </thead>
-    <tbody>
+        </thead>
+        <tbody class="small">
         @if (SampleGroups is not { } s)
         {
             <tr>
@@ -59,7 +60,8 @@
                 </tr>
             }
         }
-    </tbody>
-</table>
+        </tbody>
+    </table>
+</div>
 
 <AddSampleGroupButton ProjectId="ProjectId" OnSubmit="LoadSampleGroups" />
