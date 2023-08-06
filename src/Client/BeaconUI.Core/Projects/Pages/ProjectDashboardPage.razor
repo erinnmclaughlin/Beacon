@@ -21,10 +21,39 @@
         <div class="d-flex flex-column gap-1 h-100">
             <div class="table-responsive flex-grow-1">
                 <table class="table table-hover align-middle border border-1">
-                    <thead>
+                    <thead class="table-light align-middle">
                         <tr>
                             <th>Project Code</th>
-                            <th>Project Status</th>
+                            <th>
+                                <div class="d-flex flex-nowrap align-items-center">
+                                    <div>Project Status</div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                            <span class="icon">
+                                                <i class="fa-light fa-bars-filter fa-sm"></i>
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu py-0 overflow-auto">
+                                            <ul class="list-group list-group-flush">
+                                                @foreach (var status in Enum.GetValues<ProjectStatus>().OrderBy(s => s.GetDescription()))
+                                                {
+                                                    <li class="list-group-item">
+                                                        <input 
+                                                            class="form-check-input me-1" 
+                                                            type="checkbox"
+                                                            id="filter-@status" 
+                                                            checked="@Request.IncludedStatuses.Contains(status)"
+                                                            @onchange="() => Toggle(status)">
+                                                        <label class="form-check-label" for="filter-@status">
+                                                            <ProjectStatusTag Status="status" />
+                                                        </label>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
                             <th>Customer Name</th>
                             <th>Lead Analyst</th>
                             <th style="width: 0%;"></th>

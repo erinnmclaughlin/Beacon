@@ -59,4 +59,14 @@ public partial class ProjectDashboardPage
             await LoadProjects();
         }
     }
+
+    private async Task Toggle(ProjectStatus status)
+    {
+        if (Request.IncludedStatuses.Contains(status))
+            Request.IncludedStatuses.Remove(status);
+        else
+            Request.IncludedStatuses.Add(status);
+
+        await LoadProjects();
+    }
 }

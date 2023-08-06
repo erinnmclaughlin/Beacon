@@ -1,4 +1,6 @@
-﻿using Beacon.API.Persistence;
+﻿using System.Linq.Expressions;
+using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
@@ -19,7 +21,7 @@ internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequ
     public async Task<ErrorOr<PagedList<ProjectDto>>> Handle(GetProjectsRequest request, CancellationToken ct)
     {
         return await _dbContext.Projects
-            .Include(x => x.LeadAnalyst)
+            .Where(GetFilter(request))
             .OrderBy(x => x.ProjectCode.CustomerCode)
             .ThenBy(x => x.ProjectCode.Date)
             .ThenBy(x => x.ProjectCode.Suffix)
@@ -38,5 +40,18 @@ internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequ
             })
             .AsNoTracking()
             .ToPagedListAsync(request, ct);
+    }
+
+    private static Expression<Func<Project, bool>> GetFilter(GetProjectsRequest request)
+    {
+        var builder = new FilterBuilder<Project>();
+
+        if (request.IncludedStatuses is { Count: > 0 } includedStatuses)
+            builder.Add(project => includedStatuses.Contains(project.ProjectStatus));
+
+        if (request.ExcludedStatuses is { Count: > 0 } excludedStatuses)
+            builder.Add(project => !excludedStatuses.Contains(project.ProjectStatus));
+
+        return builder.Build();
     }
 }

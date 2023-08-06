@@ -11,3 +11,12 @@ public enum ProjectStatus
     Preliminary,
     Quoted
 }
+
+public static class ProjectStatusExtensions
+{
+    public static string GetDescription(this ProjectStatus status) => status switch
+    {
+        ProjectStatus.OnHold => "On Hold",
+        _ => status.ToString()
+    };
+}
