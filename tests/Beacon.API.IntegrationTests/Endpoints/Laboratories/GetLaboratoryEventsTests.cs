@@ -24,10 +24,8 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         var result = await DeserializeAsync<PagedList<LaboratoryEventDto>>(response);
         Assert.NotNull(result);
 
-        var testEvent = Assert.Single(result.Items);
-        Assert.Equal("Test", testEvent.Title);
-        Assert.Equal(new DateTime(2023, 5, 1), testEvent.ScheduledStart);
-        Assert.Equal(new DateTime(2023, 10, 1), testEvent.ScheduledEnd);
+        Assert.Contains(result.Items, i => i.Title == "Test");
+        Assert.Contains(result.Items, i => i.Title == "Test 2");
     }
 
     [Fact(DisplayName = "[113] Get lab events fails when user is not authorized")]
@@ -39,6 +37,78 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    [Fact]
+    public async Task AppliesMinStartFilter()
+    {
+        RunAsAdmin();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MinStart = new DateTime(2023, 1, 1)
+        };
+
+        var response = await SendAsync(request);
+        var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
+        Assert.NotNull(events);
+        Assert.Equal(1, events.TotalCount);
+        var result = Assert.Single(events.Items);
+        Assert.Equal("Test", result.Title);
+    }
+
+    [Fact]
+    public async Task AppliesMaxStartFilter()
+    {
+        RunAsAdmin();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MaxStart = new DateTime(2023, 1, 1)
+        };
+
+        var response = await SendAsync(request);
+        var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
+        Assert.NotNull(events);
+        Assert.Equal(1, events.TotalCount);
+        var result = Assert.Single(events.Items);
+        Assert.Equal("Test 2", result.Title);
+    }
+
+    [Fact]
+    public async Task AppliesMinEndFilter()
+    {
+        RunAsAdmin();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MinEnd = new DateTime(2023, 1, 1)
+        };
+
+        var response = await SendAsync(request);
+        var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
+        Assert.NotNull(events);
+        Assert.Equal(1, events.TotalCount);
+        var result = Assert.Single(events.Items);
+        Assert.Equal("Test", result.Title);
+    }
+
+    [Fact]
+    public async Task AppliesMaxEndFilter()
+    {
+        RunAsAdmin();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MaxEnd = new DateTime(2023, 1, 1)
+        };
+
+        var response = await SendAsync(request);
+        var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
+        Assert.NotNull(events);
+        Assert.Equal(1, events.TotalCount);
+        var result = Assert.Single(events.Items);
+        Assert.Equal("Test 2", result.Title);
+    }
+
     protected override void AddTestData(BeaconDbContext db)
     {
         db.ProjectEvents.Add(new ProjectEvent
@@ -48,6 +118,15 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
             LaboratoryId = TestData.Lab.Id,
             ScheduledStart = new DateTime(2023, 5, 1),
             ScheduledEnd = new DateTime(2023, 10, 1)
+        });
+
+        db.ProjectEvents.Add(new ProjectEvent
+        {
+            Title = "Test 2",
+            ProjectId = ProjectId,
+            LaboratoryId = TestData.Lab.Id,
+            ScheduledStart = new DateTime(2021, 1, 1),
+            ScheduledEnd = new DateTime(2021, 3, 1)
         });
 
         base.AddTestData(db);
