@@ -1,5 +1,6 @@
 using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Memberships;
 using Beacon.Common.Requests.Projects;
 using BeaconUI.Core.Common.Http;
 using BeaconUI.Core.Common.Modals;

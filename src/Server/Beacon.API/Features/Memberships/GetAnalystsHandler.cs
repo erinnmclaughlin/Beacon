@@ -1,10 +1,10 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Projects;
+using Beacon.Common.Requests.Memberships;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
-namespace Beacon.API.Features.Projects;
+namespace Beacon.API.Features.Memberships;
 
 internal sealed class GetAnalystsHandler : IBeaconRequestHandler<GetAnalystsRequest, LaboratoryMemberDto[]>
 {
@@ -45,8 +45,11 @@ internal sealed class GetAnalystsHandler : IBeaconRequestHandler<GetAnalystsRequ
                     MembershipType = m.MembershipType
                 })
                 .ToListAsync(ct);
-
-            analysts.AddRange(historicAnalysts.Where(a => analysts.All(aa => aa.Id != a.Id)));
+            
+            analysts
+                .AddRange(historicAnalysts
+                    .Where(a => analysts
+                        .All(aa => aa.Id != a.Id)));
         }
 
         return analysts
