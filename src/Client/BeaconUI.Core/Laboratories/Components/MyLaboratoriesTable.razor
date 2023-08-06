@@ -19,8 +19,8 @@ else
                     <tr>
                         <td></td>
                         <td>
-                            <a href="@($"laboratories/{lab.Id}")">
-                                <AvatarSquare Value="@lab.Name[0]" FontSize="1rem" Size="1.5rem" />
+                            <a class="text-decoration-none" href="@($"laboratories/{lab.Id}")">
+                                <AvatarSquare Name="@lab.Name" />
                                 <span class="nav-text">@lab.Name</span>
                             </a>
                         </td>
