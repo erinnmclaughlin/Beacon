@@ -37,7 +37,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[275] Filter project events by min start date succeeds")]
     public async Task AppliesMinStartFilter()
     {
         RunAsAdmin();
@@ -55,7 +55,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal("Test", result.Title);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[275] Filter project events by max start date succeeds")]
     public async Task AppliesMaxStartFilter()
     {
         RunAsAdmin();
@@ -73,7 +73,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal("Test 2", result.Title);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[275] Filter project events by min end date succeeds")]
     public async Task AppliesMinEndFilter()
     {
         RunAsAdmin();
@@ -91,7 +91,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal("Test", result.Title);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[275] Filter project events by max end date succeeds")]
     public async Task AppliesMaxEndFilter()
     {
         RunAsAdmin();
@@ -109,7 +109,7 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal("Test 2", result.Title);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[275] Filter project events by several criteria succeeds")]
     public async Task AppliesMultipleFilters()
     {
         RunAsAdmin();

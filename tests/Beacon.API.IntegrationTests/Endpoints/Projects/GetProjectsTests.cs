@@ -37,6 +37,19 @@ public sealed class GetProjectsTests : ProjectTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
+    [Fact(DisplayName = "[275] Pagination is applied to project search")]
+    public async Task PaginationIsApplied()
+    {
+        RunAsAdmin();
+
+        var request = new GetProjectsRequest { PageSize = 1 };
+        var response = await SendAsync(new GetProjectsRequest());
+        var projects = await DeserializeAsync<PagedList<ProjectDto>>(response);
+        Assert.NotNull(projects);
+        Assert.Equal(1, projects.TotalCount);
+        Assert.Single(projects.Items);
+    }
+
     protected override void AddTestData(BeaconDbContext db)
     {
         var otherLab = new Laboratory { Id = Guid.NewGuid(), Name = "Some other lab" };
