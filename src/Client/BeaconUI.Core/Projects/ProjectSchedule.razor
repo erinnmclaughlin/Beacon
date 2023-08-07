@@ -28,13 +28,13 @@
     {
         <p class="text-danger">There was an error loading project events.</p>
     }
-    else if (errorOrEvents.Value is not { Length: > 0 } events)
+    else if (errorOrEvents.Value is not { Count: > 0 } events)
     {
         <p>There are not events scheduled for this project!</p>
     }
     else
     {
-        <Timeline TimelineItems="@GetTimelineEvents(events)">
+        <Timeline TimelineItems="@GetTimelineEvents(events.Items)">
             <div style="margin-bottom:1.5rem;">
                 <p class="fw-semibold text-muted mb-2">
                     <span>@context.Timestamp.ToString("dd-MMM-yyyy")</span> 

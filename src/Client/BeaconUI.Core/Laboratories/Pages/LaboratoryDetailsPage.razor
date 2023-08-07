@@ -11,12 +11,12 @@
         <div class="col-12 col-lg">
         </div>
         <div class="col-12 col-lg-auto" style="min-width: 21rem;">
-            @if (Events is { Value: { Length: > 0 } } events)
+            @if (Events is { Value: { Count: > 0 } } events)
             {
-                var timelineItems = events.Value
+                var timelineItems = events.Value.Items
                     .Select(e => new TimelineItem<LaboratoryEventDto>
                     {
-                        Timestamp = e.ScheduledStart.DateTime,
+                        Timestamp = e.ScheduledStart,
                         Value = e
                     });
 

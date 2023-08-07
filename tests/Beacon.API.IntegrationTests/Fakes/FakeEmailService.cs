@@ -15,5 +15,5 @@ public class FakeEmailSendOperation : IEmailSendOperation
     public const string OperationId = "12345";
 
     string IEmailSendOperation.OperationId => "12345";
-    public DateTimeOffset Timestamp => DateTimeOffset.UtcNow;
+    public DateTime Timestamp => DateTime.UtcNow;
 }

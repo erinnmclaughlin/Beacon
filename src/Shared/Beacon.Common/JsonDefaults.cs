@@ -11,6 +11,8 @@ public static class JsonDefaults
         {
             var options = new JsonSerializerOptions
             {
+                IgnoreReadOnlyFields = true,
+                IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
                 PropertyNamingPolicy = JsonNamingPolicy.CamelCase
             };

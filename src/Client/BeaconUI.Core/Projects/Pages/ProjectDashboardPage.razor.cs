@@ -1,4 +1,6 @@
+using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Requests.Memberships;
 using Beacon.Common.Requests.Projects;
 using BeaconUI.Core.Common.Http;
 using BeaconUI.Core.Common.Modals;
@@ -17,16 +19,32 @@ public partial class ProjectDashboardPage
     [CascadingParameter]
     private IModalService ModalService { get; set; } = default!;
 
-    private ErrorOr<ProjectDto[]>? ProjectsOrError { get; set; }
+    private GetProjectsRequest Request { get; set; } = new();
+    private ErrorOr<LaboratoryMemberDto[]>? AnalystsOrError { get; set; }
+    private ErrorOr<PagedList<ProjectDto>>? ProjectsOrError { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
+        Request.PageSize = 10;
+        Request.IncludedStatuses = new List<ProjectStatus>() { ProjectStatus.Active, ProjectStatus.Pending };
+        await Task.WhenAll(LoadProjects(), LoadLeadAnalystOptions());
+    }
+
+    private async Task GoToPage(int page)
+    {
+        Request.PageNumber = page;
         await LoadProjects();
     }
 
     private async Task LoadProjects()
     {
-        ProjectsOrError = await ApiClient.SendAsync(new GetProjectsRequest());
+        ProjectsOrError = await ApiClient.SendAsync(Request);
+    }
+
+    private async Task LoadLeadAnalystOptions()
+    {
+        var request = new GetAnalystsRequest { IncludeHistoricAnalysts = true };
+        AnalystsOrError = await ApiClient.SendAsync(request);
     }
 
     private async Task CancelProject(ProjectDto project)
@@ -49,5 +67,27 @@ public partial class ProjectDashboardPage
             await ApiClient.SendAsync(new CompleteProjectRequest { ProjectId = project.Id });
             await LoadProjects();
         }
+    }
+
+    private async Task Toggle(ProjectStatus status)
+    {
+        if (Request.IncludedStatuses.Contains(status))
+            Request.IncludedStatuses.Remove(status);
+        else
+            Request.IncludedStatuses.Add(status);
+
+        await LoadProjects();
+    }
+
+    private async Task ToggleLeadAnalyst(LaboratoryMemberDto? analyst)
+    {
+        var id = analyst?.Id ?? Guid.Empty;
+
+        if (Request.LeadAnalystIds.Contains(id))
+            Request.LeadAnalystIds.Remove(id);
+        else
+            Request.LeadAnalystIds.Add(id);
+
+        await LoadProjects();
     }
 }

@@ -1,3 +1,4 @@
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
 using Beacon.Common.Requests.Laboratories;
@@ -17,7 +18,7 @@ public partial class ProjectSchedule
     [Parameter, EditorRequired]
     public required Guid ProjectId { get; set; }
 
-    private ErrorOr<LaboratoryEventDto[]>? ErrorOrEvents { get; set; }
+    private ErrorOr<PagedList<LaboratoryEventDto>>? ErrorOrEvents { get; set; }
     private ErrorOr<LaboratoryInstrumentDto[]>? ErrorOrInstruments { get; set; }
 
     private bool ShowPastEvents { get; set; }
@@ -28,13 +29,13 @@ public partial class ProjectSchedule
         ErrorOrInstruments = await ApiClient.SendAsync(new GetLaboratoryInstrumentsRequest());
     }
 
-    private int CompletedEventCount => ErrorOrEvents?.Value.Count(x => x.IsCompletedOnOrBefore(DateTime.Now)) ?? 0;
+    private int CompletedEventCount => ErrorOrEvents?.Value.Items.Count(x => x.IsCompletedOnOrBefore(DateTime.Now)) ?? 0;
 
-    private IEnumerable<TimelineItem<LaboratoryEventDto>> GetTimelineEvents(LaboratoryEventDto[] events)
+    private IEnumerable<TimelineItem<LaboratoryEventDto>> GetTimelineEvents(IEnumerable<LaboratoryEventDto> events)
     {
         return events
             .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTime.Now))
-            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart, Value = e });
     }
 
     private async Task LoadProjects()
@@ -63,7 +64,9 @@ public partial class ProjectSchedule
 
         if (!response.IsError && ErrorOrEvents != null)
         {
-            var newInstrumentList = ErrorOrEvents.Value.Value.Select(dto =>
+            var current = ErrorOrEvents.Value.Value;
+
+            var newInstrumentList = current.Items.Select(dto =>
             {
                 if (dto.Id != e.Id)
                     return dto;
@@ -71,7 +74,7 @@ public partial class ProjectSchedule
                 return dto with { AssociatedInstruments = dto.AssociatedInstruments.Append(i).ToArray() };
             });
 
-            ErrorOrEvents = newInstrumentList.ToArray();
+            ErrorOrEvents = new PagedList<LaboratoryEventDto>(newInstrumentList.ToArray(), current.TotalPages, current.CurrentPage, current.PageSize);
         }
     }
 
@@ -87,7 +90,9 @@ public partial class ProjectSchedule
 
         if (!response.IsError && ErrorOrEvents != null)
         {
-            var newInstrumentList = ErrorOrEvents.Value.Value.Select(dto =>
+            var current = ErrorOrEvents.Value.Value;
+
+            var newInstrumentList = current.Items.Select(dto =>
             {
                 if (dto.Id != e.Id)
                     return dto;
@@ -95,7 +100,7 @@ public partial class ProjectSchedule
                 return dto with { AssociatedInstruments = dto.AssociatedInstruments.Where(x => x.Id != i.Id).ToArray() };
             });
 
-            ErrorOrEvents = newInstrumentList.ToArray();
+            ErrorOrEvents = new PagedList<LaboratoryEventDto>(newInstrumentList.ToArray(), current.TotalPages, current.CurrentPage, current.PageSize);
         }
     }
 }

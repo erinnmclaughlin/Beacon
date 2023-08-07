@@ -1,12 +1,20 @@
-﻿<span class="badge @CssTagColor">@Status</span>
+﻿<span class="badge fw-normal @CssTagColor">@Status.GetDescription()</span>
 
 @code {
 
     private string CssTagColor => Status switch
     {
+        // Active
         ProjectStatus.Active => "bg-primary text-bg-primary",
-        ProjectStatus.Canceled => "bg-danger text-bg-danger",
-        ProjectStatus.Completed => "bg-success text-bg-success",
+        ProjectStatus.OnHold => "bg-danger text-bg-danger",
+        ProjectStatus.Pending  => "bg-warning text-bg-warning",
+        ProjectStatus.Preliminary => "bg-secondary-subtle text-secondary-emphasis",
+        ProjectStatus.Quoted => "bg-success text-bg-success",
+
+        // Inactive: 
+        ProjectStatus.Canceled => "bg-danger-subtle text-danger-emphasis",
+        ProjectStatus.Completed => "bg-primary-subtle text-primary-emphasis",
+        ProjectStatus.Expired => "bg-warning-subtle text-warning-emphasis",
         _ => "bg-secondary text-bg-secondary"
     };
 

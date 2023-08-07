@@ -74,7 +74,7 @@ internal sealed class AcceptEmailInvitationHandler : IBeaconRequestHandler<Accep
                 .IgnoreQueryFilters()
                 .SingleAsync(i => i.Id == emailId, ct);
 
-            return !emailInvite.IsExpired(DateTimeOffset.UtcNow);
+            return !emailInvite.IsExpired(DateTime.UtcNow);
         }
     }
 }

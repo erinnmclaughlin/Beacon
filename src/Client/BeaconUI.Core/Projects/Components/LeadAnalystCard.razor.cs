@@ -23,9 +23,9 @@ public partial class LeadAnalystCard
 
     protected override async Task OnInitializedAsync()
     {
-        ErrorOrMembers = await ApiClient.SendAsync(new GetMembershipsRequest
+        ErrorOrMembers = await ApiClient.SendAsync(new GetAnalystsRequest
         {
-            MinimumRole = LaboratoryMembershipType.Analyst
+            IncludeHistoricAnalysts = false
         });
     }
 

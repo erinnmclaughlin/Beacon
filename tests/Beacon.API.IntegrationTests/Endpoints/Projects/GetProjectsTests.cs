@@ -1,5 +1,6 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 
@@ -20,11 +21,11 @@ public sealed class GetProjectsTests : ProjectTestBase
         var response = await SendAsync(new GetProjectsRequest());
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var projects = await DeserializeAsync<ProjectDto[]>(response);
+        var projects = await DeserializeAsync<PagedList<ProjectDto>>(response);
 
         Assert.NotNull(projects);
-        Assert.Single(projects);
-        Assert.Equal(ProjectId, projects[0].Id);        
+        var project = Assert.Single(projects.Items);
+        Assert.Equal(ProjectId, project.Id);        
     }
 
     [Fact(DisplayName = "[193] Get lab projects endpoint returns 403 when user is not authorized")]
@@ -34,6 +35,19 @@ public sealed class GetProjectsTests : ProjectTestBase
 
         var response = await SendAsync(new GetProjectsRequest());
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "[275] Pagination is applied to project search")]
+    public async Task PaginationIsApplied()
+    {
+        RunAsAdmin();
+
+        var request = new GetProjectsRequest { PageSize = 1 };
+        var response = await SendAsync(new GetProjectsRequest());
+        var projects = await DeserializeAsync<PagedList<ProjectDto>>(response);
+        Assert.NotNull(projects);
+        Assert.Equal(1, projects.TotalCount);
+        Assert.Single(projects.Items);
     }
 
     protected override void AddTestData(BeaconDbContext db)

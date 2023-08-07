@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 using ErrorOr;
@@ -17,15 +18,16 @@ internal sealed class GetMembershipsHandler : IBeaconRequestHandler<GetMembershi
 
     public async Task<ErrorOr<LaboratoryMemberDto[]>> Handle(GetMembershipsRequest request, CancellationToken ct)
     {
-        var query = _dbContext.Memberships.AsQueryable();
-
+        var filterBuilder = new FilterBuilder<Membership>();
+        
         if (request.MinimumRole is { } minimumRole)
         {
             var validRoles = Enum.GetValues<LaboratoryMembershipType>().Where(m => m >= minimumRole).ToList();
-            query = query.Where(m => validRoles.Contains(m.MembershipType));
+            filterBuilder.Add(m => validRoles.Contains(m.MembershipType));
         }
 
         return await _dbContext.Memberships
+            .Where(filterBuilder.Build())
             .Select(m => new LaboratoryMemberDto
             {
                 Id = m.Member.Id,
@@ -33,6 +35,8 @@ internal sealed class GetMembershipsHandler : IBeaconRequestHandler<GetMembershi
                 EmailAddress = m.Member.EmailAddress,
                 MembershipType = m.MembershipType
             })
+            .OrderBy(m => m.DisplayName)
+            .ThenBy(m => m.EmailAddress)
             .ToArrayAsync(ct);
     }
 }

@@ -73,13 +73,13 @@
 
         if (!result.IsError)
         {
-            Events = result.Value
+            Events = result.Value.Items
                 .Select(e => new Tasks
                 {
                     Caption = e.Title,
                     Code = e.ProjectCode.ToString(),
-                    DateStart = e.ScheduledStart.DateTime,
-                    DateEnd = e.ScheduledEnd.DateTime,
+                    DateStart = e.ScheduledStart,
+                    DateEnd = e.ScheduledEnd,
                     Color = "#cbd5e1;line-height:1" // lil bit of css injection to get this third party lib to do what I want
                 })
                 .ToArray();

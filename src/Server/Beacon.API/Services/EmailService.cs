@@ -13,7 +13,7 @@ public interface IEmailService
 public interface IEmailSendOperation
 {
     string OperationId { get; }
-    DateTimeOffset Timestamp { get; }
+    DateTime Timestamp { get; }
 }
 
 internal sealed class EmailService : IEmailService
@@ -45,7 +45,7 @@ internal sealed class EmailService : IEmailService
         }
         catch (RequestFailedException ex)
         {
-            /// OperationID is contained in the exception message and can be used for troubleshooting purposes
+            // OperationID is contained in the exception message and can be used for troubleshooting purposes
             Console.WriteLine($"Email send operation failed with error code: {ex.ErrorCode}, message: {ex.Message}");
             return null;
         }
@@ -57,11 +57,11 @@ internal class BeaconEmailSendOperation : IEmailSendOperation
     private readonly EmailSendOperation _emailSendOperation;
 
     public string OperationId => _emailSendOperation.Id;
-    public DateTimeOffset Timestamp { get; }
+    public DateTime Timestamp { get; }
 
     public BeaconEmailSendOperation(EmailSendOperation emailSendOperation)
     {
         _emailSendOperation = emailSendOperation;
-        Timestamp = DateTimeOffset.UtcNow;
+        Timestamp = DateTime.UtcNow;
     }
 }

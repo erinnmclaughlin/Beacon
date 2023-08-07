@@ -4,7 +4,7 @@
 
 <LaboratoryPageHeader>
     <h4 class="mb-0 me-auto">Projects</h4>
-    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-primary" />
+    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-sm btn-primary" />
 </LaboratoryPageHeader>
 
 <PageContainer>
@@ -18,94 +18,186 @@
     }
     else
     {
-        <div class="table-responsive h-100">
-            <table class="table table-hover align-middle">
-                <thead>
-                    <tr>
-                        <th>Project Code</th>
-                        <th>Project Status</th>
-                        <th>Customer Name</th>
-                        <th>Lead Analyst</th>
-                        <th style="width: 0%;"></th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @if (projectsOrError.Value.Length == 0)
-                    {
+        <div class="d-flex flex-column gap-1 h-100">
+            <div class="table-responsive flex-grow-1">
+                <table class="table table-hover align-middle border border-1">
+                    <thead class="table-light align-middle small">
                         <tr>
-                            <td colspan="100">No projects found!</td>
-                        </tr>
-                    }
-                    else
-                    {
-                        foreach (var project in projectsOrError.Value)
-                        {
-                            <tr>
-                                <td>
-                                    <a href="l/projects/@project.ProjectCode">
-                                        @project.ProjectCode
-                                    </a>
-                                </td>
-                                <td>
-                                    <ProjectStatusTag Status="project.ProjectStatus" />
-                                </td>
-                                <td>
-                                    @project.CustomerName
-                                </td>
-                                <td>
-                                    @if (project.LeadAnalyst is not { } analyst)
-                                    {
-                                        <span class="text-muted">Unassigned</span>
-                                    }
-                                    else
-                                    {
-                                        <text>@analyst.DisplayName</text>
-                                    }
-                                </td>
-                                <td>
+                            <th class="text-nowrap">Project Code</th>
+                            <th style="width: 50%">Customer Name</th>
+                            <th class="text-nowrap">
+                                <div class="d-flex flex-nowrap align-items-center">
+                                    <div>Project Status</div>
                                     <div class="dropdown">
-                                        <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                            <span class="icon">
-                                                <i class="fa-solid fa-ellipsis-vertical"></i>
+                                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                            <span class="icon position-relative">
+                                                <i class="fa-regular fa-bars-filter fa-xs"></i>
+                                                @if (Request.IncludedStatuses.Any())
+                                                {
+                                                    <span class="position-absolute start-100 translate-middle rounded-circle bg-primary fw-normal p-1 border border-2 border-white" style="top: 80%;"></span>
+                                                }
                                             </span>
                                         </button>
-                                        <ul class="dropdown-menu">
-                                            <li>
-                                                <a class="dropdown-item" href="l/projects/@project.ProjectCode">
-                                                    <span class="icon text-primary">
-                                                        <i class="fa-regular fa-eye"></i>
-                                                    </span>
-                                                    <span>View Details</span>
-                                                </a>
-                                            </li>
-                                            @if (project.ProjectStatus is ProjectStatus.Active)
-                                            {
-                                                <li><hr class="dropdown-divider"></li>
-                                                <li>
-                                                    <button class="dropdown-item" type="button" @onclick="() => CancelProject(project)">
-                                                        <span class="icon text-danger">
-                                                            <i class="fa-regular fa-ban"></i>
-                                                        </span>
-                                                        <span>Cancel project</span>
-                                                    </button>
-                                                </li>
-                                                <li>
-                                                    <button class="dropdown-item" type="button" @onclick="() => CompleteProject(project)">
-                                                        <span class="icon text-success">
-                                                            <i class="fa-regular fa-check"></i>
-                                                        </span>
-                                                        <span>Complete project</span>
-                                                    </button>
-                                                </li>
-                                            }
-                                        </ul>
+                                        <div class="dropdown-menu py-0 overflow-auto">
+                                            <ul class="list-group list-group-flush small">
+                                                @foreach (var status in Enum.GetValues<ProjectStatus>().OrderBy(s => s.GetDescription()))
+                                                {
+                                                    <li class="list-group-item d-flex align-items-center">
+                                                        <input 
+                                                            class="form-check-input me-2" 
+                                                            type="checkbox"
+                                                            id="filter-@status" 
+                                                            checked="@Request.IncludedStatuses.Contains(status)"
+                                                            @onchange="() => Toggle(status)">
+                                                        <label class="form-check-label flex-grow-1" for="filter-@status">
+                                                            <ProjectStatusTag Status="status" />
+                                                        </label>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
                                     </div>
-                                </td>
+                                </div>
+                            </th>
+                            <th class="text-nowrap">
+                                <div class="d-flex flex-nowrap align-items-center">
+                                    <div>Lead Analyst</div>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm" type="button" data-bs-toggle="dropdown" data-bs-auto-close="outside">
+                                            <span class="icon position-relative">
+                                                <i class="fa-regular fa-bars-filter fa-xs"></i>
+                                                @if (Request.LeadAnalystIds.Any())
+                                                {
+                                                    <span class="position-absolute start-100 translate-middle rounded-circle bg-primary fw-normal p-1 border border-2 border-white" style="top: 80%;"></span>
+                                                }
+                                            </span>
+                                        </button>
+                                        <div class="dropdown-menu py-0 overflow-auto">
+                                            @if (AnalystsOrError is not { } analystsOrError)
+                                            {
+                                                <p class="p-3">Loading...</p>
+                                            }
+                                            else if (analystsOrError.IsError)
+                                            {
+                                                <p class="p-3 text-danger">There was a problem loading analyst options.</p>
+                                            }
+                                            else
+                                            {
+                                                <ul class="list-group list-group-flush small">
+                                                    @foreach (var analyst in analystsOrError.Value)
+                                                    {
+                                                        <li class="list-group-item d-flex align-items-center">
+                                                            <input class="form-check-input mt-1 me-2"
+                                                                   type="checkbox"
+                                                                   id="filter-analyst-@analyst.Id"
+                                                                   checked="@Request.LeadAnalystIds.Contains(analyst.Id)"
+                                                            @onchange="() => ToggleLeadAnalyst(analyst)">
+                                                            <label class="form-check-label fw-normal flex-grow-1" for="filter-analyst-@analyst.Id">
+                                                                @analyst.DisplayName
+                                                            </label>
+                                                        </li>
+                                                    }
+
+                                                    <li class="list-group-item d-flex align-items-center">
+                                                        <input class="form-check-input mt-1 me-2"
+                                                               type="checkbox"
+                                                               id="filter-analyst-none"
+                                                               checked="@Request.LeadAnalystIds.Contains(Guid.Empty)"
+                                                               @onchange="() => ToggleLeadAnalyst(null)">
+                                                        <label class="form-check-label fw-normal flex-grow-1" for="filter-analyst-none">
+                                                            Unassigned
+                                                        </label>
+                                                    </li>
+
+                                                </ul>
+                                            }
+                                        </div>
+                                    </div>
+                                </div>
+                            </th>
+                            <th style="width: 0%;"></th>
+                        </tr>
+                    </thead>
+                    <tbody class="small">
+                        @if (projectsOrError.Value.Count == 0)
+                        {
+                            <tr>
+                                <td colspan="100">No projects found!</td>
                             </tr>
                         }
-                    }
-                </tbody>
-            </table>
+                        else
+                        {
+                            foreach (var project in projectsOrError.Value.Items)
+                            {
+                                <tr>
+                                    <td>
+                                        <a class="font-monospace text-nowrap pe-3" href="l/projects/@project.ProjectCode">
+                                            @project.ProjectCode
+                                        </a>
+                                    </td>
+                                    <td>
+                                        @project.CustomerName
+                                    </td>
+                                    <td>
+                                        <ProjectStatusTag Status="project.ProjectStatus" />
+                                    </td>
+                                    <td>
+                                        @if (project.LeadAnalyst is not { } analyst)
+                                        {
+                                            <span class="text-body-tertiary">Unassigned</span>
+                                        }
+                                        else
+                                        {
+                                            <text>@analyst.DisplayName</text>
+                                        }
+                                    </td>
+                                    <td>
+                                        <div class="dropdown">
+                                            <button class="btn btn-small" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                                <span class="icon">
+                                                    <i class="fa-solid fa-ellipsis-vertical"></i>
+                                                </span>
+                                            </button>
+                                            <ul class="dropdown-menu">
+                                                <li>
+                                                    <a class="dropdown-item small" href="l/projects/@project.ProjectCode">
+                                                        <span class="icon text-primary">
+                                                            <i class="fa-regular fa-eye fa-sm"></i>
+                                                        </span>
+                                                        <span>View details</span>
+                                                    </a>
+                                                </li>
+                                                @if (project.ProjectStatus is ProjectStatus.Active)
+                                                {
+                                                    <li><hr class="dropdown-divider"></li>
+                                                    <li>
+                                                        <button class="dropdown-item small" type="button" @onclick="() => CancelProject(project)">
+                                                            <span class="icon text-danger">
+                                                                <i class="fa-regular fa-ban fa-sm"></i>
+                                                            </span>
+                                                            <span>Cancel project</span>
+                                                        </button>
+                                                    </li>
+                                                    <li>
+                                                        <button class="dropdown-item small" type="button" @onclick="() => CompleteProject(project)">
+                                                            <span class="icon text-success">
+                                                                <i class="fa-regular fa-check fa-sm"></i>
+                                                            </span>
+                                                            <span>Complete project</span>
+                                                        </button>
+                                                    </li>
+                                                }
+                                            </ul>
+                                        </div>
+                                    </td>
+                                </tr>
+                            }
+                        }
+                    </tbody>
+                </table>
+            </div>
+
+            <PageNumbers class="mt-auto" PagedList="projectsOrError.Value" OnSelectPage="GoToPage" />
         </div>
     }
 </PageContainer>
