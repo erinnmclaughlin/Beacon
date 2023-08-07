@@ -109,6 +109,24 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
         Assert.Equal("Test 2", result.Title);
     }
 
+    [Fact]
+    public async Task AppliesMultipleFilters()
+    {
+        RunAsAdmin();
+
+        var request = new GetLaboratoryEventsRequest
+        {
+            MaxEnd = new DateTime(2023, 1, 1),
+            MinEnd = new DateTime(2023, 1, 2)
+        };
+
+        var response = await SendAsync(request);
+        var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
+        Assert.NotNull(events);
+        Assert.Equal(0, events.TotalCount);
+        Assert.Empty(events.Items);
+    }
+
     protected override void AddTestData(BeaconDbContext db)
     {
         db.ProjectEvents.Add(new ProjectEvent
