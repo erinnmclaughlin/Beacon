@@ -37,7 +37,7 @@ steps:
     inputs:
       command: test
       projects: '**/tests/**/*.csproj'
-      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"'
+      arguments: '--configuration $(buildConfiguration) /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs" /p:ParallelizeTestCollections=false'
       publishTestResults: true
 
   - script: |
