@@ -15,23 +15,15 @@ internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<Get
 
     public async Task<ErrorOr<GetProjectTypeFrequencyRequest.Series[]>> Handle(GetProjectTypeFrequencyRequest request, CancellationToken cancellationToken)
     {
-        var query = _dbContext.ProjectApplicationTags.AsQueryable();
+        var today = DateTime.Today;
+        var minDate = new DateTime(today.Year - 1, today.Month, 1);
 
-        if (request.StartDate?.ToDateTime(TimeOnly.MinValue) is { } start)
-        {
-            query = query.Where(p => p.Project.CreatedOn >= start);
-        }
-
-        if (request.EndDate?.ToDateTime(TimeOnly.MinValue) is { } end)
-        {
-            query = query.Where(p => p.Project.CreatedOn <= end);
-        }
-
-        var projects = await query
+        var projects = await _dbContext.ProjectApplicationTags
+            .Where(p => p.Project.CreatedOn >= minDate)
             .GroupBy(p => new { p.Application.Name, p.Project.CreatedOn })
             .Select(group => new
             {
-                Date = group.Key.CreatedOn,
+                Date = new DateOnly(group.Key.CreatedOn.Year, group.Key.CreatedOn.Month, 1),
                 ProjectType = group.Key.Name,
                 Count = group.Count()
             })
@@ -42,15 +34,20 @@ internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<Get
             .Select(group => new GetProjectTypeFrequencyRequest.Series
             {
                 ProjectType = group.Key,
-                ProjectCountByDate = projects
-                    .Where(p => p.ProjectType == group.Key)
-                    .GroupBy(p => DateOnly.FromDateTime(p.Date))
-                    .ToDictionary(
-                        p => p.Key, 
-                        p => projects
-                            .Where(pp => pp.ProjectType == group.Key && p.Key == DateOnly.FromDateTime(pp.Date))
-                            .Sum(p => p.Count))
+                ProjectCountByDate = GetMonths()
+                    .ToDictionary(m => m, m => projects
+                        .Where(p => p.ProjectType == group.Key && p.Date == m)
+                        .Sum(p => p.Count))
             })
             .ToArray();
+    }
+
+    private static IEnumerable<DateOnly> GetMonths()
+    {
+        var today = DateTime.Today;
+        var start = new DateOnly(today.Year - 1, today.Month, 1);
+
+        for (int i = 0; i < 12; i++)
+            yield return start.AddMonths(i);
     }
 }

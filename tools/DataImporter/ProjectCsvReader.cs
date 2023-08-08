@@ -36,7 +36,7 @@ public static class ProjectCsvReader
                 {
                     Id = Guid.NewGuid(),
                     LeadAnalystId = users.FirstOrDefault(u => u.DisplayName == r.Lead)?.Id,
-                    CreatedOn = r.ClearedDate?.ToDateTime(TimeOnly.MinValue) ?? DateTime.UtcNow,
+                    CreatedOn = r.ClearedDate?.ToDateTime(TimeOnly.MinValue) ?? DateTime.MinValue,
                     CreatedById = erin.Id,
                     CustomerName = r.CustomerName,
                     ProjectCode = projectCode,

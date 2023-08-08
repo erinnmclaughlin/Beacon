@@ -9,6 +9,7 @@
 <PageContainer>
     <div class="row">
         <div class="col-12 col-lg">
+            <Chart Config="_config" @ref="_chart"></Chart>
         </div>
         <div class="col-12 col-lg-auto" style="min-width: 21rem;">
             @if (Events is { Value: { Count: > 0 } } events)
