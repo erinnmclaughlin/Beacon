@@ -11,7 +11,6 @@ using ChartJs.Blazor.LineChart;
 using ChartJs.Blazor.Util;
 using ErrorOr;
 using Microsoft.AspNetCore.Components;
-using System.Drawing;
 
 namespace BeaconUI.Core.Laboratories.Pages;
 
@@ -33,6 +32,7 @@ public partial class LaboratoryDetailsPage
             Options = new LineOptions
             {
                 Responsive = true,
+                MaintainAspectRatio = false,
                 Title = new OptionsTitle
                 {
                     Display = true,

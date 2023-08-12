@@ -8,10 +8,12 @@
 
 <PageContainer>
     <div class="row">
-        <div class="col-12 col-lg">
-            <Chart Config="_config" @ref="_chart"></Chart>
+        <div class="col-md-8">
+            <div class="position-relative" style="height: 60vh; width: 100%">
+                <Chart @ref="_chart" Config="_config"></Chart>
+            </div>
         </div>
-        <div class="col-12 col-lg-auto" style="min-width: 21rem;">
+        <div class="col-md-3">
             @if (Events is { Value: { Count: > 0 } } events)
             {
                 var timelineItems = events.Value.Items
