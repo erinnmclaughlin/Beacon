@@ -8,12 +8,34 @@
 
 <PageContainer>
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-9">
             <div class="card p-2 position-relative" style="height: 60vh; width: 100%">
                 <Chart @ref="_chart" Config="_config"></Chart>
             </div>
         </div>
         <div class="col-md-3">
+
+            <div class="card p-2">
+                <p>Project Insights</p>
+                @if (ProjectInsights is not { } errorOrInsights)
+                {
+                    <p>Loading...</p>
+                }
+                else if (errorOrInsights.IsError)
+                {
+                    <p class="text-danger">There was an error loading project insights.</p>
+                }
+                else
+                {
+                    <ul>
+                        @foreach (var insight in errorOrInsights.Value.OrderByDescending(x => x.Interestingness))
+                        {
+                            <li>@insight.Description (Interestingness: @insight.Interestingness.ToString("0.00"))</li>
+                        }
+                    </ul>
+                }
+            </div>
+
             @if (Events is { Value: { Count: > 0 } } events)
             {
                 var timelineItems = events.Value.Items

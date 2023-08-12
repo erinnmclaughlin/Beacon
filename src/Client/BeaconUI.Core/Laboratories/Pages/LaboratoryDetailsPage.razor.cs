@@ -22,6 +22,7 @@ public partial class LaboratoryDetailsPage
     [Inject]
     private IApiClient ApiClient { get; set; } = default!;
 
+    private ErrorOr<ProjectInsightDto[]>? ProjectInsights { get; set; }
     private ErrorOr<GetProjectTypeFrequencyRequest.Series[]>? ProjectTypeFrequencies { get; set; }
     private ErrorOr<PagedList<LaboratoryEventDto>>? Events { get; set; }
 
@@ -102,6 +103,8 @@ public partial class LaboratoryDetailsPage
         }
 
         await _chart.Update();
+
+        await LoadInsights();
     }
 
     private async Task LoadAnalytics()
@@ -116,5 +119,10 @@ public partial class LaboratoryDetailsPage
             MinEnd = DateTime.UtcNow,
             MaxStart = DateTime.UtcNow.AddDays(7)
         });
+    }
+
+    private async Task LoadInsights()
+    {
+        ProjectInsights = await ApiClient.SendAsync(new GetProjectInsightsRequest());
     }
 }
