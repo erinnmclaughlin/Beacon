@@ -18,21 +18,23 @@ internal sealed class GetProjectByIdHandler : IBeaconRequestHandler<GetProjectBy
     public async Task<ErrorOr<ProjectDto>> Handle(GetProjectByIdRequest request, CancellationToken ct)
     {
         var project = await _dbContext.Projects
-                .Include(x => x.LeadAnalyst)
+                .Where(x => x.Id == request.ProjectId)
+                .Select(x => new ProjectDto
+                {
+                    Id = x.Id,
+                    CustomerName = x.CustomerName,
+                    ProjectStatus = x.ProjectStatus,
+                    ProjectCode = x.ProjectCode.ToString(),
+                    Applications = x.TaggedApplications.Select(a => a.Application.Name).ToArray(),
+                    LeadAnalyst = x.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
+                    {
+                        Id = x.LeadAnalyst.Id,
+                        DisplayName = x.LeadAnalyst.DisplayName
+                    }
+                })
                 .AsNoTracking()
-                .SingleOrDefaultAsync(x => x.Id == request.ProjectId, ct);
+                .SingleOrDefaultAsync(ct);
 
-        return project is null ? Error.NotFound("Project not found.") : new ProjectDto
-        {
-            Id = project.Id,
-            CustomerName = project.CustomerName,
-            ProjectStatus = project.ProjectStatus,
-            ProjectCode = project.ProjectCode.ToString(),
-            LeadAnalyst = project.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
-            {
-                Id = project.LeadAnalyst.Id,
-                DisplayName = project.LeadAnalyst.DisplayName
-            }
-        };
+        return project is null ? Error.NotFound("Project not found.") : project;
     }
 }

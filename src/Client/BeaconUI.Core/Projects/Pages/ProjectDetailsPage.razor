@@ -4,7 +4,21 @@
 
 <LaboratoryPageHeader>
     <ChildContent>
-        <h4>Project Details</h4>
+        <div>
+            <div class="small font-monospace text-muted">@Code</div>
+            <h4 class="mb-1">Project Details</h4>
+            <h6 class="mb-0 d-flex gap-1 align-items-center fw-normal">
+                @if (Project?.Value is { } p)
+                {
+                    <span>@p.CustomerName</span>
+                    <ProjectStatusTag Status="@p.ProjectStatus" />
+                    @foreach (var a in p.Applications)
+                    {
+                        <span class="badge fw-normal bg-secondary-subtle text-secondary-emphasis">@a</span>                        
+                    }
+                }
+            </h6>
+        </div>
     </ChildContent>
     <TabsContent>
         <li class="nav-item">
