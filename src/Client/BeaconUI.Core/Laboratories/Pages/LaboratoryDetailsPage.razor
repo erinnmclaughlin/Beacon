@@ -11,52 +11,44 @@
         <div class="col-md-9">
             @if (ProjectInsights is { IsError: false} insights)
             {
-                <div class="row mb-4">
+                <div class="row mb-2">
                     @foreach (var insight in insights.Value)
                     {
-                        <div class="col-2">
+                        <div class="col-12 col-xxl-4 mb-2">
                             <InsightCard Insight="insight" />
                         </div>
                     }
                 </div>
             }
-            <div class="card p-2 position-relative" style="height: 60vh; width: 100%">
+            <div class="card p-2 position-relative mb-4" style="height: 60vh; width: 100%">
                 <Chart @ref="_chart" Config="_config"></Chart>
             </div>
         </div>
         <div class="col-md-3">
 
-            <div class="card p-2">
-                <p>Project Insights</p>
-                @if (ProjectInsights is not { } errorOrInsights)
-                {
-                    <p>Loading...</p>
-                }
-                else if (errorOrInsights.IsError)
-                {
-                    <p class="text-danger">There was an error loading project insights.</p>
-                }
-                else
-                {
-                    <ul>
-                        @foreach (var insight in errorOrInsights.Value.OrderByDescending(x => x.Interestingness))
-                        {
-                            <li>@insight.Description (Interestingness: @insight.Interestingness.ToString("0.00"))</li>
-                        }
-                    </ul>
-                }
-            </div>
+            <h6 style="margin-bottom: 0.75rem;">Upcoming Events</h6>
 
-            @if (Events is { Value: { Count: > 0 } } events)
+            @if (Events is not { } eventsOrError)
             {
-                var timelineItems = events.Value.Items
+                <p>Loading...</p>
+            }
+            else if (eventsOrError.IsError)
+            {
+                <p class="text-danger">There was an error loading laboratory events.</p>
+            }
+            else if (eventsOrError.Value is not { Count: > 0 } events)
+            {
+                <p>There are no upcoming laboratory events.</p>
+            }
+            else
+            {
+                var timelineItems = events.Items
                     .Select(e => new TimelineItem<LaboratoryEventDto>
                     {
                         Timestamp = e.ScheduledStart,
                         Value = e
                     });
 
-                <h6 style="margin-bottom: 0.75rem;">Laboratory Schedule</h6>
                 <div class="mb-4">
                     <Timeline TimelineItems="timelineItems">
                         <div style="margin-bottom:0.625rem;">
@@ -69,7 +61,7 @@
                                     </div>
                                 }
                             </p>
-                            <a class="btn btn-link p-0" style="font-size: 0.925rem; text-decoration: none;">@context.Value.Title</a>
+                            <a class="btn btn-link p-0" style="font-size: 0.925rem; text-decoration: none;" href="l/projects/@context.Value.ProjectCode/schedule">@context.Value.Title</a>
                         </div>
                     </Timeline>
                 </div>
