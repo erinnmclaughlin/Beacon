@@ -37,14 +37,14 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
 
     private static IEnumerable<ProjectInsightDto> GetGrowthInsights(List<ProjectApplicationPopularityStatistic> stats)
     {
-        var growthSummary = new DataSummary(stats.Select(x => x.PercentGrowth * 100.0));
+        var growthSummary = new DataSummary(stats.Select(x => x.PercentGrowth * 100.0).ToList());
 
         foreach (var stat in stats)
         {
             var percentGrowth = 100.0 * stat.PercentGrowth;
             var percentGrowthWeight = Math.Abs(percentGrowth - growthSummary.Average) / growthSummary.StandardDeviation;
 
-            if (percentGrowthWeight < 1.5)
+            if (percentGrowthWeight < 1.41) // Chebyshev's Theorem
                 continue;
 
             var desc = $"Popularity of {stat.ApplicationType} projects has " +
@@ -80,14 +80,10 @@ public class DataSummary
     public double StandardDeviation { get; }
     public double Sum { get; }
 
-    public DataSummary(IEnumerable<double> values)
+    public DataSummary(IReadOnlyCollection<double> values)
     {
         Average = values.Average();
         StandardDeviation = Math.Sqrt(values.Average(v => Math.Pow(v - Average, 2)));
         Sum = values.Sum();
-    }
-
-    public DataSummary(IEnumerable<int> values) : this(values.Cast<double>())
-    {
     }
 }
