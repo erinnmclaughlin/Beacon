@@ -10,19 +10,22 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
 
-public abstract class TestBase : IClassFixture<TestFixture>
+[CollectionDefinition("TestCollection")]
+public class TestCollection : ICollectionFixture<TestFixture>
+{
+}
+
+[Collection("TestCollection")]
+public abstract class TestBase
 {
     protected readonly TestFixture _fixture;
     protected readonly HttpClient _httpClient;
 
-    public TestBase(TestFixture fixture)
+    protected TestBase(TestFixture fixture)
     {
         _fixture = fixture;
         _httpClient = _fixture.CreateClient();
         _httpClient.Timeout = TimeSpan.FromMinutes(3);
-
-        using var scope = _fixture.Services.CreateScope();
-        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
         ResetDatabase();
     }

@@ -8,19 +8,47 @@
 
 <PageContainer>
     <div class="row">
-        <div class="col-12 col-lg">
-        </div>
-        <div class="col-12 col-lg-auto" style="min-width: 21rem;">
-            @if (Events is { Value: { Count: > 0 } } events)
+        <div class="col-md-9">
+            @if (ProjectInsights is { IsError: false} insights)
             {
-                var timelineItems = events.Value.Items
+                <div class="row mb-2">
+                    @foreach (var insight in insights.Value)
+                    {
+                        <div class="col-12 col-xxl-4 mb-2">
+                            <InsightCard Insight="insight" />
+                        </div>
+                    }
+                </div>
+            }
+            <div class="card p-2 position-relative mb-4" style="height: 60vh; width: 100%">
+                <Chart @ref="_chart" Config="_config"></Chart>
+            </div>
+        </div>
+        <div class="col-md-3">
+
+            <h6 style="margin-bottom: 0.75rem;">Upcoming Events</h6>
+
+            @if (Events is not { } eventsOrError)
+            {
+                <p>Loading...</p>
+            }
+            else if (eventsOrError.IsError)
+            {
+                <p class="text-danger">There was an error loading laboratory events.</p>
+            }
+            else if (eventsOrError.Value is not { Count: > 0 } events)
+            {
+                <p>There are no upcoming laboratory events.</p>
+            }
+            else
+            {
+                var timelineItems = events.Items
                     .Select(e => new TimelineItem<LaboratoryEventDto>
                     {
                         Timestamp = e.ScheduledStart,
                         Value = e
                     });
 
-                <h6 style="margin-bottom: 0.75rem;">Laboratory Schedule</h6>
                 <div class="mb-4">
                     <Timeline TimelineItems="timelineItems">
                         <div style="margin-bottom:0.625rem;">
@@ -33,7 +61,7 @@
                                     </div>
                                 }
                             </p>
-                            <a class="btn btn-link p-0" style="font-size: 0.925rem; text-decoration: none;">@context.Value.Title</a>
+                            <a class="btn btn-link p-0" style="font-size: 0.925rem; text-decoration: none;" href="l/projects/@context.Value.ProjectCode/schedule">@context.Value.Title</a>
                         </div>
                     </Timeline>
                 </div>

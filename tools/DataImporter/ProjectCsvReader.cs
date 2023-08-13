@@ -8,7 +8,19 @@ namespace DataImporter;
 
 public static class ProjectCsvReader
 {
-    public static IEnumerable<Project> GetProjects(User[] users)
+    public static IEnumerable<string> GetApplications()
+    {
+        using var reader = new StreamReader("Data\\projects.csv");
+        using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
+
+        var records = csv.GetRecords<ProjectCsvModel>();
+
+        foreach (var r in records)
+            if (!string.IsNullOrWhiteSpace(r.Application))
+                yield return r.Application;
+    }
+
+    public static IEnumerable<Project> GetProjects(ProjectApplication[] applications, User[] users)
     {
         using var reader = new StreamReader("Data\\projects.csv");
         using var csv = new CsvReader(reader, CultureInfo.InvariantCulture);
@@ -24,11 +36,20 @@ public static class ProjectCsvReader
                 {
                     Id = Guid.NewGuid(),
                     LeadAnalystId = users.FirstOrDefault(u => u.DisplayName == r.Lead)?.Id,
+                    CreatedOn = r.ClearedDate?.ToDateTime(TimeOnly.MinValue) ?? DateTime.MinValue,
                     CreatedById = erin.Id,
                     CustomerName = r.CustomerName,
                     ProjectCode = projectCode,
-                    ProjectStatus = GetStatus(r.Status),
+                    ProjectStatus = GetStatus(r.Status)
                 };
+
+                if (!string.IsNullOrWhiteSpace(r.Application))
+                {
+                    project.TaggedApplications.Add(new ProjectApplicationTag
+                    {
+                        ApplicationId = applications.Single(a => a.Name == r.Application).Id
+                    });
+                }
 
                 if (r.ProductName?.ToLower().Trim() is { } product && !string.IsNullOrWhiteSpace(product) && product != "na" && product != "n/a" && product != "none" && product != "empty")
                 {

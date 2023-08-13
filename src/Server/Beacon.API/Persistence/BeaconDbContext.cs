@@ -15,6 +15,8 @@ public class BeaconDbContext : DbContext
     public DbSet<LaboratoryInstrument> LaboratoryInstruments => Set<LaboratoryInstrument>();
     public DbSet<Membership> Memberships => Set<Membership>();
     public DbSet<Project> Projects => Set<Project>();
+    public DbSet<ProjectApplication> ProjectApplications => Set<ProjectApplication>();
+    public DbSet<ProjectApplicationTag> ProjectApplicationTags => Set<ProjectApplicationTag>();
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
     public DbSet<ProjectEvent> ProjectEvents => Set<ProjectEvent>();
     public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
@@ -68,6 +70,7 @@ public class BeaconDbContext : DbContext
         {
             builder.HasKey(x => new { x.InstrumentId, x.ProjectEventId });
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<Membership>(builder =>
@@ -93,12 +96,28 @@ public class BeaconDbContext : DbContext
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
+        modelBuilder.Entity<ProjectApplication>(builder =>
+        {
+            builder.Property(x => x.Name).HasMaxLength(50);
+            builder.HasIndex(x => x.Name).IsUnique();
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+        });
+
+        modelBuilder.Entity<ProjectApplicationTag>(builder =>
+        {
+            builder.HasKey(x => new { x.ApplicationId, x.ProjectId });
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+        });
+
         modelBuilder.Entity<ProjectContact>(builder =>
         {
             builder.Property(x => x.Name).HasMaxLength(ContactRules.MaximumNameLength).IsRequired();
             builder.Property(x => x.EmailAddress).HasMaxLength(255);
             builder.Property(x => x.PhoneNumber).HasMaxLength(50);
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<ProjectEvent>(builder =>
@@ -111,6 +130,7 @@ public class BeaconDbContext : DbContext
         modelBuilder.Entity<SampleGroup>(builder =>
         {
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<User>(builder =>

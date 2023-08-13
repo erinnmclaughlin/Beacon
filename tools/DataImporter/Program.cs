@@ -74,7 +74,20 @@ var instruments = LaboratoryInstrumentCsvReader.GetLaboratoryInstruments(lab.Id)
 dbContext.LaboratoryInstruments.AddRange(instruments);
 await dbContext.SaveChangesAsync();
 
-var projects = ProjectCsvReader.GetProjects(users).ToArray();
+var applications = ProjectCsvReader
+    .GetApplications()
+    .Distinct()
+    .Select(n => new ProjectApplication
+    {
+        Id = Guid.NewGuid(),
+        Name = n
+    })
+    .ToArray();
+
+dbContext.ProjectApplications.AddRange(applications);
+await dbContext.SaveChangesAsync();
+
+var projects = ProjectCsvReader.GetProjects(applications, users).ToArray();
 dbContext.Projects.AddRange(projects);
 await dbContext.SaveChangesAsync();
 

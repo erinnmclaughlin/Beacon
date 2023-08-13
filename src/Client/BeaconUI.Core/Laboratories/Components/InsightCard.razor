@@ -1,0 +1,34 @@
+﻿@using Beacon.Common.Requests.Projects
+
+<div class="card small h-100">
+    <div class="card-body">
+        <h6 class="card-title @TitleClass">
+            <span class="icon">
+                <i class="fa-regular @IconClass"></i>
+            </span>
+            <span>@Insight.Title</span>
+        </h6>
+        <p class="card-text">@Insight.Description</p>
+    </div>
+</div>
+
+@code {
+
+    private string IconClass { get; set; } = "";
+    private string TitleClass { get; set; } = "";
+
+    [Parameter, EditorRequired]
+    public required ProjectInsightDto Insight { get; set; }
+
+    protected override void OnParametersSet()
+    {
+        (IconClass, TitleClass) = Insight.InsightType switch
+        {
+            InsightType.SignificantGrowth => ("fa-angles-up", "text-success"),
+            InsightType.Growth => ("fa-angle-up", "text-success"),
+            InsightType.Decrease => ("fa-angle-down", "text-danger"),
+            InsightType.SignificantDecrease => ("fa-angles-down", "text-danger"),
+            _ => ("fa-info-circle", "text-info")
+        };
+    }
+}
