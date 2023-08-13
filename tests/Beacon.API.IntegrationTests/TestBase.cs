@@ -10,7 +10,13 @@ using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
 
-public abstract class TestBase : IClassFixture<TestFixture>
+[CollectionDefinition("TestCollection")]
+public class TestCollection : ICollectionFixture<TestFixture>
+{
+}
+
+[Collection("TestCollection")]
+public abstract class TestBase
 {
     protected readonly TestFixture _fixture;
     protected readonly HttpClient _httpClient;
