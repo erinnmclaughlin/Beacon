@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
@@ -28,15 +29,14 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
     {
         var thisYear = referenceDate.AddYears(-1);
         var lastYear = thisYear.AddYears(-1);
+        var validStatuses = new[] { ProjectStatus.Active, ProjectStatus.Completed, ProjectStatus.Pending };
 
         return await _dbContext.ProjectApplications
-            .Include(x => x.TaggedProjects)
-            .ThenInclude(x => x.Project)
             .Select(a => new ProjectApplicationPopularityStatistic
             {
                 ApplicationType = a.Name,
-                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < referenceDate),
-                NumberOfProjectsCreatedLastYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= lastYear && p.Project.CreatedOn < thisYear)
+                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => validStatuses.Contains(p.Project.ProjectStatus) && p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < referenceDate),
+                NumberOfProjectsCreatedLastYear = a.TaggedProjects.Count(p => validStatuses.Contains(p.Project.ProjectStatus) && p.Project.CreatedOn >= lastYear && p.Project.CreatedOn < thisYear)
             })
             .AsNoTracking()
             .ToListAsync(ct);
@@ -48,6 +48,9 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
             .Where(x => x.NumberOfProjectsCreatedThisYear != 0 && x.NumberOfProjectsCreatedLastYear != 0)
             .ToList();
 
+        if (!filteredStats.Any())
+            yield break;
+        
         var growthSummary = new DataSummary(filteredStats.Select(x => x.PercentGrowth * 100.0).ToList());
 
         foreach (var stat in filteredStats)
