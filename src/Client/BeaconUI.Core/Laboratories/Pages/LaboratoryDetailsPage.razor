@@ -9,6 +9,17 @@
 <PageContainer>
     <div class="row">
         <div class="col-md-9">
+            @if (ProjectInsights is { IsError: false} insights)
+            {
+                <div class="row mb-4">
+                    @foreach (var insight in insights.Value)
+                    {
+                        <div class="col-2">
+                            <InsightCard Insight="insight" />
+                        </div>
+                    }
+                </div>
+            }
             <div class="card p-2 position-relative" style="height: 60vh; width: 100%">
                 <Chart @ref="_chart" Config="_config"></Chart>
             </div>

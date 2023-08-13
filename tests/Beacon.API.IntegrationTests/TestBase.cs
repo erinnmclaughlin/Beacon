@@ -21,7 +21,7 @@ public abstract class TestBase
     protected readonly TestFixture _fixture;
     protected readonly HttpClient _httpClient;
 
-    public TestBase(TestFixture fixture)
+    protected TestBase(TestFixture fixture)
     {
         _fixture = fixture;
         _httpClient = _fixture.CreateClient();
