@@ -2,14 +2,14 @@
     <Modal>
         <div class="modal-body">
             <div class="field">
-                <label class="form-label" for="sn">Serial Number</label>
-                <InputText @bind-Value="Request.SerialNumber" class="form-control" id="sn" />
-                <ValidationMessage For="() => Request.SerialNumber" />
+                <label class="form-label" for="instrumentType">Instrument Type</label>
+                <InputText @bind-Value="Request.InstrumentType" class="form-control" id="instrumentType" placeholder="e.g., FMS" />
+                <ValidationMessage For="() => Request.InstrumentType" />
             </div>
             <div class="field">
-                <label class="form-label" for="instrumentType">Instrument Type</label>
-                <InputText @bind-Value="Request.InstrumentType" class="form-control" id="instrumentType" />
-                <ValidationMessage For="() => Request.InstrumentType" />
+                <label class="form-label" for="sn">Instrument Name</label>
+                <InputText @bind-Value="Request.SerialNumber" class="form-control" id="sn" placeholder="e.g., FMS-760" />
+                <ValidationMessage For="() => Request.SerialNumber" />
             </div>
         </div>
         <footer class="modal-footer">
