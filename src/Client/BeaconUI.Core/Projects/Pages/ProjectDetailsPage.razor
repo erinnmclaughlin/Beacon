@@ -25,9 +25,6 @@
             <NavLink Match="NavLinkMatch.All" class="nav-link link-secondary" href="@($"l/projects/{Code}")">Overview</NavLink>
         </li>
         <li class="nav-item">
-            <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/schedule")">Schedule</NavLink>
-        </li>
-        <li class="nav-item">
             <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
         </li>
         <li class="nav-item">
@@ -39,14 +36,11 @@
 <PageContainer>
     @if (Project is not { } p)
     {
+        <p>Loading...</p>
     }
     else if (p.IsError)
     {
         <p class="text-danger">There was an error loading project details.</p>
-    }
-    else if ("schedule".Equals(Tab, StringComparison.OrdinalIgnoreCase))
-    {
-        <ProjectSchedule ProjectId="p.Value.Id" />
     }
     else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
     {
