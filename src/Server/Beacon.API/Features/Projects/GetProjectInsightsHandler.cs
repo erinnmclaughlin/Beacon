@@ -30,14 +30,14 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
             .AsNoTracking()
             .ToListAsync(ct);
 
-        var results = GetGrowthInsights(stats)
-            .OrderByDescending(x => x.Interestingness)
-            .ToArray();
+        var results = GetGrowthInsights(stats).ToList();
+        AddProjectFrequencyInsight(results, stats);
+        AddMostPopularApplicationTypeInsight(results, stats);
 
-        return results;
+        return results.OrderByDescending(x => x.Interestingness).ToArray();
     }
 
-    private static IEnumerable<ProjectInsightDto> GetGrowthInsights(IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
+    public static IEnumerable<ProjectInsightDto> GetGrowthInsights(IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
     {
         var filteredStats = stats
             .Where(x => x.NumberOfProjectsCreatedThisYear != 0 && x.NumberOfProjectsCreatedLastYear != 0)
@@ -73,40 +73,51 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
             };
         }
 
+    }
+
+    public static void AddProjectFrequencyInsight(List<ProjectInsightDto> insights, IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
+    {
         var thisYearCount = stats.Sum(x => x.NumberOfProjectsCreatedThisYear);
         var lastYearCount = stats.Sum(x => x.NumberOfProjectsCreatedLastYear);
         var overallDiff = thisYearCount - lastYearCount;
-        var overallGrowth = (thisYearCount - lastYearCount) / (double)lastYearCount;
-        var overallGrowthInsightType = GetInsightTypeFromPercentGrowth(overallGrowth);
 
-        yield return new ProjectInsightDto
+        if (overallDiff != 0)
         {
-            InsightType = overallGrowthInsightType,
-            Title = "New Project Frequency",
-            Description = $"There {(overallDiff == 1 ? "was" : "were")} {Math.Abs(overallDiff)} {(overallDiff > 0 ? "more" : "less")} projects created this year than last year.",
-            Interestingness = 1.41
-        };
+            var overallGrowth = (thisYearCount - lastYearCount) / (double)lastYearCount;
+            var overallGrowthInsightType = GetInsightTypeFromPercentGrowth(overallGrowth);
 
+            insights.Add(new ProjectInsightDto
+            {
+                InsightType = overallGrowthInsightType,
+                Title = "New Project Frequency",
+                Description = $"There {(overallDiff == 1 ? "was" : "were")} {Math.Abs(overallDiff)} {(overallDiff > 0 ? "more" : "less")} projects created this year than last year.",
+                Interestingness = 1.41
+            });
+        }
+    }
+
+    public static void AddMostPopularApplicationTypeInsight(List<ProjectInsightDto> insights, IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
+    {
         var mostPopularThisYear = stats.MaxBy(x => x.NumberOfProjectsCreatedThisYear);
         var mostPopularLastYear = stats.MaxBy(x => x.NumberOfProjectsCreatedLastYear);
 
         if (mostPopularThisYear != mostPopularLastYear)
         {
-            yield return new ProjectInsightDto
+            insights.Add(new ProjectInsightDto
             {
                 InsightType = InsightType.Info,
                 Title = "Most Popular Application",
                 Description = $"The most popular application type has changed from {mostPopularLastYear?.ApplicationType} to {mostPopularThisYear?.ApplicationType} over the last year.",
                 Interestingness = 1.5
-            };
+            });
         }
     }
 
-    private static InsightType GetInsightTypeFromPercentGrowth(double percentGrowth) => percentGrowth switch
+    public static InsightType GetInsightTypeFromPercentGrowth(double percentGrowth) => percentGrowth switch
     {
-        > 50 => InsightType.SignificantGrowth,
+        >= 50 => InsightType.SignificantGrowth,
         > 0 => InsightType.Growth,
-        < -50 => InsightType.SignificantDecrease,
+        <= -50 => InsightType.SignificantDecrease,
         < 0 => InsightType.Decrease,
         _ => InsightType.Info
     };
