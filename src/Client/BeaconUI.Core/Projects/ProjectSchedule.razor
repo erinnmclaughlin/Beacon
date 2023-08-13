@@ -7,7 +7,7 @@
             <h5 class="display-6 fs-4 mb-0">
                 Project Schedule
             </h5>
-            <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button">
+            <CreateProjectEventButton ProjectId="ProjectId" OnEventCreated="LoadProjects" class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Schedule an event">
                 <span class="icon me-0"><i class="fa-regular fa-calendar-circle-plus"></i></span>
             </CreateProjectEventButton>
         </div>
@@ -45,11 +45,11 @@
                 </p>
                 <div class="card">
                     <div class="card-body position-relative" style="padding: 0.75rem 1rem">
-                        <button type="button" class="btn btn-sm position-absolute top-0 end-0 my-1 me-2 link-secondary">
+                        @* <button type="button" class="btn btn-sm position-absolute top-0 end-0 my-1 me-2 link-secondary">
                             <span class="icon">
                                 <i class="fa-regular fa-pencil"></i>
                             </span>
-                        </button>
+                        </button> *@
                         <h6 class="card-title d-flex align-items-center" style="font-size:1.075rem; margin-bottom: 0.675rem;">
                             <span class="me-1">@context.Value.Title</span>
                             @if (context.Value.IsOngoingDuring(DateTime.Today))
@@ -112,7 +112,7 @@
                                             <span>@instrument.SerialNumber</span>
                                         </Badge>
                                     </button>
-                                    <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                    <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem; max-height: 250px; overflow-y: auto;">
                                         <div class="list-group" style="white-space: nowrap;">
                                             <button class="list-group-item list-group-item-action" type="button" @onclick="() => Unassociate(context.Value, instrument)">
                                                 <span class="icon position-relative">

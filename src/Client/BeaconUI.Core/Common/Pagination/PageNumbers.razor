@@ -1,11 +1,24 @@
 ﻿<nav @attributes="@Attributes">
     <ul class="pagination justify-content-center">
+        <li class="page-item @(PagedList.CurrentPage > 1 ? "" : "disabled")">
+            <button class="page-link"
+                    disabled="@(PagedList.CurrentPage == 1)"
+                    @onclick="() => SelectPage(1)">
+                <span class="icon">
+                    <i class="fa-light fa-sm fa-angles-left"></i>
+                </span>
+                <span>First</span>
+            </button>
+        </li>
         <li class="page-item @(PagedList.HasPrevious ? "" : "disabled")">
             <button 
                 class="page-link" 
                 disabled="@(!PagedList.HasPrevious)" 
                 @onclick="() => SelectPage(PagedList.CurrentPage - 1)">
-                Previous
+                <span class="icon">
+                    <i class="fa-light fa-sm fa-angle-left"></i>
+                </span>
+                <span>Previous</span>
             </button>
         </li>
 
@@ -23,7 +36,20 @@
                 class="page-link" 
                 disabled="@(!PagedList.HasNext)" 
                 @onclick="() => SelectPage(PagedList.CurrentPage + 1)">
-                Next
+                <span>Next</span>
+                <span class="icon">
+                    <i class="fa-light fa-sm fa-angle-right"></i>
+                </span>
+            </button>
+        </li>
+        <li class="page-item @(PagedList.CurrentPage < PagedList.TotalPages ? "" : "disabled")">
+            <button class="page-link"
+                    disabled="@(PagedList.CurrentPage == PagedList.TotalPages)"
+                    @onclick="() => SelectPage(PagedList.TotalPages)">
+                <span>Last</span>
+                <span class="icon">
+                    <i class="fa-light fa-sm fa-angles-right"></i>
+                </span>
             </button>
         </li>
     </ul>
