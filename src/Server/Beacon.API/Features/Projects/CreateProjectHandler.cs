@@ -9,7 +9,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProjectRequest>
+internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProjectRequest, ProjectCode>
 {
     private readonly BeaconDbContext _dbContext;
     private readonly ISessionContext _sessionContext;
@@ -20,7 +20,7 @@ internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProject
         _sessionContext = sessionContext;
     }
 
-    public async Task<ErrorOr<Success>> Handle(CreateProjectRequest request, CancellationToken ct)
+    public async Task<ErrorOr<ProjectCode>> Handle(CreateProjectRequest request, CancellationToken ct)
     {
         if (request.LeadAnalystId is { } leadId && !await IsValidLeadAnalyst(leadId, ct))
             return Error.Validation(nameof(CreateProjectRequest.LeadAnalystId), "Lead analyst must have at least an analyst role.");
@@ -56,7 +56,7 @@ internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProject
 
         _dbContext.Projects.Add(project);
         await _dbContext.SaveChangesAsync(ct);
-        return Result.Success;
+        return project.ProjectCode;
     }
 
     private async Task<bool> IsValidLeadAnalyst(Guid analystId, CancellationToken ct)
