@@ -4,6 +4,7 @@ using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
+
 internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<GetProjectTypeFrequencyRequest, GetProjectTypeFrequencyRequest.Series[]>
 {
     private readonly BeaconDbContext _dbContext;
@@ -15,11 +16,8 @@ internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<Get
 
     public async Task<ErrorOr<GetProjectTypeFrequencyRequest.Series[]>> Handle(GetProjectTypeFrequencyRequest request, CancellationToken cancellationToken)
     {
-        var today = DateTime.Today;
-        var minDate = new DateTime(today.Year - 1, today.Month, 1);
-
         var projects = await _dbContext.ProjectApplicationTags
-            .Where(p => p.Project.CreatedOn >= minDate)
+            .Where(p => p.Project.CreatedOn >= request.StartDate)
             .GroupBy(p => new { p.Application.Name, p.Project.CreatedOn })
             .Select(group => new
             {
@@ -47,7 +45,7 @@ internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<Get
         var today = DateTime.Today;
         var start = new DateOnly(today.Year - 1, today.Month, 1);
 
-        for (int i = 0; i < 12; i++)
+        for (var i = 0; i < 12; i++)
             yield return start.AddMonths(i);
     }
 }
