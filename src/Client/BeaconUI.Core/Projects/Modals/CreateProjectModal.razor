@@ -15,6 +15,11 @@
                     <ValidationMessage For="() => Model.CustomerCode" />
                 </div>
                 <div class="field">
+                    <label class="form-label" for="application">Project Application</label>
+                    <InputText @bind-Value="Model.Application" class="form-control" id="application" placeholder="e.g., CCI" />
+                    <ValidationMessage For="() => Model.Application" />
+                </div>
+                <div class="field">
                     <label class="form-label" for="member">Lead Analyst</label>
                     <InputSelect @bind-Value="Model.LeadAnalystId" class="form-select" id="member">
                         <option>None</option>
