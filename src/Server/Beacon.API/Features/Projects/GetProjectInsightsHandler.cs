@@ -16,25 +16,30 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
 
     public async Task<ErrorOr<ProjectInsightDto[]>> Handle(GetProjectInsightsRequest request, CancellationToken ct)
     {
-        var today = DateTime.Today.AddMonths(-1);
-        var thisYear = today.AddYears(-1);
-        var lastYear = thisYear.AddYears(-1);
-
-        var stats = await _dbContext.ProjectApplications
-            .Select(a => new ProjectApplicationPopularityStatistic
-            {
-                ApplicationType = a.Name,
-                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < today),
-                NumberOfProjectsCreatedLastYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= lastYear && p.Project.CreatedOn < thisYear)
-            })
-            .AsNoTracking()
-            .ToListAsync(ct);
-
+        var stats = await GetStatistics(request.ReferenceDate, ct);
         var results = GetGrowthInsights(stats).ToList();
         AddProjectFrequencyInsight(results, stats);
         AddMostPopularApplicationTypeInsight(results, stats);
 
         return results.OrderByDescending(x => x.Interestingness).ToArray();
+    }
+
+    public async Task<List<ProjectApplicationPopularityStatistic>> GetStatistics(DateTime referenceDate, CancellationToken ct)
+    {
+        var thisYear = referenceDate.AddYears(-1);
+        var lastYear = thisYear.AddYears(-1);
+
+        return await _dbContext.ProjectApplications
+            .Include(x => x.TaggedProjects)
+            .ThenInclude(x => x.Project)
+            .Select(a => new ProjectApplicationPopularityStatistic
+            {
+                ApplicationType = a.Name,
+                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < referenceDate),
+                NumberOfProjectsCreatedLastYear = a.TaggedProjects.Count(p => p.Project.CreatedOn >= lastYear && p.Project.CreatedOn < thisYear)
+            })
+            .AsNoTracking()
+            .ToListAsync(ct);
     }
 
     public static IEnumerable<ProjectInsightDto> GetGrowthInsights(IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
