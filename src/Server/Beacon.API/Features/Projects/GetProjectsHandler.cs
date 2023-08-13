@@ -32,6 +32,7 @@ internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequ
                 CustomerName = x.CustomerName,
                 ProjectStatus = x.ProjectStatus,
                 ProjectCode = x.ProjectCode.ToString(),
+                Applications = x.TaggedApplications.Select(a => a.Application.Name).ToArray(),
                 LeadAnalyst = x.LeadAnalyst == null ? null : new ProjectDto.LeadAnalystDto
                 {
                     Id = x.LeadAnalyst.Id,

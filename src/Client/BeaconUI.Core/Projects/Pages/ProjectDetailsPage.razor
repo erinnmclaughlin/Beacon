@@ -4,14 +4,25 @@
 
 <LaboratoryPageHeader>
     <ChildContent>
-        <h4>Project Details</h4>
+        <div>
+            <div class="small font-monospace text-muted">@Code</div>
+            <h4 class="mb-1">Project Details</h4>
+            <h6 class="mb-0 d-flex gap-1 align-items-center fw-normal">
+                @if (Project?.Value is { } p)
+                {
+                    <span>@p.CustomerName</span>
+                    <ProjectStatusTag Status="@p.ProjectStatus" />
+                    @foreach (var a in p.Applications)
+                    {
+                        <span class="badge fw-normal bg-secondary-subtle text-secondary-emphasis">@a</span>                        
+                    }
+                }
+            </h6>
+        </div>
     </ChildContent>
     <TabsContent>
         <li class="nav-item">
             <NavLink Match="NavLinkMatch.All" class="nav-link link-secondary" href="@($"l/projects/{Code}")">Overview</NavLink>
-        </li>
-        <li class="nav-item">
-            <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/schedule")">Schedule</NavLink>
         </li>
         <li class="nav-item">
             <NavLink class="nav-link link-secondary" href="@($"l/projects/{Code}/samples")">Samples</NavLink>
@@ -25,14 +36,11 @@
 <PageContainer>
     @if (Project is not { } p)
     {
+        <p>Loading...</p>
     }
     else if (p.IsError)
     {
         <p class="text-danger">There was an error loading project details.</p>
-    }
-    else if ("schedule".Equals(Tab, StringComparison.OrdinalIgnoreCase))
-    {
-        <ProjectSchedule ProjectId="p.Value.Id" />
     }
     else if ("samples".Equals(Tab, StringComparison.OrdinalIgnoreCase))
     {
