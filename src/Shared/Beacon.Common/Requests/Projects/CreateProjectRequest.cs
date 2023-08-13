@@ -7,6 +7,7 @@ namespace Beacon.Common.Requests.Projects;
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
 public sealed class CreateProjectRequest : BeaconRequest<CreateProjectRequest>
 {
+    public string Application { get; set; } = string.Empty;
     public string CustomerCode { get; set; } = string.Empty;
     public string CustomerName { get; set; } = string.Empty;
     public Guid? LeadAnalystId { get; set; }

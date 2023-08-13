@@ -25,15 +25,36 @@ internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProject
         if (request.LeadAnalystId is { } leadId && !await IsValidLeadAnalyst(leadId, ct))
             return Error.Validation(nameof(CreateProjectRequest.LeadAnalystId), "Lead analyst must have at least an analyst role.");
 
-        _dbContext.Projects.Add(new Project
+        var project = new Project
         {
             Id = Guid.NewGuid(),
             ProjectCode = await GenerateProjectCode(request, ct),
             CustomerName = request.CustomerName,
             CreatedById = _sessionContext.CurrentUser.Id,
             LeadAnalystId = request.LeadAnalystId
-        });
+        };
 
+        if (!string.IsNullOrWhiteSpace(request.Application))
+        {
+            var appId = await _dbContext.ProjectApplications.Where(x => x.Name == request.Application).Select(x => x.Id).SingleOrDefaultAsync(ct);
+
+            if (appId == Guid.Empty)
+            {
+                project.TaggedApplications.Add(new ProjectApplicationTag
+                {
+                    Application = new() { Name = request.Application }
+                });
+            }
+            else
+            {
+                project.TaggedApplications.Add(new ProjectApplicationTag
+                {
+                    ApplicationId = appId
+                });
+            }
+        }
+
+        _dbContext.Projects.Add(project);
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success;
     }

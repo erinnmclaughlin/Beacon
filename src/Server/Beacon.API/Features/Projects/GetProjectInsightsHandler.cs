@@ -98,7 +98,7 @@ internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsig
             {
                 InsightType = overallGrowthInsightType,
                 Title = "New Project Frequency",
-                Description = $"There {(overallDiff == 1 ? "was" : "were")} {Math.Abs(overallDiff)} {(overallDiff > 0 ? "more" : "less")} projects created this year than last year.",
+                Description = $"There {(overallDiff == 1 ? "was" : "were")} {Math.Abs(overallDiff)} {(overallDiff > 0 ? "more" : "less")} {(overallDiff == 1 ? "project" : "projects")} created this year than last year.",
                 Interestingness = 1.41
             });
         }
