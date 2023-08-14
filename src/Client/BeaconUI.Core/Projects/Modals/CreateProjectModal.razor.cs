@@ -20,12 +20,13 @@ public partial class CreateProjectModal
     private async Task Submit(BeaconForm formContext)
     {
         var result = await ApiClient.SendAsync(Model);
+
         if (result.IsError)
         {
             formContext.AddErrors(result.Errors);
             return;
         }
 
-        await Modal.CloseAsync(ModalResult.Ok());
+        await Modal.CloseAsync(ModalResult.Ok(result.Value));
     }
 }

@@ -5,7 +5,7 @@ using FluentValidation;
 namespace Beacon.Common.Requests.Projects;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Analyst)]
-public sealed class CreateProjectRequest : BeaconRequest<CreateProjectRequest>
+public sealed class CreateProjectRequest : BeaconRequest<CreateProjectRequest, ProjectCode>
 {
     public string Application { get; set; } = string.Empty;
     public string CustomerCode { get; set; } = string.Empty;

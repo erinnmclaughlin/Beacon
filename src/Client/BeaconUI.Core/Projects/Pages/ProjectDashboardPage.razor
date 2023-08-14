@@ -4,7 +4,7 @@
 
 <LaboratoryPageHeader>
     <h4 class="mb-0 me-auto">Projects</h4>
-    <CreateProjectButton OnProjectCreated="LoadProjects" class="btn btn-sm btn-primary" />
+    <CreateProjectButton class="btn btn-sm btn-primary" />
 </LaboratoryPageHeader>
 
 <PageContainer>
@@ -24,7 +24,8 @@
                     <thead class="table-light align-middle small">
                         <tr>
                             <th class="text-nowrap">Project Code</th>
-                            <th style="width: 50%">Customer Name</th>
+                            <th style="width: 40%">Customer Name</th>
+                            <th class="text-nowrap">Application(s)</th>
                             <th class="text-nowrap">
                                 <div class="d-flex flex-nowrap align-items-center">
                                     <div>Project Status</div>
@@ -139,12 +140,27 @@
                                         @project.CustomerName
                                     </td>
                                     <td>
+                                        <div class="d-flex gap-1">
+                                            @if (project.Applications.Any())
+                                            {
+                                                foreach (var a in project.Applications)
+                                                {
+                                                    <span class="badge fw-normal bg-secondary-subtle text-secondary-emphasis">@a</span>
+                                                }
+                                            }
+                                            else
+                                            {
+                                                <span class="text-body-tertiary fst-italic">None</span>
+                                            }
+                                        </div>
+                                    </td>
+                                    <td>
                                         <ProjectStatusTag Status="project.ProjectStatus" />
                                     </td>
                                     <td>
                                         @if (project.LeadAnalyst is not { } analyst)
                                         {
-                                            <span class="text-body-tertiary">Unassigned</span>
+                                            <span class="text-body-tertiary fst-italic">Unassigned</span>
                                         }
                                         else
                                         {

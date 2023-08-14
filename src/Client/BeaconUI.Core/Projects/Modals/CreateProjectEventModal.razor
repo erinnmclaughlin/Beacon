@@ -1,5 +1,5 @@
 ﻿<BeaconForm Model="Request" OnValidSubmit="Submit">
-    <Modal>
+    <Modal DisableScroll="true">
         <div class="modal-body">
             <div class="field">
                 <label for="title">Event name</label>
@@ -45,7 +45,7 @@
                                         <span>@instrument.SerialNumber</span>
                                     </Badge>
                                 </button>
-                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem; max-height: 250px; overflow-y: auto;">
                                     <div class="list-group" style="white-space: nowrap;">
                                         <button class="list-group-item list-group-item-action" type="button" @onclick="() => Request.InstrumentIds.Remove(instrumentId)">
                                             <span class="icon position-relative">
@@ -73,7 +73,7 @@
                                         </span>
                                     </Badge>
                                 </button>
-                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem;">
+                                <div class="dropdown-menu p-0 border-0" style="font-size: 0.9rem; max-height: 250px; overflow-y: auto;">
                                     <div class="list-group" style="white-space: nowrap;">
                                         @foreach (var instrument in instrumentOptions)
                                         {

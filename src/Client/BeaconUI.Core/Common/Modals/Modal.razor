@@ -1,6 +1,6 @@
 ﻿<div class="modal modal-fullscreen-sm-down fade show d-block @BlazoredModal.Options.SizeCustomClass" tabindex="-1" role="dialog">
     <div class="modal-backdrop fade show" @onclick="Cancel"></div>
-    <div class="modal-dialog modal-dialog-centered modal-dialog-scrollable" style="z-index: 1050">
+    <div class="modal-dialog modal-dialog-centered @(DisableScroll ? "" : "modal-dialog-scrollable")" style="z-index: 1050;">
         <div class="modal-content">
             <div class="modal-header py-2">
                 <h5 class="modal-title fw-normal mb-0">@BlazoredModal.Title</h5>
@@ -15,6 +15,9 @@
 
     [CascadingParameter] 
     private BlazoredModalInstance BlazoredModal { get; set; } = default!;
+
+    [Parameter]
+    public bool DisableScroll { get; set; }
 
     [Parameter] 
     public RenderFragment? ChildContent { get; set; }

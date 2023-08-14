@@ -28,7 +28,7 @@ public sealed class CreateProjectTests : ProjectTestBase
         RunAsAdmin();
 
         var response = await SendAsync(SomeValidRequest);
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var createdProject = ExecuteDbContext(db => db.Projects.Single(x => x.CustomerName == SomeValidRequest.CustomerName));
         Assert.Equal($"ABC-{DateTime.Today:yyyyMM}-001", createdProject.ProjectCode.ToString());
