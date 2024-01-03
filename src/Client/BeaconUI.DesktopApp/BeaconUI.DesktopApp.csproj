@@ -1,8 +1,10 @@
 ﻿<Project Sdk="Microsoft.NET.Sdk.Razor">
 
   <PropertyGroup>
-    <TargetFrameworks></TargetFrameworks>
+    <!-- Support is currently for Windows only-->
+    <TargetFrameworks>net8.0-windows10.0.19041.0</TargetFrameworks>
     <OutputType>Exe</OutputType>
+    
     <RootNamespace>BeaconUI.DesktopApp</RootNamespace>
     <UseMaui>true</UseMaui>
     <SingleProject>true</SingleProject>
@@ -10,20 +12,17 @@
     <EnableDefaultCssItems>false</EnableDefaultCssItems>
 
     <!-- Display name -->
-    <ApplicationTitle>BeaconUI.DesktopApp</ApplicationTitle>
+    <ApplicationTitle>Beacon</ApplicationTitle>
 
     <!-- App Identifier -->
     <ApplicationId>com.companyname.beaconui.desktopapp</ApplicationId>
     <ApplicationIdGuid>F9A47634-8FEE-481F-9C47-B1696549A000</ApplicationIdGuid>
 
     <!-- Versions -->
-    <ApplicationDisplayVersion>1.0</ApplicationDisplayVersion>
     <ApplicationVersion>1</ApplicationVersion>
-    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
-  </PropertyGroup>
 
-  <PropertyGroup>
-    <TargetFrameworks Condition="$([MSBuild]::IsOSPlatform('windows'))">$(TargetFrameworks);net8.0-windows10.0.19041.0</TargetFrameworks>
+    <SupportedOSPlatformVersion>10.0.17763.0</SupportedOSPlatformVersion>
+    <TargetPlatformMinVersion>10.0.17763.0</TargetPlatformMinVersion>
   </PropertyGroup>
 
   <ItemGroup>
