@@ -4,14 +4,9 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Auth;
 
-internal sealed class LogoutHandler : IBeaconRequestHandler<LogoutRequest>
+internal sealed class LogoutHandler(ISignInManager signInManager) : IBeaconRequestHandler<LogoutRequest>
 {
-    private readonly ISignInManager _signInManager;
-
-    public LogoutHandler(ISignInManager signInManager)
-    {
-        _signInManager = signInManager;
-    }
+    private readonly ISignInManager _signInManager = signInManager;
 
     public async Task<ErrorOr<Success>> Handle(LogoutRequest request, CancellationToken ct)
     {

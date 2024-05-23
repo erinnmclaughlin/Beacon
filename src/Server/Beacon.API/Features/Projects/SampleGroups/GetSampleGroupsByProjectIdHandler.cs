@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects.SampleGroups;
 
-internal sealed class GetSampleGroupsByProjectIdHandler : IBeaconRequestHandler<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>
+internal sealed class GetSampleGroupsByProjectIdHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetSampleGroupsByProjectIdRequest, SampleGroupDto[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetSampleGroupsByProjectIdHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<SampleGroupDto[]>> Handle(GetSampleGroupsByProjectIdRequest request, CancellationToken ct)
     {

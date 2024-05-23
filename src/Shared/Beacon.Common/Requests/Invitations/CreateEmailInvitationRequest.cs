@@ -11,10 +11,7 @@ public sealed class CreateEmailInvitationRequest : BeaconRequest<CreateEmailInvi
 
     public sealed class Validator : AbstractValidator<CreateEmailInvitationRequest>
     {
-        public Validator()
-        {
-            RuleFor(x => x.NewMemberEmailAddress)
+        public Validator() => RuleFor(x => x.NewMemberEmailAddress)
                 .EmailAddress().WithMessage("Invalid email address.");
-        }
     }
 }

@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Instruments;
 
-internal sealed class GetLaboratoryInstrumentsHandler : IBeaconRequestHandler<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>
+internal sealed class GetLaboratoryInstrumentsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetLaboratoryInstrumentsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<LaboratoryInstrumentDto[]>> Handle(GetLaboratoryInstrumentsRequest request, CancellationToken ct)
     {

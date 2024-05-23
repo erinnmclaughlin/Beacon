@@ -16,14 +16,9 @@ public interface IEmailSendOperation
     DateTime Timestamp { get; }
 }
 
-internal sealed class EmailService : IEmailService
+internal sealed class EmailService(IOptions<EmailSettings> settings) : IEmailService
 {
-    private readonly EmailSettings _settings;
-
-    public EmailService(IOptions<EmailSettings> settings)
-    {
-        _settings = settings.Value;
-    }
+    private readonly EmailSettings _settings = settings.Value;
 
     public async Task<IEmailSendOperation?> SendAsync(string subject, string htmlBody, string toAddress)
     {
@@ -52,16 +47,10 @@ internal sealed class EmailService : IEmailService
     }
 }
 
-internal class BeaconEmailSendOperation : IEmailSendOperation
+internal class BeaconEmailSendOperation(EmailSendOperation emailSendOperation) : IEmailSendOperation
 {
-    private readonly EmailSendOperation _emailSendOperation;
+    private readonly EmailSendOperation _emailSendOperation = emailSendOperation;
 
     public string OperationId => _emailSendOperation.Id;
-    public DateTime Timestamp { get; }
-
-    public BeaconEmailSendOperation(EmailSendOperation emailSendOperation)
-    {
-        _emailSendOperation = emailSendOperation;
-        Timestamp = DateTime.UtcNow;
-    }
+    public DateTime Timestamp { get; } = DateTime.UtcNow;
 }

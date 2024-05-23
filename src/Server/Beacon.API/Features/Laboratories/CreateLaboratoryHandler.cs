@@ -7,16 +7,10 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Laboratories;
 
-internal sealed class CreateLaboratoryHandler : IBeaconRequestHandler<CreateLaboratoryRequest>
+internal sealed class CreateLaboratoryHandler(ISessionContext currentUser, BeaconDbContext dbContext) : IBeaconRequestHandler<CreateLaboratoryRequest>
 {
-    private readonly ISessionContext _context;
-    private readonly BeaconDbContext _dbContext;
-
-    public CreateLaboratoryHandler(ISessionContext currentUser, BeaconDbContext dbContext)
-    {
-        _context = currentUser;
-        _dbContext = dbContext;
-    }
+    private readonly ISessionContext _context = currentUser;
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(CreateLaboratoryRequest request, CancellationToken ct)
     {

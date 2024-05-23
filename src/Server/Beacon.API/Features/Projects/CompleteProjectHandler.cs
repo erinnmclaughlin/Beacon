@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class CompleteProjectHandler : IBeaconRequestHandler<CompleteProjectRequest>
+internal sealed class CompleteProjectHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<CompleteProjectRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public CompleteProjectHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(CompleteProjectRequest request, CancellationToken ct)
     {

@@ -9,14 +9,9 @@ using System.Linq.Expressions;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class GetProjectsHandler : IBeaconRequestHandler<GetProjectsRequest, PagedList<ProjectDto>>
+internal sealed class GetProjectsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetProjectsRequest, PagedList<ProjectDto>>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetProjectsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<PagedList<ProjectDto>>> Handle(GetProjectsRequest request, CancellationToken ct)
     {

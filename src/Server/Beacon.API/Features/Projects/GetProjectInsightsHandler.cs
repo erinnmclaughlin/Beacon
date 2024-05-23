@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal class GetProjectInsightsHandler : IBeaconRequestHandler<GetProjectInsightsRequest, ProjectInsightDto[]>
+internal class GetProjectInsightsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetProjectInsightsRequest, ProjectInsightDto[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetProjectInsightsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<ProjectInsightDto[]>> Handle(GetProjectInsightsRequest request, CancellationToken ct)
     {

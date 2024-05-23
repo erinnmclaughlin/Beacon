@@ -24,16 +24,16 @@ public static class BeaconEndpointMapper
             if (responseType == typeof(Success))
             {
                 typeof(BeaconEndpointMapper)
-                    .GetMethod(nameof(MapPost), new[] { typeof(IEndpointRouteBuilder) })!
+                    .GetMethod(nameof(MapPost), [typeof(IEndpointRouteBuilder)])!
                     .MakeGenericMethod(requestType)
-                    .Invoke(null, new object[] { app });
+                    .Invoke(null, [app]);
             }
             else
             {
                 typeof(BeaconEndpointMapper)
-                    .GetMethod(nameof(MapGet), new[] { typeof(IEndpointRouteBuilder) })!
+                    .GetMethod(nameof(MapGet), [typeof(IEndpointRouteBuilder)])!
                     .MakeGenericMethod(requestType, responseType)
-                    .Invoke(null, new object[] { app });
+                    .Invoke(null, [app]);
             }
         }
     }

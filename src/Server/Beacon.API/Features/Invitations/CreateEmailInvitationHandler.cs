@@ -11,18 +11,11 @@ using Microsoft.Extensions.Options;
 
 namespace Beacon.API.Features.Invitations;
 
-internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<CreateEmailInvitationRequest>
+internal sealed class CreateEmailInvitationHandler(ILabContext context, BeaconDbContext dbContext, IPublisher publisher) : IBeaconRequestHandler<CreateEmailInvitationRequest>
 {
-    private readonly ILabContext _context;
-    private readonly BeaconDbContext _dbContext;
-    private readonly IPublisher _publisher;
-
-    public CreateEmailInvitationHandler(ILabContext context, BeaconDbContext dbContext, IPublisher publisher)
-    {
-        _context = context;
-        _dbContext = dbContext;
-        _publisher = publisher;
-    }
+    private readonly ILabContext _context = context;
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly IPublisher _publisher = publisher;
 
     public async Task<ErrorOr<Success>> Handle(CreateEmailInvitationRequest request, CancellationToken ct)
     {
@@ -68,18 +61,11 @@ internal sealed class CreateEmailInvitationHandler : IBeaconRequestHandler<Creat
 
 public record EmailInvitationCreated(Guid EmailInvitationId) : INotification;
 
-internal sealed class NotificationHandler : INotificationHandler<EmailInvitationCreated>
+internal sealed class NotificationHandler(IOptions<ApplicationSettings> appSettings, BeaconDbContext dbContext, IEmailService emailService) : INotificationHandler<EmailInvitationCreated>
 {
-    private readonly string _baseUrl;
-    private readonly BeaconDbContext _dbContext;
-    private readonly IEmailService _emailService;
-
-    public NotificationHandler(IOptions<ApplicationSettings> appSettings, BeaconDbContext dbContext, IEmailService emailService)
-    {
-        _baseUrl = appSettings.Value.BaseUrl;
-        _dbContext = dbContext;
-        _emailService = emailService;
-    }
+    private readonly string _baseUrl = appSettings.Value.BaseUrl;
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly IEmailService _emailService = emailService;
 
     public async Task Handle(EmailInvitationCreated notification, CancellationToken ct)
     {

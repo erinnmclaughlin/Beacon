@@ -6,14 +6,9 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Projects.Contacts;
 
-internal sealed class CreateProjectContactHandler : IBeaconRequestHandler<CreateProjectContactRequest>
+internal sealed class CreateProjectContactHandler(BeaconDbContext dbContext, ILabContext labContext) : IBeaconRequestHandler<CreateProjectContactRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public CreateProjectContactHandler(BeaconDbContext dbContext, ILabContext labContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(CreateProjectContactRequest request, CancellationToken ct)
     {

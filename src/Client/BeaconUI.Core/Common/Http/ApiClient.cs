@@ -12,14 +12,9 @@ public interface IApiClient
         where TRequest : BeaconRequest<TRequest, TResult>, IBeaconRequest<TRequest>, new();
 }
 
-internal class ApiClient : IApiClient
+internal class ApiClient(IHttpClientFactory httpClientFactory) : IApiClient
 {
-    private readonly IHttpClientFactory _httpClientFactory;
-
-    public ApiClient(IHttpClientFactory httpClientFactory)
-    {
-        _httpClientFactory = httpClientFactory;
-    }
+    private readonly IHttpClientFactory _httpClientFactory = httpClientFactory;
 
     public async Task<ErrorOr<TResult>> SendAsync<TRequest, TResult>(BeaconRequest<TRequest, TResult> request, CancellationToken ct = default)
         where TRequest : BeaconRequest<TRequest, TResult>, IBeaconRequest<TRequest>, new()

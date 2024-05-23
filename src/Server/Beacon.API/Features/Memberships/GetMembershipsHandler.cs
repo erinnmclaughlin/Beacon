@@ -7,14 +7,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Memberships;
 
-internal sealed class GetMembershipsHandler : IBeaconRequestHandler<GetMembershipsRequest, LaboratoryMemberDto[]>
+internal sealed class GetMembershipsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetMembershipsRequest, LaboratoryMemberDto[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetMembershipsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<LaboratoryMemberDto[]>> Handle(GetMembershipsRequest request, CancellationToken ct)
     {

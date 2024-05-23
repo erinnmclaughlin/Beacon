@@ -9,16 +9,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class CreateProjectHandler : IBeaconRequestHandler<CreateProjectRequest, ProjectCode>
+internal sealed class CreateProjectHandler(BeaconDbContext dbContext, ISessionContext sessionContext) : IBeaconRequestHandler<CreateProjectRequest, ProjectCode>
 {
-    private readonly BeaconDbContext _dbContext;
-    private readonly ISessionContext _sessionContext;
-
-    public CreateProjectHandler(BeaconDbContext dbContext, ISessionContext sessionContext)
-    {
-        _dbContext = dbContext;
-        _sessionContext = sessionContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly ISessionContext _sessionContext = sessionContext;
 
     public async Task<ErrorOr<ProjectCode>> Handle(CreateProjectRequest request, CancellationToken ct)
     {

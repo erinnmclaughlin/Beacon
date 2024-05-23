@@ -5,16 +5,10 @@ using System.Security.Claims;
 
 namespace Beacon.API.Services;
 
-public sealed class BeaconAuthenticationService
+public sealed class BeaconAuthenticationService(BeaconDbContext dbContext, IPasswordHasher passwordHasher)
 {
-    private readonly BeaconDbContext _dbContext;
-    private readonly IPasswordHasher _passwordHasher;
-
-    public BeaconAuthenticationService(BeaconDbContext dbContext, IPasswordHasher passwordHasher)
-    {
-        _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
     public async Task<ClaimsIdentity> AuthenticateAsync(string email, string password, CancellationToken ct)
     {

@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class UpdateLeadAnalystHandler : IBeaconRequestHandler<UpdateLeadAnalystRequest>
+internal sealed class UpdateLeadAnalystHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<UpdateLeadAnalystRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public UpdateLeadAnalystHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(UpdateLeadAnalystRequest request, CancellationToken ct)
     {

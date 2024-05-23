@@ -6,14 +6,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects.Contacts;
 
-internal sealed class GetProjectContactsHandler : IBeaconRequestHandler<GetProjectContactsRequest, ProjectContactDto[]>
+internal sealed class GetProjectContactsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetProjectContactsRequest, ProjectContactDto[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetProjectContactsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<ProjectContactDto[]>> Handle(GetProjectContactsRequest request, CancellationToken ct)
     {

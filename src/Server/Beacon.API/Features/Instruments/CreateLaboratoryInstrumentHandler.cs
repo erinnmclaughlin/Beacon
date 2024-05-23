@@ -4,14 +4,9 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Instruments;
 
-internal sealed class CreateLaboratoryInstrumentHandler : IBeaconRequestHandler<CreateLaboratoryInstrumentRequest>
+internal sealed class CreateLaboratoryInstrumentHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<CreateLaboratoryInstrumentRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public CreateLaboratoryInstrumentHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(CreateLaboratoryInstrumentRequest request, CancellationToken ct)
     {

@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects.Contacts;
 
-internal sealed class DeleteProjectContactHandler : IBeaconRequestHandler<DeleteProjectContactRequest>
+internal sealed class DeleteProjectContactHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<DeleteProjectContactRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public DeleteProjectContactHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(DeleteProjectContactRequest request, CancellationToken ct)
     {

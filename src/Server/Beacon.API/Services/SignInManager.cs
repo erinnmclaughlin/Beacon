@@ -10,14 +10,9 @@ public interface ISignInManager
     Task SignOutAsync();
 }
 
-internal class SignInManager : ISignInManager
+internal class SignInManager(IHttpContextAccessor httpContextAccessor) : ISignInManager
 {
-    private readonly IHttpContextAccessor _httpContextAccessor;
-
-    public SignInManager(IHttpContextAccessor httpContextAccessor)
-    {
-        _httpContextAccessor = httpContextAccessor;
-    }
+    private readonly IHttpContextAccessor _httpContextAccessor = httpContextAccessor;
 
     public async Task SignInAsync(ClaimsPrincipal principal)
     {

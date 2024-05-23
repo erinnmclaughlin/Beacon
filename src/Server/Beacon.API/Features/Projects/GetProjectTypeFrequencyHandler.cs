@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;
 
-internal sealed class GetProjectTypeFrequencyHandler : IBeaconRequestHandler<GetProjectTypeFrequencyRequest, GetProjectTypeFrequencyRequest.Series[]>
+internal sealed class GetProjectTypeFrequencyHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetProjectTypeFrequencyRequest, GetProjectTypeFrequencyRequest.Series[]>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetProjectTypeFrequencyHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<GetProjectTypeFrequencyRequest.Series[]>> Handle(GetProjectTypeFrequencyRequest request, CancellationToken cancellationToken)
     {

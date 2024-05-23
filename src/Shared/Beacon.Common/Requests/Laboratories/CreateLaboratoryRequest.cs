@@ -9,9 +9,6 @@ public sealed class CreateLaboratoryRequest : BeaconRequest<CreateLaboratoryRequ
 
     public class Validator : AbstractValidator<CreateLaboratoryRequest>
     {
-        public Validator()
-        {
-            RuleFor(x => x.LaboratoryName).IsValidLaboratoryName();
-        }
+        public Validator() => RuleFor(x => x.LaboratoryName).IsValidLaboratoryName();
     }
 }

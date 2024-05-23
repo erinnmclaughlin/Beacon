@@ -4,14 +4,9 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Auth;
 
-internal sealed class GetSessionContextHandler : IBeaconRequestHandler<GetSessionContextRequest, SessionContext>
+internal sealed class GetSessionContextHandler(ISessionContext context) : IBeaconRequestHandler<GetSessionContextRequest, SessionContext>
 {
-    private readonly ISessionContext _context;
-
-    public GetSessionContextHandler(ISessionContext context)
-    {
-        _context = context;
-    }
+    private readonly ISessionContext _context = context;
 
     public async Task<ErrorOr<SessionContext>> Handle(GetSessionContextRequest request, CancellationToken ct)
     {

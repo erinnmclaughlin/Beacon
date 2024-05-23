@@ -5,14 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Memberships;
 
-internal sealed class UpdateMembershipHandler : IBeaconRequestHandler<UpdateMembershipRequest>
+internal sealed class UpdateMembershipHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<UpdateMembershipRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public UpdateMembershipHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(UpdateMembershipRequest request, CancellationToken ct)
     {

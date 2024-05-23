@@ -8,14 +8,9 @@ using System.Reflection;
 
 namespace Beacon.API.Behaviors;
 
-public sealed class AuthorizationPipelineBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, ErrorOr<TResponse>> where TRequest : notnull
+public sealed class AuthorizationPipelineBehavior<TRequest, TResponse>(ISessionContext context) : IPipelineBehavior<TRequest, ErrorOr<TResponse>> where TRequest : notnull
 {
-    private readonly ISessionContext _context;
-
-    public AuthorizationPipelineBehavior(ISessionContext context)
-    {
-        _context = context;
-    }
+    private readonly ISessionContext _context = context;
 
     public async Task<ErrorOr<TResponse>> Handle(TRequest request, RequestHandlerDelegate<ErrorOr<TResponse>> next, CancellationToken ct)
     {

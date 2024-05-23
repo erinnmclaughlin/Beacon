@@ -11,20 +11,15 @@ public interface IAuthenticationStateNotifier
     void TriggerAuthenticationStateChanged(SessionContext? context);
 }
 
-public sealed class BeaconAuthStateProvider : AuthenticationStateProvider, IAuthenticationStateNotifier, ISessionContext
+public sealed class BeaconAuthStateProvider(IApiClient apiClient) : AuthenticationStateProvider, IAuthenticationStateNotifier, ISessionContext
 {
-    private readonly IApiClient _apiClient;
+    private readonly IApiClient _apiClient = apiClient;
 
     private bool IsExpired { get; set; } = true;
     private ClaimsPrincipal ClaimsPrincipal { get; set; } = AnonymousUser;
 
     public CurrentUser CurrentUser => CurrentUser.FromClaimsPrincipal(ClaimsPrincipal);
     public CurrentLab? CurrentLab => CurrentLab.FromClaimsPrincipal(ClaimsPrincipal);
-
-    public BeaconAuthStateProvider(IApiClient apiClient)
-    {
-        _apiClient = apiClient;
-    }
 
     public override async Task<AuthenticationState> GetAuthenticationStateAsync()
     {

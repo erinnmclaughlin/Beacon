@@ -9,14 +9,9 @@ using System.Linq.Expressions;
 
 namespace Beacon.API.Features.Laboratories;
 
-internal sealed class GetLaboratoryEventsHandler : IBeaconRequestHandler<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>
+internal sealed class GetLaboratoryEventsHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public GetLaboratoryEventsHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<PagedList<LaboratoryEventDto>>> Handle(GetLaboratoryEventsRequest request, CancellationToken ct)
     {

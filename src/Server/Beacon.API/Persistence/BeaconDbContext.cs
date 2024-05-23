@@ -5,9 +5,9 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Persistence;
 
-public class BeaconDbContext : DbContext
+public class BeaconDbContext(DbContextOptions options, ISessionContext sessionContext) : DbContext(options)
 {
-    private readonly ISessionContext _sessionContext;
+    private readonly ISessionContext _sessionContext = sessionContext;
 
     public DbSet<Invitation> Invitations => Set<Invitation>();
     public DbSet<InvitationEmail> InvitationEmails => Set<InvitationEmail>();
@@ -21,11 +21,6 @@ public class BeaconDbContext : DbContext
     public DbSet<ProjectEvent> ProjectEvents => Set<ProjectEvent>();
     public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
     public DbSet<User> Users => Set<User>();
-
-    public BeaconDbContext(DbContextOptions options, ISessionContext sessionContext) : base(options)
-    {
-        _sessionContext = sessionContext;
-    }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

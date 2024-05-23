@@ -4,16 +4,10 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Auth;
 
-internal sealed class LoginHandler : IBeaconRequestHandler<LoginRequest>
+internal sealed class LoginHandler(BeaconAuthenticationService authService, ISignInManager signInManager) : IBeaconRequestHandler<LoginRequest>
 {
-    private readonly BeaconAuthenticationService _authService;
-    private readonly ISignInManager _signInManager;
-
-    public LoginHandler(BeaconAuthenticationService authService, ISignInManager signInManager)
-    {
-        _authService = authService;
-        _signInManager = signInManager;
-    }
+    private readonly BeaconAuthenticationService _authService = authService;
+    private readonly ISignInManager _signInManager = signInManager;
 
     public async Task<ErrorOr<Success>> Handle(LoginRequest request, CancellationToken ct)
     {

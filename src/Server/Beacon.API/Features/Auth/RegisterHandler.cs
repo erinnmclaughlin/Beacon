@@ -7,16 +7,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Auth;
 
-internal sealed class RegisterHandler : IBeaconRequestHandler<RegisterRequest>
+internal sealed class RegisterHandler(BeaconDbContext dbContext, IPasswordHasher passwordHasher) : IBeaconRequestHandler<RegisterRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-    private readonly IPasswordHasher _passwordHasher;
-
-    public RegisterHandler(BeaconDbContext dbContext, IPasswordHasher passwordHasher)
-    {
-        _dbContext = dbContext;
-        _passwordHasher = passwordHasher;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly IPasswordHasher _passwordHasher = passwordHasher;
 
     public async Task<ErrorOr<Success>> Handle(RegisterRequest request, CancellationToken ct)
     {

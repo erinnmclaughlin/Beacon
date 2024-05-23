@@ -5,14 +5,9 @@ using ErrorOr;
 
 namespace Beacon.API.Features.Projects.SampleGroups;
 
-internal sealed class CreateSampleGroupHandler : IBeaconRequestHandler<CreateSampleGroupRequest>
+internal sealed class CreateSampleGroupHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<CreateSampleGroupRequest>
 {
-    private readonly BeaconDbContext _dbContext;
-
-    public CreateSampleGroupHandler(BeaconDbContext dbContext)
-    {
-        _dbContext = dbContext;
-    }
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(CreateSampleGroupRequest request, CancellationToken ct)
     {

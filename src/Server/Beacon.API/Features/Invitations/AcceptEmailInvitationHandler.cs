@@ -8,16 +8,10 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Invitations;
 
-internal sealed class AcceptEmailInvitationHandler : IBeaconRequestHandler<AcceptEmailInvitationRequest>
+internal sealed class AcceptEmailInvitationHandler(ISessionContext context, BeaconDbContext dbContext) : IBeaconRequestHandler<AcceptEmailInvitationRequest>
 {
-    private readonly ISessionContext _context;
-    private readonly BeaconDbContext _dbContext;
-
-    public AcceptEmailInvitationHandler(ISessionContext context, BeaconDbContext dbContext)
-    {
-        _context = context;
-        _dbContext = dbContext;
-    }
+    private readonly ISessionContext _context = context;
+    private readonly BeaconDbContext _dbContext = dbContext;
 
     public async Task<ErrorOr<Success>> Handle(AcceptEmailInvitationRequest request, CancellationToken ct)
     {

@@ -7,18 +7,11 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Laboratories;
 
-internal sealed class SetCurrentLaboratoryHandler : IBeaconRequestHandler<SetCurrentLaboratoryRequest>
+internal sealed class SetCurrentLaboratoryHandler(ISessionContext context, BeaconDbContext dbContext, ISignInManager signInManager) : IBeaconRequestHandler<SetCurrentLaboratoryRequest>
 {
-    private readonly ISessionContext _context;
-    private readonly BeaconDbContext _dbContext;
-    private readonly ISignInManager _signInManager;
-
-    public SetCurrentLaboratoryHandler(ISessionContext context, BeaconDbContext dbContext, ISignInManager signInManager)
-    {
-        _context = context;
-        _dbContext = dbContext;
-        _signInManager = signInManager;
-    }
+    private readonly ISessionContext _context = context;
+    private readonly BeaconDbContext _dbContext = dbContext;
+    private readonly ISignInManager _signInManager = signInManager;
 
     public async Task<ErrorOr<Success>> Handle(SetCurrentLaboratoryRequest request, CancellationToken ct)
     {

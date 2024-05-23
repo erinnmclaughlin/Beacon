@@ -6,16 +6,10 @@ using ErrorOr;
 
 namespace BeaconUI.Core.Common.Auth;
 
-internal sealed class AuthService
+internal sealed class AuthService(IApiClient apiClient, IAuthenticationStateNotifier authStateNotifier)
 {
-    private readonly IApiClient _apiClient;
-    private readonly IAuthenticationStateNotifier _authStateNotifier;
-
-    public AuthService(IApiClient apiClient, IAuthenticationStateNotifier authStateNotifier)
-    {
-        _apiClient = apiClient;
-        _authStateNotifier = authStateNotifier;
-    }
+    private readonly IApiClient _apiClient = apiClient;
+    private readonly IAuthenticationStateNotifier _authStateNotifier = authStateNotifier;
 
     public Task<ErrorOr<Success>> SetCurrentLaboratory(Guid id)
     {
