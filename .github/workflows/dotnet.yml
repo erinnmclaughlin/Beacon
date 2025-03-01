@@ -22,8 +22,7 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Setup MAUI
-      run: | 
-        dotnet workload install maui  
+      run: dotnet workload install maui-tizen
     - name: Restore dependencies
       run: dotnet restore
     - name: Build
