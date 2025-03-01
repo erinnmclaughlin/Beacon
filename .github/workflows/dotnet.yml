@@ -7,38 +7,97 @@ on:
     branches: [ "main" ]
   workflow_dispatch:
 
+# Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# Allow only one concurrent deployment, skipping runs queued between the run in-progress and latest queued.
+# However, do NOT cancel in-progress runs as we want to allow these production deployments to complete.
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
 jobs:
-  build-api:
+  test:
     runs-on: ubuntu-latest
-
     steps:
     - uses: actions/checkout@v4
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
         dotnet-version: 9.0.x
-    - name: Restore dependencies
+        
+    # API Tests
+    - name: Restore API dependencies
       run: dotnet restore tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj
-    - name: Build
+    - name: Build API
       run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
-    - name: Test
-      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal
+    - name: Test API with coverage
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/
+    
+    # Blazor Tests
+    - name: Restore Blazor dependencies
+      run: dotnet restore tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj
+    - name: Build Blazor
+      run: dotnet build tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-restore
+    - name: Test Blazor with coverage
+      run: dotnet test tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/
+    
+    # Generate Combined Report
+    - name: Generate Coverage Report
+      uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
+      with:
+        reports: '**/TestResults/coverage.cobertura.xml'
+        targetdir: 'coveragereport'
+        reporttypes: 'HtmlInline;JsonSummary'
+        
+    # Create Coverage Badge
+    - name: Create Coverage Badge
+      run: |
+        COVERAGE=$(jq -r '.summary.lineCoverage' coveragereport/Summary.json)
+        COLOR=$(if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then echo "success"; elif [ $(echo "$COVERAGE >= 60" | bc -l) -eq 1 ]; then echo "yellow"; else echo "red"; fi)
+        echo "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > coveragereport/coverage-badge.txt
+    
+    # Upload coverage report as artifact (available for all branches/PRs)
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v4
+      with:
+        name: coverage-report
+        path: coveragereport
+        retention-days: 14
 
-  build-blazor:
+  publish:
+    needs: test
+    if: github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-    - uses: actions/checkout@v4
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v4
+    # Setup Pages
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    # Download the coverage report artifact
+    - name: Download coverage report
+      uses: actions/download-artifact@v4
       with:
-        dotnet-version: 9.0.x
-    - name: Restore dependencies
-      run: dotnet restore tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj
-    - name: Build
-      run: dotnet build tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-restore
-    - name: Test
-      run: dotnet test tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-build --verbosity normal
+        name: coverage-report
+        path: coveragereport
+
+    # Upload for GitHub Pages
+    - name: Upload artifact
+      uses: actions/upload-pages-artifact@v3
+      with:
+        path: coveragereport
+
+    # Deploy to GitHub Pages
+    - name: Deploy to GitHub Pages
+      id: deployment
+      uses: actions/deploy-pages@v4
 
   build-maui:
     runs-on: windows-latest
