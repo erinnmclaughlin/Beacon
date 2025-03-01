@@ -3,6 +3,7 @@
   <PropertyGroup>
     <!-- Support is currently for Windows only-->
     <TargetFrameworks>net9.0-windows10.0.19041.0</TargetFrameworks>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
     <OutputType>Exe</OutputType>
     
     <RootNamespace>BeaconUI.DesktopApp</RootNamespace>
