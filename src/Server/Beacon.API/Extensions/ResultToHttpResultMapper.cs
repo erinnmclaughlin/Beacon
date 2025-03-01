@@ -2,29 +2,20 @@
 using ErrorOr;
 using Microsoft.AspNetCore.Http;
 
-namespace Beacon.API;
+namespace Beacon.API.Extensions;
 
 public static class ResultToHttpResultMapper
 {
     public static IResult ToHttpResult<T>(this ErrorOr<T> errorOrValue)
     {
-        if (!errorOrValue.IsError)
-        {
-            var value = errorOrValue.Value;
-            return value is null || value.GetType() == typeof(Success) ? Results.NoContent() : Results.Ok(value);
-        }
-
-        var errors = errorOrValue.Errors;
-
-        if (errors.Any(e => e.NumericType == 401))
-        {
+        if (!errorOrValue.IsError) 
+            return GetSuccessResult(errorOrValue.Value);
+        
+        if (errorOrValue.Errors.Any(e => e.NumericType == 401)) 
             return Results.Unauthorized();
-        }
-
-        if (errors.Any(e => e.NumericType == 403))
-        {
+        
+        if (errorOrValue.Errors.Any(e => e.NumericType == 403))
             return Results.Forbid();
-        }
 
         if (errorOrValue.Errors.Where(e => e.Type == ErrorType.Validation).ToList() is { Count: > 0 } validationErrors)
         {
@@ -38,4 +29,6 @@ public static class ResultToHttpResultMapper
 
         return Results.StatusCode(500);
     }
+    
+    private static IResult GetSuccessResult<T>(T? value) => value is null or Success ? Results.NoContent() : Results.Ok(value);
 }

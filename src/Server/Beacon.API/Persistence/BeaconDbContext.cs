@@ -153,8 +153,8 @@ public class BeaconDbContext(DbContextOptions options, ISessionContext sessionCo
 
         foreach (var e in entries.Where(e => e.State == EntityState.Added))
         {
-            if (e.Entity.LaboratoryId == default)
-                e.Entity.LaboratoryId = _sessionContext.CurrentLab?.Id ?? default;
+            if (e.Entity.LaboratoryId == Guid.Empty)
+                e.Entity.LaboratoryId = _sessionContext.CurrentLab?.Id ?? Guid.Empty;
         }
     }
 }

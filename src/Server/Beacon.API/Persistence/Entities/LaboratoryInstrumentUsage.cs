@@ -2,9 +2,9 @@
 
 public class LaboratoryInstrumentUsage : LaboratoryScopedEntityBase
 {
-    public Guid InstrumentId { get; set; }
-    public LaboratoryInstrument Instrument { get; set; } = default!;
+    public Guid InstrumentId { get; init; }
+    public LaboratoryInstrument Instrument { get; init; } = null!;
 
-    public Guid ProjectEventId { get; set; }
-    public ProjectEvent ProjectEvent { get; set; } = default!;
+    public Guid ProjectEventId { get; init; }
+    public ProjectEvent ProjectEvent { get; init; } = null!;
 }

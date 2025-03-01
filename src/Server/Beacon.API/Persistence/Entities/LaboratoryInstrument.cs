@@ -6,5 +6,5 @@ public sealed class LaboratoryInstrument : LaboratoryScopedEntityBase
     public required string SerialNumber { get; set; }
     public required string InstrumentType { get; set; }
 
-    public List<ProjectEvent> AssociatedEvents { get; set; } = new();
+    public List<ProjectEvent> AssociatedEvents { get; set; } = [];
 }

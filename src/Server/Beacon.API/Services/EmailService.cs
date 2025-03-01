@@ -22,9 +22,6 @@ internal sealed class EmailService(IOptions<EmailSettings> settings) : IEmailSer
 
     public async Task<IEmailSendOperation?> SendAsync(string subject, string htmlBody, string toAddress)
     {
-        //var subject = "Welcome to Azure Communication Service Email APIs.";
-        //var htmlContent = "<html><body><h1>Quick send email test</h1><br/><h4>This email message is sent from Azure Communication Service Email.</h4><p>This mail was sent using .NET SDK!!</p></body></html>";
-
         try
         {
             var emailClient = new EmailClient(_settings.ConnectionString);

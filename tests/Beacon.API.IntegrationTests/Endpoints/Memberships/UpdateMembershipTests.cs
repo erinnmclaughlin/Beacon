@@ -48,4 +48,18 @@ public sealed class UpdateMembershipTests(TestFixture fixture) : TestBase(fixtur
                 .SingleAsync();
         }));
     }
+
+    [Fact(DisplayName = "[170] Update membership type endpoint returns 422 when member does not exist.")]
+    public async Task UpdateMembership_ShouldFail_WhenUserDoesNotExist()
+    {
+        RunAsAdmin();
+        
+        var response = await SendAsync(new UpdateMembershipRequest
+        {
+            MemberId = Guid.NewGuid(),
+            MembershipType = LaboratoryMembershipType.Analyst
+        });
+        
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
 }

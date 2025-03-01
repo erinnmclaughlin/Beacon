@@ -40,14 +40,13 @@ public static class BeaconAPI
         // Api
         services.AddEndpointsApiExplorer();
         services.Configure<ApplicationSettings>(config.GetRequiredSection("ApplicationSettings"));
-        services.ConfigureHttpJsonOptions(options => {
-            options.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
+        services.ConfigureHttpJsonOptions(o => {
+            o.SerializerOptions.Converters.Add(new JsonStringEnumConverter());
         });
         services.AddHttpContextAccessor(); 
         services.RegisterBeaconRequestHandlers();
-        services.AddMediatR(config =>
-        {
-            config.RegisterServicesFromAssemblies(serviceAssemblies);
+        services.AddMediatR(c => {
+            c.RegisterServicesFromAssemblies(serviceAssemblies);
         });
         services.AddScoped<ISessionContext, HttpSessionContext>();
         services.AddScoped<ILabContext, HttpSessionContext>();

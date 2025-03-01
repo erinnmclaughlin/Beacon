@@ -10,13 +10,13 @@ public sealed class Project : LaboratoryScopedEntityBase
     public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
     public ProjectStatus ProjectStatus { get; set; } = ProjectStatus.Active;
 
-    public Guid CreatedById { get; set; }
-    public User CreatedBy { get; set; } = null!;
+    public Guid CreatedById { get; init; }
+    public User CreatedBy { get; init; } = null!;
 
     public Guid? LeadAnalystId { get; set; }
     public User? LeadAnalyst { get; set; }
 
-    public List<ProjectContact> Contacts { get; set; } = new();
-    public List<SampleGroup> SampleGroups { get; set; } = new();
-    public List<ProjectApplicationTag> TaggedApplications { get; set; } = new();
+    public List<ProjectContact> Contacts { get; set; } = [];
+    public List<SampleGroup> SampleGroups { get; set; } = [];
+    public List<ProjectApplicationTag> TaggedApplications { get; set; } = [];
 }

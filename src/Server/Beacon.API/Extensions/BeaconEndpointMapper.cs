@@ -1,4 +1,5 @@
-﻿using Beacon.API.Features.Auth;
+﻿using System.Text.Json;
+using Beacon.API.Features.Auth;
 using Beacon.Common;
 using Beacon.Common.Requests;
 using ErrorOr;
@@ -7,9 +8,8 @@ using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
-using System.Text.Json;
 
-namespace Beacon.API;
+namespace Beacon.API.Extensions;
 
 public static class BeaconEndpointMapper
 {
@@ -43,7 +43,7 @@ public static class BeaconEndpointMapper
     {
         app.MapPost(TRequest.GetRoute(), async ([FromBody] TRequest? request, IMediator m, CancellationToken ct) =>
         {
-            var response = await m.Send(request ?? new(), ct);
+            var response = await m.Send(request ?? new TRequest(), ct);
             return response.ToHttpResult();
         })
         .AddMetaData<TRequest>();
@@ -55,17 +55,17 @@ public static class BeaconEndpointMapper
         app.MapGet(TRequest.GetRoute(), async (string? data, IMediator m, CancellationToken ct) =>
         {
             var request = JsonSerializer.Deserialize<TRequest>(data ?? "", JsonDefaults.JsonSerializerOptions);
-            var response = await m.Send(request ?? new(), ct);
+            var response = await m.Send(request ?? new TRequest(), ct);
             return response.ToHttpResult();
         })
         .AddMetaData<TRequest>();
     }
 
-    public static void AddMetaData<TRequest>(this RouteHandlerBuilder builder)
+    private static void AddMetaData<TRequest>(this RouteHandlerBuilder builder)
     {
         if (typeof(TRequest).Namespace is { } requestNamespace)
         {
-            builder.WithTags(requestNamespace[(requestNamespace.LastIndexOf(".") + 1)..]);
+            builder.WithTags(requestNamespace[(requestNamespace.LastIndexOf('.') + 1)..]);
         }
     }
 }

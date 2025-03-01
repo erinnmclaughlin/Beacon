@@ -12,9 +12,9 @@ public sealed class ProjectApplicationTag : LaboratoryScopedEntityBase
         LaboratoryId = laboratoryId;
     }
 
-    public Guid ApplicationId { get; set; }
-    public ProjectApplication Application { get; set; } = default!;
+    public Guid ApplicationId { get; init; }
+    public ProjectApplication Application { get; init; } = default!;
 
-    public Guid ProjectId { get; set; }
-    public Project Project { get; set; } = default!;
+    public Guid ProjectId { get; init; }
+    public Project Project { get; init; } = default!;
 }

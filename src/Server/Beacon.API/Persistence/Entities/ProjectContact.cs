@@ -7,6 +7,6 @@ public sealed class ProjectContact : LaboratoryScopedEntityBase
     public required string? EmailAddress { get; set; }
     public required string? PhoneNumber { get; set; }
 
-    public Guid ProjectId { get; set; }
-    public Project Project { get; set; } = null!;
+    public Guid ProjectId { get; init; }
+    public Project Project { get; init; } = null!;
 }

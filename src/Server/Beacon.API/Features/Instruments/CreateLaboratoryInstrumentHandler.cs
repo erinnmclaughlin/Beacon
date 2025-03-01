@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Instruments;
 using ErrorOr;
 
@@ -10,7 +11,7 @@ internal sealed class CreateLaboratoryInstrumentHandler(BeaconDbContext dbContex
 
     public async Task<ErrorOr<Success>> Handle(CreateLaboratoryInstrumentRequest request, CancellationToken ct)
     {
-        _dbContext.LaboratoryInstruments.Add(new()
+        _dbContext.LaboratoryInstruments.Add(new LaboratoryInstrument
         {
             InstrumentType = request.InstrumentType,
             SerialNumber = request.SerialNumber

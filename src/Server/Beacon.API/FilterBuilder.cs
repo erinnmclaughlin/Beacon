@@ -1,4 +1,5 @@
 ﻿using System.Linq.Expressions;
+using Beacon.API.Extensions;
 
 namespace Beacon.API;
 

@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Behaviors;
+using Beacon.API.Extensions;
 using Beacon.API.Features.Auth;
 using ErrorOr;
 using MediatR;

@@ -13,6 +13,6 @@ public sealed class SampleGroup : LaboratoryScopedEntityBase
     public double? TargetStorageHumidity { get; set; }
     public string? Notes { get; set; }
 
-    public Guid ProjectId { get; set; }
-    public Project Project { get; set; } = null!;
+    public Guid ProjectId { get; init; }
+    public Project Project { get; init; } = null!;
 }

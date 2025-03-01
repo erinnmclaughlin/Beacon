@@ -1,7 +1,7 @@
 ﻿using Beacon.API.Features;
 using ErrorOr;
 
-namespace Beacon.API;
+namespace Beacon.API.Extensions;
 
 public static class TypeExtensions
 {

@@ -6,6 +6,7 @@ using Beacon.Common.Requests.Projects;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
+using Beacon.API.Extensions;
 
 namespace Beacon.API.Features.Projects;
 

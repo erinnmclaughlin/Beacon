@@ -1,7 +1,7 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.Extensions;
+using Beacon.API.Persistence;
 using Beacon.Common.Requests.Memberships;
 using ErrorOr;
-using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Memberships;
 
@@ -11,9 +11,17 @@ internal sealed class UpdateMembershipHandler(BeaconDbContext dbContext) : IBeac
 
     public async Task<ErrorOr<Success>> Handle(UpdateMembershipRequest request, CancellationToken ct)
     {
-        var member = await _dbContext.Memberships.SingleAsync(m => m.MemberId == request.MemberId, ct);
+        var memberOrError = await _dbContext.Memberships.SingleOrErrorAsync(m => m.MemberId == request.MemberId, ct);
 
-        member.MembershipType = request.MembershipType;
+        if (memberOrError.IsError)
+        {
+            return Error.Validation(metadata: new Dictionary<string, object>
+            {
+                [nameof(request.MemberId)] = new[] { "Member not found." }
+            });
+        }
+        
+        memberOrError.Value.MembershipType = request.MembershipType;
         await _dbContext.SaveChangesAsync(ct);
         return Result.Success;
     }

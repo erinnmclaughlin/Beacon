@@ -17,5 +17,5 @@ public sealed class Invitation : LaboratoryScopedEntityBase
     public required Guid CreatedById { get; init; }
     public User CreatedBy { get; init; } = null!;
 
-    public List<InvitationEmail> EmailInvitations { get; set; } = new();
+    public List<InvitationEmail> EmailInvitations { get; set; } = [];
 }

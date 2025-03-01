@@ -1,4 +1,5 @@
 ﻿using Beacon.API;
+using Beacon.API.Extensions;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.WebHost;
