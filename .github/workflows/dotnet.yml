@@ -58,7 +58,7 @@ jobs:
       run: |
         COVERAGE=$(jq -r '.summary.lineCoverage' coveragereport/Summary.json)
         COLOR=$(if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then echo "success"; elif [ $(echo "$COVERAGE >= 60" | bc -l) -eq 1 ]; then echo "yellow"; else echo "red"; fi)
-        echo "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > coveragereport/coverage-badge.txt
+        echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"${COVERAGE}%\", \"color\": \"${COLOR}\"}" > coveragereport/coverage.json
     
     # Upload coverage report as artifact (available for all branches/PRs)
     - name: Upload coverage report

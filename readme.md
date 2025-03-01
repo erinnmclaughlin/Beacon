@@ -1,7 +1,7 @@
 # Beacon
 
 [![.NET](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml/badge.svg)](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml)
-[![Coverage](https://erinnmclaughlin.github.io/Beacon/coverage-badge.txt)](https://erinnmclaughlin.github.io/Beacon)
+[![Coverage](https://img.shields.io/endpoint?url=https://erinnmclaughlin.github.io/Beacon/coverage.json)](https://erinnmclaughlin.github.io/Beacon)
 
 ## Code Coverage
 
