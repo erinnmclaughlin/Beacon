@@ -18,11 +18,11 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore src/Server/Beacon.WebHost/Beacon.WebHost.csproj
+      run: dotnet restore tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj
     - name: Build
-      run: dotnet build src/Server/Beacon.WebHost/Beacon.WebHost.csproj --no-restore
+      run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
     - name: Test
-      run: dotnet test src/Server/Beacon.WebHost/Beacon.WebHost.csproj --no-build --verbosity normal
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal
 
   build-blazor:
     runs-on: ubuntu-latest
@@ -34,11 +34,11 @@ jobs:
       with:
         dotnet-version: 9.0.x
     - name: Restore dependencies
-      run: dotnet restore src/Client/BeaconUI.WebApp/BeaconUI.WebApp.csproj
+      run: dotnet restore tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj
     - name: Build
-      run: dotnet build src/Client/BeaconUI.WebApp/BeaconUI.WebApp.csproj --no-restore
+      run: dotnet build tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-restore
     - name: Test
-      run: dotnet test src/Client/BeaconUI.WebApp/BeaconUI.WebApp.csproj --no-build --verbosity normal
+      run: dotnet test tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-build --verbosity normal
 
   build-maui:
     runs-on: windows-latest
