@@ -1,4 +1,6 @@
-﻿using Beacon.Common.Requests.Projects.Events;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Requests.Projects.Events;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
@@ -25,14 +27,12 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        ExecuteDbContext(dbContext =>
-        {
-            var projectEvent = dbContext.ProjectEvents.Single();
-            Assert.Equal(validRequest.Title, projectEvent.Title);
-            Assert.Null(projectEvent.Description);
-            Assert.Equal(validRequest.ScheduledStart, projectEvent.ScheduledStart);
-            Assert.Equal(validRequest.ScheduledEnd, projectEvent.ScheduledEnd);
-        });
+        var projectEvent = await GetProjectEventAsync();
+        Assert.NotNull(projectEvent);
+        Assert.Equal(validRequest.Title, projectEvent.Title);
+        Assert.Null(projectEvent.Description);
+        Assert.Equal(validRequest.ScheduledStart, projectEvent.ScheduledStart);
+        Assert.Equal(validRequest.ScheduledEnd, projectEvent.ScheduledEnd);
     }
 
     [Fact(DisplayName = "[113] Create project activity fails when user is not authorized")]
@@ -51,7 +51,8 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        ExecuteDbContext(dbContext => Assert.Null(dbContext.ProjectEvents.SingleOrDefault()));
+        var projectEvent = await GetProjectEventAsync();
+        Assert.Null(projectEvent);
     }
 
     [Fact(DisplayName = "[113] Create project activity fails when request is invalid")]
@@ -70,6 +71,12 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         var response = await SendAsync(invalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        ExecuteDbContext(dbContext => Assert.Null(dbContext.ProjectEvents.SingleOrDefault()));
+        var projectEvent = await GetProjectEventAsync();
+        Assert.Null(projectEvent);
+    }
+
+    private async Task<ProjectEvent?> GetProjectEventAsync()
+    {
+        return await ExecuteDbContextAsync(async db => await db.ProjectEvents.SingleOrDefaultAsync());
     }
 }

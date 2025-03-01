@@ -1,10 +1,12 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
 [Trait("Feature", "Project Management")]
-public sealed class CreateProjectTests : ProjectTestBase
+public sealed class CreateProjectTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
     private static CreateProjectRequest SomeValidRequest => new()
     {
@@ -12,17 +14,13 @@ public sealed class CreateProjectTests : ProjectTestBase
         CustomerName = "ABC Company"
     };
 
-    public static CreateProjectRequest SomeInvalidRequest => new()
+    private static CreateProjectRequest SomeInvalidRequest => new()
     {
         CustomerCode = "ABCD",
         CustomerName = "ABC Company"
     };
 
-    public CreateProjectTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
-    [Fact(DisplayName = "[004] Create project suceeds when request is valid")]
+    [Fact(DisplayName = "[004] Create project succeeds when request is valid")]
     public async Task CreateProject_Succeeds_WhenRequestIsValid()
     {
         RunAsAdmin();
@@ -30,7 +28,8 @@ public sealed class CreateProjectTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
-        var createdProject = ExecuteDbContext(db => db.Projects.Single(x => x.CustomerName == SomeValidRequest.CustomerName));
+        var createdProject = await GetProjectAsync(SomeValidRequest.CustomerName);
+        Assert.NotNull(createdProject);
         Assert.Equal($"ABC-{DateTime.Today:yyyyMM}-001", createdProject.ProjectCode.ToString());
         Assert.Equal(TestData.AdminUser.Id, createdProject.CreatedById);
         Assert.Equal(TestData.Lab.Id, createdProject.LaboratoryId);
@@ -45,7 +44,7 @@ public sealed class CreateProjectTests : ProjectTestBase
         var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var createdProject = ExecuteDbContext(db => db.Projects.SingleOrDefault(x => x.CustomerName == SomeInvalidRequest.CustomerName));
+        var createdProject = await GetProjectAsync(SomeInvalidRequest.CustomerName);
         Assert.Null(createdProject);
     }
 
@@ -62,12 +61,9 @@ public sealed class CreateProjectTests : ProjectTestBase
         });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-
-        ExecuteDbContext(db =>
-        {
-            var projectOrNull = db.Projects.SingleOrDefault(x => x.CustomerName == SomeInvalidRequest.CustomerName);
-            Assert.Null(projectOrNull);
-        });
+        
+        var createdProject = await GetProjectAsync(SomeInvalidRequest.CustomerName);
+        Assert.Null(createdProject);
     }
 
     [Fact(DisplayName = "[004] Create project fails when user is not authorized")]
@@ -78,7 +74,12 @@ public sealed class CreateProjectTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var createdProject = ExecuteDbContext(db => db.Projects.SingleOrDefault(x => x.CustomerName == SomeValidRequest.CustomerName));
+        var createdProject = await GetProjectAsync(SomeValidRequest.CustomerName);
         Assert.Null(createdProject);
     }
+
+    private async Task<Project?> GetProjectAsync(string customerName) => await ExecuteDbContextAsync(async db =>
+    {
+        return await db.Projects.SingleOrDefaultAsync(x => x.CustomerName == customerName);
+    });
 }

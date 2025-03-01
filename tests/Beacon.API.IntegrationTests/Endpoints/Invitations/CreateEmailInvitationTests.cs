@@ -26,7 +26,10 @@ public sealed class CreateEmailInvitationTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var emailInvitation = ExecuteDbContext(db => db.InvitationEmails.Include(x => x.LaboratoryInvitation).Single());
+        var emailInvitation = await ExecuteDbContextAsync(async db =>
+        {
+            return await db.InvitationEmails.Include(x => x.LaboratoryInvitation).SingleAsync();
+        });
         Assert.Equal(TestData.Lab.Id, emailInvitation.LaboratoryId);
         Assert.Equal(FakeEmailSendOperation.OperationId, emailInvitation.OperationId);
 
@@ -49,7 +52,7 @@ public sealed class CreateEmailInvitationTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        Assert.False(await ExecuteDbContext(async db => await db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));
+        Assert.False(await InvitationExists(request.NewMemberEmailAddress));
     }
 
     [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
@@ -66,6 +69,11 @@ public sealed class CreateEmailInvitationTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        Assert.False(await ExecuteDbContext(async db => await db.Invitations.AnyAsync(i => i.NewMemberEmailAddress == request.NewMemberEmailAddress)));
+        Assert.False(await InvitationExists(request.NewMemberEmailAddress));
     }
+    
+    private Task<bool> InvitationExists(string email) => ExecuteDbContextAsync(async db =>
+    {
+        return await db.Invitations.AnyAsync(x => x.NewMemberEmailAddress == email);
+    });
 }

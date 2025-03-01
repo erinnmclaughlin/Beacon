@@ -7,15 +7,13 @@ namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 [Trait("Feature", "User Registration & Login")]
 public sealed class LogoutTests : IClassFixture<AuthTestFixture>
 {
-    private readonly AuthTestFixture _fixture;
     private readonly HttpClient _httpClient;
 
     public LogoutTests(AuthTestFixture fixture)
     {
-        _fixture = fixture;
         _httpClient = fixture.CreateClient();
 
-        using var scope = _fixture.Services.CreateScope();
+        using var scope = fixture.Services.CreateScope();
         var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
         if (db.Database.EnsureCreated())

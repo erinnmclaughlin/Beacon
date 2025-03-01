@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Requests.Laboratories;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
@@ -20,9 +21,7 @@ public sealed class CreateLaboratoryTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "My New Lab"));
-        Assert.NotNull(createdLab);
+        Assert.True(await LabExists("My New Lab"));
     }
 
     [Fact(DisplayName = "[002] Create lab fails when request is invalid")]
@@ -36,8 +35,11 @@ public sealed class CreateLaboratoryTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-
-        var createdLab = ExecuteDbContext(db => db.Laboratories.SingleOrDefault(x => x.Name == "no"));
-        Assert.Null(createdLab);
+        Assert.False(await LabExists("no"));
     }
+
+    private Task<bool> LabExists(string labName) => ExecuteDbContextAsync(async db =>
+    {
+        return await db.Laboratories.AnyAsync(x => x.Name == labName);
+    });
 }

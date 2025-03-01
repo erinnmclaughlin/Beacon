@@ -8,7 +8,7 @@ namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 [Trait("Feature", "Laboratory Management")]
 public sealed class GetMyLaboratoriesTests : TestBase
 {
-    public static Guid OtherLabId { get; } = Guid.NewGuid();
+    private static Guid OtherLabId { get; } = Guid.NewGuid();
 
     public GetMyLaboratoriesTests(TestFixture fixture) : base(fixture)
     {
@@ -54,6 +54,5 @@ public sealed class GetMyLaboratoriesTests : TestBase
 
         db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser);
         db.Laboratories.AddRange(lab, otherLab);
-        db.SaveChanges();
     }
 }

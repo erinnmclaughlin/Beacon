@@ -9,7 +9,7 @@ namespace Beacon.API.IntegrationTests.Endpoints.Invitations;
 [Trait("Feature", "User Management")]
 public sealed class AcceptEmailInvitationTests : TestBase
 {
-    private static Guid EmailInvitationId { get; } = new Guid("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
+    private static Guid EmailInvitationId { get; } = new("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
 
     public AcceptEmailInvitationTests(TestFixture fixture) : base(fixture)
     {
@@ -24,10 +24,16 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var invitation = ExecuteDbContext(db => db.InvitationEmails.IgnoreQueryFilters().Include(x => x.LaboratoryInvitation).Single());
+        var invitation = await ExecuteDbContextAsync(async db =>
+        {
+            return await db.InvitationEmails.IgnoreQueryFilters().Include(x => x.LaboratoryInvitation).SingleAsync();
+        });
         Assert.Equal(TestData.NonMemberUser.Id, invitation.LaboratoryInvitation.AcceptedById);
 
-        var membership = ExecuteDbContext(db => db.Memberships.IgnoreQueryFilters().Single(m => m.MemberId == TestData.NonMemberUser.Id));
+        var membership = await ExecuteDbContextAsync(async db =>
+        {
+            return await db.Memberships.IgnoreQueryFilters().Where(m => m.MemberId == TestData.NonMemberUser.Id).SingleAsync();
+        });
         Assert.Equal(LaboratoryMembershipType.Analyst, membership.MembershipType);
     }
 
@@ -45,12 +51,12 @@ public sealed class AcceptEmailInvitationTests : TestBase
     public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
     {
         // update invite to be expired
-        ExecuteDbContext(db =>
+        await ExecuteDbContextAsync(async db =>
         {
-            var invite = db.InvitationEmails.IgnoreQueryFilters().Single();
+            var invite = await db.InvitationEmails.IgnoreQueryFilters().SingleAsync();
             invite.LaboratoryId = TestData.Lab.Id;
             invite.ExpiresOn = DateTime.UtcNow.AddDays(-1);
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
         RunAsNonMember();
@@ -59,7 +65,11 @@ public sealed class AcceptEmailInvitationTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var membership = ExecuteDbContext(db => db.Memberships.IgnoreQueryFilters().SingleOrDefault(m => m.MemberId == TestData.NonMemberUser.Id));
+        var membership = await ExecuteDbContextAsync(async db =>
+        {
+            return await db.Memberships.IgnoreQueryFilters().SingleOrDefaultAsync(m => m.MemberId == TestData.NonMemberUser.Id);
+        });
+        
         Assert.Null(membership);
     }
 

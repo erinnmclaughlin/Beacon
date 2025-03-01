@@ -4,9 +4,7 @@ using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests;
 using Beacon.Common.Services;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Respawn;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
@@ -45,20 +43,6 @@ public abstract class TestBase : IAsyncLifetime
         db.Laboratories.Add(TestData.Lab);
     }
     
-    protected void ExecuteDbContext(Action<BeaconDbContext> action)
-    {
-        using var scope = _fixture.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        action.Invoke(dbContext);
-    }
-
-    protected T ExecuteDbContext<T>(Func<BeaconDbContext, T> action)
-    {
-        using var scope = _fixture.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        return action.Invoke(dbContext);
-    }
-
     protected async Task ExecuteDbContextAsync(Func<BeaconDbContext, Task> action)
     {
         using var scope = _fixture.Services.CreateScope();
@@ -66,7 +50,7 @@ public abstract class TestBase : IAsyncLifetime
         await action.Invoke(dbContext);
     }
 
-    protected async Task<T> ExecuteDbContext<T>(Func<BeaconDbContext, Task<T>> action)
+    protected async Task<T> ExecuteDbContextAsync<T>(Func<BeaconDbContext, Task<T>> action)
     {
         using var scope = _fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();

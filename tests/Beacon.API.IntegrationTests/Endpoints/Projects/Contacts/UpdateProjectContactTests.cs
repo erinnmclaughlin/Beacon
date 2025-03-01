@@ -1,15 +1,16 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.Common.Requests.Projects.Contacts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 [Trait("Feature", "Project Management")]
 public sealed class UpdateProjectContactTests : ProjectTestBase
 {
-    private static Guid ContactId { get; } = new Guid("7d6da369-c88b-4ad8-995f-2c6051f6912b");
-    private static string OriginalName { get; } = "Old name";
-    private static string? OriginalEmail { get; } = "someone@place.com";
-    private static string? OriginalPhone { get; } = null;
+    private static Guid ContactId { get; } = new("7d6da369-c88b-4ad8-995f-2c6051f6912b");
+    private const string OriginalName = "Old name";
+    private const string? OriginalEmail = "someone@place.com";
+    private const string? OriginalPhone = null;
 
     public UpdateProjectContactTests(TestFixture fixture) : base(fixture)
     {
@@ -32,7 +33,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));
+        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
 
         Assert.Equal(request.Name, updatedContact.Name);
         Assert.Equal(request.EmailAddress, updatedContact.EmailAddress);
@@ -56,7 +57,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));
+        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
 
         Assert.Equal(OriginalName, updatedContact.Name);
         Assert.Equal(OriginalEmail, updatedContact.EmailAddress);
@@ -80,7 +81,7 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var updatedContact = ExecuteDbContext(db => db.ProjectContacts.Single(x => x.Id == ContactId));
+        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
 
         Assert.Equal(OriginalName, updatedContact.Name);
         Assert.Equal(OriginalEmail, updatedContact.EmailAddress);

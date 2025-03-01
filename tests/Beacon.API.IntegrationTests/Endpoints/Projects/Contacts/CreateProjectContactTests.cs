@@ -1,4 +1,6 @@
-﻿using Beacon.Common.Requests.Projects.Contacts;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Requests.Projects.Contacts;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
@@ -31,7 +33,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
         var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
+        var createdContact = await GetProjectContactAsync();
         Assert.Null(createdContact);
     }
 
@@ -43,7 +45,7 @@ public sealed class CreateProjectContactTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var createdContact = ExecuteDbContext(db => db.ProjectContacts.SingleOrDefault());
+        var createdContact = await GetProjectContactAsync();
         Assert.Null(createdContact);
     }
 
@@ -55,10 +57,16 @@ public sealed class CreateProjectContactTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var createdContact = ExecuteDbContext(db => db.ProjectContacts.Single());
+        var createdContact = await GetProjectContactAsync();
+        Assert.NotNull(createdContact);
         Assert.Equal(ProjectId, createdContact.ProjectId);
         Assert.Equal(SomeValidRequest.Name, createdContact.Name);
         Assert.Equal(SomeValidRequest.PhoneNumber, createdContact.PhoneNumber);
         Assert.Null(createdContact.EmailAddress);
+    }
+    
+    private Task<ProjectContact?> GetProjectContactAsync()
+    {
+        return ExecuteDbContextAsync(db => db.ProjectContacts.SingleOrDefaultAsync());
     }
 }

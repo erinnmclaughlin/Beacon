@@ -1,14 +1,11 @@
 ﻿using Beacon.Common.Requests.Projects;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
 [Trait("Feature", "Project Management")]
-public sealed class UpdateLeadAnalystTests : ProjectTestBase
+public sealed class UpdateLeadAnalystTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public UpdateLeadAnalystTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[014] Assigning lead analyst fails when analyst is not in valid role")]
     public async Task AssigningLeadAnalyst_ShouldFail_WhenAnalystIsNotValid()
     {
@@ -23,7 +20,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        EnsureLeadAnalystIs(null);
+        Assert.Null(await GetProjectLeadAnalystIdAsync());
     }
 
     [Fact(DisplayName = "[014] Assigning lead analyst fails when user is not authorized")]
@@ -40,7 +37,7 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        EnsureLeadAnalystIs(null);
+        Assert.Null(await GetProjectLeadAnalystIdAsync());
     }
 
     [Fact(DisplayName = "[014] Assigning lead analyst succeeds when request is valid")]
@@ -48,16 +45,14 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     {
         RunAsAnalyst();
 
-        var request = new UpdateLeadAnalystRequest
+        var response = await SendAsync(new UpdateLeadAnalystRequest
         {
             ProjectId = ProjectId,
             AnalystId = TestData.AnalystUser.Id
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
-
-        EnsureLeadAnalystIs(TestData.AnalystUser.Id);
+        Assert.Equal(TestData.AnalystUser.Id, await GetProjectLeadAnalystIdAsync());
     }
 
     [Fact(DisplayName = "[014] Unassigning lead analyst succeeds when request is valid")]
@@ -65,11 +60,11 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
     {
         RunAsAnalyst();
 
-        ExecuteDbContext(db =>
+        await ExecuteDbContextAsync(async db =>
         {
-            var project = db.Projects.Single(p => p.Id == ProjectId);
+            var project = await db.Projects.SingleAsync(p => p.Id == ProjectId);
             project.LeadAnalystId = TestData.AdminUser.Id;
-            db.SaveChanges();
+            await db.SaveChangesAsync();
         });
 
         var request = new UpdateLeadAnalystRequest
@@ -81,14 +76,14 @@ public sealed class UpdateLeadAnalystTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        EnsureLeadAnalystIs(null);
+        Assert.Null(await GetProjectLeadAnalystIdAsync());
     }
 
-    private void EnsureLeadAnalystIs(Guid? id)
+    private Task<Guid?> GetProjectLeadAnalystIdAsync() => ExecuteDbContextAsync(async db =>
     {
-        Assert.Equal(id, ExecuteDbContext(db => db.Projects
+        return await db.Projects
             .Where(p => p.Id == ProjectId)
             .Select(p => p.LeadAnalystId)
-            .SingleOrDefault()));
-    }
+            .SingleOrDefaultAsync();
+    });
 }

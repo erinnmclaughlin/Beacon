@@ -1,4 +1,6 @@
-﻿using Beacon.Common.Requests.Instruments;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Requests.Instruments;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
@@ -23,13 +25,11 @@ public sealed class CreateLaboratoryInstrumentTests : TestBase
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        ExecuteDbContext(dbContext =>
-        {
-            var instrument = dbContext.LaboratoryInstruments.Single();
-            Assert.Equal(validRequest.SerialNumber, instrument.SerialNumber);
-            Assert.Equal(validRequest.InstrumentType, instrument.InstrumentType);
-            Assert.Equal(TestData.Lab.Id, instrument.LaboratoryId);
-        });
+        var instrument = await GetInstrumentAsync();
+        Assert.NotNull(instrument);
+        Assert.Equal(validRequest.SerialNumber, instrument.SerialNumber);
+        Assert.Equal(validRequest.InstrumentType, instrument.InstrumentType);
+        Assert.Equal(TestData.Lab.Id, instrument.LaboratoryId);
     }
 
     [Fact(DisplayName = "[017] Adding an instrument to a laboratory fails when user is not authorized")]
@@ -46,7 +46,8 @@ public sealed class CreateLaboratoryInstrumentTests : TestBase
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        ExecuteDbContext(dbContext => Assert.Null(dbContext.LaboratoryInstruments.SingleOrDefault()));
+        var instrument = await GetInstrumentAsync();
+        Assert.Null(instrument);
     }
 
     [Fact(DisplayName = "[017] Adding an instrument to a laboratory fails when request is invalid")]
@@ -63,6 +64,13 @@ public sealed class CreateLaboratoryInstrumentTests : TestBase
         var response = await SendAsync(invalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        ExecuteDbContext(dbContext => Assert.Null(dbContext.ProjectEvents.SingleOrDefault()));
+        var instrument = await GetInstrumentAsync();
+        Assert.Null(instrument);
     }
+
+    private async Task<LaboratoryInstrument?> GetInstrumentAsync()
+    {
+        return await ExecuteDbContextAsync(async db => await db.LaboratoryInstruments.SingleOrDefaultAsync());
+    }
+    
 }

@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
@@ -26,7 +27,11 @@ public sealed class RegisterTests : TestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var user = ExecuteDbContext(db => db.Users.Single(x => x.EmailAddress == request.EmailAddress));
+        var user = await ExecuteDbContextAsync(async db =>
+        {
+            return await db.Users.AsNoTracking().SingleAsync(x => x.EmailAddress == request.EmailAddress);
+        });
+        
         Assert.Equal(request.DisplayName, user.DisplayName);
         Assert.True(new PasswordHasher().Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt));
     }

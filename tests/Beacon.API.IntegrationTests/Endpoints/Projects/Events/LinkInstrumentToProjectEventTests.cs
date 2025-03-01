@@ -93,6 +93,6 @@ public sealed class LinkInstrumentToProjectEventTests : ProjectTestBase
 
     private async Task<bool> IsInstrumentLinked(Guid instrumentId, Guid projectEventId)
     {
-        return await ExecuteDbContext(async dbContext => await dbContext.Set<LaboratoryInstrumentUsage>().AnyAsync(x => x.InstrumentId == instrumentId && x.ProjectEventId == projectEventId));
+        return await ExecuteDbContextAsync(async dbContext => await dbContext.Set<LaboratoryInstrumentUsage>().AnyAsync(x => x.InstrumentId == instrumentId && x.ProjectEventId == projectEventId));
     }
 }

@@ -9,7 +9,7 @@
         MockApi.Setup<CreateLaboratoryRequest>();
 
         var sut = RenderModal();
-        var modal = ModalService.Show<CreateLaboratoryModal>();
+        _ = ModalService.Show<CreateLaboratoryModal>();
 
         sut.WaitForElement("input#lab-name", TimeSpan.FromSeconds(5)).Change("");
         await sut.Find("form").SubmitAsync();
@@ -24,7 +24,7 @@
         MockApi.Setup<CreateLaboratoryRequest>();
 
         var sut = RenderModal();
-        var modal = ModalService.Show<CreateLaboratoryModal>();
+        _ = ModalService.Show<CreateLaboratoryModal>();
 
         sut.WaitForElement("input#lab-name", TimeSpan.FromSeconds(5)).Change("My New Lab");
         await sut.Find("form").SubmitAsync();

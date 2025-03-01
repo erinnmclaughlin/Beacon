@@ -4,7 +4,6 @@
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
-
     <IsPackable>false</IsPackable>
     <IsTestProject>true</IsTestProject>
   </PropertyGroup>
@@ -33,4 +32,7 @@
     <ProjectReference Include="..\..\src\Server\Beacon.WebHost\Beacon.WebHost.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit"/>
+  </ItemGroup>
 </Project>

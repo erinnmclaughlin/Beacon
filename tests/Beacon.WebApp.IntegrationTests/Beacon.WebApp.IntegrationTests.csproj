@@ -34,4 +34,7 @@
     <ProjectReference Include="..\..\src\Client\BeaconUI.WebApp\BeaconUI.WebApp.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Using Include="Xunit"/>
+  </ItemGroup>
 </Project>

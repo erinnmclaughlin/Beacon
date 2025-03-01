@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests;
 
@@ -26,4 +27,9 @@ public abstract class ProjectTestBase : TestBase
 
         base.AddTestData(db);
     }
+
+    protected Task<ProjectStatus> GetProjectStatusAsync() => ExecuteDbContextAsync(async db =>
+    {
+        return await db.Projects.Where(p => p.Id == ProjectId).Select(p => p.ProjectStatus).SingleAsync();
+    });
 }

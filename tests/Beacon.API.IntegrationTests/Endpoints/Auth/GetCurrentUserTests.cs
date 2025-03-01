@@ -1,5 +1,4 @@
-﻿using Beacon.API.Persistence;
-using Beacon.Common.Requests.Auth;
+﻿using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
@@ -34,11 +33,5 @@ public sealed class GetCurrentUserTests : TestBase
         Assert.NotNull(session);
         Assert.Equal(TestData.AdminUser.Id, session.CurrentUser.Id);
         Assert.Equal(TestData.AdminUser.DisplayName, session.CurrentUser.DisplayName);
-    }
-
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        db.Users.Add(TestData.AdminUser);
-        db.SaveChanges();
     }
 }

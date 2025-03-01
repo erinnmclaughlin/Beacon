@@ -4,26 +4,18 @@ using Beacon.Common.Requests.Projects;
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
 [Trait("Feature", "Project Management")]
-public sealed class CancelProjectTests : ProjectTestBase
+public sealed class CancelProjectTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public CancelProjectTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[005] Cancel project succeeds when request is valid")]
     public async Task CancelProject_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
 
-        var response = await SendAsync(new CancelProjectRequest
-        {
-            ProjectId = ProjectId
-        });
-
+        var response = await SendAsync(new CancelProjectRequest { ProjectId = ProjectId });
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
-        Assert.Equal(ProjectStatus.Canceled, project.ProjectStatus);
+        var projectStatus = await GetProjectStatusAsync();
+        Assert.Equal(ProjectStatus.Canceled, projectStatus);
     }
 
     [Fact(DisplayName = "[005] Cancel project fails when user is unauthorized")]
@@ -31,14 +23,10 @@ public sealed class CancelProjectTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await SendAsync(new CancelProjectRequest
-        {
-            ProjectId = ProjectId
-        });
-
+        var response = await SendAsync(new CancelProjectRequest { ProjectId = ProjectId });
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var project = ExecuteDbContext(db => db.Projects.Single(x => x.Id == ProjectId));
-        Assert.Equal(ProjectStatus.Active, project.ProjectStatus);
+        var projectStatus = await GetProjectStatusAsync();
+        Assert.Equal(ProjectStatus.Active, projectStatus);
     }
 }

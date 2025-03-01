@@ -100,6 +100,6 @@ public sealed class UnlinkInstrumentFromProjectEventTests : ProjectTestBase
 
     private async Task<bool> IsInstrumentLinked()
     {
-        return await ExecuteDbContext(async dbContext => await dbContext.Set<LaboratoryInstrumentUsage>().AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId));
+        return await ExecuteDbContextAsync(async dbContext => await dbContext.Set<LaboratoryInstrumentUsage>().AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId));
     }
 }

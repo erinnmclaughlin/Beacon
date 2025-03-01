@@ -1,4 +1,5 @@
 ﻿using Beacon.Common.Requests.Projects.SampleGroups;
+using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
@@ -29,7 +30,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.Single());
+        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleAsync());
         Assert.Equal(ProjectId, createdSampleGroup.ProjectId);
         Assert.Equal(SomeValidRequest.SampleName, createdSampleGroup.SampleName);
     }
@@ -42,7 +43,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
         var response = await SendAsync(SomeInvalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.SingleOrDefault());
+        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleOrDefaultAsync());
         Assert.Null(createdSampleGroup);
     }
 
@@ -54,7 +55,7 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
         var response = await SendAsync(SomeValidRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var createdSampleGroup = ExecuteDbContext(db => db.SampleGroups.SingleOrDefault());
+        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleOrDefaultAsync());
         Assert.Null(createdSampleGroup);
     }
 }
