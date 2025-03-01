@@ -2,33 +2,22 @@
 using Beacon.API.Persistence;
 using Beacon.API.Services;
 using Beacon.Common.Services;
-using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.DependencyInjection.Extensions;
-using System.Data.Common;
 
 namespace Beacon.API.IntegrationTests;
 
 public static class WebApplicationFactorySetup
 {
-    public static void ReplaceWithTestDatabase(this IServiceCollection services)
+    public static void ReplaceWithTestDatabase(this IServiceCollection services, string connectionString)
     {
         services.RemoveAll<DbContextOptions<BeaconDbContext>>();
         services.RemoveAll<BeaconDbContext>();
 
-        // Create open SqliteConnection so EF won't automatically close it.
-        services.AddSingleton<DbConnection>(_ =>
-        {
-            var connection = new SqliteConnection("DataSource=:memory:");
-            connection.Open();
-
-            return connection;
-        });
-
         services.AddDbContext<BeaconDbContext>((container, options) =>
         {
-            options.UseSqlite(container.GetRequiredService<DbConnection>());
+            options.UseSqlServer(connectionString.Replace("master", "Beacon"));
         });
     }
 

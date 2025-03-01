@@ -4,66 +4,63 @@ using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Services;
-using Microsoft.Data.Sqlite;
-using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
-public sealed class GetProjectInsightsUnitTests
+public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestBase(testFixture)
 {
     [Fact]
     public async Task GetStatsReturnsExpectedResult()
     {
-        await using var connection = new SqliteConnection("DataSource=:memory:");
-        connection.Open();
-
-        var dbOptions = new DbContextOptionsBuilder<BeaconDbContext>()
-            .UseSqlite(connection)
-            .Options;
-
         var sessionContext = new SessionContext
         {
             CurrentLab = new CurrentLab { Id = TestData.Lab.Id, MembershipType = LaboratoryMembershipType.Admin, Name = TestData.Lab.Name },
             CurrentUser = null!
         };
 
-        using (var db = new BeaconDbContext(dbOptions, sessionContext))
+        var fixture = _fixture.WithWebHostBuilder(builder =>
         {
-            await db.Database.EnsureCreatedAsync();
+            builder.ConfigureServices(services =>
+            {
+                services.RemoveAll<ISessionContext>();
+                services.AddScoped<ISessionContext>(_ => sessionContext);
+            });
+        });
 
-            db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-            db.Laboratories.Add(TestData.Lab);
-            await db.SaveChangesAsync();
+        using var scope = fixture.Services.CreateScope();
 
-            var app1 = CreateApplication("Application 1",
-                // Last year (Aug 2021 - Aug 2022)
-                new DateOnly(2021, 8, 15),
-                new DateOnly(2021, 8, 15),
-                new DateOnly(2021, 9, 1),
-                new DateOnly(2021, 10, 1),
-                new DateOnly(2021, 11, 1),
-                new DateOnly(2021, 11, 1),
-                new DateOnly(2022, 4, 1),
-                // This year (Aug 2022 - Aug 2023)
-                new DateOnly(2022, 9, 1),
-                new DateOnly(2023, 1, 1));
+        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
-            var app2 = CreateApplication("Application 2",
-                new DateOnly(2021, 10, 1));
+        var app1 = CreateApplication("Application 1",
+            // Last year (Aug 2021 - Aug 2022)
+            new DateOnly(2021, 8, 15),
+            new DateOnly(2021, 8, 15),
+            new DateOnly(2021, 9, 1),
+            new DateOnly(2021, 10, 1),
+            new DateOnly(2021, 11, 1),
+            new DateOnly(2021, 11, 1),
+            new DateOnly(2022, 4, 1),
+            // This year (Aug 2022 - Aug 2023)
+            new DateOnly(2022, 9, 1),
+            new DateOnly(2023, 1, 1));
 
-            var app3 = CreateApplication("Application 3",
-                new DateOnly(2023, 2, 1));
+        var app2 = CreateApplication("Application 2",
+            new DateOnly(2021, 10, 1));
 
-            db.ProjectApplications.AddRange(app1, app2, app3);
-            await db.SaveChangesAsync();
+        var app3 = CreateApplication("Application 3",
+            new DateOnly(2023, 2, 1));
 
-            var sut = new GetProjectInsightsHandler(db);
-            var result = await sut.GetStatistics(new DateTime(2023, 8, 1), CancellationToken.None);
+        db.ProjectApplications.AddRange(app1, app2, app3);
+        await db.SaveChangesAsync();
 
-            var app1Result = result.Single(x => x.ApplicationType == "Application 1");
-            Assert.Equal(7, app1Result.NumberOfProjectsCreatedLastYear);
-            Assert.Equal(2, app1Result.NumberOfProjectsCreatedThisYear);
-        }
+        var sut = new GetProjectInsightsHandler(db);
+        var result = await sut.GetStatistics(new DateTime(2023, 8, 1), CancellationToken.None);
+
+        var app1Result = result.Single(x => x.ApplicationType == "Application 1");
+        Assert.Equal(7, app1Result.NumberOfProjectsCreatedLastYear);
+        Assert.Equal(2, app1Result.NumberOfProjectsCreatedThisYear);
     }
 
     [Fact]

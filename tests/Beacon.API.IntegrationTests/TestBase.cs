@@ -4,8 +4,9 @@ using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests;
 using Beacon.Common.Services;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using System.Data.Common;
+using Respawn;
 using System.Net.Http.Json;
 
 namespace Beacon.API.IntegrationTests;
@@ -16,7 +17,7 @@ public class TestCollection : ICollectionFixture<TestFixture>
 }
 
 [Collection("TestCollection")]
-public abstract class TestBase
+public abstract class TestBase : IAsyncLifetime
 {
     protected readonly TestFixture _fixture;
     protected readonly HttpClient _httpClient;
@@ -26,15 +27,22 @@ public abstract class TestBase
         _fixture = fixture;
         _httpClient = _fixture.CreateClient();
         _httpClient.Timeout = TimeSpan.FromMinutes(3);
+    }
 
-        ResetDatabase();
+    public async Task InitializeAsync()
+    {
+        await ResetDatabase();
+    }
+
+    public Task DisposeAsync()
+    {
+        return Task.CompletedTask;
     }
 
     protected virtual void AddTestData(BeaconDbContext db)
     {
         db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
         db.Laboratories.Add(TestData.Lab);
-        db.SaveChanges();
     }
     
     protected void ExecuteDbContext(Action<BeaconDbContext> action)
@@ -49,6 +57,20 @@ public abstract class TestBase
         using var scope = _fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         return action.Invoke(dbContext);
+    }
+
+    protected async Task ExecuteDbContextAsync(Func<BeaconDbContext, Task> action)
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        await action.Invoke(dbContext);
+    }
+
+    protected async Task<T> ExecuteDbContext<T>(Func<BeaconDbContext, Task<T>> action)
+    {
+        using var scope = _fixture.Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        return await action.Invoke(dbContext);
     }
 
     protected void RunAsAdmin() => SetCurrentUser(TestData.AdminUser, LaboratoryMembershipType.Admin);
@@ -74,7 +96,6 @@ public abstract class TestBase
             Name = TestData.Lab.Name,
             MembershipType = membershipType.Value
         });
-
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
@@ -94,20 +115,16 @@ public abstract class TestBase
         return await response.Content.ReadFromJsonAsync<T>(JsonDefaults.JsonSerializerOptions);
     }
 
-    private void ResetDatabase()
+    private async Task ResetDatabase()
     {
+        await _fixture.ResetDatabase();
+
         using var scope = _fixture.Services.CreateScope();
-        var dbConnection = scope.ServiceProvider.GetRequiredService<DbConnection>();
-        dbConnection.Close();
-
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        dbContext.Database.EnsureDeleted();
 
-        dbConnection.Open();
-        dbContext.Database.EnsureCreated();
         AddTestData(dbContext);
+        await dbContext.SaveChangesAsync();
 
         dbContext.ChangeTracker.Clear();
     }
-
 }

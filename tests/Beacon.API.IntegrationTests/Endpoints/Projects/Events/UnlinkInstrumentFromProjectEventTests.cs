@@ -58,14 +58,8 @@ public sealed class UnlinkInstrumentFromProjectEventTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        await ExecuteDbContext(async dbContext =>
-        {
-            var exists = await dbContext
-                .Set<LaboratoryInstrumentUsage>()
-                .AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
-
-            Assert.False(exists);
-        });
+        var isLinked = await IsInstrumentLinked();
+        Assert.False(isLinked);
     }
 
     [Fact(DisplayName = "[022] Unlink instrument from project event fails when user is unauthorized.")]
@@ -82,14 +76,8 @@ public sealed class UnlinkInstrumentFromProjectEventTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        await ExecuteDbContext(async dbContext =>
-        {
-            var exists = await dbContext
-                .Set<LaboratoryInstrumentUsage>()
-                .AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
-
-            Assert.True(exists);
-        });
+        var isLinked = await IsInstrumentLinked();
+        Assert.True(isLinked);
     }
 
     [Fact(DisplayName = "[022] Unlink instrument from project event fails when request is invalid.")]
@@ -106,13 +94,12 @@ public sealed class UnlinkInstrumentFromProjectEventTests : ProjectTestBase
         var response = await SendAsync(request);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        await ExecuteDbContext(async dbContext =>
-        {
-            var exists = await dbContext
-                .Set<LaboratoryInstrumentUsage>()
-                .AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
+        var isLinked = await IsInstrumentLinked();
+        Assert.True(isLinked);
+    }
 
-            Assert.True(exists);
-        });
+    private async Task<bool> IsInstrumentLinked()
+    {
+        return await ExecuteDbContext(async dbContext => await dbContext.Set<LaboratoryInstrumentUsage>().AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId));
     }
 }

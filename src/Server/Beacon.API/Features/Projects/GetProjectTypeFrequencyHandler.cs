@@ -27,7 +27,7 @@ internal sealed class GetProjectTypeFrequencyHandler(BeaconDbContext dbContext) 
             .Select(group => new GetProjectTypeFrequencyRequest.Series
             {
                 ProjectType = group.Key,
-                ProjectCountByDate = GetMonths()
+                ProjectCountByDate = GetMonths(request.StartDate)
                     .ToDictionary(m => m, m => projects
                         .Where(p => p.ProjectType == group.Key && p.Date == m)
                         .Sum(p => p.Count))
@@ -35,10 +35,9 @@ internal sealed class GetProjectTypeFrequencyHandler(BeaconDbContext dbContext) 
             .ToArray();
     }
 
-    private static IEnumerable<DateOnly> GetMonths()
+    private static IEnumerable<DateOnly> GetMonths(DateTime startDate)
     {
-        var today = DateTime.Today;
-        var start = new DateOnly(today.Year - 1, today.Month, 1);
+        var start = new DateOnly(startDate.Year, startDate.Month, 1);
 
         for (var i = 0; i < 12; i++)
             yield return start.AddMonths(i);
