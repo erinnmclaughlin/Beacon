@@ -20,19 +20,10 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
-  build-and-test:
+  test:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
     steps:
     - uses: actions/checkout@v4
-    
-    # Setup Pages
-    - name: Setup Pages
-      uses: actions/configure-pages@v4
-        
     - name: Setup .NET
       uses: actions/setup-dotnet@v4
       with:
@@ -69,7 +60,35 @@ jobs:
         COLOR=$(if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then echo "success"; elif [ $(echo "$COVERAGE >= 60" | bc -l) -eq 1 ]; then echo "yellow"; else echo "red"; fi)
         echo "https://img.shields.io/badge/coverage-${COVERAGE}%25-${COLOR}" > coveragereport/coverage-badge.txt
     
-    # Upload artifact
+    # Upload coverage report as artifact (available for all branches/PRs)
+    - name: Upload coverage report
+      uses: actions/upload-artifact@v3
+      with:
+        name: coverage-report
+        path: coveragereport
+        retention-days: 14
+
+  publish:
+    needs: test
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+
+    steps:
+    # Setup Pages
+    - name: Setup Pages
+      uses: actions/configure-pages@v4
+
+    # Download the coverage report artifact
+    - name: Download coverage report
+      uses: actions/download-artifact@v3
+      with:
+        name: coverage-report
+        path: coveragereport
+
+    # Upload for GitHub Pages
     - name: Upload artifact
       uses: actions/upload-pages-artifact@v3
       with:
