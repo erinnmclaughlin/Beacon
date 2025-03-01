@@ -1,17 +1,12 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Services;
+﻿using Beacon.API.Services;
 using Beacon.Common.Requests.Auth;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Trait("Feature", "User Registration & Login")]
-public sealed class RegisterTests : TestBase
+public sealed class RegisterTests(TestFixture fixture) : TestBase(fixture)
 {
-    public RegisterTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[001] Creating a new account succeeds when request is valid")]
     public async Task Register_SucceedsWhenRequestIsValid()
     {
@@ -58,11 +53,5 @@ public sealed class RegisterTests : TestBase
         });
 
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-    }
-
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        db.Users.Add(TestData.AdminUser);
-        db.SaveChanges();
     }
 }

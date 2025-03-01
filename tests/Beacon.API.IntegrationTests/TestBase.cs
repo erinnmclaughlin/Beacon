@@ -17,14 +17,13 @@ public class TestCollection : ICollectionFixture<TestFixture>
 [Collection("TestCollection")]
 public abstract class TestBase : IAsyncLifetime
 {
-    protected readonly TestFixture _fixture;
-    protected readonly HttpClient _httpClient;
+    protected TestFixture Fixture { get; }
+    protected HttpClient HttpClient { get; }
 
     protected TestBase(TestFixture fixture)
     {
-        _fixture = fixture;
-        _httpClient = _fixture.CreateClient();
-        _httpClient.Timeout = TimeSpan.FromMinutes(3);
+        Fixture = fixture;
+        HttpClient = Fixture.CreateClient();
     }
 
     public async Task InitializeAsync()
@@ -37,22 +36,26 @@ public abstract class TestBase : IAsyncLifetime
         return Task.CompletedTask;
     }
 
-    protected virtual void AddTestData(BeaconDbContext db)
+    protected virtual IEnumerable<object> EnumerateTestData()
     {
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser, TestData.AnalystUser, TestData.MemberUser, TestData.NonMemberUser);
-        db.Laboratories.Add(TestData.Lab);
+        yield return TestData.AdminUser;
+        yield return TestData.ManagerUser;
+        yield return TestData.AnalystUser;
+        yield return TestData.MemberUser;
+        yield return TestData.NonMemberUser;
+        yield return TestData.Lab;
     }
     
     protected async Task ExecuteDbContextAsync(Func<BeaconDbContext, Task> action)
     {
-        using var scope = _fixture.Services.CreateScope();
+        using var scope = Fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         await action.Invoke(dbContext);
     }
 
     protected async Task<T> ExecuteDbContextAsync<T>(Func<BeaconDbContext, Task<T>> action)
     {
-        using var scope = _fixture.Services.CreateScope();
+        using var scope = Fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         return await action.Invoke(dbContext);
     }
@@ -61,12 +64,12 @@ public abstract class TestBase : IAsyncLifetime
     protected void RunAsManager() => SetCurrentUser(TestData.ManagerUser, LaboratoryMembershipType.Manager);
     protected void RunAsAnalyst() => SetCurrentUser(TestData.AnalystUser, LaboratoryMembershipType.Analyst);
     protected void RunAsMember() => SetCurrentUser(TestData.MemberUser, LaboratoryMembershipType.Member);
-    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser, null);
-    protected void RunAsAnonymous() => SetCurrentUser(null, null);
+    protected void RunAsNonMember() => SetCurrentUser(TestData.NonMemberUser);
+    protected void RunAsAnonymous() => SetCurrentUser(null);
 
-    protected void SetCurrentUser(User? user, LaboratoryMembershipType? membershipType)
+    protected void SetCurrentUser(User? user, LaboratoryMembershipType? membershipType = null)
     {
-        using var scope = _fixture.Services.CreateScope();
+        using var scope = Fixture.Services.CreateScope();
         var sessionMock = scope.ServiceProvider.GetRequiredService<Mock<ISessionContext>>();
         sessionMock.SetupGet(x => x.UserId).Returns(user?.Id ?? Guid.Empty);
         sessionMock.SetupGet(x => x.CurrentUser).Returns(new CurrentUser
@@ -85,13 +88,13 @@ public abstract class TestBase : IAsyncLifetime
     protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
         where TRequest : BeaconRequest<TRequest>, IBeaconRequest<TRequest>, new()
     {
-        return TRequest.SendAsync(_httpClient, request as TRequest ?? new());
+        return TRequest.SendAsync(HttpClient, request as TRequest ?? new());
     }
 
     protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
         where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
     {
-        return TRequest.SendAsync(_httpClient, request as TRequest ?? new());
+        return TRequest.SendAsync(HttpClient, request as TRequest ?? new());
     }
 
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)
@@ -101,14 +104,12 @@ public abstract class TestBase : IAsyncLifetime
 
     private async Task ResetDatabase()
     {
-        await _fixture.ResetDatabase();
+        await Fixture.ResetDatabase();
 
-        using var scope = _fixture.Services.CreateScope();
+        using var scope = Fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
 
-        AddTestData(dbContext);
+        dbContext.AddRange(EnumerateTestData());
         await dbContext.SaveChangesAsync();
-
-        dbContext.ChangeTracker.Clear();
     }
 }

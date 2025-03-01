@@ -80,6 +80,6 @@ public sealed class CreateProjectTests(TestFixture fixture) : ProjectTestBase(fi
 
     private async Task<Project?> GetProjectAsync(string customerName) => await ExecuteDbContextAsync(async db =>
     {
-        return await db.Projects.SingleOrDefaultAsync(x => x.CustomerName == customerName);
+        return await db.Projects.AsNoTracking().SingleOrDefaultAsync(x => x.CustomerName == customerName);
     });
 }

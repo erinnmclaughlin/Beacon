@@ -10,8 +10,7 @@ public interface IBeaconRequest
     static abstract string GetRoute();
 }
 
-public interface IBeaconRequest<TRequest> : IBeaconRequest
-    where TRequest : IBeaconRequest<TRequest>
+public interface IBeaconRequest<in TRequest> : IBeaconRequest where TRequest : IBeaconRequest<TRequest>
 {
     static abstract Task<HttpResponseMessage> SendAsync(HttpClient httpClient, TRequest request, CancellationToken ct = default);
 

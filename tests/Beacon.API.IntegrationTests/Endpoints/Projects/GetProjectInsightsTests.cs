@@ -20,7 +20,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
             CurrentUser = null!
         };
 
-        var fixture = _fixture.WithWebHostBuilder(builder =>
+        var fixture = Fixture.WithWebHostBuilder(builder =>
         {
             builder.ConfigureServices(services =>
             {

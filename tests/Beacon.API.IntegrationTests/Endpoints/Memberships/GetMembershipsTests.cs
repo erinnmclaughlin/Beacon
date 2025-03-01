@@ -4,19 +4,14 @@ using Beacon.Common.Requests.Memberships;
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
 [Trait("Feature", "User Management")]
-public sealed class GetMembershipsTests : TestBase
+public sealed class GetMembershipsTests(TestFixture fixture) : TestBase(fixture)
 {
-    public GetMembershipsTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[170] Get memberships endpoint returns 403 when user is not authorized")]
     public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
         RunAsNonMember();
 
         var response = await SendAsync(new GetMembershipsRequest());
-
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
@@ -26,11 +21,9 @@ public sealed class GetMembershipsTests : TestBase
         RunAsMember();
 
         var response = await SendAsync(new GetMembershipsRequest());
-
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var memberships = await DeserializeAsync<LaboratoryMemberDto[]>(response);
-
         Assert.NotNull(memberships);
         Assert.Contains(memberships, m => m.Id == TestData.AdminUser.Id && m.MembershipType == LaboratoryMembershipType.Admin);
         Assert.Contains(memberships, m => m.Id == TestData.ManagerUser.Id && m.MembershipType == LaboratoryMembershipType.Manager);

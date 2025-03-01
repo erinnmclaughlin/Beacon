@@ -1,18 +1,13 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
 [Trait("Feature", "Laboratory Management")]
-public sealed class GetMyLaboratoriesTests : TestBase
+public sealed class GetMyLaboratoriesTests(TestFixture fixture) : TestBase(fixture)
 {
     private static Guid OtherLabId { get; } = Guid.NewGuid();
-
-    public GetMyLaboratoriesTests(TestFixture fixture) : base(fixture)
-    {
-    }
 
     [Fact(DisplayName = "[185] Get my labs returns current user's labs only")]
     public async Task GetMyLaboratories_ReturnsOnlyCurrentUsersLabs()
@@ -33,17 +28,11 @@ public sealed class GetMyLaboratoriesTests : TestBase
         Assert.DoesNotContain(otherMyLabs, x => x.Name == "Some other lab");
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    protected override IEnumerable<object> EnumerateTestData()
     {
-        var lab = new Laboratory
-        {
-            Id = TestData.Lab.Id,
-            Name = TestData.Lab.Name
-        };
-
-        lab.AddMember(TestData.AdminUser.Id, LaboratoryMembershipType.Admin);
-        lab.AddMember(TestData.ManagerUser.Id, LaboratoryMembershipType.Manager);
-
+        foreach (var item in base.EnumerateTestData())
+            yield return item;
+        
         var otherLab = new Laboratory
         {
             Id = OtherLabId,
@@ -51,8 +40,6 @@ public sealed class GetMyLaboratoriesTests : TestBase
         };
 
         otherLab.AddMember(TestData.ManagerUser.Id, LaboratoryMembershipType.Admin);
-
-        db.Users.AddRange(TestData.AdminUser, TestData.ManagerUser);
-        db.Laboratories.AddRange(lab, otherLab);
+        yield return otherLab;
     }
 }

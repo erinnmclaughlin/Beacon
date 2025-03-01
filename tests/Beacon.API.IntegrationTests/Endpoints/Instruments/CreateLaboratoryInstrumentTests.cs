@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
 [Trait("Feature", "Instrument Management")]
-public sealed class CreateLaboratoryInstrumentTests : TestBase
+public sealed class CreateLaboratoryInstrumentTests(TestFixture fixture) : TestBase(fixture)
 {
-    public CreateLaboratoryInstrumentTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[017] Adding an instrument to a laboratory succeeds when request is valid")]
     public async Task CreateLaboratoryInstrument_Succeeds_WhenRequestIsValid()
     {

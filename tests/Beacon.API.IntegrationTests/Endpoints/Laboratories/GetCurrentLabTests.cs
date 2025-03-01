@@ -1,17 +1,11 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
-using Beacon.Common.Models;
+﻿using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
 [Trait("Feature", "Laboratory Management")]
-public sealed class GetCurrentLabTests : TestBase
+public sealed class GetCurrentLabTests(TestFixture fixture) : TestBase(fixture)
 {
-    public GetCurrentLabTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[185] Get current lab endpoint returns lab info if current user is a member")]
     public async Task GetCurrentLab_ReturnsExpectedResult()
     {
@@ -34,20 +28,5 @@ public sealed class GetCurrentLabTests : TestBase
 
         var response = await SendAsync(new GetCurrentLaboratoryRequest());
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        var lab = new Laboratory
-        {
-            Id = TestData.Lab.Id,
-            Name = TestData.Lab.Name
-        };
-
-        lab.AddMember(TestData.AdminUser.Id, LaboratoryMembershipType.Admin);
-
-        db.Users.Add(TestData.AdminUser);
-        db.Laboratories.Add(lab);
-        db.SaveChanges();
     }
 }

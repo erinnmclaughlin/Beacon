@@ -1,18 +1,13 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.Contacts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 [Trait("Feature", "Project Management")]
-public sealed class DeleteProjectContactTests : ProjectTestBase
+public sealed class DeleteProjectContactTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
     private static Guid ContactId { get; } = new("7d6da369-c88b-4ad8-995f-2c6051f6912b");
-
-    public DeleteProjectContactTests(TestFixture fixture) : base(fixture)
-    {
-    }
 
     [Fact(DisplayName = "[013] Delete contact succeeds when request is valid")]
     public async Task DeleteContact_Succeeds_WhenRequestIsValid()
@@ -48,18 +43,13 @@ public sealed class DeleteProjectContactTests : ProjectTestBase
         Assert.True(await ExecuteDbContextAsync(async db => await db.ProjectContacts.AnyAsync(c => c.Id == ContactId)));
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Append(new ProjectContact
     {
-        db.ProjectContacts.Add(new ProjectContact
-        {
-            Id = ContactId,
-            Name = "Johnny Depp",
-            EmailAddress = null,
-            PhoneNumber = null,
-            LaboratoryId = TestData.Lab.Id,
-            ProjectId = ProjectId
-        });
-
-        base.AddTestData(db);
-    }
+        Id = ContactId,
+        Name = "Johnny Depp",
+        EmailAddress = null,
+        PhoneNumber = null,
+        LaboratoryId = TestData.Lab.Id,
+        ProjectId = ProjectId
+    });
 }

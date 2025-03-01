@@ -4,12 +4,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
 [Trait("Feature", "Laboratory Management")]
-public sealed class CreateLaboratoryTests : TestBase
+public sealed class CreateLaboratoryTests(TestFixture fixture) : TestBase(fixture)
 {
-    public CreateLaboratoryTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[002] Create lab succeeds when request is valid")]
     public async Task CreateLab_ShouldSucceed_WhenRequestIsValid()
     {

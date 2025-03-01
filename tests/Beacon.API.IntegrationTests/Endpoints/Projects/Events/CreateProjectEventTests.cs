@@ -5,12 +5,8 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
 [Trait("Feature", "Project Events")]
-public sealed class CreateProjectEventTests : ProjectTestBase
+public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public CreateProjectEventTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[113] Create project activity succeeds when request is valid")]
     public async Task CreateProjectEvent_Succeeds_WhenRequestIsValid()
     {
@@ -75,8 +71,8 @@ public sealed class CreateProjectEventTests : ProjectTestBase
         Assert.Null(projectEvent);
     }
 
-    private async Task<ProjectEvent?> GetProjectEventAsync()
+    private Task<ProjectEvent?> GetProjectEventAsync() => ExecuteDbContextAsync(async db =>
     {
-        return await ExecuteDbContextAsync(async db => await db.ProjectEvents.SingleOrDefaultAsync());
-    }
+        return await db.ProjectEvents.AsNoTracking().SingleOrDefaultAsync(x => x.ProjectId == ProjectId);
+    });
 }

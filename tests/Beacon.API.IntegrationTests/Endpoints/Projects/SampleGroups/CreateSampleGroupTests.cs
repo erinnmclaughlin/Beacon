@@ -1,38 +1,27 @@
-﻿using Beacon.Common.Requests.Projects.SampleGroups;
+﻿using Beacon.API.Persistence.Entities;
+using Beacon.Common.Requests.Projects.SampleGroups;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.SampleGroups;
 
 [Trait("Feature", "Sample Management")]
-public sealed class CreateSampleGroupTests : ProjectTestBase
+public sealed class CreateSampleGroupTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    private static CreateSampleGroupRequest SomeValidRequest => new()
-    {
-        ProjectId = ProjectId,
-        SampleName = "My Sample Group"
-    };
-
-    private static CreateSampleGroupRequest SomeInvalidRequest => new()
-    {
-        ProjectId = ProjectId,
-        SampleName = ""
-    };
-
-    public CreateSampleGroupTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[016] Create project sample group succeeds when request is valid")]
     public async Task CreateSampleGroup_SucceedsWhenRequestIsValid()
     {
         RunAsAdmin();
 
-        var response = await SendAsync(SomeValidRequest);
+        var response = await SendAsync(new CreateSampleGroupRequest
+        {
+            ProjectId = ProjectId,
+            SampleName = "My Sample Group"
+        });
+        
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleAsync());
-        Assert.Equal(ProjectId, createdSampleGroup.ProjectId);
-        Assert.Equal(SomeValidRequest.SampleName, createdSampleGroup.SampleName);
+        var createdSampleGroup = await GetSampleGroupAsync();
+        Assert.Equal("My Sample Group", createdSampleGroup?.SampleName);
     }
 
     [Fact(DisplayName = "[016] Create project sample group fails when request is invalid")]
@@ -40,11 +29,14 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await SendAsync(SomeInvalidRequest);
+        var response = await SendAsync(new CreateSampleGroupRequest
+        {
+            ProjectId = ProjectId,
+            SampleName = ""
+        });
+        
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-
-        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleOrDefaultAsync());
-        Assert.Null(createdSampleGroup);
+        Assert.Null(await GetSampleGroupAsync());
     }
 
     [Fact(DisplayName = "[016] Create project sample group fails when user is not authorized")]
@@ -52,10 +44,21 @@ public sealed class CreateSampleGroupTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await SendAsync(SomeValidRequest);
+        var response = await SendAsync(new CreateSampleGroupRequest
+        {
+            ProjectId = ProjectId,
+            SampleName = "My Sample Group"
+        });
+        
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-
-        var createdSampleGroup = await ExecuteDbContextAsync(async db => await db.SampleGroups.SingleOrDefaultAsync());
-        Assert.Null(createdSampleGroup);
+        Assert.Null(await GetSampleGroupAsync());
     }
+    
+    private Task<SampleGroup?> GetSampleGroupAsync() => ExecuteDbContextAsync(async db =>
+    {
+        return await db.SampleGroups
+            .Where(x => x.LaboratoryId == TestData.Lab.Id)
+            .AsNoTracking()
+            .SingleOrDefaultAsync();
+    });
 }

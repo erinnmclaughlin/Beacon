@@ -1,17 +1,12 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Instruments;
 
 [Trait("Feature", "Instrument Management")]
-public sealed class GetLaboratoryInstrumentsTests : TestBase
+public sealed class GetLaboratoryInstrumentsTests(TestFixture fixture) : TestBase(fixture)
 {
-    public GetLaboratoryInstrumentsTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[017] Get lab instruments succeeds when request is valid")]
     public async Task GetLaboratoryInstruments_SucceedsWhenRequestIsValid()
     {
@@ -37,15 +32,10 @@ public sealed class GetLaboratoryInstrumentsTests : TestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Append(new LaboratoryInstrument
     {
-        db.LaboratoryInstruments.Add(new LaboratoryInstrument
-        {
-            SerialNumber = "123",
-            InstrumentType = "Test",
-            LaboratoryId = TestData.Lab.Id
-        });
-
-        base.AddTestData(db);
-    }
+        SerialNumber = "123",
+        InstrumentType = "Test",
+        LaboratoryId = TestData.Lab.Id
+    });
 }

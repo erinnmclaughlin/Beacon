@@ -4,12 +4,8 @@ using Beacon.Common.Services;
 namespace Beacon.API.IntegrationTests.Endpoints.Auth;
 
 [Trait("Feature", "User Registration & Login")]
-public sealed class GetCurrentUserTests : TestBase
+public sealed class GetCurrentUserTests(TestFixture fixture) : TestBase(fixture)
 {
-    public GetCurrentUserTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[008] Get current user returns 401 if user is not logged in")]
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {

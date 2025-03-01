@@ -1,27 +1,17 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects;
 
-public sealed class GetProjectTypeFrequencyTests : TestBase
+public sealed class GetProjectTypeFrequencyTests(TestFixture fixture)  : TestBase(fixture)
 {
-    public GetProjectTypeFrequencyTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact]
     public async Task GetProjectTypeFrequencyGroupsByMonth()
     {
         RunAsAdmin();
 
-        var request = new GetProjectTypeFrequencyRequest
-        {
-            StartDate = new DateTime(2023, 1, 1)
-        };
-
-        var response = await SendAsync(request);
+        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateTime(2023, 1, 1) });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var data = await DeserializeAsync<GetProjectTypeFrequencyRequest.Series[]>(response);
@@ -36,67 +26,64 @@ public sealed class GetProjectTypeFrequencyTests : TestBase
         Assert.Equal(2, app2Data.ProjectCountByDate[new DateOnly(2023, 2, 1)]);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    protected override IEnumerable<object> EnumerateTestData()
     {
-        var app1 = new ProjectApplication
+        foreach (var item in base.EnumerateTestData())
+            yield return item;
+
+        yield return new ProjectApplication
         {
             Name = "Application 1",
-            LaboratoryId = TestData.Lab.Id
+            LaboratoryId = TestData.Lab.Id,
+            TaggedProjects = [
+                new ProjectApplicationTag
+                {
+                    LaboratoryId = TestData.Lab.Id,
+                    Project = new Project
+                    {
+                        Id = Guid.NewGuid(),
+                        CustomerName = "Test",
+                        ProjectCode = ProjectCode.FromString("TST-202301-001")!,
+                        CreatedById = TestData.AdminUser.Id,
+                        CreatedOn = new DateTime(2023, 1, 12),
+                        LaboratoryId = TestData.Lab.Id
+                    }
+                }
+            ]
         };
 
-        var app2 = new ProjectApplication
+        yield return new ProjectApplication
         {
             Name = "Application 2",
-            LaboratoryId = TestData.Lab.Id
+            LaboratoryId = TestData.Lab.Id,
+            TaggedProjects = [
+                new ProjectApplicationTag
+                {
+                    LaboratoryId = TestData.Lab.Id,
+                    Project = new Project
+                    {
+                        Id = Guid.NewGuid(),
+                        CustomerName = "Test",
+                        ProjectCode = ProjectCode.FromString("TST-202302-001")!,
+                        CreatedById = TestData.AdminUser.Id,
+                        CreatedOn = new DateTime(2023, 2, 1),
+                        LaboratoryId = TestData.Lab.Id
+                    }
+                },
+                new ProjectApplicationTag
+                {
+                    LaboratoryId = TestData.Lab.Id,
+                    Project = new Project
+                    {
+                        Id = Guid.NewGuid(),
+                        CustomerName = "Test",
+                        ProjectCode = ProjectCode.FromString("TST-202302-002")!,
+                        CreatedById = TestData.AdminUser.Id,
+                        CreatedOn = new DateTime(2023, 2, 28),
+                        LaboratoryId = TestData.Lab.Id
+                    }
+                }
+            ]
         };
-
-        db.ProjectApplications.AddRange(new[] { app1, app2 });
-
-        db.Projects.AddRange(new []
-        {
-            new Project
-            {
-                Id = Guid.NewGuid(),
-                CustomerName = "Test",
-                ProjectCode = ProjectCode.FromString("TST-202301-001")!,
-                CreatedById = TestData.AdminUser.Id,
-                CreatedOn = new DateTime(2023, 1, 12),
-                LaboratoryId = TestData.Lab.Id,
-                TaggedApplications = new()
-                {
-                    new(){ ApplicationId = app1.Id, LaboratoryId = TestData.Lab.Id }
-                }
-            },
-
-            new Project
-            {
-                Id = Guid.NewGuid(),
-                CustomerName = "Test",
-                ProjectCode = ProjectCode.FromString("TST-202302-001")!,
-                CreatedById = TestData.AdminUser.Id,
-                CreatedOn = new DateTime(2023, 2, 1),
-                LaboratoryId = TestData.Lab.Id,
-                TaggedApplications = new()
-                {
-                    new(){ ApplicationId = app2.Id, LaboratoryId = TestData.Lab.Id }
-                }
-            },
-
-            new Project
-            {
-                Id = Guid.NewGuid(),
-                CustomerName = "Test",
-                ProjectCode = ProjectCode.FromString("TST-202302-002")!,
-                CreatedById = TestData.AdminUser.Id,
-                CreatedOn = new DateTime(2023, 2, 28),
-                LaboratoryId = TestData.Lab.Id,
-                TaggedApplications = new()
-                {
-                    new(){ ApplicationId = app2.Id, LaboratoryId = TestData.Lab.Id }
-                }
-            },
-        });
-
-        base.AddTestData(db);
     }
 }

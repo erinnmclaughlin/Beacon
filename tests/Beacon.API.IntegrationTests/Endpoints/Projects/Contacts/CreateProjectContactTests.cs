@@ -5,32 +5,19 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 [Trait("Feature", "Project Management")]
-public sealed class CreateProjectContactTests : ProjectTestBase
+public sealed class CreateProjectContactTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    private static CreateProjectContactRequest SomeValidRequest => new()
-    {
-        ProjectId = ProjectId,
-        Name = "Jenny",
-        PhoneNumber = "555-867-5309"
-    };
-
-    private static CreateProjectContactRequest SomeInvalidRequest => new()
-    {
-        ProjectId = ProjectId,
-        Name = "",
-        PhoneNumber = "555-867-5309"
-    };
-
-    public CreateProjectContactTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[013] Create contact endpoint returns 422 when request is invalid")]
     public async Task CreateContact_ShouldFail_WhenRequestIsInvalid()
     {
         RunAsAdmin();
 
-        var response = await SendAsync(SomeInvalidRequest);
+        var response = await SendAsync(new CreateProjectContactRequest
+        {
+            ProjectId = ProjectId,
+            Name = "",
+            PhoneNumber = "555-867-5309"
+        });
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         var createdContact = await GetProjectContactAsync();
@@ -42,7 +29,12 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
         RunAsMember();
 
-        var response = await SendAsync(SomeValidRequest);
+        var response = await SendAsync(new CreateProjectContactRequest
+        {
+            ProjectId = ProjectId,
+            Name = "Jenny",
+            PhoneNumber = "555-867-5309"
+        });
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
         var createdContact = await GetProjectContactAsync();
@@ -54,19 +46,26 @@ public sealed class CreateProjectContactTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var response = await SendAsync(SomeValidRequest);
+        var response = await SendAsync(new CreateProjectContactRequest
+        {
+            ProjectId = ProjectId,
+            Name = "Jenny",
+            PhoneNumber = "555-867-5309"
+        });
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
         var createdContact = await GetProjectContactAsync();
         Assert.NotNull(createdContact);
         Assert.Equal(ProjectId, createdContact.ProjectId);
-        Assert.Equal(SomeValidRequest.Name, createdContact.Name);
-        Assert.Equal(SomeValidRequest.PhoneNumber, createdContact.PhoneNumber);
+        Assert.Equal("Jenny", createdContact.Name);
+        Assert.Equal("555-867-5309", createdContact.PhoneNumber);
         Assert.Null(createdContact.EmailAddress);
     }
     
-    private Task<ProjectContact?> GetProjectContactAsync()
+    private Task<ProjectContact?> GetProjectContactAsync() => ExecuteDbContextAsync(async db =>
     {
-        return ExecuteDbContextAsync(db => db.ProjectContacts.SingleOrDefaultAsync());
-    }
+        return await db.ProjectContacts
+            .AsNoTracking()
+            .SingleOrDefaultAsync(x => x.LaboratoryId == TestData.Lab.Id);
+    });
 }

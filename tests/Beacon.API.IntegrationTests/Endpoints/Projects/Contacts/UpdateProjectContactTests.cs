@@ -1,43 +1,40 @@
-﻿using Beacon.API.Persistence;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.Contacts;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 [Trait("Feature", "Project Management")]
-public sealed class UpdateProjectContactTests : ProjectTestBase
+public sealed class UpdateProjectContactTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
     private static Guid ContactId { get; } = new("7d6da369-c88b-4ad8-995f-2c6051f6912b");
     private const string OriginalName = "Old name";
     private const string? OriginalEmail = "someone@place.com";
     private const string? OriginalPhone = null;
 
-    public UpdateProjectContactTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[013] Update contact succeeds when request is valid")]
     public async Task UpdateContact_Succeeds_WhenRequestIsValid()
     {
         RunAsAdmin();
 
-        var request = new UpdateProjectContactRequest
+        // Send a valid update request:
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = ContactId,
             ProjectId = ProjectId,
             Name = "New name",
             EmailAddress = null,
             PhoneNumber = "800-588-2300"
-        };
-
-        var response = await SendAsync(request);
+        });
+        
+        // Verify status code:
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
-
-        Assert.Equal(request.Name, updatedContact.Name);
-        Assert.Equal(request.EmailAddress, updatedContact.EmailAddress);
-        Assert.Equal(request.PhoneNumber, updatedContact.PhoneNumber);
+        // Verify that the contact was updated:
+        var updatedContact = await GetContactAsync();
+        Assert.Equal("New name", updatedContact.Name);
+        Assert.Null(updatedContact.EmailAddress);
+        Assert.Equal("800-588-2300", updatedContact.PhoneNumber);
     }
 
     [Fact(DisplayName = "[013] Update contact endpoint returns 422 when request is invalid")]
@@ -45,20 +42,21 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new UpdateProjectContactRequest
+        // Send an invalid update request:
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = ContactId,
             ProjectId = ProjectId,
             Name = "", // contact must have a name
             EmailAddress = null,
             PhoneNumber = "800-588-2300"
-        };
-
-        var response = await SendAsync(request);
+        });
+        
+        // Verify status code:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
-
+        // Verify that the contact was NOT updated
+        var updatedContact = await GetContactAsync();
         Assert.Equal(OriginalName, updatedContact.Name);
         Assert.Equal(OriginalEmail, updatedContact.EmailAddress);
         Assert.Equal(OriginalPhone, updatedContact.PhoneNumber);
@@ -67,39 +65,41 @@ public sealed class UpdateProjectContactTests : ProjectTestBase
     [Fact(DisplayName = "[013] Update contact endpoint returns 403 when user is unauthorized")]
     public async Task UpdateContact_Fails_WhenUserIsUnauthorized()
     {
+        // Members cannot manage project contacts
         RunAsMember();
 
-        var request = new UpdateProjectContactRequest
+        // Send an otherwise valid update request:
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = ContactId,
             ProjectId = ProjectId,
             Name = "New name",
             EmailAddress = null,
             PhoneNumber = "800-588-2300"
-        };
-
-        var response = await SendAsync(request);
+        });
+        
+        // Verify status code:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var updatedContact = await ExecuteDbContextAsync(async db => await db.ProjectContacts.SingleAsync(x => x.Id == ContactId));
-
+        // Verify that the contact was NOT updated
+        var updatedContact = await GetContactAsync();
         Assert.Equal(OriginalName, updatedContact.Name);
         Assert.Equal(OriginalEmail, updatedContact.EmailAddress);
         Assert.Equal(OriginalPhone, updatedContact.PhoneNumber);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    private Task<ProjectContact> GetContactAsync() => ExecuteDbContextAsync(async db =>
     {
-        db.ProjectContacts.Add(new()
-        {
-            Id = ContactId,
-            Name = OriginalName,
-            EmailAddress =  OriginalEmail,
-            PhoneNumber = OriginalPhone,
-            LaboratoryId = TestData.Lab.Id,
-            ProjectId = ProjectId
-        });
-
-        base.AddTestData(db);
-    }
+        return await db.ProjectContacts.AsNoTracking().SingleAsync(x => x.Id == ContactId);
+    });
+    
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Append(new ProjectContact
+    {
+        Id = ContactId,
+        Name = OriginalName,
+        EmailAddress = OriginalEmail,
+        PhoneNumber = OriginalPhone,
+        LaboratoryId = TestData.Lab.Id,
+        ProjectId = ProjectId
+    });
 }

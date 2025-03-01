@@ -1,5 +1,4 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
@@ -7,12 +6,8 @@ using Beacon.Common.Requests.Laboratories;
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
 [Trait("Feature", "Project Events")]
-public sealed class GetLaboratoryEventsTests : ProjectTestBase
+public sealed class GetLaboratoryEventsTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public GetLaboratoryEventsTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[113] Get lab events succeeds when request is valid")]
     public async Task GetLaboratoryEvents_SucceedsWhenRequestIsValid()
     {
@@ -42,15 +37,15 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new GetLaboratoryEventsRequest
+        var response = await SendAsync(new GetLaboratoryEventsRequest
         {
             MinStart = new DateTime(2023, 1, 1)
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
         Assert.NotNull(events);
         Assert.Equal(1, events.TotalCount);
+        
         var result = Assert.Single(events.Items);
         Assert.Equal("Test", result.Title);
     }
@@ -60,15 +55,15 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new GetLaboratoryEventsRequest
+        var response = await SendAsync(new GetLaboratoryEventsRequest
         {
             MaxStart = new DateTime(2023, 1, 1)
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
         Assert.NotNull(events);
         Assert.Equal(1, events.TotalCount);
+        
         var result = Assert.Single(events.Items);
         Assert.Equal("Test 2", result.Title);
     }
@@ -78,15 +73,15 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new GetLaboratoryEventsRequest
+        var response = await SendAsync(new GetLaboratoryEventsRequest
         {
             MinEnd = new DateTime(2023, 1, 1)
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
         Assert.NotNull(events);
         Assert.Equal(1, events.TotalCount);
+        
         var result = Assert.Single(events.Items);
         Assert.Equal("Test", result.Title);
     }
@@ -96,15 +91,15 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new GetLaboratoryEventsRequest
+        var response = await SendAsync(new GetLaboratoryEventsRequest
         {
             MaxEnd = new DateTime(2023, 1, 1)
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
         Assert.NotNull(events);
         Assert.Equal(1, events.TotalCount);
+        
         var result = Assert.Single(events.Items);
         Assert.Equal("Test 2", result.Title);
     }
@@ -114,39 +109,34 @@ public sealed class GetLaboratoryEventsTests : ProjectTestBase
     {
         RunAsAdmin();
 
-        var request = new GetLaboratoryEventsRequest
+        var response = await SendAsync(new GetLaboratoryEventsRequest
         {
             MaxEnd = new DateTime(2023, 1, 1),
             MinEnd = new DateTime(2023, 1, 2)
-        };
-
-        var response = await SendAsync(request);
+        });
+        
         var events = await DeserializeAsync<PagedList<ProjectEvent>>(response);
         Assert.NotNull(events);
         Assert.Equal(0, events.TotalCount);
         Assert.Empty(events.Items);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        db.ProjectEvents.Add(new ProjectEvent
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Concat([
+        new ProjectEvent
         {
             Title = "Test",
             ProjectId = ProjectId,
             LaboratoryId = TestData.Lab.Id,
             ScheduledStart = new DateTime(2023, 5, 1),
             ScheduledEnd = new DateTime(2023, 10, 1)
-        });
-
-        db.ProjectEvents.Add(new ProjectEvent
+        },
+        new ProjectEvent
         {
             Title = "Test 2",
             ProjectId = ProjectId,
             LaboratoryId = TestData.Lab.Id,
             ScheduledStart = new DateTime(2021, 1, 1),
             ScheduledEnd = new DateTime(2021, 3, 1)
-        });
-
-        base.AddTestData(db);
-    }
+        }
+    ]);
 }

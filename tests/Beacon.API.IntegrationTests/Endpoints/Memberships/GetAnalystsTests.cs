@@ -1,27 +1,20 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Memberships;
 
-public sealed class GetAnalystsTests : ProjectTestBase
+public sealed class GetAnalystsTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public GetAnalystsTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact]
     public async Task SucceedsWhenRequestIsValid_ExcludeHistoricAnalysts()
     {
         RunAsAdmin();
-        var request = new GetAnalystsRequest { IncludeHistoricAnalysts = false };
-        var response = await SendAsync(request);
-
+        
+        var response = await SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var members = await DeserializeAsync<LaboratoryMemberDto[]>(response);
-
         Assert.NotNull(members);
         Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
         Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
@@ -33,13 +26,11 @@ public sealed class GetAnalystsTests : ProjectTestBase
     public async Task SucceedsWhenRequestIsValid_IncludeHistoricAnalysts()
     {
         RunAsAdmin();
-        var request = new GetAnalystsRequest { IncludeHistoricAnalysts = true };
-        var response = await SendAsync(request);
-
+        
+        var response = await SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var members = await DeserializeAsync<LaboratoryMemberDto[]>(response);
-
         Assert.NotNull(members);
         Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
         Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
@@ -55,19 +46,14 @@ public sealed class GetAnalystsTests : ProjectTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Append(new Project
     {
-        db.Projects.Add(new Project
-        {
-            Id = Guid.NewGuid(),
-            LaboratoryId = TestData.Lab.Id,
-            CustomerName = "Test",
-            ProjectCode = new ProjectCode("TST", "202105", 1),
-            ProjectStatus = ProjectStatus.Completed,
-            CreatedById = TestData.AdminUser.Id,
-            LeadAnalystId = TestData.MemberUser.Id
-        });
-
-        base.AddTestData(db);
-    }
+        Id = Guid.NewGuid(),
+        LaboratoryId = TestData.Lab.Id,
+        CustomerName = "Test",
+        ProjectCode = new ProjectCode("TST", "202105", 1),
+        ProjectStatus = ProjectStatus.Completed,
+        CreatedById = TestData.AdminUser.Id,
+        LeadAnalystId = TestData.MemberUser.Id
+    });
 }

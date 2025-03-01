@@ -86,7 +86,7 @@ public class BeaconDbContext(DbContextOptions options, ISessionContext sessionCo
             });
             builder.Property(x => x.ProjectStatus).HasConversion<string>().HasMaxLength(25);
             builder.HasIndex(x => x.ProjectStatus);
-            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.Laboratory).WithMany(x => x.Projects).OnDelete(DeleteBehavior.Restrict);
             builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });

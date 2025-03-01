@@ -1,17 +1,12 @@
-﻿using Beacon.API.Persistence;
-using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects.Contacts;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Contacts;
 
 [Trait("Feature", "Project Management")]
-public sealed class GetProjectContactsTests : ProjectTestBase
+public sealed class GetProjectContactsTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
-    public GetProjectContactsTests(TestFixture fixture) : base(fixture)
-    {
-    }
-
     [Fact(DisplayName = "[013] Get contacts endpoint returns list of contacts associated with project")]
     public async Task GetProjectContacts_ReturnsExpectedResult()
     {
@@ -26,29 +21,8 @@ public sealed class GetProjectContactsTests : ProjectTestBase
         Assert.Equal("Main Contact", contacts[0].Name);
     }
 
-    protected override void AddTestData(BeaconDbContext db)
-    {
-        var otherProject = new Project
-        { 
-            Id = Guid.NewGuid(),
-            CreatedById = TestData.AdminUser.Id,
-            CustomerName = "Customer",
-            LaboratoryId = TestData.Lab.Id,
-            ProjectCode = new ProjectCode("IDK", "202301", 1)
-        };
-
-        otherProject.Contacts.Add(new ProjectContact
-        {
-            Id = Guid.NewGuid(),
-            Name = "Other Contact",
-            EmailAddress = null,
-            PhoneNumber = null,
-            LaboratoryId = TestData.Lab.Id,
-            ProjectId = otherProject.Id
-        });
-
-        db.Projects.Add(otherProject);
-        db.ProjectContacts.Add(new ProjectContact
+    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Concat([
+        new ProjectContact
         {
             Id = Guid.NewGuid(),
             Name = "Main Contact",
@@ -56,9 +30,25 @@ public sealed class GetProjectContactsTests : ProjectTestBase
             PhoneNumber = null,
             LaboratoryId = TestData.Lab.Id,
             ProjectId = ProjectId
-        });
-
-        base.AddTestData(db);
-    }
-
+        },
+        // adding another project so we can verify that we only get contacts for the specified project
+        new Project
+        { 
+            Id = Guid.NewGuid(),
+            CreatedById = TestData.AdminUser.Id,
+            CustomerName = "Customer",
+            LaboratoryId = TestData.Lab.Id,
+            ProjectCode = new ProjectCode("IDK", "202301", 1),
+            Contacts = [
+                new ProjectContact
+                {
+                    Id = Guid.NewGuid(),
+                    Name = "Other Contact",
+                    EmailAddress = null,
+                    PhoneNumber = null,
+                    LaboratoryId = TestData.Lab.Id
+                }
+            ]
+        }
+    ]);
 }

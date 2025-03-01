@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -23,10 +24,10 @@ public sealed class LogoutTests : IClassFixture<AuthTestFixture>
         }
     }
 
-    [Fact(DisplayName = "[008] Logged in user can sucessfully log out")]
+    [Fact(DisplayName = "[008] Logged in user can successfully log out")]
     public async Task LoggedInUserCanSuccessfullyLogOut()
     {
-        await LoginRequest.SendAsync(_httpClient, new LoginRequest
+        await SendAsync(new LoginRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "!!admin"
@@ -34,14 +35,19 @@ public sealed class LogoutTests : IClassFixture<AuthTestFixture>
 
         await AssertGetCurrentUserStatus(HttpStatusCode.OK);
 
-        await LogoutRequest.SendAsync(_httpClient, new());
+        await SendAsync(new LogoutRequest());
 
         await AssertGetCurrentUserStatus(HttpStatusCode.Unauthorized);
     }
 
     private async Task AssertGetCurrentUserStatus(HttpStatusCode expectedStatusCode)
     {
-        var response = await GetSessionContextRequest.SendAsync(_httpClient, new());
+        var response = await SendAsync(new GetSessionContextRequest());
         Assert.Equal(expectedStatusCode, response.StatusCode);
+    }
+    
+    private Task<HttpResponseMessage> SendAsync<T>(T request) where T : IBeaconRequest<T>
+    {
+        return T.SendAsync(_httpClient, request);
     }
 }

@@ -5,16 +5,12 @@ using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Laboratories;
 
-[Trait("Feature", "Laboratory Management")]
-public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
-{
-    private readonly AuthTestFixture _fixture;
+// This class intentionally does not inherit from TestBase, since TestBase is configured with mocked auth services
 
-    public SetCurrentLaboratoryTests(AuthTestFixture fixture)
-    {
-        _fixture = fixture;
-        AddSeedData();
-    }
+[Trait("Feature", "Laboratory Management")]
+public sealed class SetCurrentLaboratoryTests(AuthTestFixture fixture) : IClassFixture<AuthTestFixture>, IAsyncLifetime
+{
+    private readonly AuthTestFixture _fixture = fixture;
 
     [Fact(DisplayName = "[185] Set current lab succeeds when request is valid")]
     public async Task SetCurrentLaboratory_SucceedsWhenRequestIsValid()
@@ -55,13 +51,13 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         Assert.False(response.Headers.Contains("Set-Cookie"));
     }
-
-    private void AddSeedData()
+    
+    public async Task InitializeAsync()
     {
         using var scope = _fixture.Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         
-        if (dbContext.Database.EnsureCreated())
+        if (await dbContext.Database.EnsureCreatedAsync())
         {
             dbContext.AddRange(
                 TestData.AdminUser, 
@@ -72,8 +68,9 @@ public sealed class SetCurrentLaboratoryTests : IClassFixture<AuthTestFixture>
                 TestData.Lab
             );
 
-            dbContext.SaveChanges();
+            await dbContext.SaveChangesAsync();
         }
-       
     }
+
+    public Task DisposeAsync() => Task.CompletedTask;
 }
