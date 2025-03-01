@@ -56,9 +56,16 @@ jobs:
     # Create Coverage Badge
     - name: Create Coverage Badge
       run: |
-        COVERAGE=$(jq -r '.summary.lineCoverage' coveragereport/Summary.json)
+        echo "Content of Summary.json:"
+        cat coveragereport/Summary.json
+        echo "\nExtracting coverage value..."
+        COVERAGE=$(jq -r '.coverage | tonumber | floor' coveragereport/Summary.json)
+        echo "Coverage value: ${COVERAGE}"
         COLOR=$(if [ $(echo "$COVERAGE >= 80" | bc -l) -eq 1 ]; then echo "success"; elif [ $(echo "$COVERAGE >= 60" | bc -l) -eq 1 ]; then echo "yellow"; else echo "red"; fi)
+        echo "Color value: ${COLOR}"
         echo "{\"schemaVersion\": 1, \"label\": \"coverage\", \"message\": \"${COVERAGE}%\", \"color\": \"${COLOR}\"}" > coveragereport/coverage.json
+        echo "\nGenerated coverage.json content:"
+        cat coveragereport/coverage.json
     
     # Upload coverage report as artifact (available for all branches/PRs)
     - name: Upload coverage report
