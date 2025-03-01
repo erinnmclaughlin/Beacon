@@ -3,7 +3,6 @@ using Beacon.Common.Models;
 using Beacon.Common.Services;
 using ErrorOr;
 using MediatR;
-using Microsoft.EntityFrameworkCore;
 using System.Reflection;
 
 namespace Beacon.API.Behaviors;

@@ -4,7 +4,6 @@ using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using Beacon.Common.Services;
 using ErrorOr;
-using FluentValidation;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.Features.Projects;

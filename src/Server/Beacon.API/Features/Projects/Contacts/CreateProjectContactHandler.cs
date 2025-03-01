@@ -1,12 +1,11 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Requests.Projects.Contacts;
-using Beacon.Common.Services;
 using ErrorOr;
 
 namespace Beacon.API.Features.Projects.Contacts;
 
-internal sealed class CreateProjectContactHandler(BeaconDbContext dbContext, ILabContext labContext) : IBeaconRequestHandler<CreateProjectContactRequest>
+internal sealed class CreateProjectContactHandler(BeaconDbContext dbContext) : IBeaconRequestHandler<CreateProjectContactRequest>
 {
     private readonly BeaconDbContext _dbContext = dbContext;
 
