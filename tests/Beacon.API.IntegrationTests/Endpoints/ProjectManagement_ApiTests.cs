@@ -8,6 +8,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
+[Trait("Category", "API")]
 [Trait("Category", "Project Management")]
 public sealed class ProjectManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {

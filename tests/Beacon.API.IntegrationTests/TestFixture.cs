@@ -21,14 +21,11 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
     /// </summary>
     public bool ShouldResetDatabase { get; set; } = true;
     
-    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.ConfigureServices(services =>
     {
-        builder.ConfigureServices(services =>
-        {
-            services.ReplaceWithTestDatabase(ConnectionString);
-            services.UseFakeEmailService();
-        });
-    }
+        services.ReplaceWithTestDatabase(ConnectionString);
+        services.UseFakeEmailService();
+    });
 
     public async ValueTask InitializeAsync()
     {

@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
+[Trait("Category", "API")]
 [Trait("Category", "User Registration & Login")]
 public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {

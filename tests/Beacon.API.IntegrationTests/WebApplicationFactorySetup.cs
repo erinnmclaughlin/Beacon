@@ -10,14 +10,14 @@ namespace Beacon.API.IntegrationTests;
 
 public static class WebApplicationFactorySetup
 {
-    public static void ReplaceWithTestDatabase(this IServiceCollection services, string connectionString)
+    public static void ReplaceWithTestDatabase(this IServiceCollection services, string? connectionString)
     {
         services.RemoveAll<DbContextOptions<BeaconDbContext>>();
         services.RemoveAll<BeaconDbContext>();
 
-        services.AddDbContext<BeaconDbContext>((container, options) =>
+        services.AddDbContext<BeaconDbContext>(options =>
         {
-            options.UseSqlServer(connectionString.Replace("master", "Beacon"));
+            options.UseSqlServer(connectionString?.Replace("master", "Beacon"));
         });
     }
 

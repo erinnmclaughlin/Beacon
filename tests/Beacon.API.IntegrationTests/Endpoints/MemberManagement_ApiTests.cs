@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
+[Trait("Category", "API")]
 [Trait("Category", "Member Management")]
 public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
