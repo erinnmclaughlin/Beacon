@@ -25,7 +25,7 @@ public class PagedList<T> : PagedList
 
     public int Count => Items.Length;
     
-    public PagedList(T[] items, int count, int currentPage, int pageSize) : base(count, currentPage, pageSize)
+    public PagedList(T[] items, int totalCount, int currentPage, int pageSize) : base(totalCount, currentPage, pageSize)
     {
         Items = items;
     }

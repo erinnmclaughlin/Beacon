@@ -102,7 +102,7 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
     public async Task GetCurrentLab_ReturnsExpectedResult()
     {
         // Log in as a current lab member:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the current lab:
         var response = await HttpClient.SendAsync(new GetCurrentLaboratoryRequest());

@@ -40,7 +40,8 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     {
         if (ShouldResetDatabase)
         {
-            await fixture.ResetDatabase(EnumerateSeedData().ToArray());
+            await fixture.ResetDatabase();
+            await AddSeedDataAsync(EnumerateSeedData().Append(TestData.Lab).ToArray());
             ShouldResetDatabase = false;
         }
     }
@@ -62,6 +63,16 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         yield break;
     }
 
+    /// <summary>
+    /// Adds the specified <paramref name="data"/> to the database.
+    /// </summary>
+    /// <param name="data">The data to add.</param>
+    protected async Task AddSeedDataAsync(params object[] data)
+    {
+        DbContext.AddRange(data);
+        await DbContext.SaveChangesAsync();
+    }
+    
     /// <summary>
     /// Gets the default user for a given <paramref name="membershipType"/>.
     /// </summary>
@@ -93,7 +104,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// Log in as a specified user and set the current lab to <see cref="TestData.Lab"/>.
     /// </summary>
     /// <param name="user">The user to log in as.</param>
-    protected async Task LoginAndSetCurrentLab(User user)
+    protected async Task LogInToDefaultLab(User user)
     {
         var loginResponse = await LoginAs(user);
         loginResponse.EnsureSuccessStatusCode();
@@ -102,6 +113,20 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         setCurrentLabResponse.EnsureSuccessStatusCode();
     }
 
+    /// <summary>
+    /// Log in as a specified user and set the current lab to <paramref name="currentLabId"/>.
+    /// </summary>
+    /// <param name="user">The user to log in as.</param>
+    /// <param name="currentLabId">The ID of the lab to set as the current lab.</param>
+    protected async Task LogInToLab(User user, Guid? currentLabId)
+    {
+        var loginResponse = await LoginAs(user);
+        loginResponse.EnsureSuccessStatusCode();
+        
+        var setCurrentLabResponse = await SetCurrentLab(currentLabId);
+        setCurrentLabResponse.EnsureSuccessStatusCode();
+    }
+    
     /// <summary>
     /// Sets the laboratory that requests will be scoped to.
     /// </summary>

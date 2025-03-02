@@ -40,7 +40,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     {
         // Log in as a user of the specified type:
         var user = GetDefaultUserForMembershipType(membershipType);
-        await LoginAndSetCurrentLab(user);
+        await LogInToDefaultLab(user);
 
         // Attempt to create a new project:
         var response = await HttpClient.SendAsync(new CreateProjectRequest
@@ -66,12 +66,12 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CreateProject_Fails_WhenRequestIsInvalid()
     {
         // Login as a user that has permission to create projects:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to create a project with an invalid customer code:
         var response = await HttpClient.SendAsync(new CreateProjectRequest
         {
-            CustomerCode = "XYZZ", // invalid code (must be 3 characters)
+            CustomerCode = "WXYZ", // invalid code (must be 3 characters)
             CustomerName = "XYZ Company"
         });
         
@@ -83,7 +83,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CreateProject_Fails_WhenLeadAnalystIsNotAuthorized()
     {
         // Login as a user that has permission to create projects:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to create a project with an invalid lead analyst:
         var response = await HttpClient.SendAsync(new CreateProjectRequest
@@ -101,7 +101,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CreateProject_Fails_WhenUserIsNotAuthorized()
     {
         // Login as a user that does NOT have permission to create projects:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to create a new project:
         var response = await HttpClient.SendAsync(new CreateProjectRequest
@@ -118,7 +118,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CompleteProject_SucceedsWhenRequestIsValid()
     {
         // Log in as a user that has permission to complete projects:
-        await LoginAndSetCurrentLab(TestData.AnalystUser);
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to complete the default test project:
         var response = await HttpClient.SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
@@ -137,7 +137,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CompleteProject_FailsWhenRequestIsInvalid()
     {
         // Log in as a user that does NOT have permission to complete projects:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to complete the default test project:
         var response = await HttpClient.SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
@@ -153,7 +153,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CancelProject_SucceedsWhenRequestIsValid()
     {
         // Log in as a user that has permission to cancel  projects:
-        await LoginAndSetCurrentLab(TestData.AnalystUser);
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to cancel the default test project:
         var response = await HttpClient.SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
@@ -172,7 +172,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task CancelProject_FailsWhenRequestIsInvalid()
     {
         // Log in as a user that does NOT have permission to cancel projects:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to cancel the default test project:
         var response = await HttpClient.SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
@@ -188,7 +188,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task AssigningLeadAnalyst_ShouldSucceed_WhenRequestIsValid()
     {
         // Log in as a user that has permission to assign lead analysts:
-        await LoginAndSetCurrentLab(TestData.AnalystUser);
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to assign a valid lead analyst:
         var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
@@ -211,7 +211,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task AssigningLeadAnalyst_ShouldFail_WhenAnalystIsNotValid()
     {
         // Log in as a user that has permission to assign lead analysts:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to assign a lead analyst that is not in a valid role:
         var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
@@ -238,7 +238,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(TestData.AnalystUser.Id, await GetDefaultProjectAnalystId());
         
         // Log in as a user that has permission to un-assign lead analysts:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to un-assign the lead analyst:
         var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
@@ -261,7 +261,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task GetProjectByCode_Succeeds_WhenProjectCodeIsValid()
     {
         // Log in as a user that can view lab projects:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the default project details by code:
         var response = await HttpClient.SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
@@ -295,7 +295,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     public async Task GetProjectById_Succeeds_WhenProjectIdIsValid()
     {
         // Log in as a user that can view lab projects:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the default project details by ID:
         var response = await HttpClient.SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
@@ -313,7 +313,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(DefaultProject.CustomerName, project.CustomerName);
     }
 
-    [Fact(DisplayName = "[193] Unauthorized users cannot get project details by project ID")]
+    [Fact(DisplayName = "[193] Unauthorized users cannot get project details by project id")]
     public async Task GetProjectById_ReturnsForbidden_WhenUserIsNotAuthorized()
     {
         // Log in as a user that does NOT have permission to view lab projects:
@@ -326,6 +326,100 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
     }
 
+    [Fact(DisplayName = "[193] Lab projects are filtered by current laboratory")]
+    public async Task GetProjects_ReturnsOnlyProjectsAssociatedWithCurrentLab()
+    {
+        // Create another lab with a project and add the admin user as a member:
+        var otherLab = new Laboratory { Name = "Some other lab" };
+        var otherLabProject = new Project
+        {
+            Id = Guid.NewGuid(),
+            CreatedById = TestData.AdminUser.Id,
+            CustomerName = "Some other customer",
+            ProjectCode = new ProjectCode("AAA", "202301", 1),
+            ProjectStatus = ProjectStatus.Active
+        };
+        otherLab.AddAdmin(TestData.AdminUser);
+        otherLab.Projects.Add(otherLabProject);
+        DbContext.Add(otherLab);
+        await DbContext.SaveChangesAsync();
+        
+        // Log in to the default lab:
+        await LogInToDefaultLab(TestData.AdminUser);
+
+        // Attempt to get laboratory projects:
+        var response = await HttpClient.SendAsync(new GetProjectsRequest());
+        
+        // Verify that this succeeds:
+        response.EnsureSuccessStatusCode();
+
+        // Verify that the response only contains projects for the default lab:
+        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        Assert.NotNull(projects);
+        Assert.Contains(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
+        Assert.DoesNotContain(projects.Items, p => p.ProjectCode == otherLab.Projects[0].ProjectCode.ToString());
+        
+        // Switch to the other lab:
+        await SetCurrentLab(otherLab.Id);
+        
+        // Attempt to get laboratory projects again:
+        response = await HttpClient.SendAsync(new GetProjectsRequest());
+        
+        // Verify that this succeeds:
+        response.EnsureSuccessStatusCode();
+        
+        // Verify that the response only contains projects for the other lab:
+        projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        Assert.NotNull(projects);
+        Assert.DoesNotContain(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
+        Assert.Contains(projects.Items, p => p.ProjectCode == otherLab.Projects[0].ProjectCode.ToString());
+
+        // Reset the database:
+        ShouldResetDatabase = true;
+    }
+    
+    [Fact(DisplayName = "[193] Unauthorized users cannot get lab projects")]
+    public async Task GetProjects_FailsWhenUserIsUnauthorized()
+    {
+        // Log in as a user that does NOT have permission to view lab projects:
+        await LoginAs(TestData.NonMemberUser);
+
+        // Attempt to get laboratory projects:
+        var response = await HttpClient.SendAsync(new GetProjectsRequest());
+        
+        // Verify that this fails:
+        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+    }
+    
+    [Fact(DisplayName = "[275] Pagination is applied to project search")]
+    public async Task PaginationIsApplied()
+    {
+        // add an extra project to the default lab
+        await AddSeedDataAsync(new Project
+        {
+            Id = Guid.NewGuid(),
+            LaboratoryId = TestData.Lab.Id,
+            CustomerName = "Another project",
+            ProjectCode = new ProjectCode("OTH", "202301", 1),
+            ProjectStatus = ProjectStatus.Active,
+            CreatedById = TestData.AdminUser.Id
+        });
+        
+        // Sanity check: make sure lab has multiple projects:
+        var projectCount = await DbContext.Projects.IgnoreQueryFilters().CountAsync(x => x.LaboratoryId == TestData.Lab.Id);
+        Assert.True(projectCount > 1);
+        
+        // Log in as a user that can view lab projects:
+        await LogInToDefaultLab(TestData.MemberUser);
+
+        var response = await HttpClient.SendAsync(new GetProjectsRequest { PageSize = 1 });
+        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        Assert.NotNull(projects);
+        Assert.Equal(1, projects.PageSize);
+        Assert.Equal(projectCount, projects.TotalCount);
+        Assert.Single(projects.Items);
+    }
+    
     private Task<ProjectStatus> GetDefaultProjectStatus() => DbContext.Projects
         .IgnoreQueryFilters()
         .Where(x => x.Id == DefaultProject.Id)

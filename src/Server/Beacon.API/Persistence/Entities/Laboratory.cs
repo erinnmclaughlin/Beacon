@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using System.ComponentModel.DataAnnotations.Schema;
+using Beacon.Common.Models;
 
 namespace Beacon.API.Persistence.Entities;
 

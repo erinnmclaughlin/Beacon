@@ -53,7 +53,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
     {
         // Log in as a user of the specified type:
         var currentUser = GetDefaultUserForMembershipType(currentMemberType);
-        await LoginAndSetCurrentLab(currentUser);
+        await LogInToDefaultLab(currentUser);
 
         // Generate some random email for the invited user:
         var email = $"{Guid.NewGuid()}@invited.org";
@@ -90,7 +90,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
     {
         // Log in as a user of the specified type:
         var currentUser = GetDefaultUserForMembershipType(currentMemberType);
-        await LoginAndSetCurrentLab(currentUser);
+        await LogInToDefaultLab(currentUser);
 
         // Attempt to invite the user with the specified membership level:
         var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
@@ -110,7 +110,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
     public async Task InvitingUserFailsWhenRequestIsInvalid()
     {
         // Log in as a user that has permission to invite users:
-        await LoginAndSetCurrentLab(TestData.ManagerUser);
+        await LogInToDefaultLab(TestData.ManagerUser);
 
         // Attempt to invite a user that is already a member of the lab:
         var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest

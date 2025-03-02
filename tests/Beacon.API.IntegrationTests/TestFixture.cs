@@ -62,20 +62,14 @@ public sealed class TestFixture : WebApplicationFactory<Program>, IAsyncLifetime
     }
 
     /// <summary>
-    /// Clears all data from the database and reseeds with the provided <paramref name="seedData"/>.
+    /// Clears all data from the database.
     /// </summary>
-    /// <remarks>
-    /// Note that the database is ALWAYS seeded with <see cref="TestData.Lab"/>.
-    /// </remarks>
-    /// <param name="seedData">The seed data to reseed the database with.</param>
-    public async Task ResetDatabase(params object[] seedData)
+    public async Task ResetDatabase()
     {
         await Checkpoint!.ResetAsync(ConnectionString);
         
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        dbContext.Add(TestData.Lab);
-        dbContext.AddRange(seedData);
         await dbContext.SaveChangesAsync();
     }
 }

@@ -28,7 +28,7 @@ public abstract class TestBase : IAsyncLifetime
 
     public async Task InitializeAsync()
     {
-        await ResetDatabase();
+        await Fixture.ResetDatabase();
     }
 
     public Task DisposeAsync()
@@ -100,10 +100,5 @@ public abstract class TestBase : IAsyncLifetime
     protected static async Task<T?> DeserializeAsync<T>(HttpResponseMessage response)
     {
         return await response.Content.ReadFromJsonAsync<T>(JsonDefaults.JsonSerializerOptions);
-    }
-
-    private async Task ResetDatabase()
-    {
-        await Fixture.ResetDatabase(EnumerateTestData().ToArray());
     }
 }

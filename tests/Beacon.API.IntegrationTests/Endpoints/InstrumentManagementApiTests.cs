@@ -29,7 +29,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
     public async Task CreateLaboratoryInstrument_Succeeds_WhenRequestIsValid()
     {
         // Log in as a user that has permission to manage lab instruments:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
         
         // Attempt to create the instrument:
         var response = await HttpClient.SendAsync(new CreateLaboratoryInstrumentRequest
@@ -52,7 +52,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
     public async Task CreateLaboratoryInstrument_Fails_WhenUserIsNotAuthorized()
     {
         // Log in as a user that does NOT have permission to manage lab instruments:
-        await LoginAndSetCurrentLab(TestData.AnalystUser);
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to create an instrument:
         var response = await HttpClient.SendAsync( new CreateLaboratoryInstrumentRequest
@@ -70,7 +70,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
     public async Task CreateLaboratoryInstrument_Fails_WhenRequestIsInvalid()
     {
         // Log in as a user that has permission to manage lab instruments:
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to create an instrument with invalid information:
         var response = await HttpClient.SendAsync(new CreateLaboratoryInstrumentRequest
@@ -88,7 +88,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
     public async Task GetLaboratoryInstruments_SucceedsWhenRequestIsValid()
     {
         // Log in as a user that has permission to view lab instruments:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get lab instruments:
         var response = await HttpClient.SendAsync(new GetLaboratoryInstrumentsRequest());

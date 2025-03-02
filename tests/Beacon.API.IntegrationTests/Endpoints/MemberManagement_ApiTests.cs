@@ -24,7 +24,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
         // Log in as someone that has permission to view lab information:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to view the list of memberships:
         var response = await HttpClient.SendAsync(new GetMembershipsRequest());
@@ -59,7 +59,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task UpdateMembershipType_Succeeds_WhenUserIsAuthorized()
     {
         // Log in as someone that has permission to update memberships:
-        await LoginAndSetCurrentLab(TestData.ManagerUser);
+        await LogInToDefaultLab(TestData.ManagerUser);
 
         // Attempt to update the current lab analyst to a manager:
         var response = await HttpClient.SendAsync(new UpdateMembershipRequest
@@ -86,7 +86,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {
         // Log in as someone that does NOT have permission to update memberships:
-        await LoginAndSetCurrentLab(TestData.AnalystUser);
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to update the current lab analyst to a manager:
         var response = await HttpClient.SendAsync(new UpdateMembershipRequest
@@ -110,7 +110,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task UpdateMembership_ShouldFail_WhenUserIsNotAMember()
     {
         // Log in as someone that has permission to update memberships:
-        await LoginAndSetCurrentLab(TestData.ManagerUser);
+        await LogInToDefaultLab(TestData.ManagerUser);
         
         // Attempt to update a user that is not a member of the current lab:
         var response = await HttpClient.SendAsync(new UpdateMembershipRequest
@@ -127,7 +127,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task UpdateMembership_ShouldFail_WhenUserDoesNotExist()
     {
         // Log in as someone that has permission to update memberships:
-        await LoginAndSetCurrentLab(TestData.ManagerUser);
+        await LogInToDefaultLab(TestData.ManagerUser);
         
         // Attempt to update a non-existent user:
         var response = await HttpClient.SendAsync(new UpdateMembershipRequest
@@ -144,7 +144,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     public async Task SucceedsWhenRequestIsValid_ExcludeHistoricAnalysts()
     {
         // Log in as someone that has permission to view lab information:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get a list of analysts for the current lab:
         var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
@@ -184,7 +184,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await DbContext.SaveChangesAsync();
         
         // Log in as someone that has permission to view lab information:
-        await LoginAndSetCurrentLab(TestData.MemberUser);
+        await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get a list of analysts for the current lab, including historic analysts:
         var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
