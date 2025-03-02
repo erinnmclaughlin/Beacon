@@ -9,18 +9,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints;
 
 [Trait("Category", "Member Management - Invitations")]
-public class LaboratoryInvitationsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+public class MemberManagementInvitationsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Guid EmailInvitationId { get; } = new("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
     private static User InvitedUser => TestData.NonMemberUser;
-    private static User UninvitedUser => new()
-    {
-        Id = new Guid("6511db25-672c-4aed-84f3-c36aaa65e717"),
-        DisplayName = "Somebody",
-        EmailAddress = "idk@place.net",
-        HashedPassword = new PasswordHasher().Hash("!!somebody", out var salt),
-        HashedPasswordSalt = salt
-    };
     
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateSeedData()
@@ -30,7 +22,6 @@ public class LaboratoryInvitationsApiTests(TestFixture fixture) : IntegrationTes
         yield return TestData.AnalystUser;
         yield return TestData.MemberUser;
         yield return InvitedUser; // aka TestData.NonMemberUser
-        yield return UninvitedUser;
         
         yield return new InvitationEmail
         {
@@ -50,59 +41,91 @@ public class LaboratoryInvitationsApiTests(TestFixture fixture) : IntegrationTes
         };
     }
     
-    [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
-    public async Task InvitingUserSucceedsWhenRequestIsValid()
+    [Theory(DisplayName = "[003] Authorized users can invite members")]
+    [InlineData(LaboratoryMembershipType.Admin, LaboratoryMembershipType.Admin)]
+    [InlineData(LaboratoryMembershipType.Admin, LaboratoryMembershipType.Manager)]
+    [InlineData(LaboratoryMembershipType.Admin, LaboratoryMembershipType.Analyst)]
+    [InlineData(LaboratoryMembershipType.Admin, LaboratoryMembershipType.Member)]
+    [InlineData(LaboratoryMembershipType.Manager, LaboratoryMembershipType.Manager)]
+    [InlineData(LaboratoryMembershipType.Manager, LaboratoryMembershipType.Analyst)]
+    [InlineData(LaboratoryMembershipType.Manager, LaboratoryMembershipType.Member)]
+    public async Task InvitingUserSucceedsWhenRequestIsValid(LaboratoryMembershipType currentMemberType, LaboratoryMembershipType invitedMemberType)
     {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        // Log in as a user of the specified type:
+        var currentUser = GetDefaultUserForMembershipType(currentMemberType);
+        await LoginAndSetCurrentLab(currentUser);
 
+        // Generate some random email for the invited user:
+        var email = $"{Guid.NewGuid()}@invited.org";
+        
+        // Attempt to invite the user with the specified membership level:
         var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
         {
-            NewMemberEmailAddress = "tom.nook@crannies.org",
-            MembershipType = LaboratoryMembershipType.Manager
+            NewMemberEmailAddress = email,
+            MembershipType = invitedMemberType
         });
 
+        // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
-        var emailInvitation = await GetEmailInvitationAsync("tom.nook@crannies.org");
+        // Verify that the persisted information matches the request:
+        var emailInvitation = await GetEmailInvitationAsync(email);
         Assert.NotNull(emailInvitation);
         Assert.Equal(FakeEmailSendOperation.OperationId, emailInvitation.OperationId);
-        Assert.Equal(TestData.AdminUser.Id, emailInvitation.LaboratoryInvitation.CreatedById);
-        Assert.Equal(LaboratoryMembershipType.Manager, emailInvitation.LaboratoryInvitation.MembershipType);
+        Assert.Equal(currentUser.Id, emailInvitation.LaboratoryInvitation.CreatedById);
+        Assert.Equal(invitedMemberType, emailInvitation.LaboratoryInvitation.MembershipType);
         Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
 
-        ShouldResetDatabase = true;
+        // Technically added stuff to the db, but we don't expect this to affect with other tests, so to save on performance, don't reset:
+        // ShouldResetDatabase = true;
     }
     
-    [Fact(DisplayName = "[003] Invite new user endpoint returns 422 when request is not valid")]
-    public async Task InvitingUserFailsWhenRequestIsInvalid()
+    [Theory(DisplayName = "[003] Unauthorized users cannot invite members")]
+    // Managers can't invite admins:
+    [InlineData(LaboratoryMembershipType.Manager, LaboratoryMembershipType.Admin)]
+    // Analysts & members can't invite anyone:
+    [InlineData(LaboratoryMembershipType.Analyst, LaboratoryMembershipType.Member)]
+    [InlineData(LaboratoryMembershipType.Member, LaboratoryMembershipType.Member)]
+    public async Task InvitingUserFailsWhenRequestIsUnauthorized(LaboratoryMembershipType currentMemberType, LaboratoryMembershipType invitedMemberType)
     {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
+        // Log in as a user of the specified type:
+        var currentUser = GetDefaultUserForMembershipType(currentMemberType);
+        await LoginAndSetCurrentLab(currentUser);
 
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
-        {
-            NewMemberEmailAddress = TestData.MemberUser.EmailAddress, // user already exists
-            MembershipType = LaboratoryMembershipType.Manager
-        });
-        
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        Assert.Null(await GetEmailInvitationAsync(TestData.MemberUser.EmailAddress));
-    }
-    
-    [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
-    public async Task InvitingUserFailsWhenRequestIsUnauthorized()
-    {
-        await LoginAndSetCurrentLab(TestData.MemberUser);
-
+        // Attempt to invite the user with the specified membership level:
         var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
         {
             NewMemberEmailAddress = "jax@mia.com",
-            MembershipType = LaboratoryMembershipType.Manager
+            MembershipType = invitedMemberType
         });
         
+        // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        
+        // Verify that the invitation was not persisted:
         Assert.Null(await GetEmailInvitationAsync("jax@mia.com"));
     }
 
+    [Fact(DisplayName = "[003] Invitations cannot be created for existing members")]
+    public async Task InvitingUserFailsWhenRequestIsInvalid()
+    {
+        // Log in as a user that has permission to invite users:
+        await LoginAndSetCurrentLab(TestData.ManagerUser);
+
+        // Attempt to invite a user that is already a member of the lab:
+        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        {
+            NewMemberEmailAddress = TestData.MemberUser.EmailAddress, // user is already a member
+            MembershipType = LaboratoryMembershipType.Manager
+        });
+        
+        // Verify that this fails:
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        
+        // Verify that the invitation was not persisted:
+        Assert.Null(await GetEmailInvitationAsync(TestData.MemberUser.EmailAddress));
+    }
+    
     [Fact(DisplayName = "[003] Accept invitation succeeds when request is valid")]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
@@ -136,8 +159,20 @@ public class LaboratoryInvitationsApiTests(TestFixture fixture) : IntegrationTes
     [Fact(DisplayName = "[003] Accept invitation endpoint returns 403 when current user email does not match email invitation")]
     public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
     {
-        // Log in as an uninvited user:
-        await LoginAs(UninvitedUser);
+        // Add some rando user to the db:
+        var uninvitedUser = new User
+        {
+            Id = new Guid("6511db25-672c-4aed-84f3-c36aaa65e717"),
+            DisplayName = "Somebody",
+            EmailAddress = "idk@place.net",
+            HashedPassword = new PasswordHasher().Hash("!!somebody", out var salt),
+            HashedPasswordSalt = salt
+        };
+        DbContext.Users.Add(uninvitedUser);
+        await DbContext.SaveChangesAsync();
+        
+        // Log in as said rando:
+        await LoginAs(uninvitedUser);
 
         // Attempt to accept the invitation:
         var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
@@ -156,7 +191,7 @@ public class LaboratoryInvitationsApiTests(TestFixture fixture) : IntegrationTes
         Assert.Equal(0, await DbContext.Memberships
             .IgnoreQueryFilters()
             .Where(x => x.LaboratoryId == TestData.Lab.Id)
-            .Where(x => x.MemberId == InvitedUser.Id || x.MemberId == UninvitedUser.Id)
+            .Where(x => x.MemberId == InvitedUser.Id || x.MemberId == uninvitedUser.Id)
             .CountAsync());
     }
     

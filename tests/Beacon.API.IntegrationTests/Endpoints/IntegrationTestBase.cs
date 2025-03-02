@@ -1,6 +1,7 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using Microsoft.Extensions.DependencyInjection;
@@ -62,14 +63,31 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     }
 
     /// <summary>
+    /// Gets the default user for a given <paramref name="membershipType"/>.
+    /// </summary>
+    /// <param name="membershipType">The membership type to get the default user for.</param>
+    protected User GetDefaultUserForMembershipType(LaboratoryMembershipType membershipType) => membershipType switch
+    {
+        LaboratoryMembershipType.Admin => TestData.AdminUser,
+        LaboratoryMembershipType.Manager => TestData.ManagerUser,
+        LaboratoryMembershipType.Analyst => TestData.AnalystUser,
+        LaboratoryMembershipType.Member => TestData.MemberUser,
+        _ => throw new ArgumentOutOfRangeException(nameof(membershipType), membershipType, null)
+    };
+
+    /// <summary>
     /// Log in as a specific user.
     /// </summary>
     /// <param name="user">The user to log in as.</param>
-    protected Task<HttpResponseMessage> LoginAs(User user) => HttpClient.SendAsync(new LoginRequest
+    protected async Task<HttpResponseMessage> LoginAs(User user)
     {
-        EmailAddress = user.EmailAddress,
-        Password = $"!!{user.DisplayName.ToLower()}"
-    });
+        await HttpClient.SendAsync(new LogoutRequest());
+        return await HttpClient.SendAsync(new LoginRequest
+        {
+            EmailAddress = user.EmailAddress,
+            Password = $"!!{user.DisplayName.ToLower()}"
+        });
+    }
 
     /// <summary>
     /// Log in as a specified user and set the current lab to <see cref="TestData.Lab"/>.

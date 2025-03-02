@@ -1,5 +1,8 @@
-﻿namespace Beacon.Common.Models;
+﻿using System.Text.Json.Serialization;
 
+namespace Beacon.Common.Models;
+
+[JsonConverter(typeof(JsonStringEnumConverter))]
 public enum ProjectStatus
 {
     Active,
