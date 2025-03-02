@@ -1,4 +1,5 @@
-﻿using Beacon.API.Persistence.Entities;
+﻿using Beacon.API.IntegrationTests.Fakes;
+using Beacon.API.Persistence.Entities;
 using Beacon.API.Services;
 using Beacon.Common;
 using Beacon.Common.Models;
@@ -25,6 +26,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     protected override IEnumerable<object> EnumerateSeedData()
     {
         yield return TestData.AdminUser;
+        yield return TestData.MemberUser;
         yield return InvitedUser;
         yield return UninvitedUser;
         
@@ -46,6 +48,59 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         };
     }
     
+    [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
+    public async Task InvitingUserSucceedsWhenRequestIsValid()
+    {
+        await LoginAndSetCurrentLab(TestData.AdminUser);
+
+        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        {
+            NewMemberEmailAddress = "tom.nook@crannies.org",
+            MembershipType = LaboratoryMembershipType.Manager
+        });
+
+        response.EnsureSuccessStatusCode();
+
+        var emailInvitation = await GetEmailInvitationAsync("tom.nook@crannies.org");
+        Assert.NotNull(emailInvitation);
+        Assert.Equal(FakeEmailSendOperation.OperationId, emailInvitation.OperationId);
+        Assert.Equal(TestData.AdminUser.Id, emailInvitation.LaboratoryInvitation.CreatedById);
+        Assert.Equal(LaboratoryMembershipType.Manager, emailInvitation.LaboratoryInvitation.MembershipType);
+        Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
+
+        ShouldResetDatabase = true;
+    }
+    
+    [Fact(DisplayName = "[003] Invite new user endpoint returns 422 when request is not valid")]
+    public async Task InvitingUserFailsWhenRequestIsInvalid()
+    {
+        await LoginAndSetCurrentLab(TestData.AdminUser);
+
+        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        {
+            NewMemberEmailAddress = TestData.MemberUser.EmailAddress, // user already exists
+            MembershipType = LaboratoryMembershipType.Manager
+        });
+        
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+        Assert.Null(await GetEmailInvitationAsync(TestData.MemberUser.EmailAddress));
+    }
+    
+    [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
+    public async Task InvitingUserFailsWhenRequestIsUnauthorized()
+    {
+        await LoginAndSetCurrentLab(TestData.MemberUser);
+
+        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        {
+            NewMemberEmailAddress = "jax@mia.com",
+            MembershipType = LaboratoryMembershipType.Manager
+        });
+        
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+        Assert.Null(await GetEmailInvitationAsync("jax@mia.com"));
+    }
+
     [Fact(DisplayName = "[003] Accept invitation succeeds when request is valid")]
     public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
     {
@@ -62,11 +117,8 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         response.EnsureSuccessStatusCode();
 
         // Verify that the invitation was accepted by the invited user:
-        Assert.Equal(InvitedUser.Id, await DbContext.InvitationEmails
-            .IgnoreQueryFilters()
-            .Where(x => x.Id == EmailInvitationId)
-            .Select(x => x.LaboratoryInvitation.AcceptedById)
-            .SingleOrDefaultAsync());
+        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
+        Assert.Equal(InvitedUser.Id, invitation?.LaboratoryInvitation.AcceptedById);
 
         // Verify that the invited user is now a member of the lab, with the expected membership type:
         Assert.Equal(LaboratoryMembershipType.Analyst, await DbContext.Memberships
@@ -95,11 +147,8 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         
         // Verify that the invitation is still unaccepted:
-        Assert.Null(await DbContext.InvitationEmails
-            .IgnoreQueryFilters()
-            .Where(x => x.Id == EmailInvitationId)
-            .Select(x => x.LaboratoryInvitation.AcceptedById)
-            .SingleOrDefaultAsync());
+        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
+        Assert.Null(invitation?.LaboratoryInvitation.AcceptedById);
         
         // Verify that both the invited and uninvited users are not members of the lab:
         Assert.Equal(0, await DbContext.Memberships
@@ -130,11 +179,8 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         // Verify that the invitation is still unaccepted:
-        Assert.Null(await DbContext.InvitationEmails
-            .IgnoreQueryFilters()
-            .Where(x => x.Id == EmailInvitationId)
-            .Select(x => x.LaboratoryInvitation.AcceptedById)
-            .SingleOrDefaultAsync());
+        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
+        Assert.Null(invitation?.LaboratoryInvitation.AcceptedById);
         
         // Verify that the invited user was NOT added to the lab:
         Assert.Null(await DbContext.Memberships
@@ -142,4 +188,11 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
             .Where(x => x.LaboratoryId == TestData.Lab.Id && x.MemberId == InvitedUser.Id)
             .SingleOrDefaultAsync());
     }
+    
+    private async Task<InvitationEmail?> GetEmailInvitationAsync(string email) => await DbContext.InvitationEmails
+        .IgnoreQueryFilters()
+        .Include(x => x.LaboratoryInvitation)
+        .Where(x => x.LaboratoryId == TestData.Lab.Id)
+        .AsNoTracking()
+        .SingleOrDefaultAsync(x => x.LaboratoryInvitation.NewMemberEmailAddress == email);
 }
