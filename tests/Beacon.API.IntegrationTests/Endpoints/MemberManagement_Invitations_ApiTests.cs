@@ -1,7 +1,6 @@
 ﻿using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence.Entities;
 using Beacon.API.Services;
-using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
 using Microsoft.EntityFrameworkCore;
@@ -53,7 +52,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         var email = $"{Guid.NewGuid()}@invited.org";
         
         // Attempt to invite the user with the specified membership level:
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        var response = await SendAsync(new CreateEmailInvitationRequest
         {
             NewMemberEmailAddress = email,
             MembershipType = invitedMemberType
@@ -87,7 +86,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(currentUser);
 
         // Attempt to invite the user with the specified membership level:
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        var response = await SendAsync(new CreateEmailInvitationRequest
         {
             NewMemberEmailAddress = "jax@mia.com",
             MembershipType = invitedMemberType
@@ -107,7 +106,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.ManagerUser);
 
         // Attempt to invite a user that is already a member of the lab:
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
+        var response = await SendAsync(new CreateEmailInvitationRequest
         {
             NewMemberEmailAddress = TestData.MemberUser.EmailAddress, // user is already a member
             MembershipType = LaboratoryMembershipType.Manager
@@ -127,10 +126,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         await LoginAs(InvitedUser);
 
         // Attempt to accept the invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
-        {
-            EmailInvitationId = EmailInvitationId
-        });
+        var response = await SendAsync(new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
@@ -144,7 +140,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
             .IgnoreQueryFilters()
             .Where(x => x.LaboratoryId == TestData.Lab.Id && x.MemberId == InvitedUser.Id)
             .Select(x => x.MembershipType)
-            .SingleOrDefaultAsync());
+            .SingleOrDefaultAsync(AbortTest));
         
         // We messed with stuff, so reset the db:
         ShouldResetDatabase = true;
@@ -162,17 +158,13 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
             HashedPassword = new PasswordHasher().Hash("!!somebody", out var salt),
             HashedPasswordSalt = salt
         };
-        DbContext.Users.Add(uninvitedUser);
-        await DbContext.SaveChangesAsync();
+        await AddDataAsync(uninvitedUser);
         
         // Log in as said rando:
         await LoginAs(uninvitedUser);
 
         // Attempt to accept the invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
-        {
-            EmailInvitationId = EmailInvitationId
-        });
+        var response = await SendAsync(new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId });
 
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -186,7 +178,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
             .IgnoreQueryFilters()
             .Where(x => x.LaboratoryId == TestData.Lab.Id)
             .Where(x => x.MemberId == InvitedUser.Id || x.MemberId == uninvitedUser.Id)
-            .CountAsync());
+            .CountAsync(AbortTest));
     }
     
     [Fact(DisplayName = "[003] Accept invitation endpoint returns 422 when invitation has expired")]
@@ -195,16 +187,13 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         // update the invite to be expired
         await DbContext.InvitationEmails.IgnoreQueryFilters()
             .Where(x => x.Id == EmailInvitationId)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.ExpiresOn, DateTime.UtcNow.AddDays(-1)));
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.ExpiresOn, DateTime.UtcNow.AddDays(-1)), AbortTest);
         
         // Log in as the invited user:
         await LoginAs(InvitedUser);
 
         // Attempt to accept the expired invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
-        {
-            EmailInvitationId = EmailInvitationId
-        });
+        var response = await SendAsync(new AcceptEmailInvitationRequest { EmailInvitationId = EmailInvitationId });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -217,7 +206,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         Assert.Null(await DbContext.Memberships
             .IgnoreQueryFilters()
             .Where(x => x.LaboratoryId == TestData.Lab.Id && x.MemberId == InvitedUser.Id)
-            .SingleOrDefaultAsync());
+            .SingleOrDefaultAsync(AbortTest));
         
         // We messed with stuff, so reset the db:
         ShouldResetDatabase = true;

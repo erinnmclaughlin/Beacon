@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using Beacon.API.Persistence.Entities;
-using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
 using Microsoft.EntityFrameworkCore;
@@ -28,7 +27,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.AdminUser);
         
         // Attempt to create the instrument:
-        var response = await HttpClient.SendAsync(new CreateLaboratoryInstrumentRequest
+        var response = await SendAsync(new CreateLaboratoryInstrumentRequest
         {
             SerialNumber = "123",
             InstrumentType = "FMS Headspace Analyzer"
@@ -51,7 +50,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to create an instrument:
-        var response = await HttpClient.SendAsync( new CreateLaboratoryInstrumentRequest
+        var response = await SendAsync( new CreateLaboratoryInstrumentRequest
         {
             SerialNumber = "456",
             InstrumentType = "FMS Headspace Analyzer"
@@ -69,7 +68,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to create an instrument with invalid information:
-        var response = await HttpClient.SendAsync(new CreateLaboratoryInstrumentRequest
+        var response = await SendAsync(new CreateLaboratoryInstrumentRequest
         {
             SerialNumber = "789",
             InstrumentType = "" // required
@@ -87,13 +86,13 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get lab instruments:
-        var response = await HttpClient.SendAsync(new GetLaboratoryInstrumentsRequest());
+        var response = await SendAsync(new GetLaboratoryInstrumentsRequest());
         
         // Verify that this succeeds:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         
         // Verify that the response content contains the expected information about the instrument:
-        var responseContent = await response.Content.ReadFromJsonAsync<LaboratoryInstrumentDto[]>();
+        var responseContent = await response.Content.ReadFromJsonAsync<LaboratoryInstrumentDto[]>(AbortTest);
         var instrument = responseContent?.SingleOrDefault(x => x.SerialNumber == "555");
         Assert.NotNull(instrument);
         Assert.Equal("Test Type", instrument.InstrumentType);
@@ -106,7 +105,7 @@ public sealed class InstrumentManagementApiTests(TestFixture fixture) : Integrat
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to get lab instruments:
-        var response = await HttpClient.SendAsync(new GetLaboratoryInstrumentsRequest());
+        var response = await SendAsync(new GetLaboratoryInstrumentsRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

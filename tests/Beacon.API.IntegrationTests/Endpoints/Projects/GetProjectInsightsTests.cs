@@ -53,7 +53,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
             new DateOnly(2023, 2, 1));
 
         db.ProjectApplications.AddRange(app1, app2, app3);
-        await db.SaveChangesAsync();
+        await db.SaveChangesAsync(TestContext.Current.CancellationToken);
 
         var sut = new GetProjectInsightsHandler(db);
         var result = await sut.GetStatistics(new DateTime(2023, 8, 1), CancellationToken.None);

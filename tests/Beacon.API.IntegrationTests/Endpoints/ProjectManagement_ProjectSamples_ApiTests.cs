@@ -1,13 +1,12 @@
 using System.Net.Http.Json;
 using Beacon.API.Persistence.Entities;
-using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects.SampleGroups;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "Project Management - Samples")]
+[Trait("Category", "Project Management")]
 public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Project DefaultProject => CreateProject(
@@ -35,7 +34,7 @@ public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture)
     {
         await LogInToDefaultLab(TestData.AdminUser);
 
-        var response = await HttpClient.SendAsync(new CreateSampleGroupRequest
+        var response = await SendAsync(new CreateSampleGroupRequest
         {
             ProjectId = DefaultProject.Id,
             SampleName = "My Sample Group"
@@ -51,7 +50,7 @@ public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture)
     {
         await LogInToDefaultLab(TestData.AdminUser);
 
-        var response = await HttpClient.SendAsync(new CreateSampleGroupRequest
+        var response = await SendAsync(new CreateSampleGroupRequest
         {
             ProjectId = DefaultProject.Id,
             SampleName = ""
@@ -66,7 +65,7 @@ public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture)
     {
         await LogInToDefaultLab(TestData.MemberUser);
 
-        var response = await HttpClient.SendAsync(new CreateSampleGroupRequest
+        var response = await SendAsync(new CreateSampleGroupRequest
         {
             ProjectId = DefaultProject.Id,
             SampleName = "Should Not Succeed"
@@ -87,13 +86,13 @@ public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture)
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get sample groups for the default project:
-        var response = await HttpClient.SendAsync(new GetSampleGroupsByProjectIdRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new GetSampleGroupsByProjectIdRequest { ProjectId = DefaultProject.Id });
 
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
         
         // Verify that the response contains the expected sample groups:
-        var sampleGroups = await response.Content.ReadFromJsonAsync<SampleGroupDto[]>();
+        var sampleGroups = await response.Content.ReadFromJsonAsync<SampleGroupDto[]>(AbortTest);
         Assert.NotNull(sampleGroups);
         Assert.Contains(sampleGroups, s => s.Id == DefaultSampleGroup.Id);
         Assert.DoesNotContain(sampleGroups, c => c.Id == otherSampleGroup.Id);

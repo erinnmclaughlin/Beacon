@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using Beacon.API.Persistence.Entities;
-using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 using Microsoft.EntityFrameworkCore;
@@ -17,10 +16,7 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to create a new lab:
-        var response = await HttpClient.SendAsync(new CreateLaboratoryRequest
-        {
-            LaboratoryName = "My New Lab"
-        });
+        var response = await SendAsync(new CreateLaboratoryRequest { LaboratoryName = "My New Lab" });
 
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
@@ -44,11 +40,8 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
         // Log in as anyone:
         await LoginAs(TestData.NonMemberUser);
 
-        // Attempt to create a new lab with an invalid name:
-        var response = await HttpClient.SendAsync(new CreateLaboratoryRequest
-        {
-            LaboratoryName = "no" // must be at least 3 characters
-        });
+        // Attempt to create a new lab with an invalid name (too short):
+        var response = await SendAsync(new CreateLaboratoryRequest { LaboratoryName = "no" });
 
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -97,13 +90,13 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the current lab:
-        var response = await HttpClient.SendAsync(new GetCurrentLaboratoryRequest());
+        var response = await SendAsync(new GetCurrentLaboratoryRequest());
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the response content contains the expected information:
-        var lab = await response.Content.ReadFromJsonAsync<LaboratoryDto>();
+        var lab = await response.Content.ReadFromJsonAsync<LaboratoryDto>(AbortTest);
         Assert.NotNull(lab);
         Assert.Equal(TestData.Lab.Id, lab.Id);
         Assert.Equal(TestData.Lab.Name, lab.Name);
@@ -116,7 +109,7 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to get the current lab:
-        var response = await HttpClient.SendAsync(new GetCurrentLaboratoryRequest());
+        var response = await SendAsync(new GetCurrentLaboratoryRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -129,14 +122,14 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
         await LoginAs(TestData.MemberUser);
         
         // Create a new lab while logged in as that user:
-        await HttpClient.SendAsync(new CreateLaboratoryRequest
+        await SendAsync(new CreateLaboratoryRequest
         {
             LaboratoryName = "The Other Lab"
         });
         
         // Get my labs:
-        var getMyLabsResponse = await HttpClient.SendAsync(new GetMyLaboratoriesRequest());
-        var myLabs = await getMyLabsResponse.Content.ReadFromJsonAsync<LaboratoryDto[]>();
+        var getMyLabsResponse = await SendAsync(new GetMyLaboratoriesRequest());
+        var myLabs = await getMyLabsResponse.Content.ReadFromJsonAsync<LaboratoryDto[]>(AbortTest);
         
         // Verify that I now belong to two labs (the default lab and the new lab):
         Assert.NotNull(myLabs);
@@ -145,8 +138,8 @@ public sealed class LaboratoryManagementApiTests(TestFixture fixture) : Integrat
 
         // Now log in as someone else:
         await LoginAs(TestData.ManagerUser);
-        getMyLabsResponse = await HttpClient.SendAsync(new GetMyLaboratoriesRequest());
-        myLabs = await getMyLabsResponse.Content.ReadFromJsonAsync<LaboratoryDto[]>();
+        getMyLabsResponse = await SendAsync(new GetMyLaboratoriesRequest());
+        myLabs = await getMyLabsResponse.Content.ReadFromJsonAsync<LaboratoryDto[]>(AbortTest);
         
         // Verify that they still just belong to the default lab:
         Assert.NotNull(myLabs);

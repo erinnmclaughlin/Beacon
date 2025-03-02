@@ -26,9 +26,9 @@ public abstract class TestBase : IAsyncLifetime
         HttpClient = Fixture.CreateClient();
     }
 
-    public async ValueTask InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        await Fixture.Container.ResetDatabase();
+        return ValueTask.CompletedTask;
     }
 
     public ValueTask DisposeAsync()

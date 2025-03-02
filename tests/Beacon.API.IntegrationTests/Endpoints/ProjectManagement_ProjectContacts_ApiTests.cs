@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "Project Management - Contacts")]
+[Trait("Category", "Project Management")]
 public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Project DefaultProject => CreateProject(
@@ -40,13 +40,13 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get contacts for the default project:
-        var response = await HttpClient.SendAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the response contains the expected contacts:
-        var contacts = await response.Content.ReadFromJsonAsync<ProjectContactDto[]>();
+        var contacts = await response.Content.ReadFromJsonAsync<ProjectContactDto[]>(TestContext.Current.CancellationToken);
         Assert.NotNull(contacts);
         Assert.Contains(contacts, c => c.Id == DefaultProjectContact.Id);
         Assert.DoesNotContain(contacts, c => c.Id == otherContact.Id);
@@ -59,7 +59,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to create a new contact:
-        var response = await HttpClient.SendAsync(new CreateProjectContactRequest
+        var response = await SendAsync(new CreateProjectContactRequest
         {
             ProjectId = DefaultProject.Id,
             Name = "Jenny",
@@ -70,7 +70,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         response.EnsureSuccessStatusCode();
 
         // Verify that the contact was created with the expected values:
-        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });
+        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id }, AbortTest);
         Assert.Contains(contacts ?? [], c => c is { Name: "Jenny", PhoneNumber: "555-867-5309" });
     }
     
@@ -81,7 +81,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to create a contact without a name:
-        var response = await HttpClient.SendAsync(new CreateProjectContactRequest
+        var response = await SendAsync(new CreateProjectContactRequest
         {
             ProjectId = DefaultProject.Id,
             Name = "",
@@ -92,7 +92,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
         // Verify that the contact was not created:
-        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });       
+        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id }, AbortTest);       
         Assert.Contains(contacts ?? [], c => c.Id == DefaultProjectContact.Id);
         Assert.DoesNotContain(contacts ?? [], c => c is { Name: "", PhoneNumber: "555-867-5309" });
     }
@@ -104,7 +104,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to create a new contact:
-        var response = await HttpClient.SendAsync(new CreateProjectContactRequest
+        var response = await SendAsync(new CreateProjectContactRequest
         {
             ProjectId = DefaultProject.Id,
             Name = "Should Not Succeed"
@@ -114,7 +114,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         
         // Verify that the contact was not created:
-        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });
+        var contacts = await HttpClient.GetFromJsonAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id }, AbortTest);
         Assert.Contains(contacts ?? [], c => c.Id == DefaultProjectContact.Id);
         Assert.DoesNotContain(contacts ?? [], c => c.Name == "Should Not Succeed");
     }
@@ -126,7 +126,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Send a valid update request:
-        var response = await HttpClient.SendAsync(new UpdateProjectContactRequest
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = DefaultProjectContact.Id,
             ProjectId = DefaultProject.Id,
@@ -155,7 +155,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Send an invalid update request:
-        var response = await HttpClient.SendAsync(new UpdateProjectContactRequest
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = DefaultProjectContact.Id,
             ProjectId = DefaultProject.Id,
@@ -181,7 +181,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Send an otherwise valid update request:
-        var response = await HttpClient.SendAsync(new UpdateProjectContactRequest
+        var response = await SendAsync(new UpdateProjectContactRequest
         {
             ContactId = DefaultProjectContact.Id,
             ProjectId = DefaultProject.Id,
@@ -207,7 +207,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.AdminUser);
         
         // Send a valid delete request:
-        var response = await HttpClient.SendAsync(new DeleteProjectContactRequest
+        var response = await SendAsync(new DeleteProjectContactRequest
         {
             ContactId = DefaultProjectContact.Id,
             ProjectId = DefaultProject.Id
@@ -230,7 +230,7 @@ public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Send an otherwise valid request to delete a contact:
-        var response = await HttpClient.SendAsync(new DeleteProjectContactRequest
+        var response = await SendAsync(new DeleteProjectContactRequest
         {
             ContactId = DefaultProjectContact.Id,
             ProjectId = DefaultProject.Id

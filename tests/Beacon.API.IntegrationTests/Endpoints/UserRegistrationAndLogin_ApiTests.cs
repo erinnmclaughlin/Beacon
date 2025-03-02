@@ -1,6 +1,5 @@
 ﻿using System.Net.Http.Json;
 using Beacon.API.Services;
-using Beacon.Common;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Services;
 using Microsoft.EntityFrameworkCore;
@@ -21,7 +20,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Register_SucceedsWhenRequestIsValid()
     {
         // Attempt to register a valid new user:
-        var response = await HttpClient.SendAsync(new RegisterRequest
+        var response = await SendAsync(new RegisterRequest
         {
             EmailAddress = "newuser@website.com",
             Password = "!!newuser",
@@ -41,7 +40,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Register_FailsWhenRequiredInformationIsMissing()
     {
         // Attempt to register a new user without an email address or password:
-        var response = await HttpClient.SendAsync(new RegisterRequest());
+        var response = await SendAsync(new RegisterRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -51,7 +50,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Register_FailsWhenEmailExists()
     {
         // Attempt to register a new user with an existing email address:
-        var response = await HttpClient.SendAsync(new RegisterRequest
+        var response = await SendAsync(new RegisterRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "something",
@@ -77,7 +76,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Login_FailsWhenRequiredInformationIsMissing()
     {
         // Attempt to log in without providing any information:
-        var response = await HttpClient.SendAsync(new LoginRequest());
+        var response = await SendAsync(new LoginRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -88,7 +87,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Login_FailsWhenUserDoesNotExist()
     {
         // Attempt to log in with an email address that doesn't exist:
-        var response = await HttpClient.SendAsync(new LoginRequest
+        var response = await SendAsync(new LoginRequest
         {
             EmailAddress = "notreal@doesntexist.com",
             Password = "password123"
@@ -103,7 +102,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task Login_FailsWhenPasswordIsIncorrect()
     {
         // Attempt to log in with an invalid password:
-        var response = await HttpClient.SendAsync(new LoginRequest
+        var response = await SendAsync(new LoginRequest
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "NOT!!admin"
@@ -118,7 +117,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     public async Task GetCurrentUser_Returns401_WhenNotLoggedIn()
     {
         // Try to get the current session context without logging in:
-        var response = await HttpClient.SendAsync(new GetSessionContextRequest());
+        var response = await SendAsync(new GetSessionContextRequest());
 
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
@@ -131,11 +130,11 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
         await LoginAs(TestData.AdminUser);
 
         // Get the current session context:
-        var getSessionResponse = await HttpClient.SendAsync(new GetSessionContextRequest());
+        var getSessionResponse = await SendAsync(new GetSessionContextRequest());
         getSessionResponse.EnsureSuccessStatusCode();
 
         // Verify the session content matches what expect:
-        var session = await getSessionResponse.Content.ReadFromJsonAsync<SessionContext>();
+        var session = await getSessionResponse.Content.ReadFromJsonAsync<SessionContext>(AbortTest);
         Assert.NotNull(session);
         Assert.Equal(TestData.AdminUser.Id, session.CurrentUser.Id);
         Assert.Equal(TestData.AdminUser.DisplayName, session.CurrentUser.DisplayName);
@@ -148,14 +147,14 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
         await LoginAs(TestData.AdminUser);
 
         // Verify that I can get the current session context:
-        var getSessionResponse = await HttpClient.SendAsync(new GetSessionContextRequest());
+        var getSessionResponse = await SendAsync(new GetSessionContextRequest());
         getSessionResponse.EnsureSuccessStatusCode();
 
         // Logout:
-        await HttpClient.SendAsync(new LogoutRequest());
+        await SendAsync(new LogoutRequest());
 
         // Verify that I can no longer get the current session context:
-        getSessionResponse = await HttpClient.SendAsync(new GetSessionContextRequest());
+        getSessionResponse = await SendAsync(new GetSessionContextRequest());
         Assert.Equal(HttpStatusCode.Unauthorized, getSessionResponse.StatusCode);
     }
 }

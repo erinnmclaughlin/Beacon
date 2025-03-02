@@ -39,19 +39,15 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(user);
 
         // Attempt to create a new project:
-        var response = await HttpClient.SendAsync(new CreateProjectRequest
-        {
-            CustomerCode = "XYZ",
-            CustomerName = "XYZ Company"
-        });
+        var response = await SendAsync(new CreateProjectRequest { CustomerCode = "XYZ", CustomerName = "XYZ Company" });
         
         // Verify that this succeeds:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // Verify that the persisted information matches the request:
-        var code = await response.Content.ReadFromJsonAsync<ProjectCode>();
+        var code = await response.Content.ReadFromJsonAsync<ProjectCode>(AbortTest);
         Assert.NotNull(code);
-        var createdProject = await DbContext.Projects.IgnoreQueryFilters().WithCode(code).SingleAsync();
+        var createdProject = await DbContext.Projects.IgnoreQueryFilters().WithCode(code).SingleAsync(AbortTest);
         Assert.NotNull(createdProject);
         Assert.Equal(user.Id, createdProject.CreatedById);
         Assert.Equal(TestData.Lab.Id, createdProject.LaboratoryId);
@@ -64,12 +60,8 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         // Login as a user that has permission to create projects:
         await LogInToDefaultLab(TestData.AdminUser);
 
-        // Attempt to create a project with an invalid customer code:
-        var response = await HttpClient.SendAsync(new CreateProjectRequest
-        {
-            CustomerCode = "WXYZ", // invalid code (must be 3 characters)
-            CustomerName = "XYZ Company"
-        });
+        // Attempt to create a project with an invalid customer code (must be 3 chars):
+        var response = await SendAsync(new CreateProjectRequest { CustomerCode = "WXYZ", CustomerName = "XYZ Company" });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
@@ -82,7 +74,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to create a project with an invalid lead analyst:
-        var response = await HttpClient.SendAsync(new CreateProjectRequest
+        var response = await SendAsync(new CreateProjectRequest
         {
             CustomerCode = "XYZ",
             CustomerName = "XYZ Company",
@@ -100,11 +92,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to create a new project:
-        var response = await HttpClient.SendAsync(new CreateProjectRequest
-        {
-            CustomerCode = "XYZ",
-            CustomerName = "XYZ Company"
-        });
+        var response = await SendAsync(new CreateProjectRequest { CustomerCode = "XYZ", CustomerName = "XYZ Company" });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -117,7 +105,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to complete the default test project:
-        var response = await HttpClient.SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
@@ -136,7 +124,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to complete the default test project:
-        var response = await HttpClient.SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new CompleteProjectRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -152,7 +140,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to cancel the default test project:
-        var response = await HttpClient.SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
@@ -171,7 +159,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to cancel the default test project:
-        var response = await HttpClient.SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new CancelProjectRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -187,7 +175,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to assign a valid lead analyst:
-        var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
+        var response = await SendAsync(new UpdateLeadAnalystRequest
         {
             ProjectId = DefaultProject.Id,
             AnalystId = TestData.AnalystUser.Id
@@ -210,7 +198,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to assign a lead analyst that is not in a valid role:
-        var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
+        var response = await SendAsync(new UpdateLeadAnalystRequest
         {
             ProjectId = DefaultProject.Id,
             AnalystId = TestData.MemberUser.Id
@@ -228,7 +216,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     {
         // Update the default project to have a lead analyst:
         await DbContext.Projects.IgnoreQueryFilters().Where(x => x.Id == DefaultProject.Id)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.LeadAnalystId, TestData.AnalystUser.Id));
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.LeadAnalystId, TestData.AnalystUser.Id), AbortTest);
         
         // Sanity check to make sure the current analyst was set:
         Assert.Equal(TestData.AnalystUser.Id, await GetDefaultProjectAnalystId());
@@ -237,7 +225,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to un-assign the lead analyst:
-        var response = await HttpClient.SendAsync(new UpdateLeadAnalystRequest
+        var response = await SendAsync(new UpdateLeadAnalystRequest
         {
             ProjectId = DefaultProject.Id,
             AnalystId = null
@@ -260,13 +248,13 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the default project details by code:
-        var response = await HttpClient.SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
+        var response = await SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
        
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the project details are correct:
-        var project = await response.Content.ReadFromJsonAsync<ProjectDto>();
+        var project = await response.Content.ReadFromJsonAsync<ProjectDto>(AbortTest);
         Assert.NotNull(project);
         Assert.Equal(DefaultProject.Id, project.Id);
         Assert.Equal(DefaultProject.ProjectCode.ToString(), project.ProjectCode);
@@ -281,7 +269,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to get the default project details by code:
-        var response = await HttpClient.SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
+        var response = await SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -294,14 +282,14 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get the default project details by ID:
-        var response = await HttpClient.SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the project details are correct:
-        var project = await response.Content.ReadFromJsonAsync<ProjectDto>();
+        var project = await response.Content.ReadFromJsonAsync<ProjectDto>(AbortTest);
         Assert.NotNull(project);
         Assert.Equal(DefaultProject.Id, project.Id);
         Assert.Equal(DefaultProject.ProjectCode.ToString(), project.ProjectCode);
@@ -316,7 +304,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to get the default project details by code:
-        var response = await HttpClient.SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
+        var response = await SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -343,13 +331,13 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LogInToDefaultLab(TestData.AdminUser);
 
         // Attempt to get laboratory projects:
-        var response = await HttpClient.SendAsync(new GetProjectsRequest());
+        var response = await SendAsync(new GetProjectsRequest());
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the response only contains projects for the default lab:
-        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>(AbortTest);
         Assert.NotNull(projects);
         Assert.Contains(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
         Assert.DoesNotContain(projects.Items, p => p.ProjectCode == otherLabProject.ProjectCode.ToString());
@@ -358,13 +346,13 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await SetCurrentLab(otherLab.Id);
         
         // Attempt to get laboratory projects again:
-        response = await HttpClient.SendAsync(new GetProjectsRequest());
+        response = await SendAsync(new GetProjectsRequest());
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
         
         // Verify that the response only contains projects for the other lab:
-        projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>(AbortTest);
         Assert.NotNull(projects);
         Assert.DoesNotContain(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
         Assert.Contains(projects.Items, p => p.ProjectCode == otherLabProject.ProjectCode.ToString());
@@ -380,7 +368,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to get laboratory projects:
-        var response = await HttpClient.SendAsync(new GetProjectsRequest());
+        var response = await SendAsync(new GetProjectsRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -401,14 +389,16 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         });
         
         // Sanity check: make sure lab has multiple projects:
-        var projectCount = await DbContext.Projects.IgnoreQueryFilters().CountAsync(x => x.LaboratoryId == TestData.Lab.Id);
+        var projectCount = await DbContext.Projects
+            .IgnoreQueryFilters()
+            .CountAsync(x => x.LaboratoryId == TestData.Lab.Id, AbortTest);
         Assert.True(projectCount > 1);
         
         // Log in as a user that can view lab projects:
         await LogInToDefaultLab(TestData.MemberUser);
 
-        var response = await HttpClient.SendAsync(new GetProjectsRequest { PageSize = 1 });
-        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
+        var response = await SendAsync(new GetProjectsRequest { PageSize = 1 });
+        var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>(AbortTest);
         Assert.NotNull(projects);
         Assert.Equal(1, projects.PageSize);
         Assert.Equal(projectCount, projects.TotalCount);

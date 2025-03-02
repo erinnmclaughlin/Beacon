@@ -1,6 +1,5 @@
 using System.Net.Http.Json;
 using Beacon.API.Persistence.Entities;
-using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Memberships;
 using Microsoft.EntityFrameworkCore;
@@ -17,13 +16,13 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to view the list of memberships:
-        var response = await HttpClient.SendAsync(new GetMembershipsRequest());
+        var response = await SendAsync(new GetMembershipsRequest());
        
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the response content contains the expected information about the members:
-        var memberships = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        var memberships = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>(AbortTest);
         Assert.NotNull(memberships);
         Assert.Contains(memberships, m => m.Id == TestData.AdminUser.Id && m.MembershipType == LaboratoryMembershipType.Admin);
         Assert.Contains(memberships, m => m.Id == TestData.ManagerUser.Id && m.MembershipType == LaboratoryMembershipType.Manager);
@@ -39,7 +38,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LoginAs(TestData.NonMemberUser);
 
         // Attempt to view the list of memberships:
-        var response = await HttpClient.SendAsync(new GetMembershipsRequest());
+        var response = await SendAsync(new GetMembershipsRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
@@ -52,7 +51,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.ManagerUser);
 
         // Attempt to update the current lab analyst to a manager:
-        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = TestData.MemberUser.Id,
             MembershipType = LaboratoryMembershipType.Manager
@@ -66,7 +65,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
             .IgnoreQueryFilters()
             .Where(x => x.MemberId == TestData.MemberUser.Id && x.LaboratoryId == TestData.Lab.Id)
             .Select(x => x.MembershipType)
-            .SingleAsync());
+            .SingleAsync(AbortTest));
         
         // Reset the database because we messed with stuff:
         ShouldResetDatabase = true;
@@ -79,7 +78,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.AnalystUser);
 
         // Attempt to update the current lab analyst to a manager:
-        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = TestData.MemberUser.Id,
             MembershipType = LaboratoryMembershipType.Analyst
@@ -93,7 +92,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
             .IgnoreQueryFilters()
             .Where(x => x.MemberId == TestData.MemberUser.Id && x.LaboratoryId == TestData.Lab.Id)
             .Select(x => x.MembershipType)
-            .SingleAsync());
+            .SingleAsync(AbortTest));
     }
     
     [Fact(DisplayName = "[170] Update membership type endpoint returns 422 when member does not exist")]
@@ -103,7 +102,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.ManagerUser);
         
         // Attempt to update a user that is not a member of the current lab:
-        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = TestData.NonMemberUser.Id,
             MembershipType = LaboratoryMembershipType.Analyst
@@ -120,7 +119,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.ManagerUser);
         
         // Attempt to update a non-existent user:
-        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
+        var response = await SendAsync(new UpdateMembershipRequest
         {
             MemberId = Guid.NewGuid(),
             MembershipType = LaboratoryMembershipType.Analyst
@@ -137,13 +136,13 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get a list of analysts for the current lab:
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
+        var response = await SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
         
         // Verify that this succeeds:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // Verify that the response contains the expected members:
-        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>(AbortTest);
         Assert.NotNull(members);
         
         // All of these users can act as analysts, so they should be included:
@@ -160,7 +159,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     {
         // Historic analysts are users who have acted as analysts in the past, or currently have the analyst role (or higher).
         // Manually add a project with non-analyst user to the database:
-        DbContext.Projects.Add(new Project
+        await AddDataAsync(new Project
         {
             Id = Guid.NewGuid(),
             LaboratoryId = TestData.Lab.Id,
@@ -171,19 +170,18 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
             ProjectStatus = ProjectStatus.Completed,
             LeadAnalystId = TestData.MemberUser.Id
         });
-        await DbContext.SaveChangesAsync();
         
         // Log in as someone that has permission to view lab information:
         await LogInToDefaultLab(TestData.MemberUser);
         
         // Attempt to get a list of analysts for the current lab, including historic analysts:
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
+        var response = await SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
         
         // Verify that this succeeds:
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         // Verify that the response contains the expected members:
-        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>(AbortTest);
         Assert.NotNull(members);
         
         // All of these users can act as analysts, so they should be included:
@@ -205,7 +203,7 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         await LoginAs(TestData.NonMemberUser);
         
         // Attempt to view the list of analysts:
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest());
+        var response = await SendAsync(new GetAnalystsRequest());
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);

@@ -2,18 +2,25 @@
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
+using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 
 namespace Beacon.API.IntegrationTests;
 
-[Collection(nameof(ContainerFixtureCollection))]
 public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime, IClassFixture<TestFixture>
 {
+    private BeaconDbContext? _dbContext;
+    
+    /// <summary>
+    /// The cancellation token for the current test context.
+    /// </summary>
+    protected static CancellationToken AbortTest => TestContext.Current.CancellationToken;
+    
     /// <summary>
     /// A reference to the <see cref="BeaconDbContext"/> in the current test scope.
     /// </summary>
-    protected BeaconDbContext DbContext => fixture.Container.DbContext;
+    protected BeaconDbContext DbContext => _dbContext ??= fixture.CreateDbContext();
 
     /// <summary>
     /// An <see cref="HttpClient"/> instance configured to call the web API.
@@ -21,7 +28,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     protected HttpClient HttpClient { get; } = fixture.CreateClient();
     
     /// <inheritdoc cref="TestFixture.ShouldResetDatabase"/>
-    public bool ShouldResetDatabase
+    protected bool ShouldResetDatabase
     {
         get => fixture.ShouldResetDatabase;
         set => fixture.ShouldResetDatabase = value;
@@ -30,11 +37,9 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// <inheritdoc />
     public virtual async ValueTask InitializeAsync()
     {
-        DbContext.ChangeTracker.Clear();
-        
-        if (fixture.ShouldResetDatabase)
+        if (ShouldResetDatabase)
         {
-            await fixture.Container.ResetDatabase();
+            await fixture.ResetDatabase();
 
             var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
             await AddDataAsync(seedData.Distinct().ToArray());
@@ -46,8 +51,15 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     public virtual async ValueTask DisposeAsync()
     {
         GC.SuppressFinalize(this);
-        await HttpClient.SendAsync(new LogoutRequest());
+        
+        await SendAsync(new LogoutRequest());
         HttpClient.Dispose();
+
+        if (_dbContext != null)
+        {
+            await _dbContext.DisposeAsync();
+            _dbContext = null;
+        }
     }
 
     /// <summary>
@@ -78,7 +90,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     protected async Task AddDataAsync(params object[] data)
     {
         DbContext.AddRange(data);
-        await DbContext.SaveChangesAsync();
+        await DbContext.SaveChangesAsync(AbortTest);
     }
     
     /// <summary>
@@ -98,7 +110,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// Log in as a specific user.
     /// </summary>
     /// <param name="user">The user to log in as.</param>
-    protected Task<HttpResponseMessage> LoginAs(User user) => HttpClient.SendAsync(new LoginRequest
+    protected Task<HttpResponseMessage> LoginAs(User user) => SendAsync(new LoginRequest
     {
         EmailAddress = user.EmailAddress,
         Password = $"!!{user.DisplayName.ToLower()}"
@@ -126,13 +138,25 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         var setCurrentLabResponse = await SetCurrentLab(currentLabId);
         setCurrentLabResponse.EnsureSuccessStatusCode();
     }
-    
+
     /// <summary>
     /// Sets the laboratory that requests will be scoped to.
     /// </summary>
     /// <param name="labId">The ID of the lab, or null.</param>
-    protected Task<HttpResponseMessage> SetCurrentLab(Guid? labId) => HttpClient.SendAsync(new SetCurrentLaboratoryRequest
+    protected Task<HttpResponseMessage> SetCurrentLab(Guid? labId) => SendAsync(new SetCurrentLaboratoryRequest
     {
         LaboratoryId = labId
     });
+    
+    protected Task<HttpResponseMessage> SendAsync<TRequest>(BeaconRequest<TRequest> request)
+        where TRequest : BeaconRequest<TRequest>, IBeaconRequest<TRequest>, new()
+    {
+        return HttpClient.SendAsync(request, AbortTest);
+    }
+    
+    protected Task<HttpResponseMessage> SendAsync<TRequest, TResponse>(BeaconRequest<TRequest, TResponse> request)
+        where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
+    {
+        return HttpClient.SendAsync(request, AbortTest);
+    }
 }
