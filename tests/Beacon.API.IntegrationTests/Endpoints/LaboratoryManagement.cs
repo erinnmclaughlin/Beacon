@@ -29,9 +29,6 @@ public sealed class LaboratoryManagement(TestFixture fixture) : IntegrationTestB
         var member = Assert.Single(createdLab.Memberships);
         Assert.Equal(TestData.NonMemberUser.Id, member.MemberId);
         Assert.Equal(LaboratoryMembershipType.Admin, member.MembershipType);
-
-        // We messed with stuff, so reset the db:
-        ShouldResetDatabase = true;
     }
     
     [Fact(DisplayName = "[002] Create lab fails when request is invalid")]
@@ -145,9 +142,6 @@ public sealed class LaboratoryManagement(TestFixture fixture) : IntegrationTestB
         Assert.NotNull(myLabs);
         Assert.Single(myLabs);
         Assert.DoesNotContain(myLabs, x => x.Name == "The Other Lab");
-        
-        // We messed with stuff, so reset the db:
-        ShouldResetDatabase = true;
     }
     
     private Task<Laboratory?> FindLabByNameWithMembers(string labName) => DbContext.Laboratories

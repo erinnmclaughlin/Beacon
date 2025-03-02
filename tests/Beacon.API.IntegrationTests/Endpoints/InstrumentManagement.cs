@@ -10,7 +10,7 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 public sealed class InstrumentManagement(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateCustomSeedData()
+    protected override IEnumerable<object> EnumerateReseedData()
     {
         yield return new LaboratoryInstrument
         {
@@ -110,6 +110,7 @@ public sealed class InstrumentManagement(TestFixture fixture) : IntegrationTestB
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
+    
     private Task<LaboratoryInstrument?> FindInstrument(string sn) => DbContext
         .Set<LaboratoryInstrument>()
         .IgnoreQueryFilters()

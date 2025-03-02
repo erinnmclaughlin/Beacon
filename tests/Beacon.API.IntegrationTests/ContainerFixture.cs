@@ -7,8 +7,9 @@ namespace Beacon.API.IntegrationTests;
 public sealed class ContainerFixture : IAsyncLifetime
 {
     private MsSqlContainer Container { get; } = new MsSqlBuilder().Build();
+    private static string DatabaseName => $"Beacon_{TestContext.Current.TestClass?.TestClassSimpleName ?? "Container"}";
 
-    public string GetConnectionString(string database) => Container.GetConnectionString().Replace("master", database);
+    public string GetConnectionString() => Container.GetConnectionString().Replace("master", DatabaseName);
 
     public async ValueTask InitializeAsync()
     {

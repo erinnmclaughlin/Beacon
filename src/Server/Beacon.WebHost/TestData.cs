@@ -12,10 +12,7 @@ public static class TestData
         DisplayName = "Admin",
         EmailAddress = "admin@test.test",
         HashedPassword = Hash("!!admin", out var salt),
-        HashedPasswordSalt = salt,
-        Memberships = [
-            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Admin }
-        ]
+        HashedPasswordSalt = salt
     };
 
     public static User ManagerUser => new()
@@ -24,10 +21,7 @@ public static class TestData
         DisplayName = "Manager",
         EmailAddress = "manager@test.test",
         HashedPassword = Hash("!!manager", out var salt),
-        HashedPasswordSalt = salt,
-        Memberships = [
-            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Manager }
-        ]
+        HashedPasswordSalt = salt
     };
     
     public static User AnalystUser => new()
@@ -36,10 +30,7 @@ public static class TestData
         DisplayName = "Analyst",
         EmailAddress = "analyst@test.test",
         HashedPassword = Hash("!!analyst", out var salt),
-        HashedPasswordSalt = salt,
-        Memberships = [
-            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Analyst }
-        ]
+        HashedPasswordSalt = salt
     };
 
     public static User MemberUser => new()
@@ -48,10 +39,7 @@ public static class TestData
         DisplayName = "Member",
         EmailAddress = "member@test.test",
         HashedPassword = Hash("!!member", out var salt),
-        HashedPasswordSalt = salt,
-        Memberships = [
-            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Member }
-        ]
+        HashedPasswordSalt = salt
     };
 
     public static User NonMemberUser => new()

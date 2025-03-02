@@ -5,12 +5,15 @@ using Beacon.Common.Models;
 using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
+using Microsoft.EntityFrameworkCore;
+using Respawn;
+using Respawn.Graph;
 
 namespace Beacon.API.IntegrationTests;
 
 public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime, IClassFixture<TestFixture>
 {
-    private BeaconDbContext? _dbContext;
+    private Respawner? _respawnCheckpoint;
     
     /// <summary>
     /// The cancellation token for the current test context.
@@ -20,26 +23,29 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// <summary>
     /// A reference to the <see cref="BeaconDbContext"/> in the current test scope.
     /// </summary>
-    protected BeaconDbContext DbContext => _dbContext ??= fixture.CreateDbContext();
+    protected BeaconDbContext DbContext => fixture.DbContext;
 
     /// <summary>
     /// An <see cref="HttpClient"/> instance configured to call the web API.
     /// </summary>
     protected HttpClient HttpClient { get; } = fixture.CreateClient();
     
-    /// <inheritdoc cref="TestFixture.ShouldResetDatabase"/>
-    protected bool ShouldResetDatabase
-    {
-        get => fixture.ShouldResetDatabase;
-        set => fixture.ShouldResetDatabase = value;
-    }
-    
     /// <inheritdoc />
     public virtual async ValueTask InitializeAsync()
     {
-        if (ShouldResetDatabase)
+        if (!fixture.IsSeeded)
         {
-            await ResetDatabase();
+            await fixture.ApplySeedData(GetAllSeedData());
+        }
+
+        if (_respawnCheckpoint is null)
+        {
+            await CreateCheckpoint(GetAllSeedData()
+                .Select(t => DbContext.Model.FindEntityType(t.GetType())!.GetTableName()!)
+                .Select(t => new Table(t))
+                .Distinct()
+                .ToArray()
+            );
         }
     }
 
@@ -50,31 +56,54 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         
         await SendAsync(new LogoutRequest());
         HttpClient.Dispose();
-
-        if (_dbContext != null)
-        {
-            await _dbContext.DisposeAsync();
-            _dbContext = null;
-        }
     }
 
     /// <summary>
     /// Enumerates the default seed data common to all tests.
     /// </summary>
-    protected virtual IEnumerable<object> EnumerateDefaultSeedData()
+    protected virtual IEnumerable<object> EnumerateInitialSeedData()
     {
         yield return TestData.Lab;
+        
         yield return TestData.AdminUser;
+        yield return new Membership
+        {
+            LaboratoryId = TestData.Lab.Id,
+            MemberId = TestData.AdminUser.Id,
+            MembershipType = LaboratoryMembershipType.Admin
+        };
+        
         yield return TestData.ManagerUser;
+        yield return new Membership
+        {
+            LaboratoryId = TestData.Lab.Id,
+            MemberId = TestData.ManagerUser.Id,
+            MembershipType = LaboratoryMembershipType.Manager
+        };
+        
         yield return TestData.AnalystUser;
+        yield return new Membership
+        {
+            LaboratoryId = TestData.Lab.Id,
+            MemberId = TestData.AnalystUser.Id,
+            MembershipType = LaboratoryMembershipType.Analyst
+        };
+        
         yield return TestData.MemberUser;
+        yield return new Membership
+        {
+            LaboratoryId = TestData.Lab.Id,
+            MemberId = TestData.MemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Member
+        };
+        
         yield return TestData.NonMemberUser;
     }
     
     /// <summary>
     /// Enumerates the additional seed data for a specific class of tests.
     /// </summary>
-    protected virtual IEnumerable<object> EnumerateCustomSeedData()
+    protected virtual IEnumerable<object> EnumerateReseedData()
     {
         yield break;
     }
@@ -156,13 +185,25 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         return HttpClient.SendAsync(request, AbortTest);
     }
 
+    private async Task CreateCheckpoint(params Table[] tablesToInclude)
+    {
+        var options = new RespawnerOptions
+        {
+            TablesToIgnore = ["__EFMigrationsHistory"],
+            TablesToInclude = tablesToInclude
+        };
+
+        _respawnCheckpoint = await Respawner.CreateAsync(fixture.ConnectionString, options);
+    }
+
     protected async Task ResetDatabase()
     {
-        await fixture.ResetDatabase();
-
-        var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
-        await AddDataAsync(seedData.Distinct().ToArray());
+        if (_respawnCheckpoint is null)
+            throw new InvalidOperationException("The respawn checkpoint has not been set.");
         
-        fixture.ShouldResetDatabase = false;
+        await _respawnCheckpoint.ResetAsync(fixture.ConnectionString);
+        await fixture.ApplySeedData(GetAllSeedData());
     }
+
+    private object[] GetAllSeedData() => EnumerateInitialSeedData().Concat(EnumerateReseedData()).Distinct().ToArray();
 }

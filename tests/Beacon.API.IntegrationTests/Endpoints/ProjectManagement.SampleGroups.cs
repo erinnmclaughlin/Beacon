@@ -22,7 +22,7 @@ public sealed class ProjectManagementSampleGroups(TestFixture fixture) : Integra
         SampleName = "Default Sample Group"
     };
 
-    protected override IEnumerable<object> EnumerateCustomSeedData()
+    protected override IEnumerable<object> EnumerateReseedData()
     {
         var project = DefaultProject;
         project.SampleGroups.Add(DefaultSampleGroup);

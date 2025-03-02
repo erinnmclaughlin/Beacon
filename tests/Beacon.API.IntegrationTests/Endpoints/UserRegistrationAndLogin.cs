@@ -10,7 +10,7 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 public sealed class UserRegistrationAndLogin(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     // Note this is overriding the DEFAULT seed data, so we are not adding the other test users:
-    protected override IEnumerable<object> EnumerateDefaultSeedData()
+    protected override IEnumerable<object> EnumerateInitialSeedData()
     {
         yield return TestData.AdminUser;
         yield return TestData.Lab;

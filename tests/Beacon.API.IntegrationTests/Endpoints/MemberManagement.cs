@@ -67,8 +67,8 @@ public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture
             .Select(x => x.MembershipType)
             .SingleAsync(AbortTest));
         
-        // Reset the database because we messed with stuff:
-        ShouldResetDatabase = true;
+        // Reset
+        await ResetDatabase();
     }
     
     [Fact(DisplayName = "[170] Update membership type endpoint returns 403 when user is not authorized")]
@@ -159,7 +159,7 @@ public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture
     {
         // Historic analysts are users who have acted as analysts in the past, or currently have the analyst role (or higher).
         // Manually add a project with non-analyst user to the database:
-        await AddDataAsync(new Project
+        var oldProject = new Project
         {
             Id = Guid.NewGuid(),
             LaboratoryId = TestData.Lab.Id,
@@ -169,7 +169,8 @@ public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture
             CreatedOn = new DateTime(2020, 1, 1),
             ProjectStatus = ProjectStatus.Completed,
             LeadAnalystId = TestData.MemberUser.Id
-        });
+        };
+        await AddDataAsync(oldProject);
         
         // Log in as someone that has permission to view lab information:
         await LogInToDefaultLab(TestData.MemberUser);
@@ -192,8 +193,9 @@ public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture
         // This user is not currently an analyst, but they did act as one in the past, so they should be included:
         Assert.Contains(members, m => m.Id == TestData.MemberUser.Id);
 
-        // Reset the database because we messed with stuff:
-        ShouldResetDatabase = true;
+        // Remove the old project:
+        DbContext.Projects.Remove(oldProject);
+        await DbContext.SaveChangesAsync(AbortTest);
     }
     
     [Fact(DisplayName = "[275] Get analysts fails when user is not authorized")]

@@ -3,6 +3,7 @@ using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects.Contacts;
+using MediatR;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
@@ -22,7 +23,7 @@ public sealed class ProjectManagementContacts(TestFixture fixture) : Integration
         email: "test@test.com"
     );
     
-    protected override IEnumerable<object> EnumerateCustomSeedData()
+    protected override IEnumerable<object> EnumerateReseedData()
     {
         var project = DefaultProject;
         project.Contacts.Add(DefaultProjectContact);
@@ -145,7 +146,7 @@ public sealed class ProjectManagementContacts(TestFixture fixture) : Integration
         Assert.Equal("800-588-2300", updatedContact?.PhoneNumber);
 
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
     
     [Fact(DisplayName = "[013] Cannot update project contact with empty name")]
@@ -220,7 +221,7 @@ public sealed class ProjectManagementContacts(TestFixture fixture) : Integration
         Assert.Null(await GetDefaultProjectContact());
         
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[013] Unauthorized users cannot delete project contacts")]

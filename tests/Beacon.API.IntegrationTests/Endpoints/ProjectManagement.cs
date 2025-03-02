@@ -23,7 +23,7 @@ public sealed class ProjectManagement(TestFixture fixture) : IntegrationTestBase
         LeadAnalystId = null
     };
     
-    protected override IEnumerable<object> EnumerateCustomSeedData()
+    protected override IEnumerable<object> EnumerateReseedData()
     {
         yield return DefaultProject;
     }

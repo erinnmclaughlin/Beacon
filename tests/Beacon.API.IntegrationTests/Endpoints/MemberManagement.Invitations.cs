@@ -14,23 +14,27 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
     private static User InvitedUser => TestData.NonMemberUser;
     
     /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateCustomSeedData()
+    protected override IEnumerable<object> EnumerateReseedData()
     {
+        var invitation = new Invitation
+        {
+            ExpireAfterDays = 10,
+            NewMemberEmailAddress = InvitedUser.EmailAddress,
+            CreatedById = TestData.AdminUser.Id,
+            CreatedOn = DateTime.UtcNow,
+            MembershipType = LaboratoryMembershipType.Analyst,
+            LaboratoryId = TestData.Lab.Id,
+        };
+        
+        yield return invitation;
+        
         yield return new InvitationEmail
         {
             Id = EmailInvitationId,
             ExpiresOn = DateTime.UtcNow.AddDays(10),
             LaboratoryId = TestData.Lab.Id,
-            SentOn = DateTime.UtcNow,
-            LaboratoryInvitation = new Invitation
-            {
-                ExpireAfterDays = 10,
-                NewMemberEmailAddress = InvitedUser.EmailAddress,
-                CreatedById = TestData.AdminUser.Id,
-                CreatedOn = DateTime.UtcNow,
-                MembershipType = LaboratoryMembershipType.Analyst,
-                LaboratoryId = TestData.Lab.Id,
-            }
+            LaboratoryInvitationId = invitation.Id,
+            SentOn = DateTime.UtcNow
         };
     }
     
@@ -143,7 +147,7 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
             .SingleOrDefaultAsync(AbortTest));
         
         // We messed with stuff, so reset the db:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
     
     [Fact(DisplayName = "[003] Accept invitation endpoint returns 403 when current user email does not match email invitation")]
@@ -209,7 +213,7 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
             .SingleOrDefaultAsync(AbortTest));
         
         // We messed with stuff, so reset the db:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
     
     private async Task<InvitationEmail?> GetEmailInvitationAsync(string email) => await DbContext.InvitationEmails

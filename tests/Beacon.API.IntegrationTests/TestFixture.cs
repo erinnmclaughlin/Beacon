@@ -1,26 +1,18 @@
 ﻿using Beacon.API.Persistence;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Respawn;
 
 namespace Beacon.API.IntegrationTests;
 
 public sealed class TestFixture(ContainerFixture container) : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    public ContainerFixture Container { get; } = container;
+    private BeaconDbContext? _dbContext;
     
-    private Respawner? Checkpoint { get; set; }
-
-    private string? _databaseName;
-    public string DatabaseName => _databaseName ??= $"Beacon_{Guid.NewGuid()}";
-    public string ConnectionString => Container.GetConnectionString(DatabaseName);
-
-    /// <summary>
-    /// When <see langword="true"/>, the database will be reset to the most recent checkpoint.
-    /// </summary>
-    public bool ShouldResetDatabase { get; set; } = true;
+    public string ConnectionString => container.GetConnectionString();
+    public BeaconDbContext DbContext => _dbContext ??= CreateDbContext();
     
+    public bool IsSeeded { get; private set; }
+
     protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.ConfigureServices(services =>
     {
         services.ReplaceWithTestDatabase(ConnectionString);
@@ -29,35 +21,26 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
 
     public async ValueTask InitializeAsync()
     {
-        using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        await dbContext.Database.MigrateAsync();
-
-        var currentTestClass = TestContext.Current.TestClass?.TestClassSimpleName ?? nameof(TestFixture);
-        var options = TestContext.Current.KeyValueStorage.GetValueOrDefault(currentTestClass) as RespawnerOptions;
-        options ??= new RespawnerOptions { TablesToIgnore = ["_EFMigrationsHistory"], WithReseed = true };
-        
-        Checkpoint = await Respawner.CreateAsync(ConnectionString, options);
+        await DbContext.Database.MigrateAsync();
     }
     
     public override async ValueTask DisposeAsync()
     {
-        using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        await dbContext.Database.EnsureDeletedAsync();
+        await DbContext.Database.EnsureDeletedAsync();
+        await DbContext.DisposeAsync();
         
         await base.DisposeAsync();
     }
-    
-    /// <summary>
-    /// Clears all data from the database.
-    /// </summary>
-    public async Task ResetDatabase()
+
+    public async Task ApplySeedData(object[] seedData)
     {
-        await Checkpoint!.ResetAsync(ConnectionString);
+        DbContext.AddRange(seedData);
+        await DbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        IsSeeded = true;
+        DbContext.ChangeTracker.Clear();
     }
 
-    public BeaconDbContext CreateDbContext()
+    private BeaconDbContext CreateDbContext()
     {
         var options = new DbContextOptionsBuilder<BeaconDbContext>().UseSqlServer(ConnectionString).Options;
         return new BeaconDbContext(options, null!);
