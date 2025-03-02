@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints;
 
 [Trait("Category", "User Registration & Login")]
-public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTestBase(fixture)
+public sealed class UserRegistrationAndLoginEndpointTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateSeedData()
@@ -46,9 +46,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
 
     [Fact(DisplayName = "[001] Creating a new account fails when email is already in use")]
@@ -64,9 +61,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
 
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Login succeeds when request is valid")]
@@ -78,9 +72,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
         Assert.True(response.Headers.Contains("Set-Cookie"));
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Login fails when required information is missing")]
@@ -92,9 +83,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.False(response.Headers.Contains("Set-Cookie"));
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Login fails when user does not exist")]
@@ -110,9 +98,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.False(response.Headers.Contains("Set-Cookie"));
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Login fails when password is incorrect")]
@@ -128,9 +113,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
         Assert.False(response.Headers.Contains("Set-Cookie"));
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Get current user returns 401 if user is not logged in")]
@@ -141,9 +123,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
 
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Get current user returns logged in user")]
@@ -161,9 +140,6 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         Assert.NotNull(session);
         Assert.Equal(TestData.AdminUser.Id, session.CurrentUser.Id);
         Assert.Equal(TestData.AdminUser.DisplayName, session.CurrentUser.DisplayName);
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
     
     [Fact(DisplayName = "[008] Logged in user can successfully log out")]
@@ -182,8 +158,5 @@ public class UserRegistrationAndLoginTests(TestFixture fixture) : IntegrationTes
         // Verify that I can no longer get the current session context:
         getSessionResponse = await HttpClient.SendAsync(new GetSessionContextRequest());
         Assert.Equal(HttpStatusCode.Unauthorized, getSessionResponse.StatusCode);
-        
-        // We didn't modify any data in the db, so don't bother resetting:
-        ShouldResetDatabase = false;
     }
 }

@@ -1,8 +1,8 @@
 ﻿using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
-using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
+using Beacon.Common.Requests.Laboratories;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
@@ -23,7 +23,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// The service scope that the test is currently running in.
     /// </summary>
     protected IServiceScope Scope { get; } = fixture.Services.CreateScope();
-    
+
     /// <summary>
     /// When <see langword="true"/>, the database will be reset to the checkpoint defined in the <see cref="fixture"/>.
     /// Seed data defined in <see cref="EnumerateSeedData"/> will be re-applied after the database is reset.
@@ -38,7 +38,10 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     public virtual async Task InitializeAsync()
     {
         if (ShouldResetDatabase)
+        {
             await fixture.ResetDatabase(EnumerateSeedData().ToArray());
+            ShouldResetDatabase = false;
+        }
     }
 
     /// <inheritdoc />
@@ -66,5 +69,27 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     {
         EmailAddress = user.EmailAddress,
         Password = $"!!{user.DisplayName.ToLower()}"
+    });
+
+    /// <summary>
+    /// Log in as a specified user and set the current lab to <see cref="TestData.Lab"/>.
+    /// </summary>
+    /// <param name="user">The user to log in as.</param>
+    protected async Task LoginAndSetCurrentLab(User user)
+    {
+        var loginResponse = await LoginAs(user);
+        loginResponse.EnsureSuccessStatusCode();
+        
+        var setCurrentLabResponse = await SetCurrentLab(TestData.Lab.Id);
+        setCurrentLabResponse.EnsureSuccessStatusCode();
+    }
+
+    /// <summary>
+    /// Sets the laboratory that requests will be scoped to.
+    /// </summary>
+    /// <param name="labId">The ID of the lab, or null.</param>
+    protected Task<HttpResponseMessage> SetCurrentLab(Guid? labId) => HttpClient.SendAsync(new SetCurrentLaboratoryRequest
+    {
+        LaboratoryId = labId
     });
 }

@@ -19,8 +19,17 @@ internal sealed class SetCurrentLaboratoryHandler(ISessionContext context, Beaco
             .Where(m => m.LaboratoryId == request.LaboratoryId && m.MemberId == _context.UserId)
             .Select(m => new SessionContext
             {
-                CurrentUser = new() { Id = m.Member.Id, DisplayName = m.Member.DisplayName },
-                CurrentLab = new() { Id = m.Laboratory.Id, Name = m.Laboratory.Name, MembershipType = m.MembershipType }
+                CurrentUser = new CurrentUser
+                {
+                    Id = m.Member.Id,
+                    DisplayName = m.Member.DisplayName
+                },
+                CurrentLab = new CurrentLab
+                {
+                    Id = m.Laboratory.Id,
+                    Name = m.Laboratory.Name, 
+                    MembershipType = m.MembershipType
+                }
             })
             .IgnoreQueryFilters()
             .SingleOrDefaultAsync(ct);

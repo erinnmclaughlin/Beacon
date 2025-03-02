@@ -17,7 +17,7 @@ public interface IBeaconRequest<in TRequest> : IBeaconRequest where TRequest : I
     public static virtual string GetName()
     {
         var name = typeof(TRequest).Name.Replace("Request", "");
-        return name[0..1].ToLower() + name[1..];
+        return name[..1].ToLower() + name[1..];
     }
 }
 

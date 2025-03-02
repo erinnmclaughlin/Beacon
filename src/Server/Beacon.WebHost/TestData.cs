@@ -12,7 +12,10 @@ public static class TestData
         DisplayName = "Admin",
         EmailAddress = "admin@test.test",
         HashedPassword = Hash("!!admin", out var salt),
-        HashedPasswordSalt = salt
+        HashedPasswordSalt = salt,
+        Memberships = [
+            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Admin }
+        ]
     };
 
     public static User ManagerUser => new()
@@ -21,7 +24,10 @@ public static class TestData
         DisplayName = "Manager",
         EmailAddress = "manager@test.test",
         HashedPassword = Hash("!!manager", out var salt),
-        HashedPasswordSalt = salt
+        HashedPasswordSalt = salt,
+        Memberships = [
+            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Manager }
+        ]
     };
     
     public static User AnalystUser => new()
@@ -30,7 +36,10 @@ public static class TestData
         DisplayName = "Analyst",
         EmailAddress = "analyst@test.test",
         HashedPassword = Hash("!!analyst", out var salt),
-        HashedPasswordSalt = salt
+        HashedPasswordSalt = salt,
+        Memberships = [
+            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Analyst }
+        ]
     };
 
     public static User MemberUser => new()
@@ -39,7 +48,10 @@ public static class TestData
         DisplayName = "Member",
         EmailAddress = "member@test.test",
         HashedPassword = Hash("!!member", out var salt),
-        HashedPasswordSalt = salt
+        HashedPasswordSalt = salt,
+        Memberships = [
+            new Membership { LaboratoryId = Lab.Id, MembershipType = LaboratoryMembershipType.Member }
+        ]
     };
 
     public static User NonMemberUser => new()
@@ -51,23 +63,11 @@ public static class TestData
         HashedPasswordSalt = salt
     };
 
-    public static Laboratory Lab
+    public static Laboratory Lab => new()
     {
-        get
-        {
-            var lab = new Laboratory
-            {
-                Id = Guid.Parse("0fa24c7c-eefb-4909-809d-4b14f0f6f247"),
-                Name = "Test Lab"
-            };
-
-            lab.AddMember(AdminUser.Id, LaboratoryMembershipType.Admin);
-            lab.AddMember(ManagerUser.Id, LaboratoryMembershipType.Manager);
-            lab.AddMember(AnalystUser.Id, LaboratoryMembershipType.Analyst);
-            lab.AddMember(MemberUser.Id, LaboratoryMembershipType.Member);
-            return lab;
-        }
-    }
+        Id = Guid.Parse("0fa24c7c-eefb-4909-809d-4b14f0f6f247"),
+        Name = "Test Lab"
+    };
 
     private static readonly PasswordHasher PasswordHasher = new();
     private static string Hash(string password, out byte[] salt)
