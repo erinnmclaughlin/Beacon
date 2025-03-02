@@ -10,14 +10,6 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 [Trait("Category", "Laboratory Management")]
 public sealed class LaboratoryManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
-    /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateSeedData()
-    {
-        yield return TestData.ManagerUser;
-        yield return TestData.MemberUser;
-        yield return TestData.NonMemberUser;
-    }
-    
     [Fact(DisplayName = "[002] Create lab succeeds when request is valid")]
     public async Task CreateLab_ShouldSucceed_WhenRequestIsValid()
     {

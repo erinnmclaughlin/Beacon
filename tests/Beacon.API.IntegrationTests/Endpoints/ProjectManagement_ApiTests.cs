@@ -23,12 +23,8 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         LeadAnalystId = null
     };
     
-    protected override IEnumerable<object> EnumerateSeedData()
+    protected override IEnumerable<object> EnumerateCustomSeedData()
     {
-        yield return TestData.AdminUser;
-        yield return TestData.ManagerUser;
-        yield return TestData.AnalystUser;
-        yield return TestData.MemberUser;
         yield return DefaultProject;
     }
     
@@ -288,7 +284,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         var response = await HttpClient.SendAsync(new GetProjectByProjectCodeRequest { ProjectCode = DefaultProject.ProjectCode });
         
         // Verify that this fails:
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
     
     [Fact(DisplayName = "[193] Authorized users can get project details by project id")]
@@ -323,7 +319,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         var response = await HttpClient.SendAsync(new GetProjectByIdRequest { ProjectId = DefaultProject.Id });
         
         // Verify that this fails:
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
 
     [Fact(DisplayName = "[193] Lab projects are filtered by current laboratory")]
@@ -388,14 +384,14 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         var response = await HttpClient.SendAsync(new GetProjectsRequest());
         
         // Verify that this fails:
-        Assert.Equal(HttpStatusCode.Unauthorized, response.StatusCode);
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
     }
     
     [Fact(DisplayName = "[275] Pagination is applied to project search")]
     public async Task PaginationIsApplied()
     {
         // add an extra project to the default lab
-        await AddSeedDataAsync(new Project
+        await AddDataAsync(new Project
         {
             Id = Guid.NewGuid(),
             LaboratoryId = TestData.Lab.Id,

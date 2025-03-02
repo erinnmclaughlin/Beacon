@@ -10,10 +10,11 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 [Trait("Category", "User Registration & Login")]
 public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
-    /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateSeedData()
+    // Note this is overriding the DEFAULT seed data, so we are not adding the other test users:
+    protected override IEnumerable<object> EnumerateDefaultSeedData()
     {
         yield return TestData.AdminUser;
+        yield return TestData.Lab;
     }
 
     [Fact(DisplayName = "[001] Creating a new account succeeds when request is valid")]

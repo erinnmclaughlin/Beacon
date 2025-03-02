@@ -10,16 +10,6 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 [Trait("Category", "Member Management")]
 public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
-    /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateSeedData()
-    {
-        yield return TestData.AdminUser;
-        yield return TestData.ManagerUser;
-        yield return TestData.AnalystUser;
-        yield return TestData.MemberUser;
-        yield return TestData.NonMemberUser;
-    }
-    
     [Fact(DisplayName = "[170] Get memberships endpoint returns list of lab members when user is authorized")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {

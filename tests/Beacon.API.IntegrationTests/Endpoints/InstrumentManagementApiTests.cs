@@ -11,12 +11,8 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 public sealed class InstrumentManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateSeedData()
+    protected override IEnumerable<object> EnumerateCustomSeedData()
     {
-        yield return TestData.AdminUser;
-        yield return TestData.AnalystUser;
-        yield return TestData.MemberUser;
-        yield return TestData.NonMemberUser;
         yield return new LaboratoryInstrument
         {
             SerialNumber = "555",

@@ -27,7 +27,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
 
     /// <summary>
     /// When <see langword="true"/>, the database will be reset to the checkpoint defined in the <see cref="fixture"/>.
-    /// Seed data defined in <see cref="EnumerateSeedData"/> will be re-applied after the database is reset.
+    /// Seed data defined in <see cref="EnumerateCustomSeedData"/> will be re-applied after the database is reset.
     /// </summary>
     protected bool ShouldResetDatabase
     {
@@ -41,24 +41,37 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         if (ShouldResetDatabase)
         {
             await fixture.ResetDatabase();
-            await AddSeedDataAsync(EnumerateSeedData().Append(TestData.Lab).ToArray());
+
+            var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
+            await AddDataAsync(seedData.Distinct().ToArray());
             ShouldResetDatabase = false;
         }
     }
 
     /// <inheritdoc />
-    public virtual Task DisposeAsync()
+    public virtual async Task DisposeAsync()
     {
+        await HttpClient.SendAsync(new LogoutRequest());
+        
         HttpClient.Dispose(); 
         Scope.Dispose();
-        return Task.CompletedTask;
+    }
+
+    protected virtual IEnumerable<object> EnumerateDefaultSeedData()
+    {
+        yield return TestData.Lab;
+        yield return TestData.AdminUser;
+        yield return TestData.ManagerUser;
+        yield return TestData.AnalystUser;
+        yield return TestData.MemberUser;
+        yield return TestData.NonMemberUser;
     }
     
     /// <summary>
     /// Defines the seed data to add to the database whenever it's reset.
     /// </summary>
     /// <returns>An <see cref="IEnumerable{T}"/> of data to add to the database.</returns>
-    protected virtual IEnumerable<object> EnumerateSeedData()
+    protected virtual IEnumerable<object> EnumerateCustomSeedData()
     {
         yield break;
     }
@@ -67,7 +80,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// Adds the specified <paramref name="data"/> to the database.
     /// </summary>
     /// <param name="data">The data to add.</param>
-    protected async Task AddSeedDataAsync(params object[] data)
+    protected async Task AddDataAsync(params object[] data)
     {
         DbContext.AddRange(data);
         await DbContext.SaveChangesAsync();
@@ -90,15 +103,11 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// Log in as a specific user.
     /// </summary>
     /// <param name="user">The user to log in as.</param>
-    protected async Task<HttpResponseMessage> LoginAs(User user)
+    protected Task<HttpResponseMessage> LoginAs(User user) => HttpClient.SendAsync(new LoginRequest
     {
-        await HttpClient.SendAsync(new LogoutRequest());
-        return await HttpClient.SendAsync(new LoginRequest
-        {
-            EmailAddress = user.EmailAddress,
-            Password = $"!!{user.DisplayName.ToLower()}"
-        });
-    }
+        EmailAddress = user.EmailAddress,
+        Password = $"!!{user.DisplayName.ToLower()}"
+    });
 
     /// <summary>
     /// Log in as a specified user and set the current lab to <see cref="TestData.Lab"/>.
@@ -106,11 +115,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// <param name="user">The user to log in as.</param>
     protected async Task LogInToDefaultLab(User user)
     {
-        var loginResponse = await LoginAs(user);
-        loginResponse.EnsureSuccessStatusCode();
-        
-        var setCurrentLabResponse = await SetCurrentLab(TestData.Lab.Id);
-        setCurrentLabResponse.EnsureSuccessStatusCode();
+        await LogInToLab(user, TestData.Lab.Id);
     }
 
     /// <summary>

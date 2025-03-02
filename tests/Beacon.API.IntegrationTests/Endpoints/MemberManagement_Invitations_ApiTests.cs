@@ -15,14 +15,8 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
     private static User InvitedUser => TestData.NonMemberUser;
     
     /// <inheritdoc />
-    protected override IEnumerable<object> EnumerateSeedData()
+    protected override IEnumerable<object> EnumerateCustomSeedData()
     {
-        yield return TestData.AdminUser;
-        yield return TestData.ManagerUser;
-        yield return TestData.AnalystUser;
-        yield return TestData.MemberUser;
-        yield return InvitedUser; // aka TestData.NonMemberUser
-        
         yield return new InvitationEmail
         {
             Id = EmailInvitationId,
