@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "Instrument Management")]
-public sealed class InstrumentManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] Instrument Management")]
+public sealed class InstrumentManagement(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateCustomSeedData()

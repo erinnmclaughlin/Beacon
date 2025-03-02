@@ -32,19 +32,20 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
         using var scope = Services.CreateScope();
         var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
         await dbContext.Database.MigrateAsync();
+
+        var currentTestClass = TestContext.Current.TestClass?.TestClassSimpleName ?? nameof(TestFixture);
+        var options = TestContext.Current.KeyValueStorage.GetValueOrDefault(currentTestClass) as RespawnerOptions;
+        options ??= new RespawnerOptions { TablesToIgnore = ["_EFMigrationsHistory"], WithReseed = true };
         
-        Checkpoint = await Respawner.CreateAsync(ConnectionString, new RespawnerOptions
-        {
-            TablesToIgnore = [
-                "_EFMigrationsHistory"
-            ],
-            WithReseed = true
-        });
+        Checkpoint = await Respawner.CreateAsync(ConnectionString, options);
     }
     
     public override async ValueTask DisposeAsync()
     {
-        ShouldResetDatabase = true;
+        using var scope = Services.CreateScope();
+        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        await dbContext.Database.EnsureDeletedAsync();
+        
         await base.DisposeAsync();
     }
     

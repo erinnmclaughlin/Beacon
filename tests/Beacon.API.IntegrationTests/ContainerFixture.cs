@@ -12,7 +12,7 @@ public sealed class ContainerFixture : IAsyncLifetime
 
     public async ValueTask InitializeAsync()
     {
-        await Container.StartAsync();
+        await Container.StartAsync(TestContext.Current.CancellationToken);
     }
 
     public async ValueTask DisposeAsync()

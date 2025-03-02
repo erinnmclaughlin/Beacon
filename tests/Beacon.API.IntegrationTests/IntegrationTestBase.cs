@@ -39,11 +39,7 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     {
         if (ShouldResetDatabase)
         {
-            await fixture.ResetDatabase();
-
-            var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
-            await AddDataAsync(seedData.Distinct().ToArray());
-            fixture.ShouldResetDatabase = false;
+            await ResetDatabase();
         }
     }
 
@@ -158,5 +154,15 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
     {
         return HttpClient.SendAsync(request, AbortTest);
+    }
+
+    protected async Task ResetDatabase()
+    {
+        await fixture.ResetDatabase();
+
+        var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
+        await AddDataAsync(seedData.Distinct().ToArray());
+        
+        fixture.ShouldResetDatabase = false;
     }
 }

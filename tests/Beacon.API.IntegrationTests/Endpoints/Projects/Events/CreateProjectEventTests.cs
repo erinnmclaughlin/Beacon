@@ -4,7 +4,6 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
-[Trait("Feature", "Project Events")]
 public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBase(fixture)
 {
     [Fact(DisplayName = "[113] Create project activity succeeds when request is valid")]

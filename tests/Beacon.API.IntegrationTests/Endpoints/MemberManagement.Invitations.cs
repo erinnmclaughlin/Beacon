@@ -7,9 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "Member Management - Invitations")]
-public class MemberManagementInvitationsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] Member Management")]
+public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Guid EmailInvitationId { get; } = new("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
     private static User InvitedUser => TestData.NonMemberUser;

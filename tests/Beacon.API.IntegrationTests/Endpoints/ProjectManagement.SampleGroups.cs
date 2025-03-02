@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "Project Management")]
-public sealed class ProjectManagementProjectSamplesApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] Project Management")]
+public sealed class ProjectManagementSampleGroups(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Project DefaultProject => CreateProject(
         id: new Guid("a2871dc3-8746-45ad-bfd8-87e503d397cd"), 

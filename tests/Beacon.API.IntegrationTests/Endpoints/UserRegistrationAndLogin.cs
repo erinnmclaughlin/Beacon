@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "User Registration & Login")]
-public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] User Registration & Login")]
+public sealed class UserRegistrationAndLogin(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     // Note this is overriding the DEFAULT seed data, so we are not adding the other test users:
     protected override IEnumerable<object> EnumerateDefaultSeedData()

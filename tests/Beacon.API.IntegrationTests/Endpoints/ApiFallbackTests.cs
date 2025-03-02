@@ -2,7 +2,7 @@
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
+[Trait("Category", "[Configuration]")]
 public sealed class ApiFallbackTests(WebApplicationFactory<Program> fixture) : IClassFixture<WebApplicationFactory<Program>>
 {
     [Fact]

@@ -8,9 +8,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "Project Management")]
-public sealed class ProjectManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] Project Management")]
+public sealed class ProjectManagement(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Project DefaultProject => new()
     {
@@ -115,7 +114,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(ProjectStatus.Completed, await GetDefaultProjectStatus());
 
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[005] Unauthorized users cannot complete laboratory projects")]
@@ -150,7 +149,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(ProjectStatus.Canceled, await GetDefaultProjectStatus());
 
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[005] Unauthorized users cannot cancel laboratory projects")]
@@ -189,7 +188,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Equal(TestData.AnalystUser.Id, await GetDefaultProjectAnalystId());
         
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[014] Cannot update lead analyst to an unauthorized user")]
@@ -359,7 +358,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         Assert.Contains(projects.Items, p => p.ProjectCode == otherLabProject.ProjectCode.ToString());
 
         // Reset the database:
-        ShouldResetDatabase = true;
+        await ResetDatabase();
     }
     
     [Fact(DisplayName = "[193] Unauthorized users cannot get lab projects")]

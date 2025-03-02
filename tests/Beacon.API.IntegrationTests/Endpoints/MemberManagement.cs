@@ -6,9 +6,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-[Trait("Category", "API")]
-[Trait("Category", "Member Management")]
-public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "[Feature] Member Management")]
+public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     [Fact(DisplayName = "[170] Get memberships endpoint returns list of lab members when user is authorized")]
     public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
