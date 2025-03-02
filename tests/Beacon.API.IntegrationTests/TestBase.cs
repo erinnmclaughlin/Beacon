@@ -26,14 +26,15 @@ public abstract class TestBase : IAsyncLifetime
         HttpClient = Fixture.CreateClient();
     }
 
-    public async Task InitializeAsync()
+    public async ValueTask InitializeAsync()
     {
-        await Fixture.ResetDatabase();
+        await Fixture.Container.ResetDatabase();
     }
 
-    public Task DisposeAsync()
+    public ValueTask DisposeAsync()
     {
-        return Task.CompletedTask;
+        GC.SuppressFinalize(this);
+        return ValueTask.CompletedTask;
     }
 
     protected virtual IEnumerable<object> EnumerateTestData()

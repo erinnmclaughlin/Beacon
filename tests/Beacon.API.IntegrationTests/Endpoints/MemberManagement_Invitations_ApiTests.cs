@@ -70,7 +70,7 @@ public class MemberManagementInvitationsApiTests(TestFixture fixture) : Integrat
         Assert.Equal(invitedMemberType, emailInvitation.LaboratoryInvitation.MembershipType);
         Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
 
-        // Technically added stuff to the db, but we don't expect this to affect with other tests, so to save on performance, don't reset:
+        // Technically added stuff to the db, but we don't expect this to affect other tests, so to save on performance, don't reset:
         // ShouldResetDatabase = true;
     }
     

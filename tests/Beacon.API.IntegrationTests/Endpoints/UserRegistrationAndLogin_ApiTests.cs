@@ -32,7 +32,7 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
         response.EnsureSuccessStatusCode();
 
         // Verify that the persisted information matches the request:
-        var user = await DbContext.Users.SingleAsync(x => x.EmailAddress == "newuser@website.com");
+        var user = await DbContext.Users.SingleAsync(x => x.EmailAddress == "newuser@website.com", TestContext.Current.CancellationToken);
         Assert.Equal("New User", user.DisplayName);
         Assert.True(new PasswordHasher().Verify("!!newuser", user.HashedPassword, user.HashedPasswordSalt));
     }

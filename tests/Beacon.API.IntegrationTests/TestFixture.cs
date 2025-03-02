@@ -1,75 +1,37 @@
-﻿using Beacon.API.Persistence;
-using Microsoft.AspNetCore.Hosting;
-using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
-using Respawn;
-using Testcontainers.MsSql;
+﻿using Microsoft.AspNetCore.Hosting;
 
 namespace Beacon.API.IntegrationTests;
 
-public sealed class TestFixture : WebApplicationFactory<Program>, IAsyncLifetime
+public sealed class TestFixture(ContainerFixture container) : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private readonly MsSqlContainer _container = new MsSqlBuilder().Build();
-    private readonly Dictionary<string, object?> _metaData = [];
+    public ContainerFixture Container { get; } = container;
     
-    private Respawner? Checkpoint { get; set; }
-    
-    private string? _connectionString;
-    private string ConnectionString => _connectionString ??= _container.GetConnectionString().Replace("master", $"Beacon-{Guid.NewGuid()}");
-
-    public object? this[string key]
+    /// <summary>
+    /// When <see langword="true"/>, the database will be reset to the most recent checkpoint.
+    /// </summary>
+    public bool ShouldResetDatabase
     {
-        get => _metaData.GetValueOrDefault(key);
-        set => _metaData[key] = value;
+        get => Container[nameof(ShouldResetDatabase)] is null or true;
+        set => Container[nameof(ShouldResetDatabase)] = value;
     }
     
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
         builder.ConfigureServices(services =>
         {
-            services.ReplaceWithTestDatabase(ConnectionString);
-            //services.UseMockedCurrentUser();
-            //services.UseMockedLabContext();
+            services.ReplaceWithTestDatabase(Container.GetConnectionString());
             services.UseFakeEmailService();
         });
     }
 
-    public async Task InitializeAsync()
+    public ValueTask InitializeAsync()
     {
-        await _container.StartAsync();
-
-        using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        await dbContext.Database.MigrateAsync();
-
-        Checkpoint = await Respawner.CreateAsync(ConnectionString, new RespawnerOptions
-        {
-            TablesToIgnore = [
-                "_EFMigrationsHistory"
-            ],
-            WithReseed = true
-        });
+        return ValueTask.CompletedTask;
     }
     
-    public new async Task DisposeAsync()
+    public override async ValueTask DisposeAsync()
     {
-        using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        await dbContext.Database.EnsureDeletedAsync();
-        
-        await _container.DisposeAsync();
+        ShouldResetDatabase = true;
         await base.DisposeAsync();
-    }
-
-    /// <summary>
-    /// Clears all data from the database.
-    /// </summary>
-    public async Task ResetDatabase()
-    {
-        await Checkpoint!.ResetAsync(ConnectionString);
-        
-        using var scope = Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-        await dbContext.SaveChangesAsync();
     }
 }

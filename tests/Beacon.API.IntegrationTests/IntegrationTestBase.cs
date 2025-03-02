@@ -4,56 +4,50 @@ using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
-using Microsoft.Extensions.DependencyInjection;
 
-namespace Beacon.API.IntegrationTests.Endpoints;
+namespace Beacon.API.IntegrationTests;
 
+[Collection(nameof(ContainerFixtureCollection))]
 public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime, IClassFixture<TestFixture>
 {
     /// <summary>
     /// A reference to the <see cref="BeaconDbContext"/> in the current test scope.
     /// </summary>
-    protected BeaconDbContext DbContext => Scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-    
+    protected BeaconDbContext DbContext => fixture.Container.DbContext;
+
     /// <summary>
     /// An <see cref="HttpClient"/> instance configured to call the web API.
     /// </summary>
     protected HttpClient HttpClient { get; } = fixture.CreateClient();
     
-    /// <summary>
-    /// The service scope that the test is currently running in.
-    /// </summary>
-    protected IServiceScope Scope { get; } = fixture.Services.CreateScope();
-
-    /// <summary>
-    /// When <see langword="true"/>, the database will be reset to the checkpoint defined in the <see cref="fixture"/>.
-    /// Seed data defined in <see cref="EnumerateCustomSeedData"/> will be re-applied after the database is reset.
-    /// </summary>
-    protected bool ShouldResetDatabase
+    /// <inheritdoc cref="TestFixture.ShouldResetDatabase"/>
+    public bool ShouldResetDatabase
     {
-        get => fixture[nameof(ShouldResetDatabase)] is null or true;
-        set => fixture[nameof(ShouldResetDatabase)] = value;
+        get => fixture.ShouldResetDatabase;
+        set => fixture.ShouldResetDatabase = value;
     }
     
     /// <inheritdoc />
-    public virtual async Task InitializeAsync()
+    public virtual async ValueTask InitializeAsync()
     {
-        if (ShouldResetDatabase)
+        DbContext.ChangeTracker.Clear();
+        
+        if (fixture.ShouldResetDatabase)
         {
-            await fixture.ResetDatabase();
+            await fixture.Container.ResetDatabase();
 
             var seedData = EnumerateDefaultSeedData().Concat(EnumerateCustomSeedData());
             await AddDataAsync(seedData.Distinct().ToArray());
-            ShouldResetDatabase = false;
+            fixture.ShouldResetDatabase = false;
         }
     }
 
     /// <inheritdoc />
-    public virtual async Task DisposeAsync()
+    public virtual async ValueTask DisposeAsync()
     {
+        GC.SuppressFinalize(this);
         await HttpClient.SendAsync(new LogoutRequest());
-        HttpClient.Dispose(); 
-        Scope.Dispose();
+        HttpClient.Dispose();
     }
 
     /// <summary>
