@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints;
 
 [Trait("Category", "Laboratory Management")]
-public sealed class LaboratoryManagementEndpointTests(TestFixture fixture) : IntegrationTestBase(fixture)
+public sealed class LaboratoryManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateSeedData()
