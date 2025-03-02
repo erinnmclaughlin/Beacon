@@ -19,23 +19,21 @@ public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : Inte
     [Fact(DisplayName = "[001] Creating a new account succeeds when request is valid")]
     public async Task Register_SucceedsWhenRequestIsValid()
     {
-        var request = new RegisterRequest
+        // Attempt to register a valid new user:
+        var response = await HttpClient.SendAsync(new RegisterRequest
         {
             EmailAddress = "newuser@website.com",
             Password = "!!newuser",
             DisplayName = "New User"
-        };
-        
-        // Attempt to register a valid new user:
-        var response = await HttpClient.SendAsync(request);
+        });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
         // Verify that the persisted information matches the request:
-        var user = await DbContext.Users.SingleAsync(x => x.EmailAddress == request.EmailAddress);
-        Assert.Equal(request.DisplayName, user.DisplayName);
-        Assert.True(new PasswordHasher().Verify(request.Password, user.HashedPassword, user.HashedPasswordSalt));
+        var user = await DbContext.Users.SingleAsync(x => x.EmailAddress == "newuser@website.com");
+        Assert.Equal("New User", user.DisplayName);
+        Assert.True(new PasswordHasher().Verify("!!newuser", user.HashedPassword, user.HashedPasswordSalt));
     }
     
     [Fact(DisplayName = "[001] Creating a new account fails when required info isn't entered")]

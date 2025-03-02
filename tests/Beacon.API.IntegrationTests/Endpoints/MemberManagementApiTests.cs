@@ -1,10 +1,7 @@
-﻿using System.Net.Http.Json;
-using Beacon.API.IntegrationTests.Fakes;
+using System.Net.Http.Json;
 using Beacon.API.Persistence.Entities;
-using Beacon.API.Services;
 using Beacon.Common;
 using Beacon.Common.Models;
-using Beacon.Common.Requests.Invitations;
 using Beacon.Common.Requests.Memberships;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,17 +10,6 @@ namespace Beacon.API.IntegrationTests.Endpoints;
 [Trait("Category", "Member Management")]
 public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
-    private static Guid EmailInvitationId { get; } = new("de50d415-3fea-44dc-ab95-e05b86e6bfdc");
-    private static User InvitedUser => TestData.NonMemberUser;
-    private static User UninvitedUser => new()
-    {
-        Id = new Guid("6511db25-672c-4aed-84f3-c36aaa65e717"),
-        DisplayName = "Somebody",
-        EmailAddress = "idk@place.net",
-        HashedPassword = new PasswordHasher().Hash("!!somebody", out var salt),
-        HashedPasswordSalt = salt
-    };
-    
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateSeedData()
     {
@@ -31,213 +17,207 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
         yield return TestData.ManagerUser;
         yield return TestData.AnalystUser;
         yield return TestData.MemberUser;
-        yield return InvitedUser;
-        yield return UninvitedUser;
-        
-        yield return new InvitationEmail
-        {
-            Id = EmailInvitationId,
-            ExpiresOn = DateTime.UtcNow.AddDays(10),
-            LaboratoryId = TestData.Lab.Id,
-            SentOn = DateTime.UtcNow,
-            LaboratoryInvitation = new Invitation
-            {
-                ExpireAfterDays = 10,
-                NewMemberEmailAddress = InvitedUser.EmailAddress,
-                CreatedById = TestData.AdminUser.Id,
-                CreatedOn = DateTime.UtcNow,
-                MembershipType = LaboratoryMembershipType.Analyst,
-                LaboratoryId = TestData.Lab.Id,
-            }
-        };
+        yield return TestData.NonMemberUser;
     }
     
-    [Fact]
-    public async Task SucceedsWhenRequestIsValid_ExcludeHistoricAnalysts()
+    [Fact(DisplayName = "[170] Get memberships endpoint returns list of lab members when user is authorized")]
+    public async Task GetMemberships_ReturnsExpectedResult_WhenUserIsMember()
     {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
-        
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
-        Assert.NotNull(members);
-        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
-        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
-        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
-        Assert.DoesNotContain(members, m => m.Id == TestData.MemberUser.Id);
-    }
-    
-    [Fact]
-    public async Task FailsWhenUserIsNotAuthorized()
-    {
-        await LoginAs(TestData.NonMemberUser);
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest());
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-    }
-
-    [Fact]
-    public async Task SucceedsWhenRequestIsValid_IncludeHistoricAnalysts()
-    {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
-        
-        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-
-        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
-        Assert.NotNull(members);
-        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
-        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
-        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
-        Assert.DoesNotContain(members, m => m.Id == TestData.MemberUser.Id);
-    }
-
-    
-    [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
-    public async Task InvitingUserSucceedsWhenRequestIsValid()
-    {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
-
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
-        {
-            NewMemberEmailAddress = "tom.nook@crannies.org",
-            MembershipType = LaboratoryMembershipType.Manager
-        });
-
-        response.EnsureSuccessStatusCode();
-
-        var emailInvitation = await GetEmailInvitationAsync("tom.nook@crannies.org");
-        Assert.NotNull(emailInvitation);
-        Assert.Equal(FakeEmailSendOperation.OperationId, emailInvitation.OperationId);
-        Assert.Equal(TestData.AdminUser.Id, emailInvitation.LaboratoryInvitation.CreatedById);
-        Assert.Equal(LaboratoryMembershipType.Manager, emailInvitation.LaboratoryInvitation.MembershipType);
-        Assert.Null(emailInvitation.LaboratoryInvitation.AcceptedById);
-
-        ShouldResetDatabase = true;
-    }
-    
-    [Fact(DisplayName = "[003] Invite new user endpoint returns 422 when request is not valid")]
-    public async Task InvitingUserFailsWhenRequestIsInvalid()
-    {
-        await LoginAndSetCurrentLab(TestData.AdminUser);
-
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
-        {
-            NewMemberEmailAddress = TestData.MemberUser.EmailAddress, // user already exists
-            MembershipType = LaboratoryMembershipType.Manager
-        });
-        
-        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-        Assert.Null(await GetEmailInvitationAsync(TestData.MemberUser.EmailAddress));
-    }
-    
-    [Fact(DisplayName = "[003] Invite new user endpoint returns 403 when user is not authorized")]
-    public async Task InvitingUserFailsWhenRequestIsUnauthorized()
-    {
+        // Log in as someone that has permission to view lab information:
         await LoginAndSetCurrentLab(TestData.MemberUser);
 
-        var response = await HttpClient.SendAsync(new CreateEmailInvitationRequest
-        {
-            NewMemberEmailAddress = "jax@mia.com",
-            MembershipType = LaboratoryMembershipType.Manager
-        });
-        
-        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
-        Assert.Null(await GetEmailInvitationAsync("jax@mia.com"));
+        // Attempt to view the list of memberships:
+        var response = await HttpClient.SendAsync(new GetMembershipsRequest());
+       
+        // Verify that this succeeds:
+        response.EnsureSuccessStatusCode();
+
+        // Verify that the response content contains the expected information about the members:
+        var memberships = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        Assert.NotNull(memberships);
+        Assert.Contains(memberships, m => m.Id == TestData.AdminUser.Id && m.MembershipType == LaboratoryMembershipType.Admin);
+        Assert.Contains(memberships, m => m.Id == TestData.ManagerUser.Id && m.MembershipType == LaboratoryMembershipType.Manager);
+        Assert.Contains(memberships, m => m.Id == TestData.AnalystUser.Id && m.MembershipType == LaboratoryMembershipType.Analyst);
+        Assert.Contains(memberships, m => m.Id == TestData.MemberUser.Id && m.MembershipType == LaboratoryMembershipType.Member);
+        Assert.DoesNotContain(memberships, m => m.Id == TestData.NonMemberUser.Id);
     }
-
-    [Fact(DisplayName = "[003] Accept invitation succeeds when request is valid")]
-    public async Task AcceptInvitation_ShouldSucceed_WhenRequestIsValid()
+    
+    [Fact(DisplayName = "[170] Get memberships endpoint returns 403 when user is not authorized")]
+    public async Task GetMemberships_FailsWhenUserIsNotAMember()
     {
-        // Log in as the invited user:
-        await LoginAs(InvitedUser);
+        // Log in as someone that does NOT have permission to view lab information:
+        await LoginAs(TestData.NonMemberUser);
 
-        // Attempt to accept the invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
+        // Attempt to view the list of memberships:
+        var response = await HttpClient.SendAsync(new GetMembershipsRequest());
+        
+        // Verify that this fails:
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+    
+    [Fact(DisplayName = "[170] Update membership type succeeds when user is authorized")]
+    public async Task UpdateMembershipType_Succeeds_WhenUserIsAuthorized()
+    {
+        // Log in as someone that has permission to update memberships:
+        await LoginAndSetCurrentLab(TestData.ManagerUser);
+
+        // Attempt to update the current lab analyst to a manager:
+        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
         {
-            EmailInvitationId = EmailInvitationId
+            MemberId = TestData.MemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Manager
         });
         
         // Verify that this succeeds:
         response.EnsureSuccessStatusCode();
 
-        // Verify that the invitation was accepted by the invited user:
-        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
-        Assert.Equal(InvitedUser.Id, invitation?.LaboratoryInvitation.AcceptedById);
-
-        // Verify that the invited user is now a member of the lab, with the expected membership type:
-        Assert.Equal(LaboratoryMembershipType.Analyst, await DbContext.Memberships
+        // Verify that the persisted information matches the request:
+        Assert.Equal(LaboratoryMembershipType.Manager, await DbContext.Memberships
             .IgnoreQueryFilters()
-            .Where(x => x.LaboratoryId == TestData.Lab.Id && x.MemberId == InvitedUser.Id)
+            .Where(x => x.MemberId == TestData.MemberUser.Id && x.LaboratoryId == TestData.Lab.Id)
             .Select(x => x.MembershipType)
-            .SingleOrDefaultAsync());
+            .SingleAsync());
         
-        // We messed with stuff, so reset the db:
+        // Reset the database because we messed with stuff:
         ShouldResetDatabase = true;
     }
     
-    [Fact(DisplayName = "[003] Accept invitation endpoint returns 403 when current user email does not match email invitation")]
-    public async Task AcceptInvitation_ShouldFail_WhenRequestIsUnauthorized()
+    [Fact(DisplayName = "[170] Update membership type endpoint returns 403 when user is not authorized")]
+    public async Task UpdateMembership_ShouldFail_WhenUserIsBasicUser()
     {
-        // Log in as an uninvited user:
-        await LoginAs(UninvitedUser);
+        // Log in as someone that does NOT have permission to update memberships:
+        await LoginAndSetCurrentLab(TestData.AnalystUser);
 
-        // Attempt to accept the invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
+        // Attempt to update the current lab analyst to a manager:
+        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
         {
-            EmailInvitationId = EmailInvitationId
+            MemberId = TestData.MemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Analyst
         });
-
+        
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
         
-        // Verify that the invitation is still unaccepted:
-        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
-        Assert.Null(invitation?.LaboratoryInvitation.AcceptedById);
-        
-        // Verify that both the invited and uninvited users are not members of the lab:
-        Assert.Equal(0, await DbContext.Memberships
+        // Verify that the user's membership type did not change:
+        Assert.Equal(LaboratoryMembershipType.Member, await DbContext.Memberships
             .IgnoreQueryFilters()
-            .Where(x => x.LaboratoryId == TestData.Lab.Id)
-            .Where(x => x.MemberId == InvitedUser.Id || x.MemberId == UninvitedUser.Id)
-            .CountAsync());
+            .Where(x => x.MemberId == TestData.MemberUser.Id && x.LaboratoryId == TestData.Lab.Id)
+            .Select(x => x.MembershipType)
+            .SingleAsync());
     }
     
-    [Fact(DisplayName = "[003] Accept invitation endpoint returns 422 when invitation has expired")]
-    public async Task AcceptInvitation_ShouldFail_WhenInvitationIsExpired()
+    [Fact(DisplayName = "[170] Update membership type endpoint returns 422 when member does not exist")]
+    public async Task UpdateMembership_ShouldFail_WhenUserIsNotAMember()
     {
-        // update the invite to be expired
-        await DbContext.InvitationEmails.IgnoreQueryFilters()
-            .Where(x => x.Id == EmailInvitationId)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.ExpiresOn, DateTime.UtcNow.AddDays(-1)));
+        // Log in as someone that has permission to update memberships:
+        await LoginAndSetCurrentLab(TestData.ManagerUser);
         
-        // Log in as the invited user:
-        await LoginAs(InvitedUser);
-
-        // Attempt to accept the expired invitation:
-        var response = await HttpClient.SendAsync(new AcceptEmailInvitationRequest
+        // Attempt to update a user that is not a member of the current lab:
+        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
         {
-            EmailInvitationId = EmailInvitationId
+            MemberId = TestData.NonMemberUser.Id,
+            MembershipType = LaboratoryMembershipType.Analyst
         });
         
         // Verify that this fails:
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
-
-        // Verify that the invitation is still unaccepted:
-        var invitation = await GetEmailInvitationAsync(InvitedUser.EmailAddress);
-        Assert.Null(invitation?.LaboratoryInvitation.AcceptedById);
-        
-        // Verify that the invited user was NOT added to the lab:
-        Assert.Null(await DbContext.Memberships
-            .IgnoreQueryFilters()
-            .Where(x => x.LaboratoryId == TestData.Lab.Id && x.MemberId == InvitedUser.Id)
-            .SingleOrDefaultAsync());
     }
     
-    private async Task<InvitationEmail?> GetEmailInvitationAsync(string email) => await DbContext.InvitationEmails
-        .IgnoreQueryFilters()
-        .Include(x => x.LaboratoryInvitation)
-        .Where(x => x.LaboratoryId == TestData.Lab.Id)
-        .AsNoTracking()
-        .SingleOrDefaultAsync(x => x.LaboratoryInvitation.NewMemberEmailAddress == email);
+    [Fact(DisplayName = "[170] Update membership type endpoint returns 422 when user is not a member of the lab")]
+    public async Task UpdateMembership_ShouldFail_WhenUserDoesNotExist()
+    {
+        // Log in as someone that has permission to update memberships:
+        await LoginAndSetCurrentLab(TestData.ManagerUser);
+        
+        // Attempt to update a non-existent user:
+        var response = await HttpClient.SendAsync(new UpdateMembershipRequest
+        {
+            MemberId = Guid.NewGuid(),
+            MembershipType = LaboratoryMembershipType.Analyst
+        });
+        
+        // Verify that this fails:
+        Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
+    }
+    
+    [Fact(DisplayName = "[275] Get analysts succeeds when request is valid")]
+    public async Task SucceedsWhenRequestIsValid_ExcludeHistoricAnalysts()
+    {
+        // Log in as someone that has permission to view lab information:
+        await LoginAndSetCurrentLab(TestData.MemberUser);
+        
+        // Attempt to get a list of analysts for the current lab:
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
+        
+        // Verify that this succeeds:
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify that the response contains the expected members:
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        Assert.NotNull(members);
+        
+        // All of these users can act as analysts, so they should be included:
+        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
+        
+        // This user is not an analyst, so they should not be included:
+        Assert.DoesNotContain(members, m => m.Id == TestData.MemberUser.Id);
+    }
+    
+    [Fact(DisplayName = "[275] Get analysts includes historic analysts when requested")]
+    public async Task SucceedsWhenRequestIsValid_IncludeHistoricAnalysts()
+    {
+        // Historic analysts are users who have acted as analysts in the past, or currently have the analyst role (or higher).
+        // Manually add a project with non-analyst user to the database:
+        DbContext.Projects.Add(new Project
+        {
+            Id = Guid.NewGuid(),
+            LaboratoryId = TestData.Lab.Id,
+            CustomerName = "Old Customer",
+            ProjectCode = new ProjectCode("OLD", "200101", 1),
+            CreatedById = TestData.AdminUser.Id,
+            CreatedOn = new DateTime(2020, 1, 1),
+            ProjectStatus = ProjectStatus.Completed,
+            LeadAnalystId = TestData.MemberUser.Id
+        });
+        await DbContext.SaveChangesAsync();
+        
+        // Log in as someone that has permission to view lab information:
+        await LoginAndSetCurrentLab(TestData.MemberUser);
+        
+        // Attempt to get a list of analysts for the current lab, including historic analysts:
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
+        
+        // Verify that this succeeds:
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        // Verify that the response contains the expected members:
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        Assert.NotNull(members);
+        
+        // All of these users can act as analysts, so they should be included:
+        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
+        
+        // This user is not currently an analyst, but they did act as one in the past, so they should be included:
+        Assert.Contains(members, m => m.Id == TestData.MemberUser.Id);
+
+        // Reset the database because we messed with stuff:
+        ShouldResetDatabase = true;
+    }
+    
+    [Fact(DisplayName = "[275] Get analysts fails when user is not authorized")]
+    public async Task FailsWhenUserIsNotAuthorized()
+    {
+        // Login as someone that does NOT have permission to view lab information:
+        await LoginAs(TestData.NonMemberUser);
+        
+        // Attempt to view the list of analysts:
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest());
+        
+        // Verify that this fails:
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
 }
