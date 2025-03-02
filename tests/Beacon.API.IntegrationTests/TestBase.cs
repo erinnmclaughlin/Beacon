@@ -104,12 +104,6 @@ public abstract class TestBase : IAsyncLifetime
 
     private async Task ResetDatabase()
     {
-        await Fixture.ResetDatabase();
-
-        using var scope = Fixture.Services.CreateScope();
-        var dbContext = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
-
-        dbContext.AddRange(EnumerateTestData());
-        await dbContext.SaveChangesAsync();
+        await Fixture.ResetDatabase(EnumerateTestData().ToArray());
     }
 }

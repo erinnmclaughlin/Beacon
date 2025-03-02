@@ -69,9 +69,9 @@ public static class TestData
         }
     }
 
-    private static readonly PasswordHasher _passwordHasher = new();
+    private static readonly PasswordHasher PasswordHasher = new();
     private static string Hash(string password, out byte[] salt)
     {
-        return _passwordHasher.Hash(password, out salt);
+        return PasswordHasher.Hash(password, out salt);
     }
 }
