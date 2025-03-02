@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 namespace Beacon.API.IntegrationTests.Endpoints;
 
 [Trait("Category", "User Registration & Login")]
-public sealed class UserRegistrationAndLoginEndpointTests(TestFixture fixture) : IntegrationTestBase(fixture)
+public sealed class UserRegistrationAndLoginApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     /// <inheritdoc />
     protected override IEnumerable<object> EnumerateSeedData()
@@ -30,7 +30,7 @@ public sealed class UserRegistrationAndLoginEndpointTests(TestFixture fixture) :
         var response = await HttpClient.SendAsync(request);
         
         // Verify that this succeeds:
-        Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
+        response.EnsureSuccessStatusCode();
 
         // Verify that the persisted information matches the request:
         var user = await DbContext.Users.SingleAsync(x => x.EmailAddress == request.EmailAddress);
