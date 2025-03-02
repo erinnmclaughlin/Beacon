@@ -1,9 +1,11 @@
-﻿using Beacon.API.IntegrationTests.Fakes;
+﻿using System.Net.Http.Json;
+using Beacon.API.IntegrationTests.Fakes;
 using Beacon.API.Persistence.Entities;
 using Beacon.API.Services;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Invitations;
+using Beacon.Common.Requests.Memberships;
 using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
@@ -26,6 +28,8 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
     protected override IEnumerable<object> EnumerateSeedData()
     {
         yield return TestData.AdminUser;
+        yield return TestData.ManagerUser;
+        yield return TestData.AnalystUser;
         yield return TestData.MemberUser;
         yield return InvitedUser;
         yield return UninvitedUser;
@@ -47,6 +51,47 @@ public class MemberManagementApiTests(TestFixture fixture) : IntegrationTestBase
             }
         };
     }
+    
+    [Fact]
+    public async Task SucceedsWhenRequestIsValid_ExcludeHistoricAnalysts()
+    {
+        await LoginAndSetCurrentLab(TestData.AdminUser);
+        
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = false });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        Assert.NotNull(members);
+        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
+        Assert.DoesNotContain(members, m => m.Id == TestData.MemberUser.Id);
+    }
+    
+    [Fact]
+    public async Task FailsWhenUserIsNotAuthorized()
+    {
+        await LoginAs(TestData.NonMemberUser);
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest());
+        Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
+    }
+
+    [Fact]
+    public async Task SucceedsWhenRequestIsValid_IncludeHistoricAnalysts()
+    {
+        await LoginAndSetCurrentLab(TestData.AdminUser);
+        
+        var response = await HttpClient.SendAsync(new GetAnalystsRequest { IncludeHistoricAnalysts = true });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var members = await response.Content.ReadFromJsonAsync<LaboratoryMemberDto[]>();
+        Assert.NotNull(members);
+        Assert.Contains(members, m => m.Id == TestData.AdminUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.ManagerUser.Id);
+        Assert.Contains(members, m => m.Id == TestData.AnalystUser.Id);
+        Assert.DoesNotContain(members, m => m.Id == TestData.MemberUser.Id);
+    }
+
     
     [Fact(DisplayName = "[003] Inviting a new user succeeds when request is valid")]
     public async Task InvitingUserSucceedsWhenRequestIsValid()
