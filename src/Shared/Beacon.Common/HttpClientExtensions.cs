@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Requests;
+﻿using System.Net.Http.Json;
+using Beacon.Common.Requests;
 
 namespace Beacon.Common;
 
@@ -15,4 +16,14 @@ public static class HttpClientExtensions
         BeaconRequest<TRequest, TResponse> request)
         where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
         => TRequest.SendAsync(httpClient, request as TRequest ?? new TRequest());
+
+    public static async Task<TResponse?> GetFromJsonAsync<TRequest, TResponse>(
+        this HttpClient httpClient,
+        BeaconRequest<TRequest, TResponse> request)
+        where TRequest : BeaconRequest<TRequest, TResponse>, IBeaconRequest<TRequest>, new()
+    {
+        var response = await httpClient.SendAsync(request);
+        response.EnsureSuccessStatusCode();
+        return await response.Content.ReadFromJsonAsync<TResponse>();
+    }
 }

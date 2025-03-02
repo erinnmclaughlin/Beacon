@@ -15,7 +15,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
     {
         Id = new Guid("a2871dc3-8746-45ad-bfd8-87e503d397cd"),
         CustomerName = "ABC Company",
-        ProjectCode = new ProjectCode("ABC", "200101", 1),
+        ProjectCode = new ProjectCode("ABC", "202001", 1),
         ProjectStatus = ProjectStatus.Active,
         CreatedById = TestData.AdminUser.Id,
         CreatedOn = new DateTime(2020, 01, 01),
@@ -337,8 +337,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         };
         otherLab.AddAdmin(TestData.AdminUser);
         otherLab.Projects.Add(otherLabProject);
-        DbContext.Add(otherLab);
-        await DbContext.SaveChangesAsync();
+        await AddDataAsync(otherLab);
         
         // Log in to the default lab:
         await LogInToDefaultLab(TestData.AdminUser);
@@ -353,7 +352,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         var projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
         Assert.NotNull(projects);
         Assert.Contains(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
-        Assert.DoesNotContain(projects.Items, p => p.ProjectCode == otherLab.Projects[0].ProjectCode.ToString());
+        Assert.DoesNotContain(projects.Items, p => p.ProjectCode == otherLabProject.ProjectCode.ToString());
         
         // Switch to the other lab:
         await SetCurrentLab(otherLab.Id);
@@ -368,7 +367,7 @@ public sealed class ProjectManagementApiTests(TestFixture fixture) : Integration
         projects = await response.Content.ReadFromJsonAsync<PagedList<ProjectDto>>();
         Assert.NotNull(projects);
         Assert.DoesNotContain(projects.Items, p => p.ProjectCode == DefaultProject.ProjectCode.ToString());
-        Assert.Contains(projects.Items, p => p.ProjectCode == otherLab.Projects[0].ProjectCode.ToString());
+        Assert.Contains(projects.Items, p => p.ProjectCode == otherLabProject.ProjectCode.ToString());
 
         // Reset the database:
         ShouldResetDatabase = true;

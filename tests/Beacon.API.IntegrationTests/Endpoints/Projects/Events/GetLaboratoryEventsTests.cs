@@ -3,7 +3,7 @@ using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Laboratories;
 
-namespace Beacon.API.IntegrationTests.Endpoints.Projects;
+namespace Beacon.API.IntegrationTests.Endpoints.Projects.Events;
 
 [Trait("Feature", "Project Events")]
 public sealed class GetLaboratoryEventsTests(TestFixture fixture) : ProjectTestBase(fixture)
