@@ -7,7 +7,8 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
-public class ProjectManagementProjectContactsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
+[Trait("Category", "Project Management - Contacts")]
+public sealed class ProjectManagementProjectContactsApiTests(TestFixture fixture) : IntegrationTestBase(fixture)
 {
     private static Project DefaultProject => CreateProject(
         id: new Guid("a2871dc3-8746-45ad-bfd8-87e503d397cd"), 
@@ -36,7 +37,7 @@ public class ProjectManagementProjectContactsApiTests(TestFixture fixture) : Int
         await AddDataAsync(CreateProject("Some Other Project", "SOP-202001-001", otherContact));
         
         // Log in as a user that has permission to get project contacts:
-        await LogInToDefaultLab(TestData.AdminUser);
+        await LogInToDefaultLab(TestData.MemberUser);
 
         // Attempt to get contacts for the default project:
         var response = await HttpClient.SendAsync(new GetProjectContactsRequest { ProjectId = DefaultProject.Id });

@@ -52,11 +52,13 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     public virtual async Task DisposeAsync()
     {
         await HttpClient.SendAsync(new LogoutRequest());
-        
         HttpClient.Dispose(); 
         Scope.Dispose();
     }
 
+    /// <summary>
+    /// Enumerates the default seed data common to all tests.
+    /// </summary>
     protected virtual IEnumerable<object> EnumerateDefaultSeedData()
     {
         yield return TestData.Lab;
@@ -68,9 +70,8 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     }
     
     /// <summary>
-    /// Defines the seed data to add to the database whenever it's reset.
+    /// Enumerates the additional seed data for a specific class of tests.
     /// </summary>
-    /// <returns>An <see cref="IEnumerable{T}"/> of data to add to the database.</returns>
     protected virtual IEnumerable<object> EnumerateCustomSeedData()
     {
         yield break;
