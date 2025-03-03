@@ -35,7 +35,7 @@ jobs:
     - name: Build API
       run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
     - name: Test API with coverage
-      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/ /p:ExcludeByFile="**/Migrations/*.cs"
     
     # Blazor Tests
     - name: Restore Blazor dependencies
