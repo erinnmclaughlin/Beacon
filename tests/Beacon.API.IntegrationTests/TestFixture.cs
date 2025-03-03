@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,10 +7,7 @@ namespace Beacon.API.IntegrationTests;
 
 public sealed class TestFixture(ContainerFixture container) : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    private BeaconDbContext? _dbContext;
-    
     public string ConnectionString => container.GetConnectionString();
-    public BeaconDbContext DbContext => _dbContext ??= CreateDbContext();
     
     public bool IsSeeded { get; private set; }
 
@@ -21,28 +19,29 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
 
     public async ValueTask InitializeAsync()
     {
-        await DbContext.Database.MigrateAsync();
+        await using var dbContext = CreateDbContext(null!);
+        await dbContext.Database.MigrateAsync();
     }
     
     public override async ValueTask DisposeAsync()
     {
-        await DbContext.Database.EnsureDeletedAsync();
-        await DbContext.DisposeAsync();
+        await using var dbContext = CreateDbContext(null!);
+        await dbContext.Database.EnsureDeletedAsync();
         
         await base.DisposeAsync();
     }
 
     public async Task ApplySeedData(object[] seedData)
     {
-        DbContext.AddRange(seedData);
-        await DbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
+        await using var dbContext = CreateDbContext(null!);
+        dbContext.AddRange(seedData);
+        await dbContext.SaveChangesAsync(TestContext.Current.CancellationToken);
         IsSeeded = true;
-        DbContext.ChangeTracker.Clear();
     }
 
-    private BeaconDbContext CreateDbContext()
+    public BeaconDbContext CreateDbContext(ISessionContext context)
     {
         var options = new DbContextOptionsBuilder<BeaconDbContext>().UseSqlServer(ConnectionString).Options;
-        return new BeaconDbContext(options, null!);
+        return new BeaconDbContext(options, context);
     }
 }

@@ -9,10 +9,39 @@ public sealed class UnlinkInstrumentFromProjectEventTests(TestFixture fixture) :
     private Guid ProjectEventId { get; } = new("f9951855-2d00-486e-8f52-ca1b68beebaa");
     private Guid InstrumentId { get; } = new("4921dfd1-57e1-44b6-a3b1-49635bcccd44");
 
+    protected override IEnumerable<object> EnumerateReseedData()
+    {
+        foreach (var item in base.EnumerateReseedData())
+            yield return item;
+        
+        yield return new ProjectEvent
+        {
+            Id = ProjectEventId,
+            Title = "An Event",
+            ScheduledStart = DateTime.Now,
+            ScheduledEnd = DateTime.Now.AddMonths(1),
+            LaboratoryId = TestData.Lab.Id,
+            ProjectId = ProjectId
+        };
+        yield return new LaboratoryInstrument
+        {
+            Id = InstrumentId,
+            SerialNumber = "Any SN",
+            InstrumentType = "Any Instrument Type",
+            LaboratoryId = TestData.Lab.Id
+        };
+        yield return new LaboratoryInstrumentUsage
+        {
+            InstrumentId = InstrumentId,
+            LaboratoryId = TestData.Lab.Id,
+            ProjectEventId = ProjectEventId
+        };
+    }
+    
     [Fact(DisplayName = "[022] Unlink instrument from project event succeeds when request is valid.")]
     public async Task SucceedsWhenRequestIsValid()
     {
-        RunAsAnalyst();
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         var response = await SendAsync(new UnlinkInstrumentFromProjectEventRequest
         {
@@ -22,12 +51,14 @@ public sealed class UnlinkInstrumentFromProjectEventTests(TestFixture fixture) :
         
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
         Assert.False(await IsInstrumentLinked());
+        
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[022] Unlink instrument from project event fails when user is unauthorized.")]
     public async Task FailsWhenUserIsNotAuthorized()
     {
-        RunAsMember();
+        await LogInToDefaultLab(TestData.MemberUser);
 
         var response = await SendAsync(new UnlinkInstrumentFromProjectEventRequest
         {
@@ -42,7 +73,7 @@ public sealed class UnlinkInstrumentFromProjectEventTests(TestFixture fixture) :
     [Fact(DisplayName = "[022] Unlink instrument from project event fails when request is invalid.")]
     public async Task FailsWhenRequestIsInvalid()
     {
-        RunAsAdmin();
+        await LogInToDefaultLab(TestData.AdminUser);
 
         var response = await SendAsync(new UnlinkInstrumentFromProjectEventRequest
         {
@@ -54,34 +85,7 @@ public sealed class UnlinkInstrumentFromProjectEventTests(TestFixture fixture) :
         Assert.True(await IsInstrumentLinked());
     }
 
-    private Task<bool> IsInstrumentLinked() => ExecuteDbContextAsync(async db =>
-    {
-        var usage = db.Set<LaboratoryInstrumentUsage>();
-        return await usage.AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
-    });
-    
-    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Concat([
-        new ProjectEvent
-        {
-            Id = ProjectEventId,
-            Title = "An Event",
-            ScheduledStart = DateTime.Now,
-            ScheduledEnd = DateTime.Now.AddMonths(1),
-            LaboratoryId = TestData.Lab.Id,
-            ProjectId = ProjectId
-        },
-        new LaboratoryInstrument
-        {
-            Id = InstrumentId,
-            SerialNumber = "Any SN",
-            InstrumentType = "Any Instrument Type",
-            LaboratoryId = TestData.Lab.Id
-        },
-        new LaboratoryInstrumentUsage
-        {
-            InstrumentId = InstrumentId,
-            LaboratoryId = TestData.Lab.Id,
-            ProjectEventId = ProjectEventId
-        }
-    ]);
+    private Task<bool> IsInstrumentLinked() => DbContext.Set<LaboratoryInstrumentUsage>()
+        .IgnoreQueryFilters()
+        .AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
 }

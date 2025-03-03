@@ -12,7 +12,7 @@ public sealed class LinkInstrumentToProjectEventTests(TestFixture fixture) : Pro
     [Fact(DisplayName = "[022] Link instrument to project event succeeds when request is valid.")]
     public async Task SucceedsWhenRequestIsValid()
     {
-        RunAsAnalyst();
+        await LogInToDefaultLab(TestData.AnalystUser);
 
         var request = new LinkInstrumentToProjectEventRequest 
         {
@@ -25,12 +25,14 @@ public sealed class LinkInstrumentToProjectEventTests(TestFixture fixture) : Pro
 
         var isLinked = await IsInstrumentLinked();
         Assert.True(isLinked);
+
+        await ResetDatabase();
     }
 
     [Fact(DisplayName = "[022] Link instrument to project event fails when user is not authorized.")]
     public async Task FailsWhenUserIsNotAuthorized()
     {
-        RunAsMember();
+        await LogInToDefaultLab(TestData.MemberUser);
 
         var request = new LinkInstrumentToProjectEventRequest
         {
@@ -48,7 +50,7 @@ public sealed class LinkInstrumentToProjectEventTests(TestFixture fixture) : Pro
     [Fact(DisplayName = "[022] Link instrument to project event fails when request is invalid.")]
     public async Task FailsWhenRequestIsInvalid()
     {
-        RunAsAdmin();
+        await LogInToDefaultLab(TestData.AdminUser);
 
         var request = new LinkInstrumentToProjectEventRequest
         {
@@ -63,8 +65,12 @@ public sealed class LinkInstrumentToProjectEventTests(TestFixture fixture) : Pro
         Assert.False(isLinked);
     }
 
-    protected override IEnumerable<object> EnumerateTestData() => base.EnumerateTestData().Concat([
-        new ProjectEvent
+    protected override IEnumerable<object> EnumerateReseedData()
+    {
+        foreach (var item in base.EnumerateReseedData())
+            yield return item;
+        
+        yield return new ProjectEvent
         {
             Id = ProjectEventId,
             Title = "An Event",
@@ -72,19 +78,18 @@ public sealed class LinkInstrumentToProjectEventTests(TestFixture fixture) : Pro
             ScheduledEnd = DateTime.Now.AddMonths(1),
             LaboratoryId = TestData.Lab.Id,
             ProjectId = ProjectId
-        },
-        new LaboratoryInstrument
+        };
+        yield return new LaboratoryInstrument
         {
             Id = InstrumentId,
             SerialNumber = "Any SN",
             InstrumentType = "Any Instrument Type",
             LaboratoryId = TestData.Lab.Id
-        }
-    ]);
+        };
+    }
     
-    private Task<bool> IsInstrumentLinked() => ExecuteDbContextAsync(async db =>
-    {
-        var usage = db.Set<LaboratoryInstrumentUsage>();
-        return await usage.AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
-    });
+    private Task<bool> IsInstrumentLinked() => DbContext
+        .Set<LaboratoryInstrumentUsage>()
+        .IgnoreQueryFilters()
+        .AnyAsync(x => x.InstrumentId == InstrumentId && x.ProjectEventId == ProjectEventId);
 }

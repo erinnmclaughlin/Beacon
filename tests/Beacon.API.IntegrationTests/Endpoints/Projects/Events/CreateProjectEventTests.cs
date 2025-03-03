@@ -9,7 +9,7 @@ public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBa
     [Fact(DisplayName = "[113] Create project activity succeeds when request is valid")]
     public async Task CreateProjectEvent_Succeeds_WhenRequestIsValid()
     {
-        RunAsAdmin();
+        await LogInToDefaultLab(TestData.AdminUser);
 
         var validRequest = new CreateProjectEventRequest
         {
@@ -22,7 +22,7 @@ public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBa
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
 
-        var projectEvent = await GetProjectEventAsync();
+        var projectEvent = await GetProjectEventAsync("My Cool Event");
         Assert.NotNull(projectEvent);
         Assert.Equal(validRequest.Title, projectEvent.Title);
         Assert.Null(projectEvent.Description);
@@ -33,11 +33,11 @@ public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBa
     [Fact(DisplayName = "[113] Create project activity fails when user is not authorized")]
     public async Task CreateProjectEvent_Fails_WhenUserIsNotAuthorized()
     {
-        RunAsMember(); 
+        await LogInToDefaultLab(TestData.MemberUser); 
         
         var validRequest = new CreateProjectEventRequest
         {
-            Title = "My Cool Event",
+            Title = "My Un-Cool Event",
             ProjectId = ProjectId,
             ScheduledStart = DateTime.Now,
             ScheduledEnd = DateTime.Now.AddMonths(1)
@@ -46,18 +46,18 @@ public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBa
         var response = await SendAsync(validRequest);
         Assert.Equal(HttpStatusCode.Forbidden, response.StatusCode);
 
-        var projectEvent = await GetProjectEventAsync();
+        var projectEvent = await GetProjectEventAsync("My Un-Cool Event");
         Assert.Null(projectEvent);
     }
 
     [Fact(DisplayName = "[113] Create project activity fails when request is invalid")]
     public async Task CreateProjectEvent_Fails_WhenRequestIsInvalid()
     {
-        RunAsAdmin(); 
+        await LogInToDefaultLab(TestData.AdminUser); 
         
         var invalidRequest = new CreateProjectEventRequest
         {
-            Title = "My Cool Event",
+            Title = "My Un-Cool Event",
             ProjectId = ProjectId,
             ScheduledEnd = DateTime.Now,
             ScheduledStart = DateTime.Now.AddMonths(1) // start date is after end date
@@ -66,12 +66,12 @@ public sealed class CreateProjectEventTests(TestFixture fixture) : ProjectTestBa
         var response = await SendAsync(invalidRequest);
         Assert.Equal(HttpStatusCode.UnprocessableEntity, response.StatusCode);
 
-        var projectEvent = await GetProjectEventAsync();
+        var projectEvent = await GetProjectEventAsync("My Un-Cool Event");
         Assert.Null(projectEvent);
     }
 
-    private Task<ProjectEvent?> GetProjectEventAsync() => ExecuteDbContextAsync(async db =>
-    {
-        return await db.ProjectEvents.AsNoTracking().SingleOrDefaultAsync(x => x.ProjectId == ProjectId);
-    });
+    private Task<ProjectEvent?> GetProjectEventAsync(string name) => DbContext.ProjectEvents
+        .IgnoreQueryFilters()
+        .AsNoTracking()
+        .SingleOrDefaultAsync(x => x.ProjectId == ProjectId && x.Title == name);
 }

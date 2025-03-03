@@ -1,11 +1,14 @@
-﻿using Beacon.API.Persistence;
+﻿using System.Net.Http.Json;
+using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
+using Beacon.Common.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using Respawn.Graph;
 
@@ -19,11 +22,11 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// The cancellation token for the current test context.
     /// </summary>
     protected static CancellationToken AbortTest => TestContext.Current.CancellationToken;
-    
+
     /// <summary>
     /// A reference to the <see cref="BeaconDbContext"/> in the current test scope.
     /// </summary>
-    protected BeaconDbContext DbContext => fixture.DbContext;
+    protected BeaconDbContext DbContext { get; private set; } = null!;
 
     /// <summary>
     /// An <see cref="HttpClient"/> instance configured to call the web API.
@@ -33,6 +36,8 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// <inheritdoc />
     public virtual async ValueTask InitializeAsync()
     {
+        DbContext = fixture.CreateDbContext(null!);
+        
         if (!fixture.IsSeeded)
         {
             await fixture.ApplySeedData(GetAllSeedData());
@@ -56,8 +61,10 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         
         await SendAsync(new LogoutRequest());
         HttpClient.Dispose();
-    }
 
+        await DbContext.DisposeAsync();
+    }
+    
     /// <summary>
     /// Enumerates the default seed data common to all tests.
     /// </summary>
@@ -196,6 +203,14 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         _respawnCheckpoint = await Respawner.CreateAsync(fixture.ConnectionString, options);
     }
 
+    protected async Task<BeaconDbContext> CreateDbContext()
+    {
+        var getContextResponse = await SendAsync(new GetSessionContextRequest());
+        var context = await getContextResponse.Content.ReadFromJsonAsync<SessionContext>(AbortTest);
+
+        return fixture.CreateDbContext(context!);
+    }
+    
     protected async Task ResetDatabase()
     {
         if (_respawnCheckpoint is null)
