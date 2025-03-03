@@ -1,37 +1,18 @@
-﻿using Beacon.API.Features.Projects;
-using Beacon.API.Persistence;
+﻿using System.Net.Http.Json;
+using Beacon.API.Features.Projects;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
-using Beacon.Common.Services;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
 
-namespace Beacon.API.IntegrationTests.Endpoints.Projects;
+namespace Beacon.API.IntegrationTests.Endpoints;
 
-public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestBase(testFixture)
+[Trait("Category", "[Feature] Project Insights")]
+public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : IntegrationTestBase(testFixture)
 {
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected stats")]
     public async Task GetStatsReturnsExpectedResult()
     {
-        var sessionContext = new SessionContext
-        {
-            CurrentLab = new CurrentLab { Id = TestData.Lab.Id, MembershipType = LaboratoryMembershipType.Admin, Name = TestData.Lab.Name },
-            CurrentUser = null!
-        };
-
-        var fixture = Fixture.WithWebHostBuilder(builder =>
-        {
-            builder.ConfigureServices(services =>
-            {
-                services.RemoveAll<ISessionContext>();
-                services.AddScoped<ISessionContext>(_ => sessionContext);
-            });
-        });
-
-        using var scope = fixture.Services.CreateScope();
-
-        var db = scope.ServiceProvider.GetRequiredService<BeaconDbContext>();
+        await LogInToDefaultLab(TestData.MemberUser);
 
         var app1 = CreateApplication("Application 1",
             // Last year (Aug 2021 - Aug 2022)
@@ -52,10 +33,10 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         var app3 = CreateApplication("Application 3",
             new DateOnly(2023, 2, 1));
 
-        db.ProjectApplications.AddRange(app1, app2, app3);
-        await db.SaveChangesAsync();
+        await AddDataAsync(app1, app2, app3);
 
-        var sut = new GetProjectInsightsHandler(db);
+        await using var dbContext = await CreateDbContext();
+        var sut = new GetProjectInsightsHandler(dbContext);
         var result = await sut.GetStatistics(new DateTime(2023, 8, 1), CancellationToken.None);
 
         var app1Result = result.Single(x => x.ApplicationType == "Application 1");
@@ -63,7 +44,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Equal(2, app1Result.NumberOfProjectsCreatedThisYear);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected popularity insight when most popular application type has changed")]
     public void AddMostPopularApplicationTypeInsight_AddsToList_WhenMostPopularApplicationTypeHasChanged()
     {
         var stats = new List<ProjectApplicationPopularityStatistic>
@@ -87,8 +68,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Single(insights);
     }
 
-
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected popularity insight when most popular application type has NOT changed")]
     public void AddMostPopularApplicationTypeInsight_DoesNotAddToList_WhenMostPopularApplicationTypeHasNotChanged()
     {
         var stats = new List<ProjectApplicationPopularityStatistic>
@@ -112,7 +92,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Empty(insights);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected frequency insight when frequency has changed")]
     public void AddProjectFrequencyInsight_AddsToList_WhenFrequencyHasChanged()
     {
         var stats = new List<ProjectApplicationPopularityStatistic>
@@ -136,7 +116,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Single(insights);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected frequency insight when frequency has NOT changed")]
     public void AddProjectFrequencyInsight_DoesNotAddToList_WhenFrequencyHasNotChanged()
     {
         var stats = new List<ProjectApplicationPopularityStatistic>
@@ -160,7 +140,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Empty(insights);
     }
 
-    [Theory]
+    [Theory(DisplayName = "[???] GetInsightTypeFromPercentGrowth returns expected result")]
     [InlineData(-100, InsightType.SignificantDecrease)]
     [InlineData(-51, InsightType.SignificantDecrease)]
     [InlineData(-50, InsightType.SignificantDecrease)]
@@ -178,7 +158,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Equal(expected, actual);
     }
 
-    [Fact]
+    [Fact(DisplayName = "[???] Project Insights returns expected data summary")]
     public void DataSummary_ReturnsExpectedResult()
     {
         var data = new[] { 0, 0.5, 1, 1, 1, 13 };
@@ -189,9 +169,81 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         Assert.Equal(4.598, Math.Round(sut.StandardDeviation, 3));
     }
 
+    [Fact(DisplayName = "[???] Authorized users can get project type frequency grouped by month")]
+    public async Task GetProjectTypeFrequencyGroupsByMonth()
+    {
+        await LogInToDefaultLab(TestData.AdminUser);
+        
+        var otherLab = new Laboratory { Name = "Get Project Insights Lab" };
+        await AddDataAsync(otherLab);
+
+        await SetCurrentLab(otherLab.Id);
+        
+        await AddDataAsync( 
+            new ProjectApplication
+            {
+                Name = "Application 4",
+                TaggedProjects = [
+                    new ProjectApplicationTag
+                    {
+                        Project = new Project
+                        {
+                            Id = Guid.NewGuid(),
+                            CustomerName = "Test",
+                            ProjectCode = ProjectCode.FromString("TST-202301-001")!,
+                            CreatedById = TestData.AdminUser.Id,
+                            CreatedOn = new DateTime(2023, 1, 12)
+                        }
+                    }
+                ]
+            },
+            new ProjectApplication
+            {
+                Name = "Application 5",
+                TaggedProjects = [
+                    new ProjectApplicationTag
+                    {
+                        Project = new Project
+                        {
+                            Id = Guid.NewGuid(),
+                            CustomerName = "Test",
+                            ProjectCode = ProjectCode.FromString("TST-202302-001")!,
+                            CreatedById = TestData.AdminUser.Id,
+                            CreatedOn = new DateTime(2023, 2, 1)
+                        }
+                    },
+                    new ProjectApplicationTag
+                    {
+                        Project = new Project
+                        {
+                            Id = Guid.NewGuid(),
+                            CustomerName = "Test",
+                            ProjectCode = ProjectCode.FromString("TST-202302-002")!,
+                            CreatedById = TestData.AdminUser.Id,
+                            CreatedOn = new DateTime(2023, 2, 28)
+                        }
+                    }
+                ]
+            });
+        
+        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateTime(2023, 1, 1) });
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var data = await response.Content.ReadFromJsonAsync<GetProjectTypeFrequencyRequest.Series[]>(AbortTest);
+        Assert.NotNull(data);
+
+        var app1Data = data.Single(x => x.ProjectType == "Application 4");
+        Assert.Equal(1, app1Data.ProjectCountByDate[new DateOnly(2023, 1, 1)]);
+        Assert.Equal(0, app1Data.ProjectCountByDate[new DateOnly(2023, 2, 1)]);
+
+        var app2Data = data.Single(x => x.ProjectType == "Application 5");
+        Assert.Equal(0, app2Data.ProjectCountByDate[new DateOnly(2023, 1, 1)]);
+        Assert.Equal(2, app2Data.ProjectCountByDate[new DateOnly(2023, 2, 1)]);
+    }
+
     private static ProjectApplication CreateApplication(string name, params DateOnly[] dates)
     {
-        var application = new ProjectApplication { Name = name };
+        var application = new ProjectApplication { Name = name, LaboratoryId = TestData.Lab.Id };
 
         foreach (var date in dates.Distinct())
         {
@@ -200,7 +252,8 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
             {
                 application.TaggedProjects.Add(new ProjectApplicationTag
                 {
-                    Project = CreateProject(date, i + i)
+                    Project = CreateProject(date, i + i),
+                    LaboratoryId = TestData.Lab.Id
                 });
             }
         }
@@ -208,15 +261,13 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : TestB
         return application;
     }
 
-    private static Project CreateProject(DateOnly date, int index)
+    private static Project CreateProject(DateOnly date, int index) =>  new Project
     {
-        return new Project
-        {
-            Id = Guid.NewGuid(),
-            CustomerName = "Doesn't Matter",
-            ProjectCode = new ProjectCode("TST", date.ToString("yyyyMM"), index + 1),
-            CreatedById = TestData.AdminUser.Id,
-            CreatedOn = date.ToDateTime(TimeOnly.MinValue)
-        };
-    }
+        Id = Guid.NewGuid(),
+        CustomerName = "Doesn't Matter",
+        ProjectCode = new ProjectCode("TST", date.ToString("yyyyMM"), index + 1),
+        LaboratoryId = TestData.Lab.Id,
+        CreatedById = TestData.AdminUser.Id,
+        CreatedOn = date.ToDateTime(TimeOnly.MinValue)
+    };
 }

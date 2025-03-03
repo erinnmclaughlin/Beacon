@@ -9,12 +9,11 @@ public class CurrentLab
     public required string Name { get; init; }
     public required LaboratoryMembershipType MembershipType { get; init; }
 
-    public Claim[] GetClaims() => new[]
-    {
-        new Claim(BeaconClaimTypes.LabId, Id.ToString()),
-        new Claim(BeaconClaimTypes.LabName, Name.ToString()),
-        new Claim(BeaconClaimTypes.MembershipType, MembershipType.ToString())
-    };
+    public Claim[] GetClaims() => [
+        new(BeaconClaimTypes.LabId, Id.ToString()),
+        new(BeaconClaimTypes.LabName, Name),
+        new(BeaconClaimTypes.MembershipType, MembershipType.ToString())
+    ];
 
     public static CurrentLab? FromClaimsPrincipal(ClaimsPrincipal? user)
     {
@@ -24,7 +23,7 @@ public class CurrentLab
         var id = user.FindGuidValue(BeaconClaimTypes.LabId);
         var membershipType = user.FindEnumValue<LaboratoryMembershipType>(BeaconClaimTypes.MembershipType);
 
-        if (id == default || membershipType == null)
+        if (id == Guid.Empty || membershipType == null)
             return null;
 
         return new CurrentLab

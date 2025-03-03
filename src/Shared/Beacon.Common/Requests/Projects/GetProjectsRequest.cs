@@ -8,6 +8,6 @@ public sealed class GetProjectsRequest : BeaconRequest<GetProjectsRequest, Paged
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 20;
 
-    public List<ProjectStatus> IncludedStatuses { get; set; } = new();
-    public List<Guid> LeadAnalystIds { get; set; } = new();
+    public List<ProjectStatus> IncludedStatuses { get; set; } = [];
+    public List<Guid> LeadAnalystIds { get; set; } = [];
 }
