@@ -121,8 +121,18 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     /// <param name="data">The data to add.</param>
     protected async Task AddDataAsync(params object[] data)
     {
-        DbContext.AddRange(data);
-        await DbContext.SaveChangesAsync(AbortTest);
+        SessionContext context = null!;
+
+        try
+        {
+            var response = await SendAsync(new GetSessionContextRequest());
+            context = await response.Content.ReadFromJsonAsync<SessionContext>(AbortTest) ?? null!;
+        }
+        catch { }
+        
+        await using var dbContext = fixture.CreateDbContext(context);
+        dbContext.AddRange(data);
+        await dbContext.SaveChangesAsync(AbortTest);
     }
     
     /// <summary>
