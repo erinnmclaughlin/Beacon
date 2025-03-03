@@ -1,6 +1,4 @@
-﻿using Beacon.API;
-using Beacon.API.Extensions;
-using Microsoft.EntityFrameworkCore;
+﻿using Beacon.API.Extensions;
 
 namespace Beacon.WebHost;
 
@@ -8,10 +6,7 @@ public static class BeaconWebHost
 {
     public static WebApplication BuildBeaconApplication(this WebApplicationBuilder builder)
     {
-        builder.Services.AddBeaconApi(builder.Configuration, o =>
-        {
-            o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerDb"));
-        });
+        builder.AddBeaconApi();
 
         builder.Services.AddSwaggerGen();
 
