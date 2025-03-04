@@ -41,6 +41,8 @@ Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Storage", "Storage", "{67F3
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.StorageProviders.MsSqlServer", "src\Server\Beacon.StorageProviders.MsSqlServer\Beacon.StorageProviders.MsSqlServer.csproj", "{99A20D41-212C-4D47-949C-7A762E60C4CC}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Beacon.StorageProviders.Postgres", "src\Server\Beacon.StorageProviders.Postgres\Beacon.StorageProviders.Postgres.csproj", "{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -89,6 +91,10 @@ Global
 		{99A20D41-212C-4D47-949C-7A762E60C4CC}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{99A20D41-212C-4D47-949C-7A762E60C4CC}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{99A20D41-212C-4D47-949C-7A762E60C4CC}.Release|Any CPU.Build.0 = Release|Any CPU
+		{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -104,6 +110,7 @@ Global
 		{5308039E-952D-40B6-A5B1-9CD523DED437} = {532CBA62-82CF-4D77-96B9-B21A39D3F993}
 		{0B7E704B-B262-488D-9F0D-17A76B79AE97} = {838CD4C5-FF90-49A6-80C2-1F26F2E8E245}
 		{99A20D41-212C-4D47-949C-7A762E60C4CC} = {67F3C221-1993-4119-8EA4-D8914BABC861}
+		{D6916B7F-C7F7-401F-9D3B-ACDE4AD824B9} = {67F3C221-1993-4119-8EA4-D8914BABC861}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {5E1D1693-99AE-4EC0-89BA-3EA69BE684A4}

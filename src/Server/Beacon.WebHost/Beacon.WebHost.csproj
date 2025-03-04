@@ -21,6 +21,7 @@
     <ProjectReference Include="..\..\Client\BeaconUI.WebApp\BeaconUI.WebApp.csproj" />
     <ProjectReference Include="..\Beacon.API\Beacon.API.csproj" />
     <ProjectReference Include="..\Beacon.StorageProviders.MsSqlServer\Beacon.StorageProviders.MsSqlServer.csproj" />
+    <ProjectReference Include="..\Beacon.StorageProviders.Postgres\Beacon.StorageProviders.Postgres.csproj" />
   </ItemGroup>
 
 </Project>
