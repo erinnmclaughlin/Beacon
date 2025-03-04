@@ -48,7 +48,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-mssql
-        path: ./TestResults/
+        path: ./**/TestResults/
 
   test-postgres:
     runs-on: ubuntu-latest
@@ -81,7 +81,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-postgres
-        path: ./TestResults/
+        path: ./**/TestResults/
 
   test-blazor:
     runs-on: ubuntu-latest
@@ -112,7 +112,7 @@ jobs:
       uses: actions/upload-artifact@v4
       with:
         name: coverage-blazor
-        path: ./TestResults/
+        path: ./**/TestResults/
     
   generate-report:
     runs-on: ubuntu-latest
