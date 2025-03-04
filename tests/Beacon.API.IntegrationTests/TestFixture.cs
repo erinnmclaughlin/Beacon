@@ -2,6 +2,7 @@
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Beacon.API.IntegrationTests;
 
@@ -11,11 +12,22 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
     
     public bool IsSeeded { get; private set; }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.ConfigureServices(services =>
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        services.ReplaceWithTestDatabase(ConnectionString);
-        services.UseFakeEmailService();
-    });
+        var config = new ConfigurationBuilder()
+            .AddInMemoryCollection([
+                new KeyValuePair<string, string?>("StorageProvider", "MsSqlServer")
+            ])
+            .Build();
+
+        builder.UseConfiguration(config);
+
+        builder.ConfigureServices(services =>
+        {
+            services.ReplaceWithTestDatabase(ConnectionString);
+            services.UseFakeEmailService();
+        });
+    }
 
     public async ValueTask InitializeAsync()
     {
