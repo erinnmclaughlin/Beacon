@@ -41,7 +41,7 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
 
     public BeaconDbContext CreateDbContext(ISessionContext context)
     {
-        var options = new DbContextOptionsBuilder<BeaconDbContext>().UseSqlServer(ConnectionString).Options;
+        var options = BeaconMsSqlStorageProvider.BuildOptions(ConnectionString);
         return new BeaconDbContext(options, context);
     }
 }

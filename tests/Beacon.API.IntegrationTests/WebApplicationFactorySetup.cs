@@ -16,7 +16,7 @@ public static class WebApplicationFactorySetup
 
         services.AddDbContext<BeaconDbContext>(options =>
         {
-            options.UseSqlServer(connectionString?.Replace("master", "Beacon"));
+            options.UseSqlServer(connectionString, b => b.MigrationsAssembly(typeof(BeaconMsSqlStorageProvider).Assembly));
         });
     }
 

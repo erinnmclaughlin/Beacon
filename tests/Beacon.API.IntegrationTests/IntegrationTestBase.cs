@@ -8,7 +8,6 @@ using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.DependencyInjection;
 using Respawn;
 using Respawn.Graph;
 
