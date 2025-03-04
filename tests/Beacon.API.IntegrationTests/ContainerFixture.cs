@@ -8,7 +8,7 @@ namespace Beacon.API.IntegrationTests;
 
 public sealed class ContainerFixture : IAsyncLifetime
 {
-    public static string StorageProvider { get; } = WebHost.StorageProviders.Postgres;
+    public static string StorageProvider { get; } = Environment.GetEnvironmentVariable("BEACON_STORAGE_PROVIDER") ?? WebHost.StorageProviders.MsSqlServer;
 
     private IDatabaseContainer Container { get; }
     private static string DatabaseName => $"Beacon_{TestContext.Current.TestClass?.TestClassSimpleName ?? "Container"}";

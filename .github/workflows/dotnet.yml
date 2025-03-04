@@ -34,9 +34,14 @@ jobs:
       run: dotnet restore tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj
     - name: Build API
       run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
-    - name: Test API with coverage
+    - name: Test API with coverage (MsSqlServer)
       run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/ /p:ExcludeByFile="**/Migrations/*.cs"
-    
+      env:
+          BEACON_STORAGE_PROVIDER: MsSqlServer
+    - name: Test API with coverage (Postgres)
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput=./TestResults/ /p:ExcludeByFile="**/Migrations/*.cs"
+      env:
+          BEACON_STORAGE_PROVIDER: Postgres
     # Blazor Tests
     - name: Restore Blazor dependencies
       run: dotnet restore tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj
