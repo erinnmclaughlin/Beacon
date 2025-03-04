@@ -41,14 +41,13 @@ jobs:
     - name: Build API
       run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
     - name: Test API with coverage (MsSqlServer)
-      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="./TestResults/MsSqlServer/" /p:ExcludeByFile="**/Migrations/*.cs"
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"
       env:
           BEACON_STORAGE_PROVIDER: MsSqlServer
     - name: Upload coverage artifact
       uses: actions/upload-artifact@v4
       with:
         name: coverage-mssql
-        path: ./TestResults/MsSqlServer/
 
   test-postgres:
     runs-on: ubuntu-latest
@@ -74,14 +73,13 @@ jobs:
     - name: Build API
       run: dotnet build tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-restore
     - name: Test API with coverage (Postgres)
-      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="./TestResults/Postgres/" /p:ExcludeByFile="**/Migrations/*.cs"
+      run: dotnet test tests/Beacon.API.IntegrationTests/Beacon.API.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:ExcludeByFile="**/Migrations/*.cs"
       env:
           BEACON_STORAGE_PROVIDER: Postgres
     - name: Upload coverage artifact
       uses: actions/upload-artifact@v4
       with:
         name: coverage-postgres
-        path: ./TestResults/Postgres/
 
   test-blazor:
     runs-on: ubuntu-latest
@@ -107,12 +105,11 @@ jobs:
     - name: Build Blazor
       run: dotnet build tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-restore
     - name: Test Blazor with coverage
-      run: dotnet test tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura /p:CoverletOutput="./TestResults/Blazor/"
+      run: dotnet test tests/Beacon.WebApp.IntegrationTests/Beacon.WebApp.IntegrationTests.csproj --no-build --verbosity normal /p:CollectCoverage=true /p:CoverletOutputFormat=cobertura
     - name: Upload coverage artifact
       uses: actions/upload-artifact@v4
       with:
         name: coverage-blazor
-        path: ./TestResults/Blazor/
     
   generate-report:
     runs-on: ubuntu-latest
@@ -126,23 +123,23 @@ jobs:
       uses: actions/download-artifact@v4
       with:
         name: coverage-mssql
-        path: ./TestResults/MsSqlServer/
+        path: ./TestResults/
     - name: Download coverage artifact (Postgres)
       uses: actions/download-artifact@v4
       with:
         name: coverage-postgres
-        path: ./TestResults/Postgres/
+        path: ./TestResults/
     - name: Download coverage artifact (Blazor)
       uses: actions/download-artifact@v4
       with:
         name: coverage-blazor
-        path: ./TestResults/Blazor/
+        path: ./TestResults/
 
     # Generate Combined Report
     - name: Generate Coverage Report
       uses: danielpalme/ReportGenerator-GitHub-Action@5.2.0
       with:
-        reports: '**/TestResults/**/coverage.cobertura.xml'
+        reports: './TestResults/coverage.cobertura.xml'
         targetdir: 'coveragereport'
         reporttypes: 'HtmlInline'
         
