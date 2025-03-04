@@ -1,4 +1,6 @@
-﻿using System.Net.Http.Json;
+﻿using System.Data;
+using System.Data.Common;
+using System.Net.Http.Json;
 using Beacon.API.Persistence;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common;
@@ -7,7 +9,9 @@ using Beacon.Common.Requests;
 using Beacon.Common.Requests.Auth;
 using Beacon.Common.Requests.Laboratories;
 using Beacon.Common.Services;
+using Microsoft.Data.SqlClient;
 using Microsoft.EntityFrameworkCore;
+using Npgsql;
 using Respawn;
 using Respawn.Graph;
 
@@ -206,10 +210,16 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
         var options = new RespawnerOptions
         {
             TablesToIgnore = ["__EFMigrationsHistory"],
-            TablesToInclude = tablesToInclude
+            TablesToInclude = tablesToInclude,
+            DbAdapter = ContainerFixture.StorageProvider.ToLower() switch
+            {
+                "postgres" => DbAdapter.Postgres,
+                _ => DbAdapter.SqlServer
+            }
         };
 
-        _respawnCheckpoint = await Respawner.CreateAsync(fixture.ConnectionString, options);
+        using DbConnection connection = GetDbConnection();
+        _respawnCheckpoint = await Respawner.CreateAsync(connection, options);
     }
 
     protected async Task<BeaconDbContext> CreateDbContext()
@@ -224,10 +234,24 @@ public abstract class IntegrationTestBase(TestFixture fixture) : IAsyncLifetime,
     {
         if (_respawnCheckpoint is null)
             throw new InvalidOperationException("The respawn checkpoint has not been set.");
-        
-        await _respawnCheckpoint.ResetAsync(fixture.ConnectionString);
+
+        using DbConnection connection = GetDbConnection();
+        await _respawnCheckpoint.ResetAsync(connection);
         await fixture.ApplySeedData(GetAllSeedData());
     }
 
     private object[] GetAllSeedData() => EnumerateInitialSeedData().Concat(EnumerateReseedData()).Distinct().ToArray();
+
+    private DbConnection GetDbConnection()
+    {
+        DbConnection connection = ContainerFixture.StorageProvider.ToLower() switch
+        {
+            "postgres" => new NpgsqlConnection(fixture.ConnectionString),
+            _ => new SqlConnection(fixture.ConnectionString)
+        };
+
+        connection.Open();
+
+        return connection;
+    }
 }

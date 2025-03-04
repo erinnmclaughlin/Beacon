@@ -12,7 +12,7 @@ public sealed class ApiFallbackTests(WebApplicationFactory<Program> fixture) : I
         {
             builder.ConfigureTestServices(services =>
             {
-                services.ReplaceWithTestDatabase(null);
+                services.ReplaceWithTestDatabase(null, null);
                 services.UseFakeEmailService();
             });
         });

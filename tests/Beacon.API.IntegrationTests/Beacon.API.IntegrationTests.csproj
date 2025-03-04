@@ -14,6 +14,7 @@
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.2" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageReference Include="Respawn" Version="6.2.1" />
+    <PackageReference Include="Testcontainers.PostgreSql" Version="4.3.0" />
     <PackageReference Include="xunit.v3" Version="1.0.0" />
     <PackageReference Include="xunit.v3.runner.msbuild" Version="2.0.0" />
     <PackageReference Include="xunit.runner.visualstudio" Version="3.0.0" />
@@ -28,6 +29,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <Using Include="Xunit"/>
+    <Using Include="Xunit" />
   </ItemGroup>
 </Project>
