@@ -20,8 +20,8 @@ public class ProjectManagementInstrumentUsage(TestFixture fixture) : ProjectTest
         {
             Id = ProjectEventId,
             Title = "An Event",
-            ScheduledStart = DateTime.Now,
-            ScheduledEnd = DateTime.Now.AddMonths(1),
+            ScheduledStart = DateTime.UtcNow,
+            ScheduledEnd = DateTime.UtcNow.AddMonths(1),
             LaboratoryId = TestData.Lab.Id,
             ProjectId = ProjectId
         };

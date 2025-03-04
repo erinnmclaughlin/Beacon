@@ -8,14 +8,28 @@ public static class BeaconWebHost
 {
     public static WebApplication BuildBeaconApplication(this WebApplicationBuilder builder)
     {
-        builder.Services.AddBeaconApi(builder.Configuration, o =>
-        {
-            o.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerDb"));
-        });
+        var storageProvider = builder.Configuration.GetValue<string>("StorageProvider") ?? StorageProviders.MsSqlServer;
+        var connectionString = builder.Configuration.GetConnectionString(storageProvider);
+
+        builder.Services.AddBeaconApi(builder.Configuration, ConfigureDbContextOptions(storageProvider, connectionString));
 
         builder.Services.AddSwaggerGen();
 
         return builder.Build();
+    }
+
+    public static Action<DbContextOptionsBuilder> ConfigureDbContextOptions(string storageProvider, string? connectionString)
+    {
+        if (connectionString is null)
+            return o => { };
+
+        if (storageProvider.Equals(StorageProviders.Postgres, StringComparison.OrdinalIgnoreCase))
+            return BeaconPostgresStorageProvider.BuildDbContextOptionsBuilder(connectionString);
+
+        if (storageProvider.Equals(StorageProviders.MsSqlServer, StringComparison.OrdinalIgnoreCase))
+            return BeaconMsSqlStorageProvider.ConfigureDbContextOptions(connectionString);
+
+        throw new NotSupportedException($"Storage provider '{storageProvider}' is not supported.");
     }
 
     public static WebApplication ConfigurePipeline(this WebApplication app)

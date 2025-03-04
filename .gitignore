@@ -364,3 +364,4 @@ FodyWeavers.xsd
 
 # Custom
 /tools/DataImporter/Data/*.csv
+/.idea/.idea.Beacon/.idea

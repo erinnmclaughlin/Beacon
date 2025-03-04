@@ -7,15 +7,11 @@ namespace Beacon.API.IntegrationTests;
 
 public sealed class TestFixture(ContainerFixture container) : WebApplicationFactory<Program>, IAsyncLifetime
 {
-    public string ConnectionString => container.GetConnectionString();
-    
+    public string ConnectionString { get; } = container.GetConnectionString();
+
     public bool IsSeeded { get; private set; }
 
-    protected override void ConfigureWebHost(IWebHostBuilder builder) => builder.ConfigureServices(services =>
-    {
-        services.ReplaceWithTestDatabase(ConnectionString);
-        services.UseFakeEmailService();
-    });
+    public static string StorageProvider => ContainerFixture.StorageProvider;
 
     public async ValueTask InitializeAsync()
     {
@@ -27,7 +23,6 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
     {
         await using var dbContext = CreateDbContext(null!);
         await dbContext.Database.EnsureDeletedAsync();
-        
         await base.DisposeAsync();
     }
 
@@ -41,7 +36,22 @@ public sealed class TestFixture(ContainerFixture container) : WebApplicationFact
 
     public BeaconDbContext CreateDbContext(ISessionContext context)
     {
-        var options = new DbContextOptionsBuilder<BeaconDbContext>().UseSqlServer(ConnectionString).Options;
-        return new BeaconDbContext(options, context);
+        var optionsBuilder = new DbContextOptionsBuilder<BeaconDbContext>();
+        BeaconWebHost.ConfigureDbContextOptions(StorageProvider, ConnectionString)(optionsBuilder);
+
+        return new BeaconDbContext(optionsBuilder.Options, context);
+    }
+
+    protected override void ConfigureWebHost(IWebHostBuilder builder)
+    {
+        builder.UseEnvironment("IntegrationTests");
+
+        builder.ConfigureServices((context, services) =>
+        {
+            context.Configuration["StorageProvider"] = StorageProvider;
+
+            services.ReplaceWithTestDatabase(context, ConnectionString);
+            services.UseFakeEmailService();
+        });
     }
 }

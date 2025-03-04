@@ -37,7 +37,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
 
         await using var dbContext = await CreateDbContext();
         var sut = new GetProjectInsightsHandler(dbContext);
-        var result = await sut.GetStatistics(new DateTime(2023, 8, 1), CancellationToken.None);
+        var result = await sut.GetStatistics(new DateTime(new DateOnly(2023, 8, 1), TimeOnly.MinValue, DateTimeKind.Utc), CancellationToken.None);
 
         var app1Result = result.Single(x => x.ApplicationType == "Application 1");
         Assert.Equal(7, app1Result.NumberOfProjectsCreatedLastYear);
@@ -192,7 +192,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202301-001")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(2023, 1, 12)
+                            CreatedOn = new DateTime(new DateOnly(2023, 1, 12), TimeOnly.MinValue, DateTimeKind.Utc)
                         }
                     }
                 ]
@@ -209,7 +209,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202302-001")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(2023, 2, 1)
+                            CreatedOn = new DateTime(new DateOnly(2023, 2, 1), TimeOnly.MinValue, DateTimeKind.Utc)
                         }
                     },
                     new ProjectApplicationTag
@@ -220,13 +220,13 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202302-002")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(2023, 2, 28)
+                            CreatedOn = new DateTime(new DateOnly(2023, 2, 28), TimeOnly.MinValue, DateTimeKind.Utc)
                         }
                     }
                 ]
             });
         
-        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateTime(2023, 1, 1) });
+        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc) });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var data = await response.Content.ReadFromJsonAsync<GetProjectTypeFrequencyRequest.Series[]>(AbortTest);
@@ -268,6 +268,6 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
         ProjectCode = new ProjectCode("TST", date.ToString("yyyyMM"), index + 1),
         LaboratoryId = TestData.Lab.Id,
         CreatedById = TestData.AdminUser.Id,
-        CreatedOn = date.ToDateTime(TimeOnly.MinValue)
+        CreatedOn = new DateTime(date, TimeOnly.MinValue, DateTimeKind.Utc)
     };
 }
