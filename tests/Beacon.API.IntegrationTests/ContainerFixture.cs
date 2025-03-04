@@ -19,7 +19,7 @@ public sealed class ContainerFixture : IAsyncLifetime
 
     public ContainerFixture()
     {
-        TestContext.Current.TestOutputHelper?.WriteLine("Starting {0} container...", StorageProvider);
+        TestContext.Current.SendDiagnosticMessage("Starting {0} container...", StorageProvider);
 
         if (StorageProvider == WebHost.StorageProviders.Postgres)
         {
