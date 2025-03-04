@@ -2,8 +2,6 @@
 using Beacon.Common.Services;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.DependencyInjection;
 
 namespace Beacon.API.IntegrationTests;
 
