@@ -65,8 +65,8 @@
 
         var request = new GetLaboratoryEventsRequest
         {
-            MaxStart = NextMonth.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc),
-            MinEnd = CurrentMonth.ToDateTime(TimeOnly.MinValue, DateTimeKind.Utc)
+            MaxStart = NextMonth.ToDateTimeOffset(),
+            MinEnd = CurrentMonth.ToDateTimeOffset()
         };
 
         var result = await ApiClient.SendAsync(request);

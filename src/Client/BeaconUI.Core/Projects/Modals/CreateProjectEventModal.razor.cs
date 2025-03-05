@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
 using Beacon.Common.Requests.Projects.Events;
 using BeaconUI.Core.Common.Forms;
@@ -50,25 +51,21 @@ public partial class CreateProjectEventModal
 
     private void UpdateStartDate(DateOnly datePart)
     {
-        var timePart = TimeOnly.FromDateTime(Request.ScheduledStart.DateTime);
-        Request.ScheduledStart = datePart.ToDateTime(timePart, DateTimeKind.Utc);
+        Request.ScheduledStart = datePart.ToDateTimeOffset(Request.ScheduledStart.ToTimeOnly());
     }
 
     private void UpdateStartTime(TimeOnly timePart)
     {
-        var datePart = DateOnly.FromDateTime(Request.ScheduledStart.DateTime);
-        Request.ScheduledStart = datePart.ToDateTime(timePart, DateTimeKind.Utc);
+        Request.ScheduledStart = Request.ScheduledStart.WithNewTimePart(timePart);
     }
 
     private void UpdateEndDate(DateOnly datePart)
     {
-        var timePart = TimeOnly.FromDateTime(Request.ScheduledEnd.DateTime);
-        Request.ScheduledEnd = datePart.ToDateTime(timePart, DateTimeKind.Utc);
+        Request.ScheduledEnd = datePart.ToDateTimeOffset(Request.ScheduledEnd.ToTimeOnly());
     }
 
     private void UpdateEndTime(TimeOnly timePart)
     {
-        var datePart = DateOnly.FromDateTime(Request.ScheduledEnd.DateTime);
-        Request.ScheduledEnd = datePart.ToDateTime(timePart, DateTimeKind.Utc);
+        Request.ScheduledEnd = Request.ScheduledEnd.WithNewTimePart(timePart);
     }
 }
