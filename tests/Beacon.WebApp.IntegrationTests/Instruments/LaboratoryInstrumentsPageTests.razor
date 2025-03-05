@@ -1,0 +1,55 @@
+@page "/tests/Beacon.WebApp.IntegrationTests/Instruments/LaboratoryInstrumentsPageTests.razor"
+
+@using Beacon.WebApp.IntegrationTests.TestHelpers
+@using BeaconUI.Core.Instruments
+@using Bunit
+@using ErrorOr
+@using Moq
+
+<Trait("Category", "Laboratory Instruments")>
+public class LaboratoryInstrumentsPageTests : BeaconTestContext
+{
+    [Fact]
+    public void LaboratoryInstrumentsPage_DisplaysCorrectData()
+    {
+        // Arrange
+        var instruments = new[]
+        {
+            new LaboratoryInstrumentDto { InstrumentType = "Type1", SerialNumber = "SN1" },
+            new LaboratoryInstrumentDto { InstrumentType = "Type2", SerialNumber = "SN2" }
+        };
+
+        MockApi.Setup<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>()
+            .ReturnsAsync(instruments);
+
+        // Act
+        var cut = RenderComponent<LaboratoryInstrumentsPage>();
+
+        // Assert
+        cut.WaitForAssertion(() =>
+        {
+            cut.FindAll("tbody tr").Count.Should().Be(2);
+            cut.FindAll("tbody tr")[0].TextContent.Should().Contain("Type1");
+            cut.FindAll("tbody tr")[0].TextContent.Should().Contain("SN1");
+            cut.FindAll("tbody tr")[1].TextContent.Should().Contain("Type2");
+            cut.FindAll("tbody tr")[1].TextContent.Should().Contain("SN2");
+        });
+    }
+
+    [Fact]
+    public void LaboratoryInstrumentsPage_HandlesErrorsCorrectly()
+    {
+        // Arrange
+        MockApi.Setup<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>()
+            .ReturnsAsync(Error.Failure("Error loading instruments"));
+
+        // Act
+        var cut = RenderComponent<LaboratoryInstrumentsPage>();
+
+        // Assert
+        cut.WaitForAssertion(() =>
+        {
+            cut.Find("p.text-danger").TextContent.Should().Be("There was an error loading laboratory instruments.");
+        });
+    }
+}

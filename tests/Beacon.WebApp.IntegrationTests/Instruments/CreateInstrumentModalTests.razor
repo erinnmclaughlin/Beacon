@@ -1,0 +1,41 @@
+@page "/tests/instruments/create-instrument-modal-tests"
+@using Beacon.WebApp.IntegrationTests.TestHelpers
+@inherits BeaconTestContext
+
+<h3>Create Instrument Modal Tests</h3>
+
+<button @onclick="TestDisplayCorrectData">Test Display Correct Data</button>
+<button @onclick="TestFormSubmission">Test Form Submission</button>
+
+@code {
+    private async Task TestDisplayCorrectData()
+    {
+        // Arrange
+        var modal = RenderModal<CreateInstrumentModal>();
+
+        // Act
+        var instrumentTypeInput = modal.Find("#instrumentType");
+        var instrumentNameInput = modal.Find("#sn");
+
+        // Assert
+        instrumentTypeInput.Should().NotBeNull();
+        instrumentNameInput.Should().NotBeNull();
+    }
+
+    private async Task TestFormSubmission()
+    {
+        // Arrange
+        var modal = RenderModal<CreateInstrumentModal>();
+        var instrumentTypeInput = modal.Find("#instrumentType");
+        var instrumentNameInput = modal.Find("#sn");
+        var submitButton = modal.Find("button[type='submit']");
+
+        // Act
+        instrumentTypeInput.Change("FMS");
+        instrumentNameInput.Change("FMS-760");
+        submitButton.Click();
+
+        // Assert
+        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Once);
+    }
+}

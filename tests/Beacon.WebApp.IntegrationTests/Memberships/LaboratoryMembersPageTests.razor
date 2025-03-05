@@ -1,0 +1,43 @@
+@using Beacon.Common.Models
+@using Beacon.Common.Requests.Memberships
+@using BeaconUI.Core.Memberships.Pages
+@attribute [Trait("Category", "Laboratory Members")]
+@inherits BeaconTestContext
+@code {
+
+    [Fact]
+    public async Task GivenValidData_WhenPageLoads_ThenDisplayCorrectData()
+    {
+        var members = new LaboratoryMemberDto[]
+        {
+            new() { Id = Guid.NewGuid(), DisplayName = "John Doe", EmailAddress = "john.doe@example.com", MembershipType = LaboratoryMembershipType.Member },
+            new() { Id = Guid.NewGuid(), DisplayName = "Jane Smith", EmailAddress = "jane.smith@example.com", MembershipType = LaboratoryMembershipType.Manager }
+        };
+
+        MockApi.Succeeds<GetMembershipsRequest, LaboratoryMemberDto[]>(members);
+
+        var sut = Render(@<LaboratoryMembersPage />);
+
+        // Assert:
+        sut.WaitForAssertion(() =>
+        {
+            sut.FindAll("tbody tr").Count.Should().Be(2);
+            sut.Find("tbody tr:nth-child(1) td:nth-child(1)").TextContent.Should().Be("John Doe");
+            sut.Find("tbody tr:nth-child(2) td:nth-child(1)").TextContent.Should().Be("Jane Smith");
+        }, TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public async Task GivenError_WhenPageLoads_ThenDisplayErrorMessage()
+    {
+        MockApi.Fails<GetMembershipsRequest, LaboratoryMemberDto[]>(Error.Failure("Error loading members"));
+
+        var sut = Render(@<LaboratoryMembersPage />);
+
+        // Assert:
+        sut.WaitForAssertion(() =>
+        {
+            sut.Find(".text-danger").TextContent.Should().Be("There was an error loading laboratory members.");
+        }, TimeSpan.FromSeconds(5));
+    }
+}
