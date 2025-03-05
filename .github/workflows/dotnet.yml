@@ -159,13 +159,12 @@ jobs:
         retention-days: 14
 
     # Upload to Codecov
-    - name: Upload to Codecov
-      uses: codecov/codecov-action@v3
-      with:
-        files: ./TestResults/coverage.cobertura.xml
-        flags: unittests
-        name: codecov-umbrella
-        fail_ci_if_error: true
+    - name: Upload coverage reports to Codecov
+    uses: codecov/codecov-action@v5
+    with:
+      fail_ci_if_error: true
+      files: ./TestResults/coverage.cobertura.xml
+      token: ${{ secrets.CODECOV_TOKEN }}
 
   publish:
     needs: generate-report
