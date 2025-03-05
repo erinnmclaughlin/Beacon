@@ -19,10 +19,10 @@ public partial class CreateProjectEventModal
     }
 
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = default!;
+    private BlazoredModalInstance Modal { get; set; } = null!;
 
     [Parameter]
     public Guid ProjectId { get; set; }
@@ -48,35 +48,27 @@ public partial class CreateProjectEventModal
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private void DoSelectInstrument(LaboratoryInstrumentDto instrument)
+    private void UpdateStartDate(DateOnly datePart)
     {
-        if (Request.InstrumentIds.Contains(instrument.Id))
-            Request.InstrumentIds.Remove(instrument.Id);
-        else
-            Request.InstrumentIds.Add(instrument.Id);
+        var timePart = TimeOnly.FromDateTime(Request.ScheduledStart.DateTime);
+        Request.ScheduledStart = datePart.ToDateTime(timePart, DateTimeKind.Utc);
     }
 
-    private void UpdateStartDate(DateTime dateTime)
+    private void UpdateStartTime(TimeOnly timePart)
     {
-        var dateOnly = DateOnly.FromDateTime(dateTime);
-        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledStart));
+        var datePart = DateOnly.FromDateTime(Request.ScheduledStart.DateTime);
+        Request.ScheduledStart = datePart.ToDateTime(timePart, DateTimeKind.Utc);
     }
 
-    private void UpdateStartTime(DateTime dateTime)
+    private void UpdateEndDate(DateOnly datePart)
     {
-        var dateOnly = DateOnly.FromDateTime(Request.ScheduledStart);
-        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
+        var timePart = TimeOnly.FromDateTime(Request.ScheduledEnd.DateTime);
+        Request.ScheduledEnd = datePart.ToDateTime(timePart, DateTimeKind.Utc);
     }
 
-    private void UpdateEndDate(DateTime dateTime)
+    private void UpdateEndTime(TimeOnly timePart)
     {
-        var dateOnly = DateOnly.FromDateTime(dateTime);
-        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledEnd));
-    }
-
-    private void UpdateEndTime(DateTime dateTime)
-    {
-        var dateOnly = DateOnly.FromDateTime(Request.ScheduledEnd);
-        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
+        var datePart = DateOnly.FromDateTime(Request.ScheduledEnd.DateTime);
+        Request.ScheduledEnd = datePart.ToDateTime(timePart, DateTimeKind.Utc);
     }
 }

@@ -13,7 +13,7 @@ namespace BeaconUI.Core.Projects;
 public partial class ProjectSchedule
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [Parameter, EditorRequired]
     public required Guid ProjectId { get; set; }
@@ -35,12 +35,12 @@ public partial class ProjectSchedule
     {
         return events
             .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTime.Now))
-            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart, Value = e });
+            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
     }
 
     private async Task LoadProjects()
     {
-        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new() { ProjectId } });
+        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = [ProjectId] });
     }
 
     private ErrorOr<LaboratoryInstrumentDto[]>? GetSuggestedInstruments(LaboratoryEventDto e)

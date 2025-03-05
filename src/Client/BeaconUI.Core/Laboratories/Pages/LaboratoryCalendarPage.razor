@@ -39,10 +39,10 @@
 @code {
 
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
+    private NavigationManager NavigationManager { get; set; } = null!;
 
     private DateTime CurrentMonth { get; set; }
     private DateTime LastMonth => CurrentMonth.AddMonths(-1);
@@ -78,8 +78,8 @@
                 {
                     Caption = e.Title,
                     Code = e.ProjectCode.ToString(),
-                    DateStart = e.ScheduledStart,
-                    DateEnd = e.ScheduledEnd,
+                    DateStart = e.ScheduledStart.DateTime,
+                    DateEnd = e.ScheduledEnd.DateTime,
                     Color = "#cbd5e1;line-height:1" // lil bit of css injection to get this third party lib to do what I want
                 })
                 .ToArray();

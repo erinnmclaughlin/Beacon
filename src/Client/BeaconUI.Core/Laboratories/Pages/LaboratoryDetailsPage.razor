@@ -45,7 +45,7 @@
                 var timelineItems = events.Items
                     .Select(e => new TimelineItem<LaboratoryEventDto>
                     {
-                        Timestamp = e.ScheduledStart,
+                        Timestamp = e.ScheduledStart.DateTime,
                         Value = e
                     });
 

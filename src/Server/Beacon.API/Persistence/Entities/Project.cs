@@ -7,7 +7,7 @@ public sealed class Project : LaboratoryScopedEntityBase
     public required Guid Id { get; init; }
     public required string CustomerName { get; set; }
     public required ProjectCode ProjectCode { get; set; }
-    public DateTime CreatedOn { get; init; } = DateTime.UtcNow;
+    public DateTimeOffset CreatedOn { get; init; } = DateTimeOffset.UtcNow;
     public ProjectStatus ProjectStatus { get; set; } = ProjectStatus.Active;
 
     public Guid CreatedById { get; init; }
