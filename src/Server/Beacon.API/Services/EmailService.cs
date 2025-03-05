@@ -13,7 +13,7 @@ public interface IEmailService
 public interface IEmailSendOperation
 {
     string OperationId { get; }
-    DateTime Timestamp { get; }
+    DateTimeOffset Timestamp { get; }
 }
 
 internal sealed class EmailService(IOptions<EmailSettings> settings) : IEmailService
@@ -49,5 +49,5 @@ internal class BeaconEmailSendOperation(EmailSendOperation emailSendOperation) :
     private readonly EmailSendOperation _emailSendOperation = emailSendOperation;
 
     public string OperationId => _emailSendOperation.Id;
-    public DateTime Timestamp { get; } = DateTime.UtcNow;
+    public DateTimeOffset Timestamp { get; } = DateTimeOffset.UtcNow;
 }

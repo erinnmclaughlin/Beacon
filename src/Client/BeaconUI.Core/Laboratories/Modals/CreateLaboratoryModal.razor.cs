@@ -10,10 +10,10 @@ namespace BeaconUI.Core.Laboratories.Modals;
 public partial class CreateLaboratoryModal
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = default!;
+    private BlazoredModalInstance Modal { get; set; } = null!;
 
     private CreateLaboratoryRequest Model { get; } = new();
 

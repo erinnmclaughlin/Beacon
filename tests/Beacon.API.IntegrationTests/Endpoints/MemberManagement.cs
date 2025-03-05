@@ -166,7 +166,7 @@ public class MemberManagement(TestFixture fixture) : IntegrationTestBase(fixture
             CustomerName = "Old Customer",
             ProjectCode = new ProjectCode("OLD", "200101", 1),
             CreatedById = TestData.AdminUser.Id,
-            CreatedOn = new DateTime(new DateOnly(2020, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc),
+            CreatedOn = new DateTimeOffset(new DateOnly(2020, 1, 1), TimeOnly.MinValue, TimeSpan.Zero),
             ProjectStatus = ProjectStatus.Completed,
             LeadAnalystId = TestData.MemberUser.Id
         };

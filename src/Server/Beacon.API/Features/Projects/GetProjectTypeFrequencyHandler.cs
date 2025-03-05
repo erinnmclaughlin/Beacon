@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common;
 using Beacon.Common.Requests.Projects;
 using ErrorOr;
 using Microsoft.EntityFrameworkCore;
@@ -11,8 +12,10 @@ internal sealed class GetProjectTypeFrequencyHandler(BeaconDbContext dbContext) 
 
     public async Task<ErrorOr<GetProjectTypeFrequencyRequest.Series[]>> Handle(GetProjectTypeFrequencyRequest request, CancellationToken cancellationToken)
     {
+        var startDate = request.StartDate.ToDateTimeOffset();
+        
         var projects = await _dbContext.ProjectApplicationTags
-            .Where(p => p.Project.CreatedOn >= request.StartDate)
+            .Where(p => p.Project.CreatedOn >= startDate)
             .GroupBy(p => new { p.Application.Name, p.Project.CreatedOn })
             .Select(group => new
             {
@@ -35,7 +38,7 @@ internal sealed class GetProjectTypeFrequencyHandler(BeaconDbContext dbContext) 
             .ToArray();
     }
 
-    private static IEnumerable<DateOnly> GetMonths(DateTime startDate)
+    private static IEnumerable<DateOnly> GetMonths(DateOnly startDate)
     {
         var start = new DateOnly(startDate.Year, startDate.Month, 1);
 

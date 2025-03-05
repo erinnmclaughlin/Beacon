@@ -1,4 +1,5 @@
-﻿using Beacon.Common.Models;
+﻿using Beacon.Common;
+using Beacon.Common.Models;
 using Beacon.Common.Requests.Instruments;
 using Beacon.Common.Requests.Projects.Events;
 using BeaconUI.Core.Common.Forms;
@@ -19,10 +20,10 @@ public partial class CreateProjectEventModal
     }
 
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [CascadingParameter]
-    private BlazoredModalInstance Modal { get; set; } = default!;
+    private BlazoredModalInstance Modal { get; set; } = null!;
 
     [Parameter]
     public Guid ProjectId { get; set; }
@@ -33,8 +34,8 @@ public partial class CreateProjectEventModal
     private CreateProjectEventRequest Request => _request ??= new()
     {
         ProjectId = ProjectId,
-        ScheduledStart = DateTime.Today,
-        ScheduledEnd = DateTime.Today.AddDays(1)
+        ScheduledStart = DateTimeOffset.UtcNow.Date,
+        ScheduledEnd = DateTimeOffset.UtcNow.Date.AddDays(1)
     };
 
     protected override async Task OnInitializedAsync()
@@ -48,35 +49,23 @@ public partial class CreateProjectEventModal
         await Modal.CloseAsync(ModalResult.Ok());
     }
 
-    private void DoSelectInstrument(LaboratoryInstrumentDto instrument)
+    private void UpdateStartDate(DateOnly datePart)
     {
-        if (Request.InstrumentIds.Contains(instrument.Id))
-            Request.InstrumentIds.Remove(instrument.Id);
-        else
-            Request.InstrumentIds.Add(instrument.Id);
+        Request.ScheduledStart = datePart.ToDateTimeOffset(Request.ScheduledStart.ToTimeOnly());
     }
 
-    private void UpdateStartDate(DateTime dateTime)
+    private void UpdateStartTime(TimeOnly timePart)
     {
-        var dateOnly = DateOnly.FromDateTime(dateTime);
-        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledStart));
+        Request.ScheduledStart = Request.ScheduledStart.WithNewTimePart(timePart);
     }
 
-    private void UpdateStartTime(DateTime dateTime)
+    private void UpdateEndDate(DateOnly datePart)
     {
-        var dateOnly = DateOnly.FromDateTime(Request.ScheduledStart);
-        Request.ScheduledStart = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
+        Request.ScheduledEnd = datePart.ToDateTimeOffset(Request.ScheduledEnd.ToTimeOnly());
     }
 
-    private void UpdateEndDate(DateTime dateTime)
+    private void UpdateEndTime(TimeOnly timePart)
     {
-        var dateOnly = DateOnly.FromDateTime(dateTime);
-        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(Request.ScheduledEnd));
-    }
-
-    private void UpdateEndTime(DateTime dateTime)
-    {
-        var dateOnly = DateOnly.FromDateTime(Request.ScheduledEnd);
-        Request.ScheduledEnd = dateOnly.ToDateTime(TimeOnly.FromDateTime(dateTime));
+        Request.ScheduledEnd = Request.ScheduledEnd.WithNewTimePart(timePart);
     }
 }

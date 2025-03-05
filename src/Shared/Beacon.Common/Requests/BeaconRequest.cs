@@ -2,6 +2,7 @@
 using MediatR;
 using System.Net.Http.Json;
 using System.Text.Json;
+using System.Web;
 
 namespace Beacon.Common.Requests;
 
@@ -40,8 +41,9 @@ public abstract class BeaconRequest<TRequest, TResponse> : IBeaconRequest<TReque
 {
     public static Task<HttpResponseMessage> SendAsync(HttpClient httpClient, TRequest request, CancellationToken ct = default)
     {
-        var json = JsonSerializer.Serialize(request, JsonSerializerOptions.Default);
-        return httpClient.GetAsync(GetRoute() + $"?data={json}", ct);
+        var json = JsonSerializer.Serialize(request, JsonDefaults.JsonSerializerOptions);
+        var encodedJson = HttpUtility.UrlEncode(json);
+        return httpClient.GetAsync(GetRoute() + $"?data={encodedJson}", ct);
     }
 
     public static string GetRoute()

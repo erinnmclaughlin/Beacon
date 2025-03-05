@@ -29,7 +29,7 @@
         </div>
 
         <div style="border: 1px solid hsl(0, 0%, 90%);">
-            <CalendarContainer FirstDate="CurrentMonth" DisplayedView="DisplayedView.Monthly" TasksList="Events">
+            <CalendarContainer FirstDate="CurrentMonth.ToDateTime()" DisplayedView="DisplayedView.Monthly" TasksList="Events">
                 <MonthlyView PriorityDisplay="@PriorityLabel.Caption" />
             </CalendarContainer>
         </div>
@@ -39,21 +39,21 @@
 @code {
 
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
+    private NavigationManager NavigationManager { get; set; } = null!;
 
-    private DateTime CurrentMonth { get; set; }
-    private DateTime LastMonth => CurrentMonth.AddMonths(-1);
-    private DateTime NextMonth => CurrentMonth.AddMonths(1);
+    private DateOnly CurrentMonth { get; set; }
+    private DateOnly LastMonth => CurrentMonth.AddMonths(-1);
+    private DateOnly NextMonth => CurrentMonth.AddMonths(1);
 
     private Tasks[]? Events { get; set; }
 
     protected override async Task OnInitializedAsync()
     {
-        var today = DateTime.Today;
-        CurrentMonth = new DateTime(today.Year, today.Month, 1);
+        var today = DateTimeOffset.UtcNow;
+        CurrentMonth = new DateOnly(today.Year, today.Month, 1);
 
         await Search();
     }
@@ -65,8 +65,8 @@
 
         var request = new GetLaboratoryEventsRequest
         {
-            MaxStart = NextMonth,
-            MinEnd = CurrentMonth
+            MaxStart = NextMonth.ToDateTimeOffset(),
+            MinEnd = CurrentMonth.ToDateTimeOffset()
         };
 
         var result = await ApiClient.SendAsync(request);
@@ -78,8 +78,8 @@
                 {
                     Caption = e.Title,
                     Code = e.ProjectCode.ToString(),
-                    DateStart = e.ScheduledStart,
-                    DateEnd = e.ScheduledEnd,
+                    DateStart = e.ScheduledStart.DateTime,
+                    DateEnd = e.ScheduledEnd.DateTime,
                     Color = "#cbd5e1;line-height:1" // lil bit of css injection to get this third party lib to do what I want
                 })
                 .ToArray();

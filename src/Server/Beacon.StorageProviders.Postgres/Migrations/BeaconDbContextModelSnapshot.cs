@@ -37,7 +37,7 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by_id");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
@@ -83,7 +83,7 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("id");
 
-                    b.Property<DateTime>("ExpiresOn")
+                    b.Property<DateTimeOffset>("ExpiresOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_on");
 
@@ -99,7 +99,7 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .HasColumnType("text")
                         .HasColumnName("operation_id");
 
-                    b.Property<DateTime>("SentOn")
+                    b.Property<DateTimeOffset>("SentOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("sent_on");
 
@@ -228,7 +228,7 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("created_by_id");
 
-                    b.Property<DateTime>("CreatedOn")
+                    b.Property<DateTimeOffset>("CreatedOn")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_on");
 
@@ -387,11 +387,11 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .HasColumnType("uuid")
                         .HasColumnName("project_id");
 
-                    b.Property<DateTime>("ScheduledEnd")
+                    b.Property<DateTimeOffset>("ScheduledEnd")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("scheduled_end");
 
-                    b.Property<DateTime>("ScheduledStart")
+                    b.Property<DateTimeOffset>("ScheduledStart")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("scheduled_start");
 

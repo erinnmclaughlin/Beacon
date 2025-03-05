@@ -14,16 +14,16 @@
             <div class="field">
                 <label for="startDate">Starts on</label>
                 <div class="input-group">
-                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledStart" ValueChanged="(DateTime v) => UpdateStartDate(v)" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startDate" />
-                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledStart" ValueChanged="(DateTime v) => UpdateStartTime(v)" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startTime" />
+                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledStart" ValueChanged="(DateTimeOffset v) => UpdateStartDate(DateOnly.FromDateTime(v.DateTime))" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startDate" />
+                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledStart" ValueChanged="(DateTimeOffset v) => UpdateStartTime(TimeOnly.FromDateTime(v.DateTime))" ValueExpression="() => Request.ScheduledStart" class="form-control" id="startTime" />
                 </div>
                 <ValidationMessage For="() => Request.ScheduledStart" />
             </div>
             <div class="field">
                 <label for="endDate">Ends on</label>
                 <div class="input-group">
-                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledEnd" ValueChanged="(DateTime v) => UpdateEndDate(v)" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endDate" />
-                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledEnd" ValueChanged="(DateTime v) => UpdateEndTime(v)" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endTime" />
+                    <InputDate Type="InputDateType.Date" Value="Request.ScheduledEnd" ValueChanged="(DateTimeOffset v) => UpdateEndDate(DateOnly.FromDateTime(v.DateTime))" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endDate" />
+                    <InputDate Type="InputDateType.Time" Value="Request.ScheduledEnd" ValueChanged="(DateTimeOffset v) => UpdateEndTime(TimeOnly.FromDateTime(v.DateTime))" ValueExpression="() => Request.ScheduledEnd" class="form-control" id="endTime" />
                 </div>
                 <ValidationMessage For="() => Request.ScheduledEnd" />
             </div>
@@ -61,9 +61,9 @@
                             </div>
                         }
 
-                        var instrumentOptions = getInstrumentsResult.Value.Where(i => !Request.InstrumentIds.Contains(i.Id));
+                        var instrumentOptions = getInstrumentsResult.Value.Where(i => !Request.InstrumentIds.Contains(i.Id)).ToList();
 
-                        if (instrumentOptions.Any())
+                        if (instrumentOptions.Count > 0)
                         {
                             <div class="dropdown d-flex">
                                 <button class="p-0 border-0 bg-transparent" style="height: min-content;" type="button" data-bs-toggle="dropdown">

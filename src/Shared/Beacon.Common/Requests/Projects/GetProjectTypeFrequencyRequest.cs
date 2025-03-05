@@ -3,7 +3,7 @@
 [RequireMinimumMembership(Models.LaboratoryMembershipType.Member)]
 public sealed class GetProjectTypeFrequencyRequest : BeaconRequest<GetProjectTypeFrequencyRequest, GetProjectTypeFrequencyRequest.Series[]>
 {
-    public DateTime StartDate { get; set; } = new(DateTime.Today.Year - 1, DateTime.Today.Month, 1);
+    public DateOnly StartDate { get; set; } = new(DateTime.UtcNow.Year - 1, DateTime.UtcNow.Month, 1);
 
     public sealed class Series
     {

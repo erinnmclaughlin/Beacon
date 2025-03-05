@@ -21,7 +21,7 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
             ExpireAfterDays = 10,
             NewMemberEmailAddress = InvitedUser.EmailAddress,
             CreatedById = TestData.AdminUser.Id,
-            CreatedOn = DateTime.UtcNow,
+            CreatedOn = DateTimeOffset.UtcNow,
             MembershipType = LaboratoryMembershipType.Analyst,
             LaboratoryId = TestData.Lab.Id,
         };
@@ -31,10 +31,10 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
         yield return new InvitationEmail
         {
             Id = EmailInvitationId,
-            ExpiresOn = DateTime.UtcNow.AddDays(10),
+            ExpiresOn = DateTimeOffset.UtcNow.AddDays(10),
             LaboratoryId = TestData.Lab.Id,
             LaboratoryInvitationId = invitation.Id,
-            SentOn = DateTime.UtcNow
+            SentOn = DateTimeOffset.UtcNow
         };
     }
     
@@ -191,7 +191,7 @@ public class MemberManagementInvitations(TestFixture fixture) : IntegrationTestB
         // update the invite to be expired
         await DbContext.InvitationEmails.IgnoreQueryFilters()
             .Where(x => x.Id == EmailInvitationId)
-            .ExecuteUpdateAsync(x => x.SetProperty(p => p.ExpiresOn, DateTime.UtcNow.AddDays(-1)), AbortTest);
+            .ExecuteUpdateAsync(x => x.SetProperty(p => p.ExpiresOn, DateTimeOffset.UtcNow.AddDays(-1)), AbortTest);
         
         // Log in as the invited user:
         await LoginAs(InvitedUser);
