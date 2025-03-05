@@ -16,11 +16,11 @@ namespace BeaconUI.Core.Laboratories.Pages;
 
 public partial class LaboratoryDetailsPage
 {
-    private LineConfig _config = default!;
-    private Chart _chart = default!;
+    private LineConfig _config = null!;
+    private Chart _chart = null!;
 
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     private ErrorOr<ProjectInsightDto[]>? ProjectInsights { get; set; }
     private ErrorOr<GetProjectTypeFrequencyRequest.Series[]>? ProjectTypeFrequencies { get; set; }
@@ -76,16 +76,16 @@ public partial class LaboratoryDetailsPage
             }
         };
 
-        var start = DateOnly.FromDateTime(DateTime.Today).AddYears(-1);
+        var start = DateTime.UtcNow.AddYears(-1).ToDateOnly();
         start = new DateOnly(start.Year, start.Month, 1);
-        for (int i = 0; i < 12; i++)
+        for (var i = 0; i < 12; i++)
         {
             _config.Data.Labels.Add(start.AddMonths(i).ToString("MMM yyyy"));
         }
 
         await Task.WhenAll(LoadAnalytics(), LoadEvents());
 
-        if (ProjectTypeFrequencies.HasValue && !ProjectTypeFrequencies.Value.IsError)
+        if (ProjectTypeFrequencies is { IsError: false })
         {
             var seriesOptions = ProjectTypeFrequencies.Value.Value
                 .Where(v => v.ProjectCountByDate.Any(d => d.Value > 0))
@@ -114,10 +114,12 @@ public partial class LaboratoryDetailsPage
 
     private async Task LoadEvents()
     {
+        var now = DateTimeOffset.UtcNow;
+        
         Events = await ApiClient.SendAsync(new GetLaboratoryEventsRequest
         {
-            MinEnd = DateTime.UtcNow,
-            MaxStart = DateTime.UtcNow.AddDays(7)
+            MinEnd = now,
+            MaxStart = now.AddDays(7)
         });
     }
 

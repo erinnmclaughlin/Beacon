@@ -10,12 +10,12 @@ public sealed record LaboratoryEventDto
     public required ProjectCode ProjectCode { get; init; }
     public required LaboratoryInstrumentDto[] AssociatedInstruments { get; init; }
 
-    public bool IsCompletedOnOrBefore(DateTime timestamp)
+    public bool IsCompletedOnOrBefore(DateTimeOffset timestamp)
     {
         return ScheduledEnd <= timestamp;
     }
 
-    public bool IsOngoingDuring(DateTime timestamp)
+    public bool IsOngoingDuring(DateTimeOffset timestamp)
     {
         return ScheduledStart <= timestamp && ScheduledEnd > timestamp;
     }

@@ -33,8 +33,8 @@ public partial class CreateProjectEventModal
     private CreateProjectEventRequest Request => _request ??= new()
     {
         ProjectId = ProjectId,
-        ScheduledStart = DateTime.Today,
-        ScheduledEnd = DateTime.Today.AddDays(1)
+        ScheduledStart = DateTimeOffset.UtcNow.Date,
+        ScheduledEnd = DateTimeOffset.UtcNow.Date.AddDays(1)
     };
 
     protected override async Task OnInitializedAsync()

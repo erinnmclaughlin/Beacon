@@ -1,15 +1,25 @@
-﻿using Beacon.Common.Models;
+﻿using System.Text.Json.Serialization;
+using Beacon.Common.Models;
 
 namespace Beacon.Common.Requests.Laboratories;
 
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class GetLaboratoryEventsRequest : BeaconRequest<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>, IPaginated
 {
-    public List<Guid> ProjectIds { get; set; } = new();
-    public DateTime? MinStart { get; set; }
-    public DateTime? MaxStart { get; set; }
-    public DateTime? MinEnd { get; set; }
-    public DateTime? MaxEnd { get; set; }
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingDefault)]
+    public List<Guid> ProjectIds { get; set; } = [];
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTimeOffset? MinStart { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTimeOffset? MaxStart { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTimeOffset? MinEnd { get; set; }
+    
+    [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+    public DateTimeOffset? MaxEnd { get; set; }
 
     public int PageNumber { get; set; } = 1;
     public int PageSize { get; set; } = 100;

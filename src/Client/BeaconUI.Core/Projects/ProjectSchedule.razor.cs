@@ -29,18 +29,18 @@ public partial class ProjectSchedule
         ErrorOrInstruments = await ApiClient.SendAsync(new GetLaboratoryInstrumentsRequest());
     }
 
-    private int CompletedEventCount => ErrorOrEvents?.Value.Items.Count(x => x.IsCompletedOnOrBefore(DateTime.Now)) ?? 0;
+    private int CompletedEventCount => ErrorOrEvents?.Value.Items.Count(x => x.IsCompletedOnOrBefore(DateTimeOffset.UtcNow)) ?? 0;
 
     private IEnumerable<TimelineItem<LaboratoryEventDto>> GetTimelineEvents(IEnumerable<LaboratoryEventDto> events)
     {
         return events
-            .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTime.Now))
-            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart.DateTime, Value = e });
+            .Where(e => ShowPastEvents || !e.IsCompletedOnOrBefore(DateTimeOffset.UtcNow))
+            .Select(e => new TimelineItem<LaboratoryEventDto> { Timestamp = e.ScheduledStart, Value = e });
     }
 
     private async Task LoadProjects()
     {
-        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new List<Guid> { ProjectId } });
+        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = [ProjectId] });
     }
 
     private ErrorOr<LaboratoryInstrumentDto[]>? GetSuggestedInstruments(LaboratoryEventDto e)

@@ -11,8 +11,8 @@ public sealed class InvitationEmail : LaboratoryScopedEntityBase
     public Guid LaboratoryInvitationId { get; init; }
     public Invitation LaboratoryInvitation { get; init; } = null!;
 
-    public bool IsExpired(DateTime now)
+    public bool IsExpired(DateTimeOffset asOfDate)
     {
-        return now > ExpiresOn;
+        return asOfDate > ExpiresOn;
     }
 }

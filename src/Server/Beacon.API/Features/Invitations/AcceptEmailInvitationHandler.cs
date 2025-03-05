@@ -68,7 +68,7 @@ internal sealed class AcceptEmailInvitationHandler(ISessionContext context, Beac
                 .IgnoreQueryFilters()
                 .SingleAsync(i => i.Id == emailId, ct);
 
-            return !emailInvite.IsExpired(DateTime.UtcNow);
+            return !emailInvite.IsExpired(DateTimeOffset.UtcNow);
         }
     }
 }

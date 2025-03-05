@@ -2,6 +2,6 @@
 
 public sealed record TimelineItem<T>
 {
-    public DateTime Timestamp { get; init; }
+    public DateTimeOffset Timestamp { get; init; }
     public required T Value { get; init; }
 }

@@ -3,6 +3,7 @@ using Beacon.API.Features.Projects;
 using Beacon.API.Persistence.Entities;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
+using Microsoft.VisualBasic;
 
 namespace Beacon.API.IntegrationTests.Endpoints;
 
@@ -37,7 +38,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
 
         await using var dbContext = await CreateDbContext();
         var sut = new GetProjectInsightsHandler(dbContext);
-        var result = await sut.GetStatistics(new DateTime(new DateOnly(2023, 8, 1), TimeOnly.MinValue, DateTimeKind.Utc), CancellationToken.None);
+        var result = await sut.GetStatistics(new DateOnly(2023, 8, 1), AbortTest);
 
         var app1Result = result.Single(x => x.ApplicationType == "Application 1");
         Assert.Equal(7, app1Result.NumberOfProjectsCreatedLastYear);
@@ -192,7 +193,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202301-001")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(new DateOnly(2023, 1, 12), TimeOnly.MinValue, DateTimeKind.Utc)
+                            CreatedOn = GetDateTimeOffset(2023, 1, 12)
                         }
                     }
                 ]
@@ -209,7 +210,7 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202302-001")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(new DateOnly(2023, 2, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+                            CreatedOn = GetDateTimeOffset(2023, 2, 1)
                         }
                     },
                     new ProjectApplicationTag
@@ -220,13 +221,13 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
                             CustomerName = "Test",
                             ProjectCode = ProjectCode.FromString("TST-202302-002")!,
                             CreatedById = TestData.AdminUser.Id,
-                            CreatedOn = new DateTime(new DateOnly(2023, 2, 28), TimeOnly.MinValue, DateTimeKind.Utc)
+                            CreatedOn = GetDateTimeOffset(2023, 2, 28)
                         }
                     }
                 ]
             });
         
-        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc) });
+        var response = await SendAsync(new GetProjectTypeFrequencyRequest { StartDate = new DateOnly(2023, 1, 1) });
         Assert.Equal(HttpStatusCode.OK, response.StatusCode);
 
         var data = await response.Content.ReadFromJsonAsync<GetProjectTypeFrequencyRequest.Series[]>(AbortTest);
@@ -261,13 +262,19 @@ public sealed class GetProjectInsightsUnitTests(TestFixture testFixture) : Integ
         return application;
     }
 
-    private static Project CreateProject(DateOnly date, int index) =>  new Project
+    private static Project CreateProject(DateOnly date, int index) => new()
     {
         Id = Guid.NewGuid(),
         CustomerName = "Doesn't Matter",
         ProjectCode = new ProjectCode("TST", date.ToString("yyyyMM"), index + 1),
         LaboratoryId = TestData.Lab.Id,
         CreatedById = TestData.AdminUser.Id,
-        CreatedOn = new DateTime(date, TimeOnly.MinValue, DateTimeKind.Utc)
+        CreatedOn = GetDateTimeOffset(date.Year, date.Month, date.Day)
     };
+
+    private static DateTimeOffset GetDateTimeOffset(int year, int month, int day)
+    {
+        var dateOnly = new DateOnly(year, month, day);
+        return new DateTimeOffset(dateOnly, TimeOnly.MinValue, TimeSpan.Zero);
+    }
 }

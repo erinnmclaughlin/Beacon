@@ -18,7 +18,7 @@ public sealed class ProjectManagement(TestFixture fixture) : IntegrationTestBase
         ProjectCode = new ProjectCode("ABC", "202001", 1),
         ProjectStatus = ProjectStatus.Active,
         CreatedById = TestData.AdminUser.Id,
-        CreatedOn = new DateTime(new DateOnly(2020, 01, 01), TimeOnly.MinValue, DateTimeKind.Utc),
+        CreatedOn = new DateOnly(2020, 01, 01).ToDateTimeOffset(),
         LaboratoryId = TestData.Lab.Id,
         LeadAnalystId = null
     };

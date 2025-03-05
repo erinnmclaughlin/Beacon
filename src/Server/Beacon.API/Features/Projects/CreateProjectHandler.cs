@@ -63,7 +63,7 @@ internal sealed class CreateProjectHandler(BeaconDbContext dbContext, ISessionCo
 
     private async Task<ProjectCode> GenerateProjectCode(CreateProjectRequest request, CancellationToken ct)
     {
-        var today = DateTime.Today.ToString("yyyyMM");
+        var today = DateTimeOffset.UtcNow.ToString("yyyyMM");
 
         var lastSuffix = await _dbContext.Projects
             .Where(p => p.ProjectCode.CustomerCode == request.CustomerCode && p.ProjectCode.Date == today)

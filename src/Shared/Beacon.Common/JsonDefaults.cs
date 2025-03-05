@@ -9,12 +9,13 @@ public static class JsonDefaults
     {
         get
         {
-            var options = new JsonSerializerOptions
+            var options = new JsonSerializerOptions(JsonSerializerDefaults.Web)
             {
                 IgnoreReadOnlyFields = true,
                 IgnoreReadOnlyProperties = true,
                 PropertyNameCaseInsensitive = true,
-                PropertyNamingPolicy = JsonNamingPolicy.CamelCase
+                PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                WriteIndented = false
             };
 
             options.Converters.Add(new JsonStringEnumConverter());

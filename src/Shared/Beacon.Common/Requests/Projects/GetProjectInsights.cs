@@ -2,7 +2,7 @@
 
 public class GetProjectInsightsRequest : BeaconRequest<GetProjectInsightsRequest, ProjectInsightDto[]>
 {
-    public DateTime ReferenceDate { get; set; } = DateTime.Today.AddMonths(-1);
+    public DateOnly ReferenceDate { get; set; } = DateTimeOffset.UtcNow.ToDateOnly().AddMonths(-1);
 }
 
 public class ProjectInsightDto

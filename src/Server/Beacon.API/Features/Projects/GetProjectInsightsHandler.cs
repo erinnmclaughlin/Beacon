@@ -1,4 +1,5 @@
 ﻿using Beacon.API.Persistence;
+using Beacon.Common;
 using Beacon.Common.Models;
 using Beacon.Common.Requests.Projects;
 using ErrorOr;
@@ -20,9 +21,10 @@ internal class GetProjectInsightsHandler(BeaconDbContext dbContext) : IBeaconReq
         return results.OrderByDescending(x => x.Interestingness).ToArray();
     }
 
-    public async Task<List<ProjectApplicationPopularityStatistic>> GetStatistics(DateTime referenceDate, CancellationToken ct)
+    public async Task<List<ProjectApplicationPopularityStatistic>> GetStatistics(DateOnly referenceDate, CancellationToken ct)
     {
-        var thisYear = referenceDate.AddYears(-1);
+        var referenceDateOffset = referenceDate.ToDateTimeOffset();
+        var thisYear = referenceDateOffset.AddYears(-1);
         var lastYear = thisYear.AddYears(-1);
         var validStatuses = new[] { ProjectStatus.Active, ProjectStatus.Completed, ProjectStatus.Pending };
 
@@ -30,14 +32,14 @@ internal class GetProjectInsightsHandler(BeaconDbContext dbContext) : IBeaconReq
             .Select(a => new ProjectApplicationPopularityStatistic
             {
                 ApplicationType = a.Name,
-                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => validStatuses.Contains(p.Project.ProjectStatus) && p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < referenceDate),
+                NumberOfProjectsCreatedThisYear = a.TaggedProjects.Count(p => validStatuses.Contains(p.Project.ProjectStatus) && p.Project.CreatedOn >= thisYear && p.Project.CreatedOn < referenceDateOffset),
                 NumberOfProjectsCreatedLastYear = a.TaggedProjects.Count(p => validStatuses.Contains(p.Project.ProjectStatus) && p.Project.CreatedOn >= lastYear && p.Project.CreatedOn < thisYear)
             })
             .AsNoTracking()
             .ToListAsync(ct);
     }
 
-    public static IEnumerable<ProjectInsightDto> GetGrowthInsights(IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
+    private static IEnumerable<ProjectInsightDto> GetGrowthInsights(IReadOnlyCollection<ProjectApplicationPopularityStatistic> stats)
     {
         var filteredStats = stats
             .Where(x => x.NumberOfProjectsCreatedThisYear != 0 && x.NumberOfProjectsCreatedLastYear != 0)
@@ -132,7 +134,7 @@ public class ProjectApplicationPopularityStatistic
     public required int NumberOfProjectsCreatedThisYear { get; init; }
     public required int NumberOfProjectsCreatedLastYear { get; init; }
 
-    public int NumberOfProjectsCreatedDiff => NumberOfProjectsCreatedThisYear - NumberOfProjectsCreatedLastYear;
+    private int NumberOfProjectsCreatedDiff => NumberOfProjectsCreatedThisYear - NumberOfProjectsCreatedLastYear;
     public double PercentGrowth => NumberOfProjectsCreatedDiff / (double)NumberOfProjectsCreatedLastYear;
 }
 

@@ -36,7 +36,7 @@
             <div style="margin-bottom:1.5rem;">
                 <p class="fw-semibold text-muted mb-2">
                     <span>@context.Timestamp.ToString("dd-MMM-yyyy")</span> 
-                    @if (TimeOnly.FromDateTime(context.Timestamp) != TimeOnly.MinValue)
+                    @if (TimeOnly.FromTimeSpan(context.Timestamp.TimeOfDay) != TimeOnly.MinValue)
                     {
                         <small class="text-black-50 ms-1" style="font-size: 0.8rem;">@context.Timestamp.ToString("h:mm tt")</small>
                     }
@@ -50,7 +50,7 @@
                         </button> *@
                         <h6 class="card-title d-flex align-items-center" style="font-size:1.075rem; margin-bottom: 0.675rem;">
                             <span class="me-1">@context.Value.Title</span>
-                            @if (context.Value.IsOngoingDuring(DateTime.Today))
+                            @if (context.Value.IsOngoingDuring(DateTimeOffset.UtcNow))
                             {
                                 <span class="d-flex">
                                     <Badge Class="is-primary">Ongoing</Badge>
@@ -58,22 +58,22 @@
                             }
                         </h6>
                         <h6 class="card-subtitle mb-2 text-black-50 small">
-                            @if (context.Value.IsCompletedOnOrBefore(DateTime.Now))
+                            @if (context.Value.IsCompletedOnOrBefore(DateTimeOffset.UtcNow))
                             {
                                 <span class="icon">
                                     <i class="fa-regular fa-calendar"></i>
                                 </span>
                                 <span>
-                                    Completed <Duration TimeSpan="@(DateTime.Now - context.Value.ScheduledEnd)" /> ago
+                                    Completed <Duration TimeSpan="@(DateTimeOffset.UtcNow - context.Value.ScheduledEnd)" /> ago
                                 </span>
                             }
-                            else if (context.Value.IsOngoingDuring(DateTime.Now))
+                            else if (context.Value.IsOngoingDuring(DateTimeOffset.UtcNow))
                             {
                                 <span class="icon">
                                     <i class="fa-regular fa-clock"></i>
                                 </span>
                                 <span>
-                                    Ends in <Duration TimeSpan="@(context.Value.ScheduledEnd - DateTime.Now)" />
+                                    Ends in <Duration TimeSpan="@(context.Value.ScheduledEnd - DateTimeOffset.UtcNow)" />
                                 </span>
                             }
                             else
@@ -82,7 +82,7 @@
                                     <i class="fa-regular fa-calendar"></i>
                                 </span>
                                 <span>
-                                    Starts in <Duration TimeSpan="@(context.Value.ScheduledStart - DateTime.Now)" />
+                                    Starts in <Duration TimeSpan="@(context.Value.ScheduledStart - DateTimeOffset.UtcNow)" />
                                 </span>
                             }
                         </h6>

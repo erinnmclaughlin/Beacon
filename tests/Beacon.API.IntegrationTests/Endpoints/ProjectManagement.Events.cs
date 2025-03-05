@@ -21,8 +21,8 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
             Title = "Test 1",
             ProjectId = ProjectId,
             LaboratoryId = TestData.Lab.Id,
-            ScheduledStart = new DateTime(new DateOnly(2023, 5, 1), TimeOnly.MinValue, DateTimeKind.Utc),
-            ScheduledEnd = new DateTime(new DateOnly(2023, 10, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            ScheduledStart = new DateOnly(2023, 5, 1).ToDateTimeOffset(),
+            ScheduledEnd = new DateOnly(2023, 10, 1).ToDateTimeOffset()
         };
         
         yield return new ProjectEvent
@@ -30,8 +30,8 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
             Title = "Test 2",
             ProjectId = ProjectId,
             LaboratoryId = TestData.Lab.Id,
-            ScheduledStart = new DateTime(new DateOnly(2021, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc),
-            ScheduledEnd = new DateTime(new DateOnly(2021, 3, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            ScheduledStart = new DateOnly(2021, 1, 1).ToDateTimeOffset(),
+            ScheduledEnd = new DateOnly(2021, 3, 1).ToDateTimeOffset()
         };
     }
 
@@ -40,7 +40,7 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
     {
         await LogInToDefaultLab(TestData.AdminUser);
 
-        var now = DateTime.UtcNow;
+        var now = DateTimeOffset.UtcNow;
 
         var validRequest = new CreateProjectEventRequest
         {
@@ -72,8 +72,8 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
         {
             Title = "My Un-Cool Event",
             ProjectId = ProjectId,
-            ScheduledStart = DateTime.UtcNow,
-            ScheduledEnd = DateTime.UtcNow.AddMonths(1)
+            ScheduledStart = DateTimeOffset.UtcNow,
+            ScheduledEnd = DateTimeOffset.UtcNow.AddMonths(1)
         };
 
         var response = await SendAsync(validRequest);
@@ -92,8 +92,8 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
         {
             Title = "My Un-Cool Event",
             ProjectId = ProjectId,
-            ScheduledEnd = DateTime.UtcNow,
-            ScheduledStart = DateTime.UtcNow.AddMonths(1) // start date is after end date
+            ScheduledEnd = DateTimeOffset.UtcNow,
+            ScheduledStart = DateTimeOffset.UtcNow.AddMonths(1) // start date is after end date
         };
 
         var response = await SendAsync(invalidRequest);
@@ -134,7 +134,7 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
 
         var response = await SendAsync(new GetLaboratoryEventsRequest
         {
-            MinStart = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            MinStart = new DateOnly(2023, 1, 1).ToDateTimeOffset()
         });
         
         var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(AbortTest);
@@ -150,8 +150,10 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
 
         var response = await SendAsync(new GetLaboratoryEventsRequest
         {
-            MaxStart = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            MaxStart = new DateOnly(2023, 1, 1).ToDateTimeOffset()
         });
+
+        var content = response.Content.ReadAsStringAsync(AbortTest);
         
         var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(AbortTest);
         Assert.NotNull(events);
@@ -166,7 +168,7 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
 
         var response = await SendAsync(new GetLaboratoryEventsRequest
         {
-            MinEnd = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            MinEnd = new DateOnly(2023, 1, 1).ToDateTimeOffset()
         });
         
         var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(AbortTest);
@@ -182,12 +184,18 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
     {
         await LogInToDefaultLab(TestData.AdminUser);
 
+        var request = new GetLaboratoryEventsRequest
+        {
+            MaxEnd = new DateOnly(2023, 1, 1).ToDateTimeOffset()
+        };
+        
+        
         var response = await SendAsync(new GetLaboratoryEventsRequest
         {
-            MaxEnd = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc)
+            MaxEnd = new DateOnly(2023, 1, 1).ToDateTimeOffset()
         });
         
-        var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(AbortTest);
+        var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(JsonDefaults.JsonSerializerOptions, AbortTest);
         Assert.NotNull(events);
         Assert.Equal(1, events.TotalCount);
         
@@ -202,8 +210,8 @@ public sealed class ProjectManagementEvents(TestFixture fixture) : ProjectTestBa
 
         var response = await SendAsync(new GetLaboratoryEventsRequest
         {
-            MaxEnd = new DateTime(new DateOnly(2023, 1, 1), TimeOnly.MinValue, DateTimeKind.Utc),
-            MinEnd = new DateTime(new DateOnly(2023, 1, 2), TimeOnly.MinValue, DateTimeKind.Utc)
+            MaxEnd = new DateOnly(2023, 1, 1).ToDateTimeOffset(),
+            MinEnd = new DateOnly(2023, 1, 2).ToDateTimeOffset()
         });
         
         var events = await response.Content.ReadFromJsonAsync<PagedList<ProjectEvent>>(AbortTest);
