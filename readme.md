@@ -3,6 +3,13 @@
 [![.NET](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml/badge.svg)](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml)
 [![codecov](https://codecov.io/gh/erinnmclaughlin/Beacon/graph/badge.svg?token=L23K6YGUER)](https://codecov.io/gh/erinnmclaughlin/Beacon)
 
+Beacon is a **lightweight**, **modern**, and **intuitive** [laboratory information management system (LIMS)](https://en.wikipedia.org/wiki/Laboratory_information_management_system) focued on managing common laboratory operations. Beacon aims to meet the following goals:
+
+- Improve process efficiency and quality of common laboratory operations.
+- Simplify the user experience by offering a lightweight and intuitive core solution.
+- Avoid feature bloat by offering optional extensions to the core system.
+
+This project was initially developed at Penn State University as my Master's capstone project.
 
 ## Getting Started
 
