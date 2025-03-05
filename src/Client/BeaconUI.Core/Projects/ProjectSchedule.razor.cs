@@ -40,7 +40,7 @@ public partial class ProjectSchedule
 
     private async Task LoadProjects()
     {
-        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = [ProjectId] });
+        ErrorOrEvents = await ApiClient.SendAsync(new GetLaboratoryEventsRequest { ProjectIds = new List<Guid> { ProjectId } });
     }
 
     private ErrorOr<LaboratoryInstrumentDto[]>? GetSuggestedInstruments(LaboratoryEventDto e)
