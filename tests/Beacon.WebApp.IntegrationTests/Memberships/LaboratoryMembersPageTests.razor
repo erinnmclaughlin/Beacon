@@ -1,6 +1,8 @@
 @using Beacon.Common.Models
 @using Beacon.Common.Requests.Memberships
 @using BeaconUI.Core.Memberships.Pages
+@using ErrorOr
+@using BeaconUI.Core.Common.Auth
 @attribute [Trait("Category", "Laboratory Members")]
 @inherits BeaconTestContext
 @code {
@@ -8,6 +10,8 @@
     [Fact]
     public async Task GivenValidData_WhenPageLoads_ThenDisplayCorrectData()
     {
+        this.SetAuthorized();
+        
         var members = new LaboratoryMemberDto[]
         {
             new() { Id = Guid.NewGuid(), DisplayName = "John Doe", EmailAddress = "john.doe@example.com", MembershipType = LaboratoryMembershipType.Member },
@@ -16,7 +20,7 @@
 
         MockApi.Succeeds<GetMembershipsRequest, LaboratoryMemberDto[]>(members);
 
-        var sut = Render(@<LaboratoryMembersPage />);
+        var sut = Render(@<AuthorizeLabView><LaboratoryMembersPage /></AuthorizeLabView>);
 
         // Assert:
         sut.WaitForAssertion(() =>
@@ -30,9 +34,11 @@
     [Fact]
     public async Task GivenError_WhenPageLoads_ThenDisplayErrorMessage()
     {
+        this.SetAuthorized();
+        
         MockApi.Fails<GetMembershipsRequest, LaboratoryMemberDto[]>(Error.Failure("Error loading members"));
 
-        var sut = Render(@<LaboratoryMembersPage />);
+        var sut = Render(@<AuthorizeLabView><LaboratoryMembersPage /></AuthorizeLabView>);
 
         // Assert:
         sut.WaitForAssertion(() =>

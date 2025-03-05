@@ -1,41 +1,34 @@
-@page "/tests/instruments/create-instrument-modal-tests"
+@using Beacon.Common.Requests.Instruments
 @using Beacon.WebApp.IntegrationTests.TestHelpers
+@using BeaconUI.Core.Instruments.CreateInstrument
 @inherits BeaconTestContext
-
-<h3>Create Instrument Modal Tests</h3>
-
-<button @onclick="TestDisplayCorrectData">Test Display Correct Data</button>
-<button @onclick="TestFormSubmission">Test Form Submission</button>
-
 @code {
+    
+    [Fact]
     private async Task TestDisplayCorrectData()
     {
-        // Arrange
-        var modal = RenderModal<CreateInstrumentModal>();
+        MockApi.Setup<CreateLaboratoryInstrumentRequest>();
+        
+        var sut = RenderModal();
+        _ = ModalService.Show<CreateInstrumentModal>();
 
-        // Act
-        var instrumentTypeInput = modal.Find("#instrumentType");
-        var instrumentNameInput = modal.Find("#sn");
+        sut.WaitForElement("#sn", TimeSpan.FromSeconds(5));
+        await sut.Find("form").SubmitAsync();
 
-        // Assert
-        instrumentTypeInput.Should().NotBeNull();
-        instrumentNameInput.Should().NotBeNull();
+        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Never());
     }
 
-    private async Task TestFormSubmission()
+    private async Task CreateInstrumentModal_CallsApi_WhenStateIsValid()
     {
-        // Arrange
-        var modal = RenderModal<CreateInstrumentModal>();
-        var instrumentTypeInput = modal.Find("#instrumentType");
-        var instrumentNameInput = modal.Find("#sn");
-        var submitButton = modal.Find("button[type='submit']");
+        MockApi.Setup<CreateLaboratoryInstrumentRequest>();
+        
+        var sut = RenderModal();
+        _ = ModalService.Show<CreateInstrumentModal>();
+        
+        sut.WaitForElement("#sn", TimeSpan.FromSeconds(5)).Change("42");
+        sut.WaitForElement("#instrumentType", TimeSpan.FromSeconds(5)).Change("Microscope");
+        await sut.Find("form").SubmitAsync();
 
-        // Act
-        instrumentTypeInput.Change("FMS");
-        instrumentNameInput.Change("FMS-760");
-        submitButton.Click();
-
-        // Assert
-        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Once);
+        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Once());
     }
 }

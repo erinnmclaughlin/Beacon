@@ -9,10 +9,10 @@ namespace BeaconUI.Core.Projects.Pages;
 public partial class ProjectDetailsPage
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [Inject]
-    private NavigationManager NavigationManager { get; set; } = default!;
+    private NavigationManager NavigationManager { get; set; } = null!;
 
     [Parameter]
     public required string Code { get; set; }

@@ -10,10 +10,10 @@ namespace BeaconUI.Core.Memberships.Pages;
 public partial class LaboratoryMembersPage
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [CascadingParameter]
-    private ILabContext LabContext { get; set; } = default!;
+    private ILabContext LabContext { get; set; } = null!;
 
     private ErrorOr<LaboratoryMemberDto[]>? Result { get; set; }
 

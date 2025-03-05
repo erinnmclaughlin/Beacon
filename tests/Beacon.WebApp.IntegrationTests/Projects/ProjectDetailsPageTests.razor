@@ -1,42 +1,50 @@
 @using Beacon.Common.Models
+@using Beacon.Common.Requests.Instruments
+@using Beacon.Common.Requests.Laboratories
+@using Beacon.Common.Requests.Memberships
 @using Beacon.Common.Requests.Projects
 @using BeaconUI.Core.Projects.Pages
 @inherits BeaconTestContext
 
 @code {
-    private static ProjectDto TestProject { get; } = new ProjectDto
+    private static ProjectDto TestProject { get; } = new()
     {
         Id = Guid.NewGuid(),
-        ProjectCode = "P12345",
+        ProjectCode = "ABC-123456-001",
         CustomerName = "Test Customer",
-        Applications = new List<string> { "App1", "App2" },
+        Applications = ["App1", "App2"],
         ProjectStatus = ProjectStatus.Active,
-        LeadAnalyst = new LaboratoryMemberDto { DisplayName = "Test Analyst" }
+        LeadAnalyst = new ProjectDto.LeadAnalystDto { Id = Guid.NewGuid(), DisplayName = "Test Analyst" }
     };
 
     [Fact]
     public void ProjectDetailsPage_DisplaysCorrectData()
     {
+        this.SetAuthorized();
         MockApi.Succeeds<GetProjectByProjectCodeRequest, ProjectDto>(TestProject);
-
-        var sut = Render(@<ProjectDetailsPage Code="P12345" />);
+        MockApi.Succeeds<GetAnalystsRequest, LaboratoryMemberDto[]>([]);
+        MockApi.Succeeds<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>(new PagedList<LaboratoryEventDto>([], 0, 1, 1));
+        MockApi.Succeeds<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>([]);
+        
+        var sut = Render(@<ProjectDetailsPage Code="@TestProject.ProjectCode" />);
         sut.WaitForAssertion(() =>
         {
-            sut.Markup.Should()
-                .Contain(TestProject.ProjectCode).And
-                .Contain(TestProject.CustomerName).And
-                .Contain(TestProject.Applications.First()).And
-                .Contain(TestProject.ProjectStatus.ToString()).And
-                .Contain(TestProject.LeadAnalyst.DisplayName);
+            sut.Markup.Should().Contain(TestProject.ProjectCode)
+                .And.Contain(TestProject.CustomerName)
+                .And.Contain(TestProject.Applications.First())
+                .And.Contain(TestProject.ProjectStatus.GetDescription())
+                .And.Contain(TestProject.LeadAnalyst!.DisplayName)
+            ;
         }, TimeSpan.FromSeconds(5));
     }
 
     [Fact]
     public void ProjectDetailsPage_DisplaysErrorWhenApiCallFails()
     {
+        this.SetAuthorized();
         MockApi.Fails<GetProjectByProjectCodeRequest, ProjectDto>();
 
-        var sut = Render(@<ProjectDetailsPage Code="P12345" />);
+        var sut = Render(@<ProjectDetailsPage Code="@TestProject.ProjectCode" />);
         sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"), TimeSpan.FromSeconds(5));
     }
 }

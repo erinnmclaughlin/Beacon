@@ -14,10 +14,10 @@ namespace BeaconUI.Core.Projects.Pages;
 public partial class ProjectDashboardPage
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [CascadingParameter]
-    private IModalService ModalService { get; set; } = default!;
+    private IModalService ModalService { get; set; } = null!;
 
     private GetProjectsRequest Request { get; set; } = new();
     private ErrorOr<LaboratoryMemberDto[]>? AnalystsOrError { get; set; }
@@ -26,7 +26,7 @@ public partial class ProjectDashboardPage
     protected override async Task OnInitializedAsync()
     {
         Request.PageSize = 10;
-        Request.IncludedStatuses = new List<ProjectStatus>() { ProjectStatus.Active, ProjectStatus.Pending };
+        Request.IncludedStatuses = [ProjectStatus.Active, ProjectStatus.Pending];
         await Task.WhenAll(LoadProjects(), LoadLeadAnalystOptions());
     }
 
