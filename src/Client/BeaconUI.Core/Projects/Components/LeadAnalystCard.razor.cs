@@ -10,7 +10,7 @@ namespace BeaconUI.Core.Projects.Components;
 public partial class LeadAnalystCard
 {
     [Inject]
-    private IApiClient ApiClient { get; set; } = default!;
+    private IApiClient ApiClient { get; set; } = null!;
 
     [Parameter]
     public required ProjectDto Project { get; set; }

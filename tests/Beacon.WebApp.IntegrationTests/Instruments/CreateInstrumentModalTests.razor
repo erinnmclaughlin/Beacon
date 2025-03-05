@@ -1,0 +1,34 @@
+@using Beacon.Common.Requests.Instruments
+@using Beacon.WebApp.IntegrationTests.TestHelpers
+@using BeaconUI.Core.Instruments.CreateInstrument
+@inherits BeaconTestContext
+@code {
+    
+    [Fact]
+    private async Task TestDisplayCorrectData()
+    {
+        MockApi.Setup<CreateLaboratoryInstrumentRequest>();
+        
+        var sut = RenderModal();
+        _ = ModalService.Show<CreateInstrumentModal>();
+
+        sut.WaitForElement("#sn", TimeSpan.FromSeconds(5));
+        await sut.Find("form").SubmitAsync();
+
+        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Never());
+    }
+
+    private async Task CreateInstrumentModal_CallsApi_WhenStateIsValid()
+    {
+        MockApi.Setup<CreateLaboratoryInstrumentRequest>();
+        
+        var sut = RenderModal();
+        _ = ModalService.Show<CreateInstrumentModal>();
+        
+        sut.WaitForElement("#sn", TimeSpan.FromSeconds(5)).Change("42");
+        sut.WaitForElement("#instrumentType", TimeSpan.FromSeconds(5)).Change("Microscope");
+        await sut.Find("form").SubmitAsync();
+
+        MockApi.Verify<CreateLaboratoryInstrumentRequest>(Times.Once());
+    }
+}
