@@ -1,6 +1,7 @@
 # Beacon
 
 [![.NET](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml/badge.svg)](https://github.com/erinnmclaughlin/Beacon/actions/workflows/dotnet.yml)
+[![codecov](https://codecov.io/gh/erinnmclaughlin/Beacon/branch/main/graph/badge.svg)](https://codecov.io/gh/erinnmclaughlin/Beacon)
 
 ## Getting Started
 

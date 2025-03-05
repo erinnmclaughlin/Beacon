@@ -158,6 +158,15 @@ jobs:
         path: coveragereport
         retention-days: 14
 
+    # Upload to Codecov
+    - name: Upload to Codecov
+      uses: codecov/codecov-action@v3
+      with:
+        files: ./TestResults/coverage.cobertura.xml
+        flags: unittests
+        name: codecov-umbrella
+        fail_ci_if_error: true
+
   publish:
     needs: generate-report
     if: github.ref == 'refs/heads/main'
