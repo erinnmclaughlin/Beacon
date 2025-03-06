@@ -4,11 +4,17 @@ on:
   push:
     branches: [ "main" ]
     paths:
-      - '!README.md'
+      - 'src/**'
+      - 'tests/**'
+      - 'tools/**'
+      - '.github/workflows/dotnet.yml'
   pull_request:
     branches: [ "main" ]
     paths:
-      - '!README.md'
+      - 'src/**'
+      - 'tests/**'
+      - 'tools/**'
+      - '.github/workflows/dotnet.yml'
   workflow_dispatch:
 
 permissions:
