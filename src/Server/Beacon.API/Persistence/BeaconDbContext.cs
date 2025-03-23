@@ -19,6 +19,7 @@ public class BeaconDbContext(DbContextOptions options, ISessionContext sessionCo
     public DbSet<ProjectApplicationTag> ProjectApplicationTags => Set<ProjectApplicationTag>();
     public DbSet<ProjectContact> ProjectContacts => Set<ProjectContact>();
     public DbSet<ProjectEvent> ProjectEvents => Set<ProjectEvent>();
+    public DbSet<ProjectNote> ProjectNotes => Set<ProjectNote>();
     public DbSet<SampleGroup> SampleGroups => Set<SampleGroup>();
     public DbSet<User> Users => Set<User>();
 
@@ -119,6 +120,18 @@ public class BeaconDbContext(DbContextOptions options, ISessionContext sessionCo
         {
             builder.Property(x => x.Title).HasMaxLength(50);
             builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
+        });
+
+        modelBuilder.Entity<ProjectNote>(builder =>
+        {
+            builder.Property(x => x.Content).HasMaxLength(2000);
+            builder.HasOne(x => x.Project)
+                .WithMany(x => x.Notes)
+                .HasForeignKey(x => x.ProjectId)
+                .OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.Laboratory).WithMany().OnDelete(DeleteBehavior.Restrict);
+            builder.HasOne(x => x.CreatedBy).WithMany().OnDelete(DeleteBehavior.Restrict);
             builder.HasQueryFilter(x => x.LaboratoryId == _sessionContext.CurrentLab!.Id);
         });
 
