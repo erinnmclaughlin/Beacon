@@ -1,6 +1,11 @@
-﻿<div class="row">
+﻿@using Beacon.Common.Models
+
+<div class="row">
     <div class="col-12 col-lg">
-        <ProjectSchedule ProjectId="Project.Id" />
+        <div class="d-flex flex-column gap-3">
+            <ProjectSchedule ProjectId="Project.Id" />
+            <ProjectNotes ProjectId="Project.Id" />
+        </div>
     </div>
     <div class="col-12 col-lg-auto" style="min-width: 21rem;">
         <LeadAnalystCard Project="Project" ProjectChanged="ProjectChanged" />

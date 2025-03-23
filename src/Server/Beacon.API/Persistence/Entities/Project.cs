@@ -19,4 +19,5 @@ public sealed class Project : LaboratoryScopedEntityBase
     public List<ProjectContact> Contacts { get; set; } = [];
     public List<SampleGroup> SampleGroups { get; set; } = [];
     public List<ProjectApplicationTag> TaggedApplications { get; set; } = [];
+    public List<ProjectNote> Notes { get; set; } = [];
 }
