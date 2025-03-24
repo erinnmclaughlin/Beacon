@@ -1,0 +1,221 @@
+@using Beacon.Common.Models
+@using Beacon.Common.Requests.Projects.Notes
+@using BeaconUI.Core.Projects.Components
+@using BeaconUI.Core.Projects.Modals
+@using Beacon.WebApp.IntegrationTests.TestHelpers
+@using BeaconUI.Core.Common.Http
+@using Bunit
+@using FluentAssertions
+@using Moq
+@using Xunit
+@using Blazored.Modal
+@using Blazored.Modal.Services
+@using Microsoft.Extensions.DependencyInjection
+@using ErrorOr
+
+@inherits BeaconTestContext
+
+@code {
+    private static readonly Guid TestProjectId = Guid.NewGuid();
+    private static readonly ProjectNoteDto TestNote = new()
+    {
+        Id = Guid.NewGuid(),
+        Content = "Test note content",
+        CreatedAt = DateTime.UtcNow,
+        CreatedById = Guid.NewGuid(),
+        CreatedByDisplayName = "Test User"
+    };
+
+    [Fact]
+    public void ProjectNotes_DisplaysLoadingState()
+    {
+        // Arrange
+        this.SetAuthorized();
+        var neverComplete = new TaskCompletionSource<ErrorOr<ProjectNoteDto[]>>();
+        MockApi.Setup(x => x.SendAsync(It.IsAny<GetProjectNotesRequest>(), It.IsAny<CancellationToken>()))
+            .Returns(neverComplete.Task);
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+
+        // Assert
+        cut.WaitForAssertion(() => cut.MarkupMatches(@<text>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center">
+                    <h5 class="display-6 fs-4 mb-0">Project Notes</h5>
+                    <button class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Add note">
+                        <span class="icon me-0"><i class="fa-regular fa-note-sticky"></i></span>
+                    </button>
+                </div>
+                <p>Loading...</p>
+            </div>
+        </text>), TimeSpan.FromSeconds(5));
+    }
+
+    [Fact]
+    public void ProjectNotes_DisplaysErrorState()
+    {
+        // Arrange
+        this.SetAuthorized();
+        MockApi.Fails<GetProjectNotesRequest, ProjectNoteDto[]>();
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+
+        // Assert
+        cut.WaitForAssertion(() => cut.MarkupMatches(@<text>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center">
+                    <h5 class="display-6 fs-4 mb-0">Project Notes</h5>
+                    <button class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Add note">
+                        <span class="icon me-0"><i class="fa-regular fa-note-sticky"></i></span>
+                    </button>
+                </div>
+                <p class="text-danger">There was an error loading project notes. Please try again later.</p>
+            </div>
+        </text>));
+    }
+
+    [Fact]
+    public void ProjectNotes_DisplaysEmptyState()
+    {
+        // Arrange
+        this.SetAuthorized();
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+
+        // Assert
+        cut.WaitForAssertion(() => cut.MarkupMatches(@<text>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center">
+                    <h5 class="display-6 fs-4 mb-0">Project Notes</h5>
+                    <button class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Add note">
+                        <span class="icon me-0"><i class="fa-regular fa-note-sticky"></i></span>
+                    </button>
+                </div>
+                <p class="text-muted">No notes have been added to this project.</p>
+            </div>
+        </text>));
+    }
+
+    [Fact]
+    public void ProjectNotes_DisplaysNotes()
+    {
+        // Arrange
+        this.SetAuthorized();
+        var olderNote = TestNote with { CreatedAt = DateTime.UtcNow.AddDays(-1) };
+        var newerNote = TestNote with { Id = Guid.NewGuid(), CreatedAt = DateTime.UtcNow };
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([newerNote, olderNote]);
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+
+        // Assert
+        cut.WaitForAssertion(() => cut.MarkupMatches(@<text>
+            <div class="d-flex flex-column gap-3">
+                <div class="d-flex align-items-center">
+                    <h5 class="display-6 fs-4 mb-0">Project Notes</h5>
+                    <button class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Add note">
+                        <span class="icon me-0"><i class="fa-regular fa-note-sticky"></i></span>
+                    </button>
+                </div>
+                <div class="d-flex flex-column gap-3">
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <small class="text-muted">@newerNote.CreatedByDisplayName</small>
+                                <small class="text-muted">•</small>
+                                <small class="text-muted">@newerNote.CreatedAt.ToLocalTime().ToString("g")</small>
+                            </div>
+                            <p class="card-text mb-0" style="white-space: pre-wrap">@newerNote.Content</p>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <div class="card-body">
+                            <div class="d-flex align-items-center gap-2 mb-2">
+                                <small class="text-muted">@olderNote.CreatedByDisplayName</small>
+                                <small class="text-muted">•</small>
+                                <small class="text-muted">@olderNote.CreatedAt.ToLocalTime().ToString("g")</small>
+                            </div>
+                            <p class="card-text mb-0" style="white-space: pre-wrap">@olderNote.Content</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </text>));
+    }
+
+    [Fact]
+    public async Task ProjectNotes_CanAddNote()
+    {
+        // Arrange
+        this.SetAuthorized();
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
+        MockApi.Setup<AddProjectNoteRequest>();
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+        var modal = RenderModal();
+
+        // Open modal
+        cut.Find("button[title='Add note']").Click();
+        await Task.Delay(100); // Wait for modal to open
+
+        // Fill and submit form
+        var form = modal.Find("form");
+        var textarea = modal.Find("textarea");
+        textarea.Change("New test note");
+        await modal.Find("form").SubmitAsync();
+
+        // Assert
+        MockApi.Verify<AddProjectNoteRequest>(Times.Once());
+        MockApi.Verify<GetProjectNotesRequest, ProjectNoteDto[]>(Times.Exactly(2)); // Initial load + refresh after add
+    }
+
+    [Fact]
+    public async Task ProjectNotes_ValidatesEmptyContent()
+    {
+        // Arrange
+        this.SetAuthorized();
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+        var modal = RenderModal();
+
+        // Open modal
+        cut.Find("button[title='Add note']").Click();
+        await Task.Delay(100); // Wait for modal to open
+
+        // Submit empty form
+        var form = modal.Find("form");
+        await form.SubmitAsync();
+
+        // Assert
+        modal.FindAll(".validation-message").Count.Should().BeGreaterThan(0);
+        MockApi.Verify<AddProjectNoteRequest>(Times.Never());
+    }
+
+    [Fact]
+    public async Task ProjectNotes_CanCancelAdd()
+    {
+        // Arrange
+        this.SetAuthorized();
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
+
+        // Act
+        var cut = Render(@<ProjectNotes ProjectId="TestProjectId" />);
+        var modal = RenderModal();
+
+        // Open modal and cancel
+        cut.Find("button[title='Add note']").Click();
+        await Task.Delay(100); // Wait for modal to open
+        modal.Find("button.btn-secondary").Click();
+
+        // Assert
+        MockApi.Verify<AddProjectNoteRequest>(Times.Never());
+        MockApi.Verify<GetProjectNotesRequest, ProjectNoteDto[]>(Times.Once()); // Only initial load
+    }
+} 

@@ -3,6 +3,7 @@
 @using Beacon.Common.Requests.Laboratories
 @using Beacon.Common.Requests.Memberships
 @using Beacon.Common.Requests.Projects
+@using Beacon.Common.Requests.Projects.Notes
 @using BeaconUI.Core.Projects.Pages
 @inherits BeaconTestContext
 
@@ -25,6 +26,7 @@
         MockApi.Succeeds<GetAnalystsRequest, LaboratoryMemberDto[]>([]);
         MockApi.Succeeds<GetLaboratoryEventsRequest, PagedList<LaboratoryEventDto>>(new PagedList<LaboratoryEventDto>([], 0, 1, 1));
         MockApi.Succeeds<GetLaboratoryInstrumentsRequest, LaboratoryInstrumentDto[]>([]);
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
         
         var sut = Render(@<ProjectDetailsPage Code="@TestProject.ProjectCode" />);
         sut.WaitForAssertion(() =>
@@ -43,6 +45,7 @@
     {
         this.SetAuthorized();
         MockApi.Fails<GetProjectByProjectCodeRequest, ProjectDto>();
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
 
         var sut = Render(@<ProjectDetailsPage Code="@TestProject.ProjectCode" />);
         sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"), TimeSpan.FromSeconds(5));
