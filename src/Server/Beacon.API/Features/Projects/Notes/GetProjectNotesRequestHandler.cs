@@ -12,6 +12,9 @@ internal sealed class GetProjectNotesRequestHandler(BeaconDbContext dbContext) :
 
     public async Task<ErrorOr<ProjectNoteDto[]>> Handle(GetProjectNotesRequest request, CancellationToken ct)
     {
+        if (!await _dbContext.Projects.AnyAsync(p => p.Id == request.ProjectId, ct))
+            return Error.NotFound("Project not found.");
+
         return await _dbContext.ProjectNotes
             .Where(n => n.ProjectId == request.ProjectId)
             .Select(n => new ProjectNoteDto

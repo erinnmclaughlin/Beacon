@@ -50,4 +50,15 @@
         var sut = Render(@<ProjectDetailsPage Code="@TestProject.ProjectCode" />);
         sut.WaitForAssertion(() => sut.Markup.Should().Contain("error"), TimeSpan.FromSeconds(5));
     }
+
+    [Fact]
+    public void ProjectDetailsPage_NavigatesToProjectsDashboardWhenInvalidProjectCodeProvided()
+    {
+        this.SetAuthorized();
+        var invalidProjectCode = "INVALID-CODE";
+        MockApi.Succeeds<GetProjectNotesRequest, ProjectNoteDto[]>([]);
+
+        var sut = Render(@<ProjectDetailsPage Code="@invalidProjectCode" />);
+        sut.WaitForAssertion(() => NavigationManager.Uri.Should().EndWith("l/projects"), TimeSpan.FromSeconds(5));
+    }
 }

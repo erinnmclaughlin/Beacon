@@ -97,6 +97,36 @@ public sealed class ProjectManagementNotes(TestFixture fixture) : IntegrationTes
         Assert.DoesNotContain(notes ?? [], n => n.Content == "");
     }
 
+    [Fact(DisplayName = "[013] Cannot get project notes for non-existent project")]
+    public async Task GetProjectNotes_ShouldFail_WhenProjectDoesNotExist()
+    {
+        // Log in as a user that has permission to get project notes:
+        await LogInToDefaultLab(TestData.MemberUser);
+
+        // Attempt to get notes for a project that doesn't exist:
+        var response = await SendAsync(new GetProjectNotesRequest { ProjectId = Guid.NewGuid() });
+        
+        // Verify that this fails with a not found status:
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
+    [Fact(DisplayName = "[013] Cannot add project note to non-existent project")]
+    public async Task AddNote_ShouldFail_WhenProjectDoesNotExist()
+    {
+        // Log in as a user that has permission to add project notes:
+        await LogInToDefaultLab(TestData.AnalystUser);
+
+        // Attempt to create a note for a project that doesn't exist:
+        var response = await SendAsync(new AddProjectNoteRequest
+        {
+            ProjectId = Guid.NewGuid(),
+            Content = "This note should not be created"
+        });
+        
+        // Verify that this fails with a not found status:
+        Assert.Equal(HttpStatusCode.NotFound, response.StatusCode);
+    }
+
     private static Project CreateProject(string customerName, string projectCode) 
         => CreateProject(Guid.NewGuid(), customerName, projectCode);
     
