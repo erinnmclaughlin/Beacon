@@ -6,8 +6,8 @@ namespace Beacon.Common.Requests.Projects.Notes;
 [RequireMinimumMembership(LaboratoryMembershipType.Member)]
 public sealed class AddProjectNoteRequest : BeaconRequest<AddProjectNoteRequest>
 {
-    public Guid ProjectId { get; init; }
-    public string Content { get; init; } = string.Empty;
+    public Guid ProjectId { get; set; }
+    public string Content { get; set; } = string.Empty;
 
     public sealed class Validator : AbstractValidator<AddProjectNoteRequest>
     {

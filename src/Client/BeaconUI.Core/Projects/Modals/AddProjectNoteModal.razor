@@ -1,0 +1,46 @@
+@using Beacon.Common.Requests.Projects.Notes
+
+<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="content">Note Content</label>
+                <InputTextArea @bind-Value="Request.Content" class="form-control" id="content" rows="5" placeholder="Enter your note here..." />
+                <ValidationMessage For="() => Request.Content" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton>Add Note</SubmitButton>
+            <ModalCancelButton />
+        </footer>
+    </Modal>
+</BeaconForm>
+
+@code {
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [CascadingParameter]
+    private BlazoredModalInstance Modal { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public required Guid ProjectId { get; set; }
+
+    private AddProjectNoteRequest? _request;
+    private AddProjectNoteRequest Request => _request ??= new()
+    {
+        ProjectId = ProjectId
+    };
+
+    private async Task Submit(BeaconForm formContext)
+    {
+        var result = await ApiClient.SendAsync(Request);
+        if (result.IsError)
+        {
+            formContext.AddErrors(result.Errors);
+            return;
+        }
+
+        await Modal.CloseAsync(ModalResult.Ok());
+    }
+} 
