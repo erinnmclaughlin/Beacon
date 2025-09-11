@@ -26,7 +26,12 @@ public sealed class RegisterRequest : BeaconRequest<RegisterRequest>
 
             RuleFor(r => r.ConfirmPassword)
                 .NotEmpty().WithMessage("Please confirm your password.")
-                .Equal(r => r.Password).WithMessage("Passwords do not match.").When(r => !string.IsNullOrWhiteSpace(r.ConfirmPassword));
+                .When(r => !string.IsNullOrWhiteSpace(r.Password));
+
+            RuleFor(r => r.ConfirmPassword)
+                .Equal(r => r.Password)
+                .WithMessage("Passwords do not match.")
+                .When(r => !string.IsNullOrWhiteSpace(r.ConfirmPassword));
         }
     }
 }
