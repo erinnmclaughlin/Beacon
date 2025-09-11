@@ -32,6 +32,12 @@
         </div>
 
         <div class="field">
+            <label class="form-label" for="confirm-password">Confirm Password</label>
+            <InputText @bind-Value="Model.ConfirmPassword" class="form-control" id="confirm-password" type="password" placeholder="**********" autocomplete="new-password" />
+            <ValidationMessage For="() => Model.ConfirmPassword" />
+        </div>
+
+        <div class="field">
             <button type="submit" class="btn btn-primary w-100">Create Account</button>
         </div>
 

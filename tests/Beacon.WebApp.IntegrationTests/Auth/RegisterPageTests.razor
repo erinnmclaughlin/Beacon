@@ -14,6 +14,7 @@
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
         cut.Find("input[type=password]").Change("password123");
+        cut.Find("input[id=confirm-password]").Change("password123");
         await cut.Find("form").SubmitAsync();
 
         // Assert:
@@ -30,6 +31,7 @@
         // Act:
         cut.Find("input[type=email]").Change("test@test.com");
         cut.Find("input[type=password]").Change("password123");
+        cut.Find("input[id=confirm-password]").Change("password123");
         await cut.Find("form").SubmitAsync();
 
         // Assert:

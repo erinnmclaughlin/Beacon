@@ -24,6 +24,7 @@ public sealed class UserRegistrationAndLogin(TestFixture fixture) : IntegrationT
         {
             EmailAddress = "newuser@website.com",
             Password = "!!newuser",
+            ConfirmPassword = "!!newuser",
             DisplayName = "New User"
         });
         
@@ -54,6 +55,7 @@ public sealed class UserRegistrationAndLogin(TestFixture fixture) : IntegrationT
         {
             EmailAddress = TestData.AdminUser.EmailAddress,
             Password = "something",
+            ConfirmPassword = "something",
             DisplayName = "something"
         });
 
