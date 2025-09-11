@@ -9,6 +9,7 @@ public sealed class RegisterRequest : BeaconRequest<RegisterRequest>
     public string DisplayName { get; set; } = string.Empty;
     public string EmailAddress { get; set; } = string.Empty;
     public string Password { get; set; } = string.Empty;
+    public string ConfirmPassword { get; set; } = string.Empty;
 
     public class Validator : AbstractValidator<RegisterRequest>
     {
@@ -20,8 +21,12 @@ public sealed class RegisterRequest : BeaconRequest<RegisterRequest>
             RuleFor(r => r.DisplayName)
                 .NotEmpty().WithMessage("Display name is required.");
 
-            RuleFor(r => r.Password).IsValidPassword();
+            RuleFor(r => r.Password)
+                .IsValidPassword();
+
+            RuleFor(r => r.ConfirmPassword)
+                .NotEmpty().WithMessage("Please confirm your password.")
+                .Equal(r => r.Password).WithMessage("Passwords do not match.").When(r => !string.IsNullOrWhiteSpace(r.ConfirmPassword));
         }
     }
-
 }
