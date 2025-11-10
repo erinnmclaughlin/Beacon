@@ -1,0 +1,17 @@
+@using Beacon.Common.Requests.Projects.Notes
+
+<BeaconForm Model="Request" OnValidSubmit="Submit">
+    <Modal>
+        <div class="modal-body">
+            <div class="field">
+                <label class="form-label" for="content">Note Content</label>
+                <InputTextArea @bind-Value="Request.Content" class="form-control" id="content" rows="5" placeholder="Enter your note here..." />
+                <ValidationMessage For="() => Request.Content" />
+            </div>
+        </div>
+        <footer class="modal-footer">
+            <SubmitButton>Add Note</SubmitButton>
+            <ModalCancelButton />
+        </footer>
+    </Modal>
+</BeaconForm>

@@ -3,463 +3,585 @@ using System;
 using Beacon.API.Persistence;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
+using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Beacon.API.Persistence.Migrations
+namespace Beacon.StorageProviders.Postgres.Migrations
 {
     [DbContext(typeof(BeaconDbContext))]
-    partial class BeaconDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250323204626_AddProjectNotes")]
+    partial class AddProjectNotes
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasAnnotation("ProductVersion", "9.0.2")
-                .HasAnnotation("Relational:MaxIdentifierLength", 128);
+                .HasAnnotation("Relational:MaxIdentifierLength", 63);
 
-            SqlServerModelBuilderExtensions.UseIdentityColumns(modelBuilder);
+            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.Invitation", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid?>("AcceptedById")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("accepted_by_id");
 
                     b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_id");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<double>("ExpireAfterDays")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision")
+                        .HasColumnName("expire_after_days");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<string>("MembershipType")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("membership_type");
 
                     b.Property<string>("NewMemberEmailAddress")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("new_member_email_address");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_invitations");
 
-                    b.HasIndex("AcceptedById");
+                    b.HasIndex("AcceptedById")
+                        .HasDatabaseName("ix_invitations_accepted_by_id");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_invitations_created_by_id");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_invitations_laboratory_id");
 
-                    b.ToTable("Invitations");
+                    b.ToTable("invitations", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.InvitationEmail", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<DateTimeOffset>("ExpiresOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("expires_on");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<Guid>("LaboratoryInvitationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_invitation_id");
 
                     b.Property<string>("OperationId")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("operation_id");
 
                     b.Property<DateTimeOffset>("SentOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("sent_on");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_invitation_emails");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_invitation_emails_laboratory_id");
 
-                    b.HasIndex("LaboratoryInvitationId");
+                    b.HasIndex("LaboratoryInvitationId")
+                        .HasDatabaseName("ix_invitation_emails_laboratory_invitation_id");
 
-                    b.ToTable("InvitationEmails");
+                    b.ToTable("invitation_emails", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.Laboratory", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_laboratories");
 
-                    b.ToTable("Laboratories");
+                    b.ToTable("laboratories", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.LaboratoryInstrument", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("InstrumentType")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("instrument_type");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<string>("SerialNumber")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("serial_number");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_laboratory_instruments");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_laboratory_instruments_laboratory_id");
 
-                    b.ToTable("LaboratoryInstruments");
+                    b.ToTable("laboratory_instruments", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.LaboratoryInstrumentUsage", b =>
                 {
                     b.Property<Guid>("InstrumentId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("instrument_id");
 
                     b.Property<Guid>("ProjectEventId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_event_id");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
-                    b.HasKey("InstrumentId", "ProjectEventId");
+                    b.HasKey("InstrumentId", "ProjectEventId")
+                        .HasName("pk_laboratory_instrument_usage");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_laboratory_instrument_usage_laboratory_id");
 
-                    b.HasIndex("ProjectEventId");
+                    b.HasIndex("ProjectEventId")
+                        .HasDatabaseName("ix_laboratory_instrument_usage_project_event_id");
 
-                    b.ToTable("LaboratoryInstrumentUsage");
+                    b.ToTable("laboratory_instrument_usage", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.Membership", b =>
                 {
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<Guid>("MemberId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("member_id");
 
                     b.Property<string>("MembershipType")
                         .IsRequired()
                         .HasMaxLength(20)
-                        .HasColumnType("nvarchar(20)");
+                        .HasColumnType("character varying(20)")
+                        .HasColumnName("membership_type");
 
-                    b.HasKey("LaboratoryId", "MemberId");
+                    b.HasKey("LaboratoryId", "MemberId")
+                        .HasName("pk_memberships");
 
-                    b.HasIndex("MemberId");
+                    b.HasIndex("MemberId")
+                        .HasDatabaseName("ix_memberships_member_id");
 
-                    b.ToTable("Memberships");
+                    b.ToTable("memberships", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.Project", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_id");
 
                     b.Property<DateTimeOffset>("CreatedOn")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_on");
 
                     b.Property<string>("CustomerName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("customer_name");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<Guid?>("LeadAnalystId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("lead_analyst_id");
 
                     b.Property<string>("ProjectStatus")
                         .IsRequired()
                         .HasMaxLength(25)
-                        .HasColumnType("nvarchar(25)");
+                        .HasColumnType("character varying(25)")
+                        .HasColumnName("project_status");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_projects");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_projects_created_by_id");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_projects_laboratory_id");
 
-                    b.HasIndex("LeadAnalystId");
+                    b.HasIndex("LeadAnalystId")
+                        .HasDatabaseName("ix_projects_lead_analyst_id");
 
-                    b.HasIndex("ProjectStatus");
+                    b.HasIndex("ProjectStatus")
+                        .HasDatabaseName("ix_projects_project_status");
 
-                    b.ToTable("Projects");
+                    b.ToTable("projects", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectApplication", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("name");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_project_applications");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_applications_laboratory_id");
 
                     b.HasIndex("Name")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_project_applications_name");
 
-                    b.ToTable("ProjectApplications");
+                    b.ToTable("project_applications", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectApplicationTag", b =>
                 {
                     b.Property<Guid>("ApplicationId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("application_id");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
-                    b.HasKey("ApplicationId", "ProjectId");
+                    b.HasKey("ApplicationId", "ProjectId")
+                        .HasName("pk_project_application_tags");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_application_tags_laboratory_id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_project_application_tags_project_id");
 
-                    b.ToTable("ProjectApplicationTags");
+                    b.ToTable("project_application_tags", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectContact", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("EmailAddress")
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("email_address");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(100)
-                        .HasColumnType("nvarchar(100)");
+                        .HasColumnType("character varying(100)")
+                        .HasColumnName("name");
 
                     b.Property<string>("PhoneNumber")
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("phone_number");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_project_contacts");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_contacts_laboratory_id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_project_contacts_project_id");
 
-                    b.ToTable("ProjectContacts");
+                    b.ToTable("project_contacts", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectEvent", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Description")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("description");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
                     b.Property<DateTimeOffset>("ScheduledEnd")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_end");
 
                     b.Property<DateTimeOffset>("ScheduledStart")
-                        .HasColumnType("datetimeoffset");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("scheduled_start");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                        .HasColumnType("character varying(50)")
+                        .HasColumnName("title");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_project_events");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_events_laboratory_id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_project_events_project_id");
 
-                    b.ToTable("ProjectEvents");
+                    b.ToTable("project_events", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectNote", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("Content")
                         .IsRequired()
                         .HasMaxLength(2000)
-                        .HasColumnType("nvarchar(2000)");
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("content");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("datetime2");
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
 
                     b.Property<Guid>("CreatedById")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_id");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_project_notes");
 
-                    b.HasIndex("CreatedById");
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_project_notes_created_by_id");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_notes_laboratory_id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_project_notes_project_id");
 
-                    b.ToTable("ProjectNotes");
+                    b.ToTable("project_notes", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.SampleGroup", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("ContainerType")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("container_type");
 
                     b.Property<bool?>("IsHazardous")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_hazardous");
 
                     b.Property<bool?>("IsLightSensitive")
-                        .HasColumnType("bit");
+                        .HasColumnType("boolean")
+                        .HasColumnName("is_light_sensitive");
 
                     b.Property<Guid>("LaboratoryId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
 
                     b.Property<string>("Notes")
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("notes");
 
                     b.Property<Guid>("ProjectId")
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
 
                     b.Property<int?>("Quantity")
-                        .HasColumnType("int");
+                        .HasColumnType("integer")
+                        .HasColumnName("quantity");
 
                     b.Property<string>("SampleName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("sample_name");
 
                     b.Property<double?>("TargetStorageHumidity")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision")
+                        .HasColumnName("target_storage_humidity");
 
                     b.Property<double?>("TargetStorageTemperature")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision")
+                        .HasColumnName("target_storage_temperature");
 
                     b.Property<double?>("Volume")
-                        .HasColumnType("float");
+                        .HasColumnType("double precision")
+                        .HasColumnName("volume");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_sample_groups");
 
-                    b.HasIndex("LaboratoryId");
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_sample_groups_laboratory_id");
 
-                    b.HasIndex("ProjectId");
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_sample_groups_project_id");
 
-                    b.ToTable("SampleGroups");
+                    b.ToTable("sample_groups", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.User", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uniqueidentifier");
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
 
                     b.Property<string>("DisplayName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("display_name");
 
                     b.Property<string>("EmailAddress")
                         .IsRequired()
                         .HasMaxLength(255)
-                        .HasColumnType("nvarchar(255)");
+                        .HasColumnType("character varying(255)")
+                        .HasColumnName("email_address");
 
                     b.Property<string>("HashedPassword")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasColumnType("text")
+                        .HasColumnName("hashed_password");
 
                     b.Property<byte[]>("HashedPasswordSalt")
                         .IsRequired()
-                        .HasColumnType("varbinary(max)");
+                        .HasColumnType("bytea")
+                        .HasColumnName("hashed_password_salt");
 
-                    b.HasKey("Id");
+                    b.HasKey("Id")
+                        .HasName("pk_users");
 
                     b.HasIndex("EmailAddress")
-                        .IsUnique();
+                        .IsUnique()
+                        .HasDatabaseName("ix_users_email_address");
 
-                    b.ToTable("Users");
+                    b.ToTable("users", (string)null);
                 });
 
             modelBuilder.Entity("Beacon.API.Persistence.Entities.Invitation", b =>
                 {
                     b.HasOne("Beacon.API.Persistence.Entities.User", "AcceptedBy")
                         .WithMany()
-                        .HasForeignKey("AcceptedById");
+                        .HasForeignKey("AcceptedById")
+                        .HasConstraintName("fk_invitations_users_accepted_by_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.User", "CreatedBy")
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_invitations_users_created_by_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_invitations_laboratories_laboratory_id");
 
                     b.Navigation("AcceptedBy");
 
@@ -474,13 +596,15 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_invitation_emails_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Invitation", "LaboratoryInvitation")
                         .WithMany("EmailInvitations")
                         .HasForeignKey("LaboratoryInvitationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_invitation_emails_invitations_laboratory_invitation_id");
 
                     b.Navigation("Laboratory");
 
@@ -493,7 +617,8 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_laboratory_instruments_laboratories_laboratory_id");
 
                     b.Navigation("Laboratory");
                 });
@@ -504,19 +629,22 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("InstrumentId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_laboratory_instrument_usage_laboratory_instruments_instrume");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_laboratory_instrument_usage_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.ProjectEvent", "ProjectEvent")
                         .WithMany()
                         .HasForeignKey("ProjectEventId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_laboratory_instrument_usage_project_events_project_event_id");
 
                     b.Navigation("Instrument");
 
@@ -531,13 +659,15 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany("Memberships")
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_memberships_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.User", "Member")
                         .WithMany("Memberships")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_memberships_users_member_id");
 
                     b.Navigation("Laboratory");
 
@@ -550,43 +680,52 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_users_created_by_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
                         .WithMany("Projects")
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_projects_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.User", "LeadAnalyst")
                         .WithMany("Projects")
-                        .HasForeignKey("LeadAnalystId");
+                        .HasForeignKey("LeadAnalystId")
+                        .HasConstraintName("fk_projects_users_lead_analyst_id");
 
                     b.OwnsOne("Beacon.Common.Models.ProjectCode", "ProjectCode", b1 =>
                         {
                             b1.Property<Guid>("ProjectId")
-                                .HasColumnType("uniqueidentifier");
+                                .HasColumnType("uuid")
+                                .HasColumnName("id");
 
                             b1.Property<string>("CustomerCode")
                                 .IsRequired()
                                 .HasMaxLength(3)
-                                .HasColumnType("nvarchar(3)");
+                                .HasColumnType("character varying(3)")
+                                .HasColumnName("project_code_customer_code");
 
                             b1.Property<string>("Date")
                                 .IsRequired()
-                                .HasColumnType("nvarchar(max)");
+                                .HasColumnType("text")
+                                .HasColumnName("project_code_date");
 
                             b1.Property<int>("Suffix")
-                                .HasColumnType("int");
+                                .HasColumnType("integer")
+                                .HasColumnName("project_code_suffix");
 
                             b1.HasKey("ProjectId");
 
-                            b1.HasIndex("CustomerCode", "Suffix");
+                            b1.HasIndex("CustomerCode", "Suffix")
+                                .HasDatabaseName("ix_projects_project_code_customer_code_project_code_suffix");
 
-                            b1.ToTable("Projects");
+                            b1.ToTable("projects");
 
                             b1.WithOwner()
-                                .HasForeignKey("ProjectId");
+                                .HasForeignKey("ProjectId")
+                                .HasConstraintName("fk_projects_projects_id");
                         });
 
                     b.Navigation("CreatedBy");
@@ -605,7 +744,8 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_applications_laboratories_laboratory_id");
 
                     b.Navigation("Laboratory");
                 });
@@ -616,19 +756,22 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany("TaggedProjects")
                         .HasForeignKey("ApplicationId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_application_tags_project_applications_application_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_application_tags_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
                         .WithMany("TaggedApplications")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_application_tags_projects_project_id");
 
                     b.Navigation("Application");
 
@@ -643,13 +786,15 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_contacts_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
                         .WithMany("Contacts")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_contacts_projects_project_id");
 
                     b.Navigation("Laboratory");
 
@@ -662,13 +807,15 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_events_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_events_projects_project_id");
 
                     b.Navigation("Laboratory");
 
@@ -681,19 +828,22 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("CreatedById")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_users_created_by_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
                         .WithMany()
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_projects_project_id");
 
                     b.Navigation("CreatedBy");
 
@@ -708,13 +858,15 @@ namespace Beacon.API.Persistence.Migrations
                         .WithMany()
                         .HasForeignKey("LaboratoryId")
                         .OnDelete(DeleteBehavior.Restrict)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_sample_groups_laboratories_laboratory_id");
 
                     b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
                         .WithMany("SampleGroups")
                         .HasForeignKey("ProjectId")
                         .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .IsRequired()
+                        .HasConstraintName("fk_sample_groups_projects_project_id");
 
                     b.Navigation("Laboratory");
 

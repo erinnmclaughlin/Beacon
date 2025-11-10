@@ -1,0 +1,78 @@
+@using Beacon.Common.Models
+@using Beacon.Common.Requests.Projects.Notes
+
+<div class="d-flex flex-column gap-3">
+    <div class="d-flex align-items-center">
+        <h5 class="display-6 fs-4 mb-0">Project Notes</h5>
+        <button class="btn btn-sm bg-white link-body-emphasis border ms-auto" type="button" title="Add note" @onclick="ShowAddNoteModal">
+            <span class="icon me-0"><i class="fa-regular fa-note-sticky"></i></span>
+        </button>
+    </div>
+
+    @if (NotesOrError is not { } notesOrError)
+    {
+        <p>Loading...</p>
+    }
+    else if (notesOrError.IsError)
+    {
+        <p class="text-danger">There was an error loading project notes. Please try again later.</p>
+    }
+    else if (!notesOrError.Value.Any())
+    {
+        <p class="text-muted">No notes have been added to this project.</p>
+    }
+    else
+    {
+        <div class="d-flex flex-column gap-3">
+            @foreach (var note in notesOrError.Value.OrderByDescending(n => n.CreatedAt))
+            {
+                <div class="card">
+                    <div class="card-body">
+                        <div class="d-flex align-items-center gap-2 mb-2">
+                            <small class="text-muted">@note.CreatedByDisplayName</small>
+                            <small class="text-muted">•</small>
+                            <small class="text-muted">@note.CreatedAt.ToLocalTime().ToString("g")</small>
+                        </div>
+                        <p class="card-text mb-0" style="white-space: pre-wrap">@note.Content</p>
+                    </div>
+                </div>
+            }
+        </div>
+    }
+</div>
+
+@code {
+    [Inject]
+    private IApiClient ApiClient { get; set; } = default!;
+
+    [Inject]
+    private IModalService ModalService { get; set; } = default!;
+
+    [Parameter, EditorRequired]
+    public Guid ProjectId { get; set; }
+
+    private ErrorOr<ProjectNoteDto[]>? NotesOrError { get; set; }
+
+    protected override async Task OnInitializedAsync()
+    {
+        await LoadNotes();
+    }
+
+    private async Task LoadNotes()
+    {
+        NotesOrError = await ApiClient.SendAsync(new GetProjectNotesRequest { ProjectId = ProjectId });
+        StateHasChanged();
+    }
+
+    private async Task ShowAddNoteModal()
+    {
+        var parameters = new ModalParameters()
+            .Add(nameof(AddProjectNoteModal.ProjectId), ProjectId);
+
+        var result = await ModalService.Show<AddProjectNoteModal>("Add Note", parameters).Result;
+        if (!result.Cancelled)
+        {
+            await LoadNotes();
+        }
+    }
+} 

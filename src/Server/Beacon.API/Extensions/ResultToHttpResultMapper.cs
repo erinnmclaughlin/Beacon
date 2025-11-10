@@ -17,6 +17,9 @@ public static class ResultToHttpResultMapper
         if (errorOrValue.Errors.Any(e => e.NumericType == 403))
             return Results.Forbid();
 
+        if (errorOrValue.Errors.Any(e => e.Type == ErrorType.NotFound))
+            return Results.NotFound();
+
         if (errorOrValue.Errors.Where(e => e.Type == ErrorType.Validation).ToList() is { Count: > 0 } validationErrors)
         {
             return Results.UnprocessableEntity(new BeaconValidationProblem

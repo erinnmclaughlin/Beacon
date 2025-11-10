@@ -413,6 +413,50 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                     b.ToTable("project_events", (string)null);
                 });
 
+            modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectNote", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Content")
+                        .IsRequired()
+                        .HasMaxLength(2000)
+                        .HasColumnType("character varying(2000)")
+                        .HasColumnName("content");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("CreatedById")
+                        .HasColumnType("uuid")
+                        .HasColumnName("created_by_id");
+
+                    b.Property<Guid>("LaboratoryId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("laboratory_id");
+
+                    b.Property<Guid>("ProjectId")
+                        .HasColumnType("uuid")
+                        .HasColumnName("project_id");
+
+                    b.HasKey("Id")
+                        .HasName("pk_project_notes");
+
+                    b.HasIndex("CreatedById")
+                        .HasDatabaseName("ix_project_notes_created_by_id");
+
+                    b.HasIndex("LaboratoryId")
+                        .HasDatabaseName("ix_project_notes_laboratory_id");
+
+                    b.HasIndex("ProjectId")
+                        .HasDatabaseName("ix_project_notes_project_id");
+
+                    b.ToTable("project_notes", (string)null);
+                });
+
             modelBuilder.Entity("Beacon.API.Persistence.Entities.SampleGroup", b =>
                 {
                     b.Property<Guid>("Id")
@@ -769,6 +813,36 @@ namespace Beacon.StorageProviders.Postgres.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired()
                         .HasConstraintName("fk_project_events_projects_project_id");
+
+                    b.Navigation("Laboratory");
+
+                    b.Navigation("Project");
+                });
+
+            modelBuilder.Entity("Beacon.API.Persistence.Entities.ProjectNote", b =>
+                {
+                    b.HasOne("Beacon.API.Persistence.Entities.User", "CreatedBy")
+                        .WithMany()
+                        .HasForeignKey("CreatedById")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_users_created_by_id");
+
+                    b.HasOne("Beacon.API.Persistence.Entities.Laboratory", "Laboratory")
+                        .WithMany()
+                        .HasForeignKey("LaboratoryId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_laboratories_laboratory_id");
+
+                    b.HasOne("Beacon.API.Persistence.Entities.Project", "Project")
+                        .WithMany()
+                        .HasForeignKey("ProjectId")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired()
+                        .HasConstraintName("fk_project_notes_projects_project_id");
+
+                    b.Navigation("CreatedBy");
 
                     b.Navigation("Laboratory");
 
